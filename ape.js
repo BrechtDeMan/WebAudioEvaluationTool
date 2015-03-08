@@ -53,9 +53,27 @@ function loadInterface(xmlDoc) {
 	
 	sliderBox.appendChild(canvas);
 	
+	var feedbackHolder = document.createElement('div');
+	
+	var tracksXML = xmlDoc.find('track');
+	tracksXML.each(function(index,element){
+		var trackObj = document.createElement('div');
+		var trackTitle = document.createElement('span');
+		trackTitle.innerText = 'Comment on track '+index;
+		var trackComment = document.createElement('textarea');
+		trackComment.rows = '4';
+		trackComment.cols = '100';
+		trackComment.name = 'trackComment'+index;
+		trackComment.className = 'trackComment';
+		feedbackHolder.appendChild(trackTitle);
+		feedbackHolder.appendChild(trackComment);
+		feedbackHolder.appendChild(trackObj);
+	})
+	
 	
 	// Inject into HTML
 	insertPoint.innerHTML = null; // Clear the current schema
 	insertPoint.appendChild(title); // Insert the title
 	insertPoint.appendChild(sliderBox);
+	insertPoint.appendChild(feedbackHolder);
 }
