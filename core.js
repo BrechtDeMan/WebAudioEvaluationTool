@@ -7,7 +7,7 @@
 
 /* create the web audio API context and store in audioContext*/
 var audioContext;
-
+var projectXML;
 var audioEngineContext;
 
 window.onload = function() {
@@ -25,6 +25,28 @@ window.onload = function() {
 function loadProjectSpec(url) {
 	// Load the project document from the given URL, decode the XML and instruct audioEngine to get audio data
 	// If url is null, request client to upload project XML document
+	var r = new XMLHttpRequest();
+	r.open('GET',url,true);
+	r.onload = function() {
+		loadProjectSpecCallback(r.response);
+	}
+	r.send();
+}
+
+function loadProjectSpecCallback(response) {
+	// Function called after asynchronous download of XML project specification
+	var decode = $.parseXML(response);
+	projectXML = $(decode);
+	
+	// Now extract the setup tag
+	var xmlSetup = projectXML.find('setup');
+	var interfaceType = xmlSetup[0].attributes['interface'];
+	var interfaceJS = document.createElement('script');
+	interfaceJS.setAttribute("type","text/javascript");
+	if (interfaceType.value == 'APE') {
+		interfaceJS.setAttribute("src","ape.js");
+	}
+	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
 }
 
 function createProjectSave(destURL) {
