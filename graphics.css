@@ -2,6 +2,9 @@
  * Define colours and effects for classes and objects
  */
 
-body {
+div.title {
+	font-size: 2em;
+}
 
+body {
 }
