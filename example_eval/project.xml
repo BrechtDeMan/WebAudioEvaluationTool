@@ -1,0 +1,16 @@
+<BrowserEvalProjectDocument>
+	<setup interface="APE" projectReturn="null" />
+	<tracks hostURL="example_eval/" sampleRate="44100" sampleRateExplicit="true">
+		<track url="0.wav"/>
+		<track url="1.wav"/>
+		<track url="2.wav"/>
+		<track url="3.wav"/>
+		<track url="4.wav"/>
+		<track url="5.wav"/>
+		<track url="6.wav"/>
+		<track url="7.wav"/>
+		<track url="8.wav"/>
+		<track url="9.wav"/>
+		<track url="10.wav"/>
+	</tracks>
+</BrowserEvalProjectDocument>
