@@ -45,14 +45,15 @@ function loadInterface(xmlDoc) {
 	sliderBox.id = 'sliderCanvasHolder'; // create an id so we can easily link to it later
 	sliderBox.align = 'center';
 	
-	var canvas = document.createElement('canvas');
+	var canvas = document.createElement('div');
 	canvas.id = 'slider';
-	canvas.width = width - 100;
-	canvas.height = 150;
+	canvas.style.width = width - 100 +"px";
+	canvas.style.height = 150 + "px";
+	canvas.style.marginBottom = "25px"
 	canvas.style.backgroundColor = '#eee';
-	
+	canvas.align = "left";
 	sliderBox.appendChild(canvas);
-	
+
 	var feedbackHolder = document.createElement('div');
 	
 	var tracksXML = xmlDoc.find('track');
@@ -68,6 +69,24 @@ function loadInterface(xmlDoc) {
 		feedbackHolder.appendChild(trackTitle);
 		feedbackHolder.appendChild(trackComment);
 		feedbackHolder.appendChild(trackObj);
+		// Create a slider per track
+		
+		var trackSliderObj = document.createElement('div');
+		trackSliderObj.className = 'track-slider';
+		trackSliderObj.id = 'track-slider-'+index;
+		trackSliderObj.style.position = 'absolute';
+		// Distribute it randomnly
+		var w = window.innerWidth - 100;
+		w = Math.random()*w;
+		trackSliderObj.style.left = Math.floor(w)+50+'px';
+		trackSliderObj.style.height = "150px";
+		trackSliderObj.style.width = "10px";
+		trackSliderObj.style.backgroundColor = 'rgb(100,200,100)';
+		trackSliderObj.innerHTML = '<span>'+index+'</span>';
+		trackSliderObj.style.float = "left";
+		trackSliderObj.draggable = true;
+		trackSliderObj.ondragend = dragEnd;
+		canvas.appendChild(trackSliderObj);
 	})
 	
 	
@@ -76,4 +95,17 @@ function loadInterface(xmlDoc) {
 	insertPoint.appendChild(title); // Insert the title
 	insertPoint.appendChild(sliderBox);
 	insertPoint.appendChild(feedbackHolder);
+}
+
+function dragEnd(ev) {
+	// Function call when a div has been dropped
+	if (ev.x >= 50 && ev.x < window.innerWidth-50) {
+		this.style.left = (ev.x)+'px';
+	} else {
+		if (ev.x<50) {
+			this.style.left = '50px';
+		} else {
+			this.style.left = window.innerWidth-50 + 'px';
+		}
+	}
 }
