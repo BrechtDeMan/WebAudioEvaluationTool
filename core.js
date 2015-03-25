@@ -121,6 +121,18 @@ function AudioEngine() {
 		}
 	}
 	
+	this.selectedTrack = function(id) {
+		for (var i=0; i<this.audioObjects.length; i++)
+		{
+			if (id == i) {
+				this.audioObjects[i].outputGain.gain.value = 1.0;
+			} else {
+				this.audioObjects[i].outputGain.gain.value = 0.0;
+			}
+		}
+	}
+	
+	
 	this.newTrack = function(url) {
 		// Pull data from given URL into new audio buffer
 		// URLs must either be from the same source OR be setup to 'Access-Control-Allow-Origin'
@@ -145,6 +157,9 @@ function audioObject(id) {
 	this.bufferNode = audioContext.createBufferSource();
 	this.outputGain = audioContext.createGain();
 	
+	// Default output gain to be zero
+	this.outputGain.gain.value = 0.0;
+	
 	// Connect buffer to the audio graph
 	this.bufferNode.connect(this.outputGain);
 	this.outputGain.connect(audioEngineContext.outputGain);
@@ -164,7 +179,7 @@ function audioObject(id) {
 		this.bufferNode.buffer = this.buffer;
 		this.bufferNode.loop = true;
 	}
-	
+
 	this.constructTrack = function(url) {
 		var request = new XMLHttpRequest();
 		request.open('GET',url,true);

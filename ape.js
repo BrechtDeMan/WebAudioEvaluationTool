@@ -155,6 +155,14 @@ function loadInterface(xmlDoc) {
 		trackSliderObj.style.float = "left";
 		trackSliderObj.draggable = true;
 		trackSliderObj.ondragend = dragEnd;
+		
+		// Onclick, switch playback to that track
+		trackSliderObj.onclick = function() {
+			// Get the track ID from the object ID
+			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
+			audioEngineContext.selectedTrack(id);
+		}
+		
 		canvas.appendChild(trackSliderObj);
 	})
 	
