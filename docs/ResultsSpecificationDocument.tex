@@ -1,0 +1,32 @@
+\documentclass{article}
+
+\usepackage[margin=2cm]{geometry}
+\usepackage{listings}
+\usepackage{color}
+
+\begin{document}
+
+\large APE Browser Tool - Results Specification Document
+
+\section{Introduction}
+This document outlines the return XML document structure to hold the results from the Browser Evaluation Tool, specifically for the APE Interface.
+
+\section{Root}
+The root of the document is \texttt{BrowserEvaluationResult}. This takes no attributes but contains all children.
+
+\section{Track}
+The first child element is the \texttt{Track} element. This contains the results for a specific track. This requires the attribute \texttt{trackId} to be set to the numerical track Id.
+
+\subsection{Value}
+One of these elements per track, containing the value between 0 and 100 relating the user rating of the track. This is a mandatory element.
+
+\subsection{Comment}
+One of these elements per track, containing any commenting data from the interface text boxes.
+
+\section{Session Data}
+This will contain any captured session data. Currently not implemented but here for future referencing.
+
+\section{Globals}
+Contains any comment boxes which were specified in the APE project specification with the comment ID, comment text and the comment results.
+
+\end{document}

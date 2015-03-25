@@ -1,0 +1,78 @@
+\documentclass{article}
+
+\usepackage[margin=2cm]{geometry}
+
+\begin{document}
+
+\large APE Browser Tool - Project Specification Document
+
+\section{Document}
+
+An XML file containing all project information to load and execute the project on the client. Certain interfaces are optional, however others are mandatory. This guide should reflect the changes in the XML project and keep track of the versions. Hopwfully this can remain simple!
+
+\section{Root}
+
+The XML root must be \texttt{<BrowserEvalProjectDocument>}. This should be sufficiently identifiable in both itself and in the JavaScript decoding as it will create an object called the root name.
+
+There must also be a \texttt{<version>} tag which has the attribute \texttt{id} containing a numerical representation of the version. Currently everything in this document can be assumed to be version 1. If future updates or corrections are made post delivery this should give the flexibility to ensure past projects still work.
+
+The root will also contain the following tags: setup and tracks.
+
+\section{Setup tag}
+
+The setup tag specifies certain global test settings including: the interface type to use, the project return location and any other setup instructions.
+
+An example of this tag could be:
+
+\texttt{<setup interface="APE" projectReturn="http://project.return.url/goes/here" />}
+
+The setup should not require an element or any children to run.
+
+\subsection{Attributes}
+\begin{itemize}
+\item \texttt{interface} - Mandatory. Defaults to APE, otherwise use to load any of the available interfaces
+\item \texttt{projectReturn} - Mandatory. Specify the URL to return the test results. If null client will generate XML locally and prompt user to return the file.
+\end{itemize}
+
+\subsection{Elements}
+None
+
+\section{Tracks tag}
+
+There should be one tracks tag, inside which each track is specified as children. The track tag can help to generalise certain objects.
+
+\subsection{Attributes}
+\begin{itemize}
+\item \texttt{hostURL} - Optional. If all tracks are hosted from the same folder on a server, you can put in the lead here. For instance, if loading http://test.com/tracks/track1.wav and http://test.com/tracks/track2.wav, this could equal http://test.com/tracks/ and the url attribute in the track tag can be track1.wav or track2.wav. Equally http://test.com/ and then using tracks/track1.wav and tracks/track2.wav is valid.
+\end{itemize}
+
+\subsection{Elements}
+Contain the track tags.
+
+\section{Track tag}
+
+This must reside as children in the tracks tag. There must be one track tag per track to load. The track tag must contain the URL to load.
+
+\subsection{Attributes}
+\begin{itemize}
+\item \texttt{url} - Mandatory. Contain the full URL to the track. If the Tracks tag hostURL is set, concatenate this tag with the hostURL attribute to obtain the full URL.
+\end{itemize}
+
+\section{Example}
+
+Here is an example XML structure. Apologies for LATEX formatting!
+
+\texttt{
+<?xml version="1.0" encoding="UTF-8"?> \\
+<BrowserEvalProjectDocument> \\
+<setup interface="APE" projectReturn="http://project.return.url/goes/here" />\\
+    <tracks hostURL="http://apeTest.qmul.ac.uk/tracks/"> \\
+        <track url = "track1.wav"/> \\
+        <track url = "track2.wav"/> \\
+        <track url = "track3.wav"/> \\
+    </tracks> \\
+</BrowserEvalProjectDocument>
+}
+
+
+\end{document}
