@@ -17,6 +17,7 @@ function loadInterface(xmlDoc) {
 	// The injection point into the HTML page
 	var insertPoint = document.getElementById("topLevelBody");
 	
+	
 	// Decode parts of the xmlDoc that are needed
 	// xmlDoc MUST already be parsed by jQuery!
 	var xmlSetup = xmlDoc.find('setup');
@@ -38,6 +39,41 @@ function loadInterface(xmlDoc) {
 	// Insert the titleSpan element into the title div element.
 	title.appendChild(titleSpan);
 	
+	// Store the return URL path in global projectReturn
+	projectReturn = xmlSetup[0].attributes['projectReturn'].value;
+	
+	// Create Interface buttons!
+	var interfaceButtons = document.createElement('div');
+	interfaceButtons.id = 'interface-buttons';
+	
+	// MANUAL DOWNLOAD POINT
+	// If project return is null, this MUST be specified as the location to create the download link
+	var downloadPoint = document.createElement('div');
+	downloadPoint.id = 'download-point';
+	
+	// Create playback start/stop points
+	var playback = document.createElement("button");
+	playback.innerText = 'Start';
+	playback.onclick = function() {
+		if (audioEngineContext.status == 0) {
+			audioEngineContext.play();
+			this.innerText = 'Stop';
+		} else {
+			audioEngineContext.stop();
+			this.innerText = 'Start';
+		}
+	}
+	// Create Submit (save) button
+	var submit = document.createElement("button");
+	submit.innerText = 'Submit';
+	submit.onclick = function() {
+		createProjectSave(projectReturn)
+	}
+	
+	interfaceButtons.appendChild(playback);
+	interfaceButtons.appendChild(submit);
+	interfaceButtons.appendChild(downloadPoint);
+	
 	// Now create the slider and HTML5 canvas boxes
 	
 	var sliderBox = document.createElement('div');
@@ -56,8 +92,41 @@ function loadInterface(xmlDoc) {
 
 	var feedbackHolder = document.createElement('div');
 	
+	var tracks = xmlDoc.find('tracks');
+	tracks = tracks[0];
+	var hostURL = tracks.attributes['hostURL'];
+	if (hostURL == undefined) {
+		hostURL = "";
+	} else {
+		hostURL = hostURL.value;
+	}
+	
+	var hostFs = tracks.attributes['sampleRate'];
+	var hostFsExplicit = tracks.attributes['sampleRateExplicit'];
+	if (hostFs == undefined) {
+		hostFsExplicit = false;
+	} else {
+		hostFs = hostFs.value;
+		if (hostFsExplicit != undefined) {
+			hostFsExplicit = hostFsExplicit.value;
+		}
+	}
+	
+	/// CHECK FOR SAMPLE RATE COMPATIBILITY
+	if (hostFsExplicit == true) {
+		if (Number(hostFs) != audioContext.sampleRate) {
+			var errStr = 'Sample rates do not match! Requested '+Number(hostFs)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
+			alert(errStr);
+			return;
+		}
+	}
+	
 	var tracksXML = xmlDoc.find('track');
 	tracksXML.each(function(index,element){
+		// Find URL of track
+		var trackURL = hostURL + this.attributes['url'].value;
+		// Now load each track in
+		audioEngineContext.newTrack(trackURL);
 		var trackObj = document.createElement('div');
 		var trackTitle = document.createElement('span');
 		trackTitle.innerText = 'Comment on track '+index;
@@ -93,6 +162,7 @@ function loadInterface(xmlDoc) {
 	// Inject into HTML
 	insertPoint.innerHTML = null; // Clear the current schema
 	insertPoint.appendChild(title); // Insert the title
+	insertPoint.appendChild(interfaceButtons);
 	insertPoint.appendChild(sliderBox);
 	insertPoint.appendChild(feedbackHolder);
 }
@@ -109,3 +179,30 @@ function dragEnd(ev) {
 		}
 	}
 }
+
+// Only other global function which must be defined in the interface class. Determines how to create the XML document.
+function interfaceXMLSave(){
+	// Create the XML string to be exported with results
+	var xmlDoc = document.createElement("BrowserEvaluationResult");
+	var trackSliderObjects = document.getElementsByClassName('track-slider');
+	var commentObjects = document.getElementsByClassName('trackComment');
+	var rateMin = 50;
+	var rateMax = window.innerWidth-50;
+	for (var i=0; i<trackSliderObjects.length; i++)
+	{
+		var trackObj = document.createElement("Track");
+		trackObj.id = i;
+		var slider = document.createElement("Rating");
+		var rate = Number(trackSliderObjects[i].style.left.substr(0,trackSliderObjects[i].style.left.length-2));
+		rate = (rate-rateMin)/rateMax;
+		slider.innerText = Math.floor(rate*100);
+		var comment = document.createElement("Comment");
+		comment.innerText = commentObjects[i].value;
+		trackObj.appendChild(slider);
+		trackObj.appendChild(comment);
+		xmlDoc.appendChild(trackObj);
+	}
+	
+	return xmlDoc;
+}
+
