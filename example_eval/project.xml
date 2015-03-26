@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
 	<setup interface="APE" projectReturn="null" />
 	<tracks hostURL="example_eval/" sampleRate="44100" sampleRateExplicit="true">

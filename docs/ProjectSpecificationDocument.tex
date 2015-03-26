@@ -1,6 +1,7 @@
 \documentclass{article}
 
 \usepackage[margin=2cm]{geometry}
+\usepackage{listings}
 
 \begin{document}
 
@@ -44,6 +45,8 @@ There should be one tracks tag, inside which each track is specified as children
 \subsection{Attributes}
 \begin{itemize}
 \item \texttt{hostURL} - Optional. If all tracks are hosted from the same folder on a server, you can put in the lead here. For instance, if loading http://test.com/tracks/track1.wav and http://test.com/tracks/track2.wav, this could equal http://test.com/tracks/ and the url attribute in the track tag can be track1.wav or track2.wav. Equally http://test.com/ and then using tracks/track1.wav and tracks/track2.wav is valid.
+\item \texttt{sampleRate} - Optional. If your test requires a specific sample rate, this should be set to the desired sample rate in Hertz. This does not set the browser to the correct sample rate, but allows for checking if the sample rates match.
+\item \texttt{sampleRateExplicit} - Optional. A true/false to determine if the sample rate given in the attribute \texttt{sampleRate} must be matched by the system. If the web audio API does not match, a browser alert is called and the rest of the interface loading is discarded. Media files are also not downloaded until this check can be corrected.
 \end{itemize}
 
 \subsection{Elements}
@@ -60,19 +63,29 @@ This must reside as children in the tracks tag. There must be one track tag per 
 
 \section{Example}
 
-Here is an example XML structure. Apologies for LATEX formatting!
+Here is an example XML structure
 
-\texttt{
-<?xml version="1.0" encoding="UTF-8"?> \\
-<BrowserEvalProjectDocument> \\
-<setup interface="APE" projectReturn="http://project.return.url/goes/here" />\\
-    <tracks hostURL="http://apeTest.qmul.ac.uk/tracks/"> \\
-        <track url = "track1.wav"/> \\
-        <track url = "track2.wav"/> \\
-        <track url = "track3.wav"/> \\
-    </tracks> \\
+\begin{lstlisting}
+<?xml version="1.0" encoding="utf-8"?>
+<BrowserEvalProjectDocument>
+	<setup interface="APE" projectReturn="null" />
+	<tracks hostURL="example_eval/" sampleRate="44100"
+	sampleRateExplicit="true">
+		<track url="0.wav"/>
+		<track url="1.wav"/>
+		<track url="2.wav"/>
+		<track url="3.wav"/>
+		<track url="4.wav"/>
+		<track url="5.wav"/>
+		<track url="6.wav"/>
+		<track url="7.wav"/>
+		<track url="8.wav"/>
+		<track url="9.wav"/>
+		<track url="10.wav"/>
+	</tracks>
 </BrowserEvalProjectDocument>
-}
+\end{lstlisting}
+
 
 
 \end{document}
