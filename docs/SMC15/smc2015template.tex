@@ -1,0 +1,208 @@
+% -----------------------------------------------
+% Template for SMC 2012
+% adapted from the template for SMC 2011, which was adapted from that of SMC 2010
+% -----------------------------------------------
+
+\documentclass{article}
+\usepackage{smc2015}
+\usepackage{times}
+\usepackage{ifpdf}
+\usepackage[english]{babel}
+\usepackage{cite}
+
+%%%%%%%%%%%%%%%%%%%%%%%% Some useful packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% See related documentation %%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{amsmath} % popular packages from Am. Math. Soc. Please use the 
+%\usepackage{amssymb} % related math environments (split, subequation, cases,
+%\usepackage{amsfonts}% multline, etc.)
+%\usepackage{bm}      % Bold Math package, defines the command \bf{}
+%\usepackage{paralist}% extended list environments
+%%subfig.sty is the modern replacement for subfigure.sty. However, subfig.sty 
+%%requires and automatically loads caption.sty which overrides class handling 
+%%of captions. To prevent this problem, preload caption.sty with caption=false 
+%\usepackage[caption=false]{caption}
+%\usepackage[font=footnotesize]{subfig}
+
+
+%user defined variables
+\def\papertitle{APE FOR WEB: A BROWSER-BASED EVALUATION TOOL FOR AUDIO}
+\def\firstauthor{Brecht De Man}
+\def\secondauthor{Nicholas Jillings}
+\def\thirdauthor{David Moffat}
+\def\fourthauthor{Joshua D. Reiss}
+
+% adds the automatic
+% Saves a lot of ouptut space in PDF... after conversion with the distiller
+% Delete if you cannot get PS fonts working on your system.
+
+% pdf-tex settings: detect automatically if run by latex or pdflatex
+\newif\ifpdf
+\ifx\pdfoutput\relax
+\else
+   \ifcase\pdfoutput
+      \pdffalse
+   \else
+      \pdftrue
+\fi
+
+\ifpdf % compiling with pdflatex
+  \usepackage[pdftex,
+    pdftitle={\papertitle},
+    pdfauthor={\firstauthor, \secondauthor, \thirdauthor},
+    bookmarksnumbered, % use section numbers with bookmarks
+    pdfstartview=XYZ % start with zoom=100% instead of full screen; 
+                     % especially useful if working with a big screen :-)
+   ]{hyperref}
+  %\pdfcompresslevel=9
+
+  \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are and their extensions so 
+  %you won't have to specify these with every instance of \includegraphics
+  \graphicspath{{./figures/}}
+  \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+
+  \usepackage[figure,table]{hypcap}
+
+\else % compiling with latex
+  \usepackage[dvips,
+    bookmarksnumbered, % use section numbers with bookmarks
+    pdfstartview=XYZ % start with zoom=100% instead of full screen
+  ]{hyperref}  % hyperrefs are active in the pdf file after conversion
+
+  \usepackage[dvips]{epsfig,graphicx}
+  % declare the path(s) where your graphic files are and their extensions so 
+  %you won't have to specify these with every instance of \includegraphics
+  \graphicspath{{./figures/}}
+  \DeclareGraphicsExtensions{.eps}
+
+  \usepackage[figure,table]{hypcap}
+\fi
+
+%setup the hyperref package - make the links black without a surrounding frame
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black
+}
+
+
+% Title.
+% ------
+\title{\papertitle}
+
+% Authors
+% Please note that submissions are NOT anonymous, therefore 
+% authors' names have to be VISIBLE in your manuscript. 
+%
+% Single address
+% To use with only one author or several with the same address
+% ---------------
+%\oneauthor
+%   {\firstauthor} {Affiliation1 \\ %
+%     {\tt \href{mailto:author1@smcnetwork.org}{author1@smcnetwork.org}}}
+
+%Two addresses
+%--------------
+% \twoauthors
+%   {\firstauthor} {Affiliation1 \\ %
+%     {\tt \href{mailto:author1@smcnetwork.org}{author1@smcnetwork.org}}}
+%   {\secondauthor} {Affiliation2 \\ %
+%     {\tt \href{mailto:author2@smcnetwork.org}{author2@smcnetwork.org}}}
+
+% Three addresses
+% --------------
+ \fourauthors
+   {\firstauthor} {%Affiliation1 \\
+     {\tt \href{mailto:b.deman@qmul.ac.uk}{\{b.deman@, }}}
+   {\secondauthor} {%Affiliation2\\ %
+     {\tt \href{mailto:n.g.r.jillings@se14.qmul.ac.uk}{n.g.r.jillings@se14. ,}}}
+   {\thirdauthor} {%Affiliation3\\ %
+     {\tt \href{mailto:d.j.moffat@qmul.ac.uk}{d.j.moffat@, }}}
+    {\fourthauthor} {%Affiliation4\\ %
+     {\tt \href{mailto:joshua.reiss@qmul.ac.uk}{joshua.reiss@\}qmul.ac.uk}}}
+
+% ***************************************** the document starts here ***************
+\begin{document}
+%
+\capstartfalse
+\maketitle
+\capstarttrue
+%
+\begin{abstract}
+Place your abstract at the top left column on the first page.
+Please write about 150-200 words that specifically highlight the purpose of your work,
+its context, and provide a brief synopsis of your results.
+Avoid equations in this part.
+\end{abstract}
+%
+
+\section{Introduction}\label{sec:introduction}
+
+background (types of research)\\
+prior work: \cite{deman2014b} \\
+goal, what are we trying to do? \\
+
+
+Minimum 4 pages, 6 preferred, max. 8 (6 for demos/posters)
+
+
+
+
+%\subsection{Equations}
+%Equations of importance, 
+%or to which you refer later,
+%should be placed on separated lines and numbered.
+%The number should be on the right side, in parentheses.
+%\begin{equation}
+%E=mc^{2+\delta}.
+%\label{eq:Emc2}
+%\end{equation}
+%Refer to equations like so:
+%As (\ref{eq:Emc2}) shows, 
+%I do not completely trust Special Relativity.
+%
+%\subsection{Figures, Tables and Captions}
+%\begin{table}[t]
+% \begin{center}
+% \begin{tabular}{|l|l|}
+%  \hline
+%  String value & Numeric value \\
+%  \hline
+%  Hej SMC  & 2015 \\
+%  \hline
+% \end{tabular}
+%\end{center}
+% \caption{Table captions should be placed below the table, exactly like this,
+% but using words different from these.}
+% \label{tab:example}
+%\end{table}
+
+%\begin{figure}[t]
+%\figbox{
+%\subfloat[][]{\includegraphics[width=60mm]{figure}\label{fig:subfigex_a}}\\
+%\subfloat[][]{\includegraphics[width=80mm]{figure}\label{fig:subfigex_b}}
+%}
+%\caption{Here's an example using the subfig package.\label{fig:subfigex} }
+%\end{figure}
+
+
+\section{Conclusions}\label{sec:conclusions}
+
+
+%\begin{acknowledgments}
+%You may acknowledge people, projects, 
+%funding agencies, etc. 
+%which can be included after the second-level heading
+%``Acknowledgments'' (with no numbering).
+%\end{acknowledgments} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%bibliography here
+%\bibliography{smc2015template}
+
+\bibliography{../General}{}
+
+
+\end{document}
