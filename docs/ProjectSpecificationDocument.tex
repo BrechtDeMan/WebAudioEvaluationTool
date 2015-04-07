@@ -27,39 +27,72 @@ An example of this tag could be:
 
 \texttt{<setup interface="APE" projectReturn="http://project.return.url/goes/here" />}
 
-The setup should not require an element or any children to run.
+The setup should not have any element or any children.
 
 \subsection{Attributes}
 \begin{itemize}
-\item \texttt{interface} - Mandatory. Defaults to APE, otherwise use to load any of the available interfaces
-\item \texttt{projectReturn} - Mandatory. Specify the URL to return the test results. If null client will generate XML locally and prompt user to return the file.
+\item \texttt{interface} - Mandatory, String. Defaults to APE, otherwise use to load any of the available interfaces. Currently only valid string is APE.
+\item \texttt{projectReturn} - Mandatory, String. Specify the URL to return the test results. If null client will generate XML locally and prompt user to return the file.
 \end{itemize}
 
 \subsection{Elements}
 None
 
-\section{Tracks tag}
+\section{AudioHolder tag}
 
-There should be one tracks tag, inside which each track is specified as children. The track tag can help to generalise certain objects.
+There should be one audioHolder tag, inside which each audioElement is specified as children. The audioHolder tag can help to generalise certain objects.
 
 \subsection{Attributes}
 \begin{itemize}
-\item \texttt{hostURL} - Optional. If all tracks are hosted from the same folder on a server, you can put in the lead here. For instance, if loading http://test.com/tracks/track1.wav and http://test.com/tracks/track2.wav, this could equal http://test.com/tracks/ and the url attribute in the track tag can be track1.wav or track2.wav. Equally http://test.com/ and then using tracks/track1.wav and tracks/track2.wav is valid.
-\item \texttt{sampleRate} - Optional. If your test requires a specific sample rate, this should be set to the desired sample rate in Hertz. This does not set the browser to the correct sample rate, but allows for checking if the sample rates match.
-\item \texttt{sampleRateExplicit} - Optional. A true/false to determine if the sample rate given in the attribute \texttt{sampleRate} must be matched by the system. If the web audio API does not match, a browser alert is called and the rest of the interface loading is discarded. Media files are also not downloaded until this check can be corrected.
+\item \texttt{hostURL} - Optional, String. If all tracks are hosted from the same folder on a server, you can put in the lead here. For instance, if loading http://test.com/tracks/track1.wav and http://test.com/tracks/track2.wav, this could equal http://test.com/tracks/ and the url attribute in the track tag can be track1.wav or track2.wav. Equally http://test.com/ and then using tracks/track1.wav and tracks/track2.wav is valid.
+\item \texttt{sampleRate} - Optional, Number. If your test requires a specific sample rate, this should be set to the desired sample rate in Hertz. This does not set the browser to the correct sample rate, but forces the browser to check the sample rate matches. If this is undefined, no sample rate matching will occur.
+\item \texttt{sampleRateExplicit} - Optional, DEPRECATED. A true/false to determine if the sample rate given in the attribute \texttt{sampleRate} must be matched by the system. If the web audio API does not match, a browser alert is called and the rest of the interface loading is discarded. Media files are also not downloaded until this check can be corrected.
 \end{itemize}
 
 \subsection{Elements}
-Contain the track tags.
+Contain the audioElements tags.
 
-\section{Track tag}
+\section{audioElements tag}
 
-This must reside as children in the tracks tag. There must be one track tag per track to load. The track tag must contain the URL to load.
+This must reside as children in the audioHolder tag. There must be one audioElement tag per sound sample to load into the test.
 
 \subsection{Attributes}
 \begin{itemize}
-\item \texttt{url} - Mandatory. Contain the full URL to the track. If the Tracks tag hostURL is set, concatenate this tag with the hostURL attribute to obtain the full URL.
+\item \texttt{url} - Mandatory, String. Contain the full URL to the track. If the Tracks tag hostURL is set, concatenate this tag with the hostURL attribute to obtain the full URL.
+\item \texttt{ID} - Optional, Number. Give the track a specific ID for the return. This will help if using multiple projects to spread a test across multiple sessions and/or locations, where each test will not use all the samples. If one audioElement is given the ID 3, the next audioElement (assuming it does not have an ID set itself) will have the ID of 4. This continues until the next audioElement with the ID attribute set is reached.
 \end{itemize}
+
+\section {CommentQuestion tag}
+
+This is a 1st level tag (same level as AudioHolder and setup). This allows another question and comment box to be presented on the page. The results of these are passed back in the results XML with both the comment and the question.
+
+\subsection{Attributes}
+None.
+
+\subsection{Elements}
+The question to be presented.
+
+\section {PreTest tag and PostTest tag}
+
+These are 1st level tags. The PreTest tag allows for the specifying of pre test instructions and questions. These appear as a pop-up style window with next buttons and other automatic GUI. The postTest tag allows for specifying post test instructions, questions and resources. These appear as a pop-up style window after the submit button is pressed.
+
+\subsection{Attributes}
+None.
+
+\subsection{Elements}
+Takes the \texttt{statement} and \texttt{question} tags. The order these are presented in the XML define the order they appear on the screen.
+
+\subsubsection{Statement}
+
+The statement tag simply prints the included string verbatim on a 'pop-up' window with a next button.
+
+\subsubsection{Question}
+
+This allows for a question to be asked pre/post the test. This is added to the response XML in the same location as the other common/global questions. The response includes both the question asked and the response. The optional attribute 'mandatory' defines whether the question can be blank or not, default is for optional. If mandatory, the next button is not available until something is entered.
+
+\subsubsection{Resource}
+
+The resource tag is only available in the postTest tag. This allows for the linking to some external resource via the href attribute.
 
 \section{Example}
 
@@ -69,20 +102,28 @@ Here is an example XML structure
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
 	<setup interface="APE" projectReturn="null" />
-	<tracks hostURL="example_eval/" sampleRate="44100"
+	<AudioHolder hostURL="example_eval/" sampleRate="44100"
 	sampleRateExplicit="true">
-		<track url="0.wav"/>
-		<track url="1.wav"/>
-		<track url="2.wav"/>
-		<track url="3.wav"/>
-		<track url="4.wav"/>
-		<track url="5.wav"/>
-		<track url="6.wav"/>
-		<track url="7.wav"/>
-		<track url="8.wav"/>
-		<track url="9.wav"/>
-		<track url="10.wav"/>
-	</tracks>
+		<audioElements url="0.wav" ID=0/>
+		<audioElements url="1.wav"/>
+		<audioElements url="2.wav"/>
+		<audioElements url="3.wav"/>
+		<audioElements url="4.wav"/>
+		<audioElements url="5.wav"/>
+		<audioElements url="6.wav"/>
+		<audioElements url="7.wav"/>
+		<audioElements url="8.wav"/>
+		<audioElements url="9.wav"/>
+		<audioElements url="10.wav"/>
+	</AudioHolder>
+	<CommentQuestion>What is your mixing experiance</CommentQuestion>
+	<PreTest>
+		<statement>Please listen to all mixes</statement>
+	</PreTest>
+	<PostTest>
+		<statement>Thank you for taking this listening test.</statement>
+		<question>Please enter your name.</question>
+	</PostTest>
 </BrowserEvalProjectDocument>
 \end{lstlisting}
 
