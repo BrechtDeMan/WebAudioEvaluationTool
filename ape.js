@@ -67,6 +67,7 @@ function loadInterface(xmlDoc) {
 	var submit = document.createElement("button");
 	submit.innerText = 'Submit';
 	submit.onclick = function() {
+		// TODO: Update this for postTest tags
 		createProjectSave(projectReturn)
 	}
 	
@@ -92,7 +93,7 @@ function loadInterface(xmlDoc) {
 
 	var feedbackHolder = document.createElement('div');
 	
-	var tracks = xmlDoc.find('tracks');
+	var tracks = xmlDoc.find('audioHolder');
 	tracks = tracks[0];
 	var hostURL = tracks.attributes['hostURL'];
 	if (hostURL == undefined) {
@@ -102,18 +103,12 @@ function loadInterface(xmlDoc) {
 	}
 	
 	var hostFs = tracks.attributes['sampleRate'];
-	var hostFsExplicit = tracks.attributes['sampleRateExplicit'];
-	if (hostFs == undefined) {
-		hostFsExplicit = false;
-	} else {
-		hostFs = hostFs.value;
-		if (hostFsExplicit != undefined) {
-			hostFsExplicit = hostFsExplicit.value;
-		}
+	if (hostFs != undefined) {
+		hostFs = Number(hostFs.value);
 	}
 	
 	/// CHECK FOR SAMPLE RATE COMPATIBILITY
-	if (hostFsExplicit == true) {
+	if (hostFs != undefined) {
 		if (Number(hostFs) != audioContext.sampleRate) {
 			var errStr = 'Sample rates do not match! Requested '+Number(hostFs)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
 			alert(errStr);
@@ -121,7 +116,7 @@ function loadInterface(xmlDoc) {
 		}
 	}
 	
-	var tracksXML = xmlDoc.find('track');
+	var tracksXML = xmlDoc.find('audioElements');
 	tracksXML.each(function(index,element){
 		// Find URL of track
 		var trackURL = hostURL + this.attributes['url'].value;
@@ -135,8 +130,8 @@ function loadInterface(xmlDoc) {
 		trackComment.cols = '100';
 		trackComment.name = 'trackComment'+index;
 		trackComment.className = 'trackComment';
-		feedbackHolder.appendChild(trackTitle);
-		feedbackHolder.appendChild(trackComment);
+		trackObj.appendChild(trackTitle);
+		trackObj.appendChild(trackComment);
 		feedbackHolder.appendChild(trackObj);
 		// Create a slider per track
 		
@@ -161,10 +156,10 @@ function loadInterface(xmlDoc) {
 			// Get the track ID from the object ID
 			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
 			audioEngineContext.selectedTrack(id);
-		}
+		};
 		
 		canvas.appendChild(trackSliderObj);
-	})
+	});
 	
 	
 	// Inject into HTML
