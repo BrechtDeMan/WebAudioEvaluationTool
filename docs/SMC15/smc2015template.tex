@@ -25,9 +25,9 @@
 
 
 %user defined variables
-\def\papertitle{APE FOR WEB: A BROWSER-BASED EVALUATION TOOL FOR AUDIO}
-\def\firstauthor{Brecht De Man}
-\def\secondauthor{Nicholas Jillings}
+\def\papertitle{APE FOR WEB: A BROWSER-BASED EVALUATION TOOL FOR AUDIO} %?
+\def\firstauthor{Nicholas Jillings}
+\def\secondauthor{Brecht De Man}
 \def\thirdauthor{David Moffat}
 \def\fourthauthor{Joshua D. Reiss}
 
@@ -111,17 +111,18 @@
 %   {\secondauthor} {Affiliation2 \\ %
 %     {\tt \href{mailto:author2@smcnetwork.org}{author2@smcnetwork.org}}}
 
-% Three addresses
-% --------------
+
+
+% FIX!!! 
  \fourauthors
    {\firstauthor} {%Affiliation1 \\
-     {\tt \href{mailto:b.deman@qmul.ac.uk}{\{b.deman@, }}}
+     {\tt \href{mailto:b.deman@qmul.ac.uk}{n.g.r.jillings@se14.qmul.ac.uk, }}}
    {\secondauthor} {%Affiliation2\\ %
-     {\tt \href{mailto:n.g.r.jillings@se14.qmul.ac.uk}{n.g.r.jillings@se14. ,}}}
+     {\tt \href{mailto:n.g.r.jillings@se14.qmul.ac.uk}{\{b.deman,}}}
    {\thirdauthor} {%Affiliation3\\ %
-     {\tt \href{mailto:d.j.moffat@qmul.ac.uk}{d.j.moffat@, }}}
+     {\tt \href{mailto:d.j.moffat@qmul.ac.uk}{d.j.moffat, }}}
     {\fourthauthor} {%Affiliation4\\ %
-     {\tt \href{mailto:joshua.reiss@qmul.ac.uk}{joshua.reiss@\}qmul.ac.uk}}}
+     {\tt \href{mailto:joshua.reiss@qmul.ac.uk}{joshua.reiss\}@qmul.ac.uk}}}
 
 % ***************************************** the document starts here ***************
 \begin{document}
@@ -134,21 +135,69 @@
 Place your abstract at the top left column on the first page.
 Please write about 150-200 words that specifically highlight the purpose of your work,
 its context, and provide a brief synopsis of your results.
-Avoid equations in this part.
+Avoid equations in this part.\\
+TOTAL PAPER: Minimum 4 pages, 6 preferred, max. 8 (6 for demos/posters)\\ 
 \end{abstract}
 %
 
 \section{Introduction}\label{sec:introduction}
 
-background (types of research)\\
-prior work: \cite{deman2014b} \\
+background (types of research where this type of perceptual evaluation of audio is relevant)\\
+
+multiple stimulus perceptual evaluation (reference to Bech etc.)\\
+
+prior work: \cite{deman2014b} in MATLAB, much less easy to deploy, and often stops working due to version updates \\ 
+
 goal, what are we trying to do? \\
 
-
-Minimum 4 pages, 6 preferred, max. 8 (6 for demos/posters)
-
+[Previously, due to limited functionality of HTML, ..., it was not possible to design this type of interfaces with such high quality audio... ]
 
 
+\section{Design considerations}\label{sec:designconsiderations}
+
+We present a browser-based perceptual evaluation tool for audio that ... \\
+
+see \cite{deman2014b}: requirements informed by research on music production (see my work and that of others' in the group), such as randomisation, playback of high quality audio, some degree of flexibility in terms of configuration, ... \\
+
+
+\section{Implementation}\label{sec:implementation}
+[Nick???]
+
+section on overall architecture\\
+
+section with overview of the structure of the input and output files, perhaps with graph or table
+
+
+\section{Applications}\label{sec:applications} %?
+
+discussion of use of this toolbox (possibly based on a quick mock test using my research data, to be repeated with a large number of participants and more data later)\\
+
+
+\section{Conclusions and future work}\label{sec:conclusions}
+
+In this paper we have presented an approach to creating a browser-based listening test environment that can be used for a variety of types of perceptual evaluation of audio. 
+Specifically, we discussed the use of the toolbox in the context of assessment of preference for different production practices, with identical source material. 
+The purpose of this paper is to outline the design of this tool, to describe our implementation using basic HTML5 functionality, and to discuss design challenges and limitations of our approach. % or something
+
+% future work
+Further work may include the development of other common test designs, such as [...], and [...]. In addition, [...]. 
+
+...
+
+The source code of this tool can be found on \url{code.soundsoftware.ac.uk/projects/browserevaluationtool}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%bibliography here
+\bibliography{smc2015template}
+
+
+
+\end{document}
+
+
+
+% RUBBISH
 
 %\subsection{Equations}
 %Equations of importance, 
@@ -188,7 +237,7 @@ Minimum 4 pages, 6 preferred, max. 8 (6 for demos/posters)
 %\end{figure}
 
 
-\section{Conclusions}\label{sec:conclusions}
+
 
 
 %\begin{acknowledgments}
@@ -198,11 +247,3 @@ Minimum 4 pages, 6 preferred, max. 8 (6 for demos/posters)
 %``Acknowledgments'' (with no numbering).
 %\end{acknowledgments} 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%bibliography here
-%\bibliography{smc2015template}
-
-\bibliography{../General}{}
-
-
-\end{document}
