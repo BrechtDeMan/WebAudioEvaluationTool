@@ -8,6 +8,7 @@ loadInterface(projectXML);
 
 function loadInterface(xmlDoc) {
 	
+	// Get the dimensions of the screen available to the page
 	var width = window.innerWidth;
 	var height = window.innerHeight;
 	
@@ -54,6 +55,8 @@ function loadInterface(xmlDoc) {
 	// Create playback start/stop points
 	var playback = document.createElement("button");
 	playback.innerText = 'Start';
+	// onclick function. Check if it is playing or not, call the correct function in the
+	// audioEngine, change the button text to reflect the next state.
 	playback.onclick = function() {
 		if (audioEngineContext.status == 0) {
 			audioEngineContext.play();
@@ -62,47 +65,52 @@ function loadInterface(xmlDoc) {
 			audioEngineContext.stop();
 			this.innerText = 'Start';
 		}
-	}
+	};
 	// Create Submit (save) button
 	var submit = document.createElement("button");
 	submit.innerText = 'Submit';
 	submit.onclick = function() {
 		// TODO: Update this for postTest tags
 		createProjectSave(projectReturn)
-	}
-	
+	};
+	// Append the interface buttons into the interfaceButtons object.
 	interfaceButtons.appendChild(playback);
 	interfaceButtons.appendChild(submit);
 	interfaceButtons.appendChild(downloadPoint);
 	
 	// Now create the slider and HTML5 canvas boxes
 	
+	// Create the div box to center align
 	var sliderBox = document.createElement('div');
 	sliderBox.className = 'sliderCanvasDiv';
-	sliderBox.id = 'sliderCanvasHolder'; // create an id so we can easily link to it later
+	sliderBox.id = 'sliderCanvasHolder';
 	sliderBox.align = 'center';
 	
+	// Create the slider box to hold the slider elements
 	var canvas = document.createElement('div');
 	canvas.id = 'slider';
+	// Must have a known EXACT width, as this is used later to determine the ratings
 	canvas.style.width = width - 100 +"px";
 	canvas.style.height = 150 + "px";
-	canvas.style.marginBottom = "25px"
+	canvas.style.marginBottom = "25px";
 	canvas.style.backgroundColor = '#eee';
 	canvas.align = "left";
 	sliderBox.appendChild(canvas);
-
-	var feedbackHolder = document.createElement('div');
 	
-	var tracks = xmlDoc.find('audioHolder');
-	tracks = tracks[0];
-	var hostURL = tracks.attributes['hostURL'];
+	// Global parent for the comment boxes on the page
+	var feedbackHolder = document.createElement('div');
+	// Find the parent audioHolder object.
+	var audioHolder = xmlDoc.find('audioHolder');
+	audioHolder = audioHolder[0]; // Remove from one field array
+	// Extract the hostURL attribute. If not set, create an empty string.
+	var hostURL = audioHolder.attributes['hostURL'];
 	if (hostURL == undefined) {
 		hostURL = "";
 	} else {
 		hostURL = hostURL.value;
 	}
-	
-	var hostFs = tracks.attributes['sampleRate'];
+	// Extract the sampleRate. If set, convert the string to a Number.
+	var hostFs = audioHolder.attributes['sampleRate'];
 	if (hostFs != undefined) {
 		hostFs = Number(hostFs.value);
 	}
@@ -115,24 +123,31 @@ function loadInterface(xmlDoc) {
 			return;
 		}
 	}
-	
-	var tracksXML = xmlDoc.find('audioElements');
-	tracksXML.each(function(index,element){
+	// Find all the audioElements from the audioHolder
+	var audioElements = $(audioHolder).find('audioElements');
+	audioElements.each(function(index,element){
 		// Find URL of track
+		// In this jQuery loop, variable 'this' holds the current audioElement.
+		
+		// Now load each audio sample. First create the new track by passing the full URL
 		var trackURL = hostURL + this.attributes['url'].value;
-		// Now load each track in
 		audioEngineContext.newTrack(trackURL);
-		var trackObj = document.createElement('div');
-		var trackTitle = document.createElement('span');
-		trackTitle.innerText = 'Comment on track '+index;
-		var trackComment = document.createElement('textarea');
-		trackComment.rows = '4';
-		trackComment.cols = '100';
-		trackComment.name = 'trackComment'+index;
-		trackComment.className = 'trackComment';
-		trackObj.appendChild(trackTitle);
-		trackObj.appendChild(trackComment);
-		feedbackHolder.appendChild(trackObj);
+		// Create document objects to hold the comment boxes
+		var trackComment = document.createElement('div');
+		// Create a string next to each comment asking for a comment
+		var trackString = document.createElement('span');
+		trackString.innerText = 'Comment on track '+index;
+		// Create the HTML5 comment box 'textarea'
+		var trackCommentBox = document.createElement('textarea');
+		trackCommentBox.rows = '4';
+		trackCommentBox.cols = '100';
+		trackCommentBox.name = 'trackComment'+index;
+		trackCommentBox.className = 'trackComment';
+		// Add to the holder.
+		trackComment.appendChild(trackString);
+		trackComment.appendChild(trackCommentBox);
+		feedbackHolder.appendChild(trackComment);
+		
 		// Create a slider per track
 		
 		var trackSliderObj = document.createElement('div');

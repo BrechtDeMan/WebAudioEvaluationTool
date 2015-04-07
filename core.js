@@ -21,7 +21,7 @@ window.onload = function() {
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine();
-}
+};
 
 function loadProjectSpec(url) {
 	// Load the project document from the given URL, decode the XML and instruct audioEngine to get audio data
@@ -30,9 +30,9 @@ function loadProjectSpec(url) {
 	r.open('GET',url,true);
 	r.onload = function() {
 		loadProjectSpecCallback(r.response);
-	}
+	};
 	r.send();
-}
+};
 
 function loadProjectSpecCallback(response) {
 	// Function called after asynchronous download of XML project specification
@@ -41,6 +41,7 @@ function loadProjectSpecCallback(response) {
 	
 	// Now extract the setup tag
 	var xmlSetup = projectXML.find('setup');
+	// Detect the interface to use and load the relevant javascripts.
 	var interfaceType = xmlSetup[0].attributes['interface'];
 	var interfaceJS = document.createElement('script');
 	interfaceJS.setAttribute("type","text/javascript");
@@ -108,7 +109,7 @@ function AudioEngine() {
 			}
 			this.status = 1;
 		}
-	}
+	};
 	
 	this.stop = function() {
 		// Send stop and reset command to all playback buffers
@@ -119,7 +120,7 @@ function AudioEngine() {
 			}
 			this.status = 0;
 		}
-	}
+	};
 	
 	this.selectedTrack = function(id) {
 		for (var i=0; i<this.audioObjects.length; i++)
@@ -130,7 +131,7 @@ function AudioEngine() {
 				this.audioObjects[i].outputGain.gain.value = 0.0;
 			}
 		}
-	}
+	};
 	
 	
 	this.newTrack = function(url) {
@@ -143,7 +144,7 @@ function AudioEngine() {
 
 		// AudioObject will get track itself.
 		this.audioObjects[audioObjectId].constructTrack(url);
-	}
+	};
 	
 }
 
@@ -170,7 +171,7 @@ function audioObject(id) {
 	
 	this.play = function(startTime) {
 		this.bufferNode.start(startTime);
-	}
+	};
 	
 	this.stop = function() {
 		this.bufferNode.stop(0);
@@ -178,7 +179,7 @@ function audioObject(id) {
 		this.bufferNode.connect(this.outputGain);
 		this.bufferNode.buffer = this.buffer;
 		this.bufferNode.loop = true;
-	}
+	};
 
 	this.constructTrack = function(url) {
 		var request = new XMLHttpRequest();
@@ -202,8 +203,8 @@ function audioObject(id) {
 					console.log('FATAL - Error loading buffer on '+audioObj.id);
 				}
 			});
-		}
+		};
 		request.send();
-	}
+	};
 	
 }
