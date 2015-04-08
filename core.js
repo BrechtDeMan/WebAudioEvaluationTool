@@ -16,7 +16,8 @@ window.onload = function() {
 	// This should perform any initial commands such as structure / loading documents
 	
 	// Create a web audio API context
-	// NORE: Currently this will only work with webkit browsers (Chrome/Safari)!
+	// Fixed for cross-browser support
+	var AudioContext = window.AudioContext || window.webkitAudioContext;
 	audioContext = new AudioContext;
 	
 	// Create the audio engine object
