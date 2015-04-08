@@ -26,6 +26,8 @@ Has the following attributes, depending on the variables set in the Project Spec
 
 \subsection{Value}
 One of these elements per track, containing the value between 0 and 100 relating the user rating of the track. This is a mandatory element.
+% float or int? (I, Brecht, am sort of indifferent here, it used to be down to .01 or something before, so maybe that or .1)
+% Nick - Can be a float, was trying to remove/reduce ambiguity from pixel position. But can easily make it to .01
 
 \subsection{Comment}
 One of these elements per track, containing any commenting data from the interface text boxes. Has the two following child nodes.
@@ -41,6 +43,7 @@ The PostTest is a 1st level node and contains the response to any post-test ques
 
 \section{Session Data}
 This will contain any captured session data. Currently not implemented but here for future referencing.
+% I used to have a 'global' comment for each 'session' as well
 
 \section{Globals}
 Contains any comment boxes which were specified in the APE project specification with the comment ID, comment text and the comment results.
