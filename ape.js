@@ -231,8 +231,10 @@ function loadInterface(xmlDoc) {
 			preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
 		} else if (child.nodeName == 'question')
 		{
+			var questionId = child.attributes['id'].value;
 			var textHold = document.createElement('span');
 			textHold.innerHTML = child.innerHTML;
+			textHold.id = questionId + 'response';
 			var textEnter = document.createElement('textarea');
 			preTestOption.appendChild(textHold);
 			preTestOption.appendChild(textEnter);
@@ -247,6 +249,15 @@ function loadInterface(xmlDoc) {
 		nextButton.onclick = function() {
 			// Need to find and parse preTest again!
 			var preTest = projectXML.find('PreTest')[0];
+			// Check if current state is a question!
+			if (preTest.children[this.value-1].nodeName == 'question') {
+				var questionId = preTest.children[this.value-1].attributes['id'].value;
+				var questionHold = document.createElement('comment');
+				var questionResponse = document.getElementById(questionId + 'response');
+				questionHold.id = questionId;
+				questionHold.innerHTML = questionResponse.value;
+				preTestQuestions.appendChild(questionHold);
+			}
 			if (this.value < preTest.children.length)
 			{
 				// More to process
@@ -259,7 +270,8 @@ function loadInterface(xmlDoc) {
 					var textHold = document.createElement('span');
 					textHold.innerHTML = child.innerHTML;
 					var textEnter = document.createElement('textarea');
-					preTestOption.innerHTML = 'null';
+					textEnter.id = child.attributes['id'].value + 'response';
+					preTestOption.innerHTML = null;
 					preTestOption.appendChild(textHold);
 					preTestOption.appendChild(textEnter);
 				}
@@ -316,6 +328,10 @@ function interfaceXMLSave(){
 		trackObj.appendChild(comment);
 		xmlDoc.appendChild(trackObj);
 	}
+	
+	// Append Pre/Post Questions
+	xmlDoc.appendChild(preTestQuestions);
+	xmlDoc.appendChild(postTestQuestions);
 	
 	return xmlDoc;
 }
