@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
 	<setup interface="APE" projectReturn="null" />
-	<audioHolder hostURL="example_eval/" sampleRate="44100" sampleRateExplicit="true">
+	<audioHolder hostURL="example_eval/" sampleRate="44100">
 		<audioElements url="0.wav" ID="0"/>
 		<audioElements url="1.wav"/>
 		<audioElements url="2.wav"/>
@@ -17,9 +17,10 @@
 	<CommentQuestion>What is your mixing experiance</CommentQuestion>
 	<PreTest>
 		<statement>Please listen to all mixes</statement>
+		<question id="location" mandatory="true">Please enter your listening location</question>
 	</PreTest>
 	<PostTest>
 		<statement>Thank you for taking this listening test.</statement>
-		<question>Please enter your name.</question>
+		<question id="SessionID">Please enter your name.</question>
 	</PostTest>
 </BrowserEvalProjectDocument>

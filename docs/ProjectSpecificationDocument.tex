@@ -88,11 +88,48 @@ The statement tag simply prints the included string verbatim on a 'pop-up' windo
 
 \subsubsection{Question}
 
-This allows for a question to be asked pre/post the test. This is added to the response XML in the same location as the other common/global questions. The response includes both the question asked and the response. The optional attribute 'mandatory' defines whether the question can be blank or not, default is for optional. If mandatory, the next button is not available until something is entered.
+This allows for a question to be asked pre/post the test. This is added to the response XML in the same location as the other common/global questions. The response includes both the question asked and the response. This takes two attributes, id and mandatory. ID is a mandatory field. The same ID will be used in the results so it is important it is properly entered. Mandatory is optional. True means the field must be entered before continuing.
 
 \subsubsection{Resource}
 
 The resource tag is only available in the postTest tag. This allows for the linking to some external resource via the href attribute.
+
+\section{Feature List}
+\begin{itemize}
+\item Paging listening tests - eg. Ask multiple questions in each experiment
+\item Labels on X axis - scale
+\item Input questions/comment at top to guide towards the question being asked.
+\item Randomise track numbers -(inc. comment boxes and relate back to correct reference track)
+\item Randomise order of individual tests
+\item Save output XML file to remote server
+\item Tests Metrics
+\begin{itemize}
+\item Duration of listening to each track
+\item Time spent on each individual test
+\item Start and end position of every track
+\item Flags on each track, to ensure each track (but may not restrict users from submitting)
+\begin{itemize}
+\item Has been listened to 
+\item Has been moved
+\item Has comments about it
+\end{itemize}
+\end{itemize}
+\end{itemize}
+
+\subsection{Advanced feature list}
+\begin{itemize}
+\item Repeat each tests number of times (2 or 3?) to remove learning / experience bias and ensure that the order is consistent
+\item Perform Loudness equalisation on all tracks
+\item Selection of test type
+\item Pre-test of some basic hearing test
+\begin{itemize}
+\item MUSHRA (with vertical slider per track)
+\item APE (Single horizontal slider)
+\item AB Test
+\end{itemize}
+\end{itemize}
+
+
 
 \section{Example}
 

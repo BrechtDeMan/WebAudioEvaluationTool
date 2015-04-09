@@ -10,13 +10,16 @@ var audioContext;
 var projectXML;
 var audioEngineContext;
 var projectReturn;
+var preTestQuestions = document.createElement('PreTest');
+var postTestQuestions = document.createElement('PostTest');
 
 window.onload = function() {
 	// Function called once the browser has loaded all files.
 	// This should perform any initial commands such as structure / loading documents
 	
 	// Create a web audio API context
-	// NORE: Currently this will only work with webkit browsers (Chrome/Safari)!
+	// Fixed for cross-browser support
+	var AudioContext = window.AudioContext || window.webkitAudioContext;
 	audioContext = new AudioContext;
 	
 	// Create the audio engine object
@@ -153,6 +156,7 @@ function audioObject(id) {
 	
 	this.id = id;
 	this.state = 0; // 0 - no data, 1 - ready
+	this.url = null; // Hold the URL given for the output back to the results.
 	
 	// Create a buffer and external gain control to allow internal patching of effects and volume leveling.
 	this.bufferNode = audioContext.createBufferSource();
@@ -183,6 +187,7 @@ function audioObject(id) {
 
 	this.constructTrack = function(url) {
 		var request = new XMLHttpRequest();
+		this.url = url;
 		request.open('GET',url,true);
 		request.responseType = 'arraybuffer';
 		

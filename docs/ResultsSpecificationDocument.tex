@@ -12,19 +12,38 @@
 This document outlines the return XML document structure to hold the results from the Browser Evaluation Tool, specifically for the APE Interface.
 
 \section{Root}
-The root of the document is \texttt{BrowserEvaluationResult}. This takes no attributes but contains all children.
+The root of the document is \texttt{BrowserEvaluationResult}.
 
-\section{Track}
-The first child element is the \texttt{Track} element. This contains the results for a specific track. This requires the attribute \texttt{trackId} to be set to the numerical track Id.
+\section{AudioElement}
+A 1st level node, this contains the results for a specific audioElement.
+
+\subsection{Attributes}
+Has the following attributes, depending on the variables set in the Project Specification.
+\begin{itemize}
+\item \texttt{id} - Mandatory. This returns the ID of the track in question. This is either the value passed in from the project specification, or calculated based on the position in the list. For instance, in the automatic system, the first test sample has ID 0, the second ID 1 and so forth. The value passed in from the project specification can either be a string or a Number.
+\item \texttt{url} - Mandatory. Returns the full URL given incase of errors or for later checking.
+\end{itemize}
 
 \subsection{Value}
 One of these elements per track, containing the value between 0 and 100 relating the user rating of the track. This is a mandatory element.
+% float or int? (I, Brecht, am sort of indifferent here, it used to be down to .01 or something before, so maybe that or .1)
+% Nick - Can be a float, was trying to remove/reduce ambiguity from pixel position. But can easily make it to .01
 
 \subsection{Comment}
-One of these elements per track, containing any commenting data from the interface text boxes.
+One of these elements per track, containing any commenting data from the interface text boxes. Has the two following child nodes.
+\begin{itemize}
+\item \texttt{Question} - Returns the text next to the comment box
+\item \texttt{Response} - Returns the text in the comment box
+\end{itemize}
+
+\section{PreTest and PostTest}
+A 1st level node, contains the response to any pre-test questions given in the project specification. These are stored in the same Comment node as outlined in the above audioElement.
+
+The PostTest is a 1st level node and contains the response to any post-test questions given in the project specification.
 
 \section{Session Data}
 This will contain any captured session data. Currently not implemented but here for future referencing.
+% I used to have a 'global' comment for each 'session' as well
 
 \section{Globals}
 Contains any comment boxes which were specified in the APE project specification with the comment ID, comment text and the comment results.
