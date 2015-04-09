@@ -10,6 +10,8 @@ var audioContext;
 var projectXML;
 var audioEngineContext;
 var projectReturn;
+var preTestQuestions = document.createElement('PreTest');
+var postTestQuestions = document.createElement('PostTest');
 
 window.onload = function() {
 	// Function called once the browser has loaded all files.

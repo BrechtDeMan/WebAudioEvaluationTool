@@ -88,7 +88,7 @@ The statement tag simply prints the included string verbatim on a 'pop-up' windo
 
 \subsubsection{Question}
 
-This allows for a question to be asked pre/post the test. This is added to the response XML in the same location as the other common/global questions. The response includes both the question asked and the response. The optional attribute 'mandatory' defines whether the question can be blank or not, default is for optional. If mandatory, the next button is not available until something is entered.
+This allows for a question to be asked pre/post the test. This is added to the response XML in the same location as the other common/global questions. The response includes both the question asked and the response. This takes two attributes, id and mandatory. ID is a mandatory field. The same ID will be used in the results so it is important it is properly entered. Mandatory is optional. True means the field must be entered before continuing.
 
 \subsubsection{Resource}
 
