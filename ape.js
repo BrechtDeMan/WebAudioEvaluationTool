@@ -35,9 +35,9 @@ function loadInterface(xmlDoc) {
 	
 	// Set title to that defined in XML, else set to default
 	if (titleAttr != undefined) {
-		titleSpan.innerText = titleAttr.value;
+		titleSpan.innerHTML = titleAttr.value;
 	} else {
-		titleSpan.innerText =  'APE Tool';
+		titleSpan.innerHTML =  'APE Tool';
 	}
 	// Insert the titleSpan element into the title div element.
 	title.appendChild(titleSpan);
@@ -56,21 +56,21 @@ function loadInterface(xmlDoc) {
 	
 	// Create playback start/stop points
 	var playback = document.createElement("button");
-	playback.innerText = 'Start';
+	playback.innerHTML = 'Start';
 	// onclick function. Check if it is playing or not, call the correct function in the
 	// audioEngine, change the button text to reflect the next state.
 	playback.onclick = function() {
 		if (audioEngineContext.status == 0) {
 			audioEngineContext.play();
-			this.innerText = 'Stop';
+			this.innerHTML = 'Stop';
 		} else {
 			audioEngineContext.stop();
-			this.innerText = 'Start';
+			this.innerHTML = 'Start';
 		}
 	};
 	// Create Submit (save) button
 	var submit = document.createElement("button");
-	submit.innerText = 'Submit';
+	submit.innerHTML = 'Submit';
 	submit.onclick = function() {
 		// TODO: Update this for postTest tags
 		createProjectSave(projectReturn)
@@ -138,7 +138,7 @@ function loadInterface(xmlDoc) {
 		var trackComment = document.createElement('div');
 		// Create a string next to each comment asking for a comment
 		var trackString = document.createElement('span');
-		trackString.innerText = 'Comment on track '+index;
+		trackString.innerHTML = 'Comment on track '+index;
 		// Create the HTML5 comment box 'textarea'
 		var trackCommentBox = document.createElement('textarea');
 		trackCommentBox.rows = '4';
@@ -322,9 +322,9 @@ function interfaceXMLSave(){
 		var slider = document.createElement("Rating");
 		var rate = Number(trackSliderObjects[i].style.left.substr(0,trackSliderObjects[i].style.left.length-2));
 		rate = (rate-rateMin)/rateMax;
-		slider.innerText = Math.floor(rate*100);
+		slider.innerHTML = Math.floor(rate*100);
 		var comment = document.createElement("Comment");
-		comment.innerText = commentObjects[i].value;
+		comment.innerHTML = commentObjects[i].value;
 		trackObj.appendChild(slider);
 		trackObj.appendChild(comment);
 		xmlDoc.appendChild(trackObj);
