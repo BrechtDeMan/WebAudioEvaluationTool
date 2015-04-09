@@ -316,8 +316,9 @@ function interfaceXMLSave(){
 	var rateMax = window.innerWidth-50;
 	for (var i=0; i<trackSliderObjects.length; i++)
 	{
-		var trackObj = document.createElement("Track");
+		var trackObj = document.createElement("audioElement");
 		trackObj.id = i;
+		trackObj.url = audioEngineContext.audioObjects[i].url;
 		var slider = document.createElement("Rating");
 		var rate = Number(trackSliderObjects[i].style.left.substr(0,trackSliderObjects[i].style.left.length-2));
 		rate = (rate-rateMin)/rateMax;
