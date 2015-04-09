@@ -17,6 +17,7 @@
 	<CommentQuestion>What is your mixing experiance</CommentQuestion>
 	<PreTest>
 		<statement>Please listen to all mixes</statement>
+		<question>Please enter your listening location</question>
 	</PreTest>
 	<PostTest>
 		<statement>Thank you for taking this listening test.</statement>

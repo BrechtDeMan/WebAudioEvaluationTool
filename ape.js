@@ -17,6 +17,8 @@ function loadInterface(xmlDoc) {
 	
 	// The injection point into the HTML page
 	var insertPoint = document.getElementById("topLevelBody");
+	var testContent = document.createElement('div');
+	testContent.id = 'testContent';
 	
 	
 	// Decode parts of the xmlDoc that are needed
@@ -177,12 +179,106 @@ function loadInterface(xmlDoc) {
 	});
 	
 	
+	// Create pre and post test questions
+	
 	// Inject into HTML
 	insertPoint.innerHTML = null; // Clear the current schema
-	insertPoint.appendChild(title); // Insert the title
-	insertPoint.appendChild(interfaceButtons);
-	insertPoint.appendChild(sliderBox);
-	insertPoint.appendChild(feedbackHolder);
+	testContent.appendChild(title); // Insert the title
+	testContent.appendChild(interfaceButtons);
+	testContent.appendChild(sliderBox);
+	testContent.appendChild(feedbackHolder);
+	insertPoint.appendChild(testContent);
+	
+	var preTest = xmlDoc.find('PreTest');
+	var postTest = xmlDoc.find('PostTest');
+	preTest = preTest[0];
+	postTest = postTest[0];
+	if (preTest != undefined || postTest != undefined)
+	{
+		testContent.style.zIndex = 1;
+		var blank = document.createElement('div');
+		blank.id = 'testHalt';
+		blank.style.zIndex = 2;
+		blank.style.width = window.innerWidth + 'px';
+		blank.style.height = window.innerHeight + 'px';
+		blank.style.position = 'absolute';
+		blank.style.top = '0';
+		blank.style.left = '0';
+		insertPoint.appendChild(blank);
+	}
+	
+	// Create Pre-Test Box
+	if (preTest != undefined && preTest.children.length >= 1)
+	{
+		
+		var preTestHolder = document.createElement('div');
+		preTestHolder.id = 'preTestHolder';
+		preTestHolder.style.zIndex = 2;
+		preTestHolder.style.width = '500px';
+		preTestHolder.style.height = '250px';
+		preTestHolder.style.backgroundColor = '#fff';
+		preTestHolder.style.position = 'absolute';
+		preTestHolder.style.left = (window.innerWidth/2)-250 + 'px';
+		preTestHolder.style.top = (window.innerHeight/2)-125 + 'px';
+		// Parse the first box
+		var preTestOption = document.createElement('div');
+		preTestOption.id = 'preTest';
+		preTestOption.style.marginTop = '25px';
+		preTestOption.align = "center";
+		var child = preTest.children[0];
+		if (child.nodeName == 'statement')
+		{
+			preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
+		} else if (child.nodeName == 'question')
+		{
+			var textHold = document.createElement('span');
+			textHold.innerHTML = child.innerHTML;
+			var textEnter = document.createElement('textarea');
+			preTestOption.appendChild(textHold);
+			preTestOption.appendChild(textEnter);
+		}
+		var nextButton = document.createElement('button');
+		nextButton.id = 'preTestNext';
+		nextButton.value = '1';
+		nextButton.innerHTML = 'next';
+		nextButton.style.position = 'relative';
+		nextButton.style.left = '450px';
+		nextButton.style.top = '175px';
+		nextButton.onclick = function() {
+			// Need to find and parse preTest again!
+			var preTest = projectXML.find('PreTest')[0];
+			if (this.value < preTest.children.length)
+			{
+				// More to process
+				var child = preTest.children[this.value];
+				if (child.nodeName == 'statement')
+				{
+					preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
+				} else if (child.nodeName == 'question')
+				{
+					var textHold = document.createElement('span');
+					textHold.innerHTML = child.innerHTML;
+					var textEnter = document.createElement('textarea');
+					preTestOption.innerHTML = 'null';
+					preTestOption.appendChild(textHold);
+					preTestOption.appendChild(textEnter);
+				}
+			} else {
+				// Time to clear
+				preTestHolder.style.zIndex = -1;
+				preTestHolder.style.visibility = 'hidden';
+				var blank = document.getElementById('testHalt');
+				blank.style.zIndex = -2;
+				blank.style.visibility = 'hidden';
+			}
+			this.value++;
+		};
+		
+		preTestHolder.appendChild(preTestOption);
+		preTestHolder.appendChild(nextButton);
+		insertPoint.appendChild(preTestHolder);
+	}
+
 }
 
 function dragEnd(ev) {
