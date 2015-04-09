@@ -156,6 +156,7 @@ function audioObject(id) {
 	
 	this.id = id;
 	this.state = 0; // 0 - no data, 1 - ready
+	this.url = null; // Hold the URL given for the output back to the results.
 	
 	// Create a buffer and external gain control to allow internal patching of effects and volume leveling.
 	this.bufferNode = audioContext.createBufferSource();
@@ -186,6 +187,7 @@ function audioObject(id) {
 
 	this.constructTrack = function(url) {
 		var request = new XMLHttpRequest();
+		this.url = url;
 		request.open('GET',url,true);
 		request.responseType = 'arraybuffer';
 		
