@@ -89,10 +89,7 @@ function loadInterface(xmlDoc) {
 	// Create Submit (save) button
 	var submit = document.createElement("button");
 	submit.innerHTML = 'Submit';
-	submit.onclick = function() {
-		// TODO: Update this for postTest tags
-		createProjectSave(projectReturn)
-	};
+	submit.onclick = buttonSubmitClick;
 	// Append the interface buttons into the interfaceButtons object.
 	interfaceButtons.appendChild(playback);
 	interfaceButtons.appendChild(submit);
@@ -330,7 +327,11 @@ function preTestButtonClick(preTest,index)
 		var questionResponse = document.getElementById(questionId + 'response');
 		questionHold.id = questionId;
 		questionHold.innerHTML = questionResponse.value;
-		preTestQuestions.appendChild(questionHold);
+		if (currentState == 'preTest') {
+			preTestQuestions.appendChild(questionHold);
+		} else if (currentState = 'postTest') {  
+			postTestQuestions.appendChild(questionHold);
+		}
 	}
 	index++;
 	if (index < preTest.children.length)
@@ -355,9 +356,14 @@ function preTestButtonClick(preTest,index)
 	} else {
 		// Time to clear
 		preTestOption.innerHTML = null;
-		hidePopup();
-		// Progress the state!
-		advanceState();
+		if (currentState != 'postTest') {
+			hidePopup();
+			// Progress the state!
+			advanceState();
+		} else {
+			a = createProjectSave(projectReturn);
+			preTestOption.appendChild(a);
+		}
 	}
 	return index;
 }

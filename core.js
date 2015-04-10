@@ -100,6 +100,7 @@ function createProjectSave(destURL) {
 		var submitDiv = document.getElementById('download-point');
 		submitDiv.appendChild(a);
 	}
+	return submitDiv;
 }
 
 function AudioEngine() {
