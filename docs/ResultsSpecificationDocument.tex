@@ -14,27 +14,46 @@ This document outlines the return XML document structure to hold the results fro
 \section{Root}
 The root of the document is \texttt{BrowserEvaluationResult}.
 
-\section{AudioElement}
-A 1st level node, this contains the results for a specific audioElement.
+\section{testReults}
+A 1st level node, contains all the results from a specific test instance defined by the audioHolder objects in the setup XML. Takes the audioElement as its children to define a full test and any test metrics.
 
 \subsection{Attributes}
+\begin{itemize}
+\item \texttt{id} - The ID given to audioHolder in the project setup XML.
+\item \texttt{repeatCount} - Specifies the repeat count of the test, there will be one testResult per test per repeat, this will help identify which repeat.
+\end{itemize}
+
+\subsection{AudioElement}
+A 2nd level node, this contains the results for a specific audioElement.
+
+\subsubsection{Attributes}
 Has the following attributes, depending on the variables set in the Project Specification.
 \begin{itemize}
 \item \texttt{id} - Mandatory. This returns the ID of the track in question. This is either the value passed in from the project specification, or calculated based on the position in the list. For instance, in the automatic system, the first test sample has ID 0, the second ID 1 and so forth. The value passed in from the project specification can either be a string or a Number.
 \item \texttt{url} - Mandatory. Returns the full URL given incase of errors or for later checking.
 \end{itemize}
 
-\subsection{Value}
+\subsubsection{Value}
 One of these elements per track, containing the value between 0 and 100 relating the user rating of the track. This is a mandatory element.
 % float or int? (I, Brecht, am sort of indifferent here, it used to be down to .01 or something before, so maybe that or .1)
 % Nick - Can be a float, was trying to remove/reduce ambiguity from pixel position. But can easily make it to .01
 
-\subsection{Comment}
+\subsubsection{Comment}
 One of these elements per track, containing any commenting data from the interface text boxes. Has the two following child nodes.
 \begin{itemize}
 \item \texttt{Question} - Returns the text next to the comment box
 \item \texttt{Response} - Returns the text in the comment box
 \end{itemize}
+
+\subsubsection{metrics}
+One of these holders per audioElement, containing the results from any of the enabled per element metrics in metricResult tags. The ID of each element represents the metricEnable tag element. The inner value contains the results.
+
+% Will list specific response structures per metric!
+
+\subsection{metrics}
+One of these holders per testResults tag, containing the results from any of the enabled per test metrics in metricResult tags. The ID of each element represents the metricEnable tag element. The inner value contains the results.
+
+% Will list specific response structures per metric!
 
 \section{PreTest and PostTest}
 A 1st level node, contains the response to any pre-test questions given in the project specification. These are stored in the same Comment node as outlined in the above audioElement.
