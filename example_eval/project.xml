@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BrowserEvalProjectDocument>
+	<setup interface="APE" projectReturn="null" />
+	<audioHolder hostURL="example_eval/" sampleRate="44100">
+		<audioElements url="0.wav" ID="0"/>
+		<audioElements url="1.wav"/>
+		<audioElements url="2.wav"/>
+		<audioElements url="3.wav"/>
+		<audioElements url="4.wav"/>
+		<audioElements url="5.wav"/>
+		<audioElements url="6.wav"/>
+		<audioElements url="7.wav"/>
+		<audioElements url="8.wav"/>
+		<audioElements url="9.wav"/>
+		<audioElements url="10.wav"/>
+	</audioHolder>
+	<CommentQuestion>What is your mixing experiance</CommentQuestion>
+	<PreTest>
+		<statement>Please listen to all mixes</statement>
+		<question id="location" mandatory="true">Please enter your listening location</question>
+	</PreTest>
+	<PostTest>
+		<statement>Thank you for taking this listening test.</statement>
+		<question id="SessionID">Please enter your name.</question>
+	</PostTest>
+</BrowserEvalProjectDocument>
