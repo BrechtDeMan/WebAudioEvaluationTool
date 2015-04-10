@@ -23,9 +23,6 @@ function loadInterface(xmlDoc) {
 	var width = window.innerWidth;
 	var height = window.innerHeight;
 	
-	// Set background to grey #ddd
-	document.getElementsByTagName('body')[0].style.backgroundColor = '#ddd';
-	
 	// The injection point into the HTML page
 	var insertPoint = document.getElementById("topLevelBody");
 	var testContent = document.createElement('div');
@@ -104,9 +101,6 @@ function loadInterface(xmlDoc) {
 	canvas.id = 'slider';
 	// Must have a known EXACT width, as this is used later to determine the ratings
 	canvas.style.width = width - 100 +"px";
-	canvas.style.height = 150 + "px";
-	canvas.style.marginBottom = "25px";
-	canvas.style.backgroundColor = '#eee';
 	canvas.align = "left";
 	sliderBox.appendChild(canvas);
 	
@@ -166,16 +160,11 @@ function loadInterface(xmlDoc) {
 		var trackSliderObj = document.createElement('div');
 		trackSliderObj.className = 'track-slider';
 		trackSliderObj.id = 'track-slider-'+index;
-		trackSliderObj.style.position = 'absolute';
 		// Distribute it randomnly
 		var w = window.innerWidth - 100;
 		w = Math.random()*w;
 		trackSliderObj.style.left = Math.floor(w)+50+'px';
-		trackSliderObj.style.height = "150px";
-		trackSliderObj.style.width = "10px";
-		trackSliderObj.style.backgroundColor = 'rgb(100,200,100)';
 		trackSliderObj.innerHTML = '<span>'+index+'</span>';
-		trackSliderObj.style.float = "left";
 		trackSliderObj.draggable = true;
 		trackSliderObj.ondragend = dragEnd;
 		
@@ -208,13 +197,7 @@ function loadInterface(xmlDoc) {
 	{
 		testContent.style.zIndex = 1;
 		var blank = document.createElement('div');
-		blank.id = 'testHalt';
-		blank.style.zIndex = 2;
-		blank.style.width = window.innerWidth + 'px';
-		blank.style.height = window.innerHeight + 'px';
-		blank.style.position = 'absolute';
-		blank.style.top = '0';
-		blank.style.left = '0';
+		blank.className = 'testHalt';
 		insertPoint.appendChild(blank);
 	}
 	
@@ -224,10 +207,7 @@ function loadInterface(xmlDoc) {
 		
 		var preTestHolder = document.createElement('div');
 		preTestHolder.id = 'preTestHolder';
-		preTestHolder.style.zIndex = 2;
-		preTestHolder.style.width = '500px';
-		preTestHolder.style.height = '250px';
-		preTestHolder.style.backgroundColor = '#fff';
+		preTestHolder.className = 'popupHolder';
 		preTestHolder.style.position = 'absolute';
 		preTestHolder.style.left = (window.innerWidth/2)-250 + 'px';
 		preTestHolder.style.top = (window.innerHeight/2)-125 + 'px';
@@ -253,10 +233,7 @@ function loadInterface(xmlDoc) {
 		var nextButton = document.createElement('button');
 		nextButton.id = 'preTestNext';
 		nextButton.value = '1';
-		nextButton.innerHTML = 'next';
-		nextButton.style.position = 'relative';
-		nextButton.style.left = '450px';
-		nextButton.style.top = '175px';
+		nextButton.innerHTML = 'Next';
 		nextButton.onclick = function() {
 			// Need to find and parse preTest again!
 			var preTest = projectXML.find('PreTest')[0];
@@ -282,15 +259,17 @@ function loadInterface(xmlDoc) {
 					textHold.innerHTML = child.innerHTML;
 					var textEnter = document.createElement('textarea');
 					textEnter.id = child.attributes['id'].value + 'response';
+					var br = document.createElement('br');
 					preTestOption.innerHTML = null;
 					preTestOption.appendChild(textHold);
+					preTestOption.appendChild(br);
 					preTestOption.appendChild(textEnter);
 				}
 			} else {
 				// Time to clear
 				preTestHolder.style.zIndex = -1;
 				preTestHolder.style.visibility = 'hidden';
-				var blank = document.getElementById('testHalt');
+				var blank = document.getElementsByClassName('testHalt')[0];
 				blank.style.zIndex = -2;
 				blank.style.visibility = 'hidden';
 			}
@@ -306,6 +285,7 @@ function loadInterface(xmlDoc) {
 
 function dragEnd(ev) {
 	// Function call when a div has been dropped
+	var slider = document.getElementById('slider');
 	if (ev.x >= 50 && ev.x < window.innerWidth-50) {
 		this.style.left = (ev.x)+'px';
 	} else {
