@@ -32,11 +32,10 @@
 		<CommentQuestion id='mixingExperiance'>What is your mixing experiance</CommentQuestion>
 		<PreTest>
 			<statement>Start the Test 3</statement>
-			<statement>Start the Test 2</statement>
-			<statement>Start the Test 1</statement>
 		</PreTest>
 		<PostTest>
 			<statement>Please take a break before the next test</statement>
+			<question id="testComment">How did you find the test</question>
 		</PostTest>
 	</audioHolder>
 </BrowserEvalProjectDocument>
