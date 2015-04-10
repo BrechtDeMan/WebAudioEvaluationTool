@@ -42,7 +42,26 @@ function loadInterface(xmlDoc) {
 	// Should put in an error function here incase of malprocessed or malformed XML
 	
 	// Extract the different test XML DOM trees
-	testXMLSetups = xmlDoc.find('audioHolder');
+	 var audioHolders = xmlDoc.find('audioHolder');
+	 audioHolders.each(function(index,element) {
+	 	var repeatN = element.attributes['repeatCount'].value;
+	 	for (var r=0; r<=repeatN; r++) {
+	 		testXMLSetups[testXMLSetups.length] = element;
+	 	}
+	 });
+	 
+	 // New check if we need to randomise the test order
+	 var randomise = xmlSetup.attributes['randomiseOrder'];
+	 if (randomise != undefine) {
+	 	randomise = Boolean(randomise.value);
+	 } else {
+	 	randomise = false;
+	 }
+	 if (randomise)
+	 {
+	 	// TODO: Implement Randomisation!!
+	 }
+	 
 	
 	// Create the top div for the Title element
 	var titleAttr = xmlSetup[0].attributes['title'];
@@ -241,7 +260,7 @@ function loadTest(id)
 	
 	// Now process any pre-test commands
 	
-	var preTest = testXMLSetups.find('PreTest')[0];
+	var preTest = $(testXMLSetups[id]).find('PreTest')[0];
 	if (preTest.children.length > 0)
 	{
 		currentState = 'testRunPre-'+id;
@@ -298,13 +317,13 @@ function popupButtonClick()
 	{
 		//Specific test pre-test
 		var testId = currentState.substr(11,currentState.length-10);
-		var preTest = testXMLSetups.find('PreTest')[testId];
+		var preTest = $(testXMLSetups[testId]).find('PreTest')[0];
 		this.value = preTestButtonClick(preTest,this.value);
 	} else if (currentState.substr(0,11) == 'testRunPost')
 	{
 		// Specific test post-test
 		var testId = currentState.substr(12,currentState.length-11);
-		var preTest = testXMLSetups.find('PostTest')[testId];
+		var preTest = $(testXMLSetups[testId]).find('PostTest')[0];
 		this.value = preTestButtonClick(preTest,this.value);
 	} else if (currentState == 'postTest')
 	{
@@ -416,12 +435,13 @@ function advanceState()
 		currentState = 'testRun-'+testId;
 	} else if (currentState.substr(0,11) == 'testRunPost')
 	{
+		var testId = currentState.substr(12,currentState.length-11);
 		testEnded(testId);
 	} else if (currentState.substr(0,7) == 'testRun')
 	{
 		var testId = currentState.substr(8,currentState.length-7);
 		// Check if we have any post tests to perform
-		var postXML = testXMLSetups.find('PostTest')[testId];
+		var postXML = $(testXMLSetups[testId]).find('PostTest')[0];
 		if (postXML.children.length > 0)
 		{
 			currentState = 'testRunPost-'+testId; 
@@ -440,11 +460,14 @@ function advanceState()
 
 function testEnded(testId)
 {
+	var xmlDoc = interfaceXMLSave();
+	testResultsHolders;
 	if (testXMLSetups.length-1 > testId)
 	{
 		// Yes we have another test to perform
-		currentState = 'testRun-'+Number(testId)+1;
-		loadTest(testId+1);
+		testId = (Number(testId)+1);
+		currentState = 'testRun-'+testId;
+		loadTest(testId);
 	} else {
 		console.log('Testing Completed!');
 		currentState = 'postTest';
@@ -463,6 +486,16 @@ function buttonSubmitClick()
 	{
 		advanceState();
 	}
+}
+
+function pageXMLSave(testId)
+{
+	// Saves a specific test page
+	var xmlDoc = document.createElement("AudioHolder");
+	var testXML = testXMLSetups[testId];
+	xmlDoc.id = testXML.id;
+	xmlDoc.repeatCount = testXML.attributes['repeatCount'].value;
+	
 }
 
 // Only other global function which must be defined in the interface class. Determines how to create the XML document.
