@@ -34,6 +34,9 @@ function loadInterface(xmlDoc) {
 	var xmlSetup = xmlDoc.find('setup');
 	// Should put in an error function here incase of malprocessed or malformed XML
 	
+	// Extract the different test XML DOM trees
+	testXMLSetups = xmlDoc.find('audioHolder');
+	
 	// Create the top div for the Title element
 	var titleAttr = xmlSetup[0].attributes['title'];
 	var title = document.createElement('div');
@@ -106,78 +109,7 @@ function loadInterface(xmlDoc) {
 	
 	// Global parent for the comment boxes on the page
 	var feedbackHolder = document.createElement('div');
-	// Find the parent audioHolder object.
-	var audioHolder = xmlDoc.find('audioHolder');
-	audioHolder = audioHolder[0]; // Remove from one field array
-	// Extract the hostURL attribute. If not set, create an empty string.
-	var hostURL = audioHolder.attributes['hostURL'];
-	if (hostURL == undefined) {
-		hostURL = "";
-	} else {
-		hostURL = hostURL.value;
-	}
-	// Extract the sampleRate. If set, convert the string to a Number.
-	var hostFs = audioHolder.attributes['sampleRate'];
-	if (hostFs != undefined) {
-		hostFs = Number(hostFs.value);
-	}
-	
-	/// CHECK FOR SAMPLE RATE COMPATIBILITY
-	if (hostFs != undefined) {
-		if (Number(hostFs) != audioContext.sampleRate) {
-			var errStr = 'Sample rates do not match! Requested '+Number(hostFs)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
-			alert(errStr);
-			return;
-		}
-	}
-	// Find all the audioElements from the audioHolder
-	var audioElements = $(audioHolder).find('audioElements');
-	audioElements.each(function(index,element){
-		// Find URL of track
-		// In this jQuery loop, variable 'this' holds the current audioElement.
-		
-		// Now load each audio sample. First create the new track by passing the full URL
-		var trackURL = hostURL + this.attributes['url'].value;
-		audioEngineContext.newTrack(trackURL);
-		// Create document objects to hold the comment boxes
-		var trackComment = document.createElement('div');
-		// Create a string next to each comment asking for a comment
-		var trackString = document.createElement('span');
-		trackString.innerHTML = 'Comment on track '+index;
-		// Create the HTML5 comment box 'textarea'
-		var trackCommentBox = document.createElement('textarea');
-		trackCommentBox.rows = '4';
-		trackCommentBox.cols = '100';
-		trackCommentBox.name = 'trackComment'+index;
-		trackCommentBox.className = 'trackComment';
-		// Add to the holder.
-		trackComment.appendChild(trackString);
-		trackComment.appendChild(trackCommentBox);
-		feedbackHolder.appendChild(trackComment);
-		
-		// Create a slider per track
-		
-		var trackSliderObj = document.createElement('div');
-		trackSliderObj.className = 'track-slider';
-		trackSliderObj.id = 'track-slider-'+index;
-		// Distribute it randomnly
-		var w = window.innerWidth - 100;
-		w = Math.random()*w;
-		trackSliderObj.style.left = Math.floor(w)+50+'px';
-		trackSliderObj.innerHTML = '<span>'+index+'</span>';
-		trackSliderObj.draggable = true;
-		trackSliderObj.ondragend = dragEnd;
-		
-		// Onclick, switch playback to that track
-		trackSliderObj.onclick = function() {
-			// Get the track ID from the object ID
-			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
-			audioEngineContext.selectedTrack(id);
-		};
-		
-		canvas.appendChild(trackSliderObj);
-	});
-	
+	feedbackHolder.id = 'feedbackHolder';
 	
 	// Create pre and post test questions
 	
@@ -188,6 +120,8 @@ function loadInterface(xmlDoc) {
 	testContent.appendChild(sliderBox);
 	testContent.appendChild(feedbackHolder);
 	insertPoint.appendChild(testContent);
+	
+	loadTest(testXMLSetups[0]);
 	
 	var preTest = xmlDoc.find('PreTest');
 	var postTest = xmlDoc.find('PostTest');
@@ -281,6 +215,93 @@ function loadInterface(xmlDoc) {
 		insertPoint.appendChild(preTestHolder);
 	}
 
+}
+
+function loadTest(textXML)
+{
+	// Used to load a specific test page
+	
+	
+	var feedbackHolder = document.getElementById('feedbackHolder');
+	var canvas = document.getElementById('slider');
+	feedbackHolder.innerHTML = null;
+	canvas.innerHTML = null;
+
+	// Extract the hostURL attribute. If not set, create an empty string.
+	var hostURL = textXML.attributes['hostURL'];
+	if (hostURL == undefined) {
+		hostURL = "";
+	} else {
+		hostURL = hostURL.value;
+	}
+	// Extract the sampleRate. If set, convert the string to a Number.
+	var hostFs = textXML.attributes['sampleRate'];
+	if (hostFs != undefined) {
+		hostFs = Number(hostFs.value);
+	}
+	
+	/// CHECK FOR SAMPLE RATE COMPATIBILITY
+	if (hostFs != undefined) {
+		if (Number(hostFs) != audioContext.sampleRate) {
+			var errStr = 'Sample rates do not match! Requested '+Number(hostFs)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
+			alert(errStr);
+			return;
+		}
+	}
+	// Find all the audioElements from the audioHolder
+	var audioElements = $(textXML).find('audioElements');
+	audioElements.each(function(index,element){
+		// Find URL of track
+		// In this jQuery loop, variable 'this' holds the current audioElement.
+		
+		// Now load each audio sample. First create the new track by passing the full URL
+		var trackURL = hostURL + this.attributes['url'].value;
+		audioEngineContext.newTrack(trackURL);
+		// Create document objects to hold the comment boxes
+		var trackComment = document.createElement('div');
+		// Create a string next to each comment asking for a comment
+		var trackString = document.createElement('span');
+		trackString.innerHTML = 'Comment on track '+index;
+		// Create the HTML5 comment box 'textarea'
+		var trackCommentBox = document.createElement('textarea');
+		trackCommentBox.rows = '4';
+		trackCommentBox.cols = '100';
+		trackCommentBox.name = 'trackComment'+index;
+		trackCommentBox.className = 'trackComment';
+		var br = document.createElement('br');
+		// Add to the holder.
+		trackComment.appendChild(trackString);
+		trackComment.appendChild(br);
+		trackComment.appendChild(trackCommentBox);
+		feedbackHolder.appendChild(trackComment);
+		
+		// Create a slider per track
+		
+		var trackSliderObj = document.createElement('div');
+		trackSliderObj.className = 'track-slider';
+		trackSliderObj.id = 'track-slider-'+index;
+		// Distribute it randomnly
+		var w = window.innerWidth - 100;
+		w = Math.random()*w;
+		trackSliderObj.style.left = Math.floor(w)+50+'px';
+		trackSliderObj.innerHTML = '<span>'+index+'</span>';
+		trackSliderObj.draggable = true;
+		trackSliderObj.ondragend = dragEnd;
+		
+		// Onclick, switch playback to that track
+		trackSliderObj.onclick = function() {
+			// Get the track ID from the object ID
+			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
+			audioEngineContext.selectedTrack(id);
+		};
+		
+		canvas.appendChild(trackSliderObj);
+	});
+}
+
+function preTestButtonClick()
+{
+	// Called on click of pre-test button
 }
 
 function dragEnd(ev) {
