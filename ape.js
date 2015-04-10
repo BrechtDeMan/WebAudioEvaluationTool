@@ -51,8 +51,8 @@ function loadInterface(xmlDoc) {
 	 });
 	 
 	 // New check if we need to randomise the test order
-	 var randomise = xmlSetup.attributes['randomiseOrder'];
-	 if (randomise != undefine) {
+	 var randomise = xmlSetup[0].attributes['randomiseOrder'];
+	 if (randomise != undefined) {
 	 	randomise = Boolean(randomise.value);
 	 } else {
 	 	randomise = false;
@@ -207,9 +207,23 @@ function loadTest(id)
 			return;
 		}
 	}
-	// Find all the audioElements from the audioHolder
+	
+	var randomise = textXML.attributes['randomiseOrder'];
+	if (randomise != undefined) {randomise = randomise.value;}
+	else {randomise = false;}
+	
 	var audioElements = $(textXML).find('audioElements');
 	audioElements.each(function(index,element){
+		// Find any blind-repeats
+		// Not implemented yet, but just incase
+		currentTrackOrder[index] = element;
+	});
+	if (randomise) {
+		// TODO: Randomise order
+	}
+	
+	// Find all the audioElements from the audioHolder
+	$(currentTrackOrder).each(function(index,element){
 		// Find URL of track
 		// In this jQuery loop, variable 'this' holds the current audioElement.
 		
@@ -460,8 +474,7 @@ function advanceState()
 
 function testEnded(testId)
 {
-	var xmlDoc = interfaceXMLSave();
-	testResultsHolders;
+	pageXMLSave(testId);
 	if (testXMLSetups.length-1 > testId)
 	{
 		// Yes we have another test to perform
@@ -495,33 +508,41 @@ function pageXMLSave(testId)
 	var testXML = testXMLSetups[testId];
 	xmlDoc.id = testXML.id;
 	xmlDoc.repeatCount = testXML.attributes['repeatCount'].value;
-	
+	var trackSliderObjects = document.getElementsByClassName('track-slider');
+	var commentObjects = document.getElementsByClassName('comment-div');
+	var rateMin = 50;
+	var rateMax = window.innerWidth-50;
+	for (var i=0; i<trackSliderObjects.length; i++) 
+	{
+		var audioElement = document.createElement('audioElement');
+		audioElement.id = currentTrackOrder[i].attributes['id'].value;
+		audioElement.url = currentTrackOrder[i].attributes['url'].value;
+		var value = document.createElement("value");
+		var rate = Number(trackSliderObjects[i].style.left.substr(0,trackSliderObjects[i].style.left.length-2));
+		rate = (rate-rateMin)/rateMax;
+		value.innerHTML = Math.floor(rate*100);
+		var comment = document.createElement("comment");
+		var question = document.createElement("question");
+		var response = document.createElement("response");
+		question.textContent = commentObjects[i].children[0].textContent;
+		response.textContent = commentObjects[i].children[2].value;
+		comment.appendChild(question);
+		comment.appendChild(response);
+		audioElement.appendChild(value);
+		audioElement.appendChild(comment);
+		xmlDoc.appendChild(audioElement);
+	}
+	testResultsHolders[testId] = xmlDoc;
 }
 
 // Only other global function which must be defined in the interface class. Determines how to create the XML document.
 function interfaceXMLSave(){
 	// Create the XML string to be exported with results
 	var xmlDoc = document.createElement("BrowserEvaluationResult");
-	var trackSliderObjects = document.getElementsByClassName('track-slider');
-	var commentObjects = document.getElementsByClassName('trackComment');
-	var rateMin = 50;
-	var rateMax = window.innerWidth-50;
-	for (var i=0; i<trackSliderObjects.length; i++)
+	for (var i=0; i<testResultsHolders.length; i++)
 	{
-		var trackObj = document.createElement("audioElement");
-		trackObj.id = i;
-		trackObj.url = audioEngineContext.audioObjects[i].url;
-		var slider = document.createElement("Rating");
-		var rate = Number(trackSliderObjects[i].style.left.substr(0,trackSliderObjects[i].style.left.length-2));
-		rate = (rate-rateMin)/rateMax;
-		slider.innerHTML = Math.floor(rate*100);
-		var comment = document.createElement("Comment");
-		comment.innerHTML = commentObjects[i].value;
-		trackObj.appendChild(slider);
-		trackObj.appendChild(comment);
-		xmlDoc.appendChild(trackObj);
+		xmlDoc.appendChild(testResultsHolders[i]);
 	}
-	
 	// Append Pre/Post Questions
 	xmlDoc.appendChild(preTestQuestions);
 	xmlDoc.appendChild(postTestQuestions);

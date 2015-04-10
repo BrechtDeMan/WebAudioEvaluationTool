@@ -25,6 +25,7 @@ var projectXML; // Hold the parsed setup XML
 
 var testXMLSetups = []; // Hold the parsed test instances
 var testResultsHolders =[]; // Hold the results from each test for publishing to XML
+var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var currentTestHolder; // Hold an intermediate results during test - metrics
 var audioEngineContext; // The custome AudioEngine object
 var projectReturn; // Hold the URL for the return
