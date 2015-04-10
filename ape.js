@@ -208,6 +208,14 @@ function loadTest(id)
 		}
 	}
 	
+	currentTestHolder = document.createElement('audioHolder');
+	currentTestHolder.id = textXML.id;
+	currentTestHolder.repeatCount = textXML.attributes['repeatCount'].value;
+	var currentPreTestHolder = document.createElement('preTest');
+	var currentPostTestHolder = document.createElement('postTest');
+	currentTestHolder.appendChild(currentPreTestHolder);
+	currentTestHolder.appendChild(currentPostTestHolder);
+	
 	var randomise = textXML.attributes['randomiseOrder'];
 	if (randomise != undefined) {randomise = randomise.value;}
 	else {randomise = false;}
@@ -360,11 +368,7 @@ function preTestButtonClick(preTest,index)
 		var questionResponse = document.getElementById(questionId + 'response');
 		questionHold.id = questionId;
 		questionHold.innerHTML = questionResponse.value;
-		if (currentState == 'preTest') {
-			preTestQuestions.appendChild(questionHold);
-		} else if (currentState = 'postTest') {  
-			postTestQuestions.appendChild(questionHold);
-		}
+		postPopupResponse(questionHold);
 	}
 	index++;
 	if (index < preTest.children.length)
@@ -399,6 +403,25 @@ function preTestButtonClick(preTest,index)
 		}
 	}
 	return index;
+}
+
+function postPopupResponse(response)
+{
+	if (currentState == 'preTest') {
+		preTestQuestions.appendChild(response);
+	} else if (currentState == 'postTest') {  
+		postTestQuestions.appendChild(response);
+	} else {
+		// Inside a specific test
+		if (currentState.substr(0,10) == 'testRunPre') {
+			// Pre Test
+			var store = $(currentTestHolder).find('preTest');
+		} else {
+			// Post Test
+			var store = $(currentTestHolder).find('postTest');
+		}
+		store[0].appendChild(response);
+	}
 }
 
 function showPopup()
@@ -504,10 +527,7 @@ function buttonSubmitClick()
 function pageXMLSave(testId)
 {
 	// Saves a specific test page
-	var xmlDoc = document.createElement("AudioHolder");
-	var testXML = testXMLSetups[testId];
-	xmlDoc.id = testXML.id;
-	xmlDoc.repeatCount = testXML.attributes['repeatCount'].value;
+	var xmlDoc = currentTestHolder;
 	var trackSliderObjects = document.getElementsByClassName('track-slider');
 	var commentObjects = document.getElementsByClassName('comment-div');
 	var rateMin = 50;
