@@ -45,6 +45,19 @@ div.track-slider {
 	background-color: rgb(100,200,100);
 }
 
+div.comment-div {
+	border:#444444;
+	border-style:solid;
+	border-width:1px;
+	width: 624px;
+	float: left;
+	margin: 5px;
+}
+div.comment-div span {
+	margin-left: 15px;
+}
+
+
 div.popupHolder {
 	width: 500px;
 	height: 250px;

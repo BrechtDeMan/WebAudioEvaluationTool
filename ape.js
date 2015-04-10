@@ -137,12 +137,13 @@ function loadInterface(xmlDoc) {
 	if (preTest != undefined && preTest.children.length >= 1)
 	{
 		
-		var preTestHolder = document.createElement('div');
-		preTestHolder.id = 'preTestHolder';
-		preTestHolder.className = 'popupHolder';
-		preTestHolder.style.position = 'absolute';
-		preTestHolder.style.left = (window.innerWidth/2)-250 + 'px';
-		preTestHolder.style.top = (window.innerHeight/2)-125 + 'px';
+		var popupHolder = document.createElement('div');
+		popupHolder.id = 'popupHolder';
+		popupHolder.className = 'popupHolder';
+		popupHolder.style.position = 'absolute';
+		popupHolder.style.left = (window.innerWidth/2)-250 + 'px';
+		popupHolder.style.top = (window.innerHeight/2)-125 + 'px';
+		
 		// Parse the first box
 		var preTestOption = document.createElement('div');
 		preTestOption.id = 'preTest';
@@ -168,9 +169,9 @@ function loadInterface(xmlDoc) {
 		nextButton.innerHTML = 'Next';
 		nextButton.onclick = preTestButtonClick;
 		
-		preTestHolder.appendChild(preTestOption);
-		preTestHolder.appendChild(nextButton);
-		insertPoint.appendChild(preTestHolder);
+		popupHolder.appendChild(preTestOption);
+		popupHolder.appendChild(nextButton);
+		insertPoint.appendChild(popupHolder);
 	}
 
 	// Load the full interface
@@ -219,6 +220,7 @@ function loadTest(textXML)
 		audioEngineContext.newTrack(trackURL);
 		// Create document objects to hold the comment boxes
 		var trackComment = document.createElement('div');
+		trackComment.className = 'comment-div';
 		// Create a string next to each comment asking for a comment
 		var trackString = document.createElement('span');
 		trackString.innerHTML = 'Comment on track '+index;
@@ -297,22 +299,29 @@ function preTestButtonClick()
 		}
 	} else {
 		// Time to clear
-		preTestHolder.style.zIndex = -1;
-		preTestHolder.style.visibility = 'hidden';
-		var blank = document.getElementsByClassName('testHalt')[0];
-		blank.style.zIndex = -2;
-		blank.style.visibility = 'hidden';
+		preTestOption.innerHTML = null;
+		hidePopup();
 	}
 }
 
 function showPopup()
 {
-	
+	var popupHolder = document.getElementById('popupHolder');
+	popupHolder.style.zIndex = 2;
+	popupHolder.style.visibility = 'visible';
+	var blank = document.getElementsByClassName('testHalt')[0];
+	blank.style.zIndex = 2;
+	blank.style.visibility = 'visible';
 }
 
 function hidePopup()
 {
-	
+	var popupHolder = document.getElementById('popupHolder');
+	popupHolder.style.zIndex = -1;
+	popupHolder.style.visibility = 'hidden';
+	var blank = document.getElementsByClassName('testHalt')[0];
+	blank.style.zIndex = -2;
+	blank.style.visibility = 'hidden';
 }
 
 function dragEnd(ev) {
