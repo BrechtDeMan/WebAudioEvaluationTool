@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="null" randomiseOrder='true' collectMetrics='true' />
+	<setup interface="APE" projectReturn="null" randomiseOrder='true' collectMetrics='true'>
+		<PreTest>
+			<statement>Please listen to all mixes</statement>
+			<question id="location" mandatory="true">Please enter your listening location</question>
+		</PreTest>
+		<PostTest>
+			<statement>Thank you for taking this listening test.</statement>
+			<question id="SessionID">Please enter your name.</question>
+		</PostTest>
+		<Metric>
+			<metricEnable>testTimer</metricEnable>
+			<metricEnable>elementTimer</metricEnable>
+			<metricEnable>elementTracker</metricEnable>
+			<metricEnable>elementFlagListenedTo</metricEnable>
+			<metricEnable>elementFlagMoved</metricEnable>
+		</Metric>
+	</setup>
 	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='1'>
 		<audioElements url="0.wav" ID="0"/>
 		<audioElements url="1.wav"/>
@@ -19,19 +35,4 @@
 			<statement>Please take a break before the next test</statement>
 		</PostTest>
 	</audioHolder>
-	<PreTest>
-		<statement>Please listen to all mixes</statement>
-		<question id="location" mandatory="true">Please enter your listening location</question>
-	</PreTest>
-	<PostTest>
-		<statement>Thank you for taking this listening test.</statement>
-		<question id="SessionID">Please enter your name.</question>
-	</PostTest>
-	<Metric>
-		<metricEnable>testTimer</metricEnable>
-		<metricEnable>elementTimer</metricEnable>
-		<metricEnable>elementTracker</metricEnable>
-		<metricEnable>elementFlagListenedTo</metricEnable>
-		<metricEnable>elementFlagMoved</metricEnable>
-	</Metric>
 </BrowserEvalProjectDocument>
