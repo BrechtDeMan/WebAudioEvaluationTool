@@ -303,6 +303,12 @@ function popupButtonClick()
 		var testId = currentState.substr(11,currentState.length-10);
 		var preTest = testXMLSetups.find('PreTest')[testId];
 		this.value = preTestButtonClick(preTest,this.value);
+	} else if (currentState == 'postTest')
+	{
+		// At the end of the test, running global post test
+		var xmlTree = projectXML.find('setup');
+		var PostTest = xmlTree.find('PostTest')[0];
+		this.value = preTestButtonClick(PostTest,this.value);
 	}
 }
 
@@ -416,10 +422,12 @@ function advanceState()
 			loadTest(testId+1);
 		} else {
 			console.log('Testing Completed!');
+			currentState = 'postTest';
 			// Check for any post tests
 			var xmlSetup = projectXML.find('setup');
-			var postTest = xmlSetup.find('PostTest');
-			console.log(postTest);
+			var postTest = xmlSetup.find('PostTest')[0];
+			showPopup();
+			preTestPopupStart(postTest);
 		}
 	}
 	console.log(currentState);
