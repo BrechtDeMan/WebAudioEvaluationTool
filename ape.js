@@ -303,6 +303,12 @@ function popupButtonClick()
 		var testId = currentState.substr(11,currentState.length-10);
 		var preTest = testXMLSetups.find('PreTest')[testId];
 		this.value = preTestButtonClick(preTest,this.value);
+	} else if (currentState.substr(0,11) == 'testRunPost')
+	{
+		// Specific test post-test
+		var testId = currentState.substr(12,currentState.length-11);
+		var preTest = testXMLSetups.find('PostTest')[testId];
+		this.value = preTestButtonClick(preTest,this.value);
 	} else if (currentState == 'postTest')
 	{
 		// At the end of the test, running global post test
@@ -402,6 +408,9 @@ function advanceState()
 		// Start the test
 		var testId = currentState.substr(11,currentState.length-10);
 		currentState = 'testRun-'+testId;
+	} else if (currentState.substr(0,11) == 'testRunPost')
+	{
+		testEnded(testId);
 	} else if (currentState.substr(0,7) == 'testRun')
 	{
 		var testId = currentState.substr(8,currentState.length-7);
@@ -409,28 +418,36 @@ function advanceState()
 		var postXML = testXMLSetups.find('PostTest')[testId];
 		if (postXML.children.length > 0)
 		{
-			console.log('POST TEST')
-		}
-		// else
-		
-		
-		// No post tests, check if we have another test to perform instead
-		if (testXMLSetups.length-1 > testId)
-		{
-			// Yes we have another test to perform
-			currentState = 'testRun-'+Number(testId)+1;
-			loadTest(testId+1);
-		} else {
-			console.log('Testing Completed!');
-			currentState = 'postTest';
-			// Check for any post tests
-			var xmlSetup = projectXML.find('setup');
-			var postTest = xmlSetup.find('PostTest')[0];
+			currentState = 'testRunPost-'+testId; 
 			showPopup();
-			preTestPopupStart(postTest);
+			preTestPopupStart(postXML);
+		}
+		else {
+		
+		
+			// No post tests, check if we have another test to perform instead
+			testEnded(testId);
 		}
 	}
 	console.log(currentState);
+}
+
+function testEnded(testId)
+{
+	if (testXMLSetups.length-1 > testId)
+	{
+		// Yes we have another test to perform
+		currentState = 'testRun-'+Number(testId)+1;
+		loadTest(testId+1);
+	} else {
+		console.log('Testing Completed!');
+		currentState = 'postTest';
+		// Check for any post tests
+		var xmlSetup = projectXML.find('setup');
+		var postTest = xmlSetup.find('PostTest')[0];
+		showPopup();
+		preTestPopupStart(postTest);
+	}
 }
 
 function buttonSubmitClick()
