@@ -11,6 +11,11 @@ div.title {
 	/* Specify any colouring for the title */
 }
 
+div.pageTitle {
+	width: auto;
+	height: 20px;
+}
+
 div.testHalt {
 	/* Specify any colouring during the test halt for pre/post questions */
 	background-color: rgba(0,0,0,0.5);
@@ -33,7 +38,20 @@ div#slider {
 	/* Specify any structure for the slider holder interface */
 	background-color: #eee;
 	height: 150px;
-	margin-bottom: 25px;
+	margin-bottom: 5px;
+}
+
+div.sliderScale {
+	width: 100%;
+	min-height: 20px;
+}
+
+div.sliderScale span {
+	/* Any formatting of text below scale */
+	min-width: 5px;
+	height: 20px;
+	height: 100%;
+	position: absolute;
 }
 
 div.track-slider {

@@ -79,6 +79,13 @@ function loadInterface(xmlDoc) {
 	// Insert the titleSpan element into the title div element.
 	title.appendChild(titleSpan);
 	
+	var pagetitle = document.createElement('div');
+	pagetitle.className = "pageTitle";
+	pagetitle.align = "center";
+	var titleSpan = document.createElement('span');
+	titleSpan.id = "pageTitle";
+	pagetitle.appendChild(titleSpan);
+	
 	// Store the return URL path in global projectReturn
 	projectReturn = xmlSetup[0].attributes['projectReturn'].value;
 	
@@ -130,6 +137,13 @@ function loadInterface(xmlDoc) {
 	canvas.align = "left";
 	sliderBox.appendChild(canvas);
 	
+	// Create the div to hold any scale objects
+	var scale = document.createElement('div');
+	scale.className = 'sliderScale';
+	scale.id = 'sliderScaleHolder';
+	scale.align = 'left';
+	sliderBox.appendChild(scale);
+	
 	// Global parent for the comment boxes on the page
 	var feedbackHolder = document.createElement('div');
 	feedbackHolder.id = 'feedbackHolder';
@@ -167,6 +181,7 @@ function loadInterface(xmlDoc) {
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
+	testContent.appendChild(pagetitle);
 	testContent.appendChild(interfaceButtons);
 	testContent.appendChild(sliderBox);
 	testContent.appendChild(feedbackHolder);
@@ -185,6 +200,27 @@ function loadTest(id)
 	var canvas = document.getElementById('slider');
 	feedbackHolder.innerHTML = null;
 	canvas.innerHTML = null;
+	
+	// Setup question title
+	var interfaceObj = $(textXML).find('interface');
+	var titleNode = interfaceObj.find('title');
+	if (titleNode[0] != undefined)
+	{
+		document.getElementById('pageTitle').textContent = titleNode[0].textContent;
+	}
+	var positionScale = canvas.style.width.substr(0,canvas.style.width.length-2);
+	var offset = 50-8;  // Half the offset of the slider (window width -100) minus the body padding of 8
+	// TODO: AUTOMATE ABOVE!!
+	var scale = document.getElementById('sliderScaleHolder');
+	scale.innerHTML = null;
+	interfaceObj.find('scale').each(function(index,scaleObj){
+		var position = Number(scaleObj.attributes['position'].value)*0.01;
+		var pixelPosition = (position*positionScale)+offset;
+		var scaleDOM = document.createElement('span');
+		scaleDOM.textContent = scaleObj.textContent;
+		scale.appendChild(scaleDOM);
+		scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
+	});
 
 	// Extract the hostURL attribute. If not set, create an empty string.
 	var hostURL = textXML.attributes['hostURL'];

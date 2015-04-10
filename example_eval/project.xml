@@ -18,6 +18,13 @@
 		</Metric>
 	</setup>
 	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='1'>
+		<interface>
+			<title>Example Test Question</title>
+			<scale position="0">Min</scale>
+			<scale position="100">Max</scale>
+			<scale position="50">Middle</scale>
+			<scale position="20">20</scale>
+		</interface>
 		<audioElements url="0.wav" id="0"/>
 		<audioElements url="1.wav" id="1"/>
 		<audioElements url="2.wav" id="2"/>
