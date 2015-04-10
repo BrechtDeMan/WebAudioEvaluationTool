@@ -396,8 +396,42 @@ function advanceState()
 		// Start the test
 		var testId = currentState.substr(11,currentState.length-10);
 		currentState = 'testRun-'+testId;
+	} else if (currentState.substr(0,7) == 'testRun')
+	{
+		var testId = currentState.substr(8,currentState.length-7);
+		// Check if we have any post tests to perform
+		var postXML = testXMLSetups.find('PostTest')[testId];
+		if (postXML.children.length > 0)
+		{
+			console.log('POST TEST')
+		}
+		// else
+		
+		
+		// No post tests, check if we have another test to perform instead
+		if (testXMLSetups.length-1 > testId)
+		{
+			// Yes we have another test to perform
+			currentState = 'testRun-'+Number(testId)+1;
+			loadTest(testId+1);
+		} else {
+			console.log('Testing Completed!');
+			// Check for any post tests
+			var xmlSetup = projectXML.find('setup');
+			var postTest = xmlSetup.find('PostTest');
+			console.log(postTest);
+		}
 	}
 	console.log(currentState);
+}
+
+function buttonSubmitClick()
+{
+	// This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
+	if (currentState.substr(0,7) == 'testRun')
+	{
+		advanceState();
+	}
 }
 
 // Only other global function which must be defined in the interface class. Determines how to create the XML document.
