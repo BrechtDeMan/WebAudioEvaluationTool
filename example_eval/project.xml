@@ -30,7 +30,11 @@
 		<audioElements url="9.wav"/>
 		<audioElements url="10.wav"/>
 		<CommentQuestion id='mixingExperiance'>What is your mixing experiance</CommentQuestion>
-		<PreTest/>
+		<PreTest>
+			<statement>Start the Test 3</statement>
+			<statement>Start the Test 2</statement>
+			<statement>Start the Test 1</statement>
+		</PreTest>
 		<PostTest>
 			<statement>Please take a break before the next test</statement>
 		</PostTest>

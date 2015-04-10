@@ -146,34 +146,7 @@ function loadInterface(xmlDoc) {
 	if (preTest != undefined && preTest.children.length >= 1)
 	{
 		showPopup();
-		
-		// Parse the first box
-		var preTestOption = document.createElement('div');
-		preTestOption.id = 'preTest';
-		preTestOption.style.marginTop = '25px';
-		preTestOption.align = "center";
-		var child = preTest.children[0];
-		if (child.nodeName == 'statement')
-		{
-			preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
-		} else if (child.nodeName == 'question')
-		{
-			var questionId = child.attributes['id'].value;
-			var textHold = document.createElement('span');
-			textHold.innerHTML = child.innerHTML;
-			textHold.id = questionId + 'response';
-			var textEnter = document.createElement('textarea');
-			preTestOption.appendChild(textHold);
-			preTestOption.appendChild(textEnter);
-		}
-		var nextButton = document.createElement('button');
-		nextButton.className = 'popupButton';
-		nextButton.value = '0';
-		nextButton.innerHTML = 'Next';
-		nextButton.onclick = popupButtonClick;
-		
-		popupHolder.appendChild(preTestOption);
-		popupHolder.appendChild(nextButton);
+		preTestPopupStart(preTest);
 	}
 	
 	// Inject into HTML
@@ -184,13 +157,13 @@ function loadInterface(xmlDoc) {
 	insertPoint.appendChild(testContent);
 
 	// Load the full interface
-	loadTest(testXMLSetups[0]);
+	
 }
 
-function loadTest(textXML)
+function loadTest(id)
 {
 	// Used to load a specific test page
-	
+	var textXML = testXMLSetups[id];
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
 	var canvas = document.getElementById('slider');
@@ -268,6 +241,51 @@ function loadTest(textXML)
 		
 		canvas.appendChild(trackSliderObj);
 	});
+	
+	// Now process any pre-test commands
+	
+	var preTest = testXMLSetups.find('PreTest')[0];
+	if (preTest.children.length > 0)
+	{
+		currentState = 'testRunPre-'+id;
+		preTestPopupStart(preTest);
+		showPopup();
+	} else {
+		currentState = 'testRun-'+id;
+	}
+}
+
+function preTestPopupStart(preTest)
+{
+	var popupHolder = document.getElementById('popupHolder');
+	popupHolder.innerHTML = null;
+	// Parse the first box
+	var preTestOption = document.createElement('div');
+	preTestOption.id = 'preTest';
+	preTestOption.style.marginTop = '25px';
+	preTestOption.align = "center";
+	var child = preTest.children[0];
+	if (child.nodeName == 'statement')
+	{
+		preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
+	} else if (child.nodeName == 'question')
+	{
+		var questionId = child.attributes['id'].value;
+		var textHold = document.createElement('span');
+		textHold.innerHTML = child.innerHTML;
+		textHold.id = questionId + 'response';
+		var textEnter = document.createElement('textarea');
+		preTestOption.appendChild(textHold);
+		preTestOption.appendChild(textEnter);
+	}
+	var nextButton = document.createElement('button');
+	nextButton.className = 'popupButton';
+	nextButton.value = '0';
+	nextButton.innerHTML = 'Next';
+	nextButton.onclick = popupButtonClick;
+	
+	popupHolder.appendChild(preTestOption);
+	popupHolder.appendChild(nextButton);
 }
 
 function popupButtonClick()
@@ -276,16 +294,22 @@ function popupButtonClick()
 	if (currentState == 'preTest')
 	{
 		// At the start of the preTest routine!
-		this.value = preTestButtonClick(this.value);
+		var xmlTree = projectXML.find('setup');
+		var preTest = xmlTree.find('PreTest')[0];
+		this.value = preTestButtonClick(preTest,this.value);
+	} else if (currentState.substr(0,10) == 'testRunPre')
+	{
+		//Specific test pre-test
+		var testId = currentState.substr(11,currentState.length-10);
+		var preTest = testXMLSetups.find('PreTest')[testId];
+		this.value = preTestButtonClick(preTest,this.value);
 	}
 }
 
-function preTestButtonClick(index)
+function preTestButtonClick(preTest,index)
 {
 	// Called on click of pre-test button
 	// Need to find and parse preTest again!
-	var xmlSetup = projectXML.find('setup');
-	var preTest = xmlSetup.find('PreTest')[0];
 	var preTestOption = document.getElementById('preTest');
 	// Check if current state is a question!
 	if (preTest.children[index].nodeName == 'question') {
@@ -321,6 +345,7 @@ function preTestButtonClick(index)
 		preTestOption.innerHTML = null;
 		hidePopup();
 		// Progress the state!
+		advanceState();
 	}
 	return index;
 }
@@ -357,6 +382,22 @@ function dragEnd(ev) {
 			this.style.left = window.innerWidth-50 + 'px';
 		}
 	}
+}
+
+function advanceState()
+{
+	console.log(currentState);
+	if (currentState == 'preTest')
+	{
+		// End of pre-test, begin the test
+		loadTest(0);
+	} else if (currentState.substr(0,10) == 'testRunPre')
+	{
+		// Start the test
+		var testId = currentState.substr(11,currentState.length-10);
+		currentState = 'testRun-'+testId;
+	}
+	console.log(currentState);
 }
 
 // Only other global function which must be defined in the interface class. Determines how to create the XML document.
