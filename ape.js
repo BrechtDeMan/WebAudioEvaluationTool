@@ -121,10 +121,8 @@ function loadInterface(xmlDoc) {
 	testContent.appendChild(feedbackHolder);
 	insertPoint.appendChild(testContent);
 	
-	loadTest(testXMLSetups[0]);
-	
-	var preTest = xmlDoc.find('PreTest');
-	var postTest = xmlDoc.find('PostTest');
+	var preTest = xmlSetup.find('PreTest');
+	var postTest = xmlSetup.find('PostTest');
 	preTest = preTest[0];
 	postTest = postTest[0];
 	if (preTest != undefined || postTest != undefined)
@@ -166,55 +164,17 @@ function loadInterface(xmlDoc) {
 		}
 		var nextButton = document.createElement('button');
 		nextButton.id = 'preTestNext';
-		nextButton.value = '1';
+		nextButton.value = '0';
 		nextButton.innerHTML = 'Next';
-		nextButton.onclick = function() {
-			// Need to find and parse preTest again!
-			var preTest = projectXML.find('PreTest')[0];
-			// Check if current state is a question!
-			if (preTest.children[this.value-1].nodeName == 'question') {
-				var questionId = preTest.children[this.value-1].attributes['id'].value;
-				var questionHold = document.createElement('comment');
-				var questionResponse = document.getElementById(questionId + 'response');
-				questionHold.id = questionId;
-				questionHold.innerHTML = questionResponse.value;
-				preTestQuestions.appendChild(questionHold);
-			}
-			if (this.value < preTest.children.length)
-			{
-				// More to process
-				var child = preTest.children[this.value];
-				if (child.nodeName == 'statement')
-				{
-					preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
-				} else if (child.nodeName == 'question')
-				{
-					var textHold = document.createElement('span');
-					textHold.innerHTML = child.innerHTML;
-					var textEnter = document.createElement('textarea');
-					textEnter.id = child.attributes['id'].value + 'response';
-					var br = document.createElement('br');
-					preTestOption.innerHTML = null;
-					preTestOption.appendChild(textHold);
-					preTestOption.appendChild(br);
-					preTestOption.appendChild(textEnter);
-				}
-			} else {
-				// Time to clear
-				preTestHolder.style.zIndex = -1;
-				preTestHolder.style.visibility = 'hidden';
-				var blank = document.getElementsByClassName('testHalt')[0];
-				blank.style.zIndex = -2;
-				blank.style.visibility = 'hidden';
-			}
-			this.value++;
-		};
+		nextButton.onclick = preTestButtonClick;
 		
 		preTestHolder.appendChild(preTestOption);
 		preTestHolder.appendChild(nextButton);
 		insertPoint.appendChild(preTestHolder);
 	}
 
+	// Load the full interface
+	loadTest(testXMLSetups[0]);
 }
 
 function loadTest(textXML)
@@ -302,6 +262,57 @@ function loadTest(textXML)
 function preTestButtonClick()
 {
 	// Called on click of pre-test button
+	// Need to find and parse preTest again!
+	var xmlSetup = projectXML.find('setup');
+	var preTest = xmlSetup.find('PreTest')[0];
+	var preTestOption = document.getElementById('preTest');
+	// Check if current state is a question!
+	if (preTest.children[this.value].nodeName == 'question') {
+		var questionId = preTest.children[this.value].attributes['id'].value;
+		var questionHold = document.createElement('comment');
+		var questionResponse = document.getElementById(questionId + 'response');
+		questionHold.id = questionId;
+		questionHold.innerHTML = questionResponse.value;
+		preTestQuestions.appendChild(questionHold);
+	}
+	this.value++;
+	if (this.value < preTest.children.length)
+	{
+		// More to process
+		var child = preTest.children[this.value];
+		if (child.nodeName == 'statement')
+		{
+			preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
+		} else if (child.nodeName == 'question')
+		{
+			var textHold = document.createElement('span');
+			textHold.innerHTML = child.innerHTML;
+			var textEnter = document.createElement('textarea');
+			textEnter.id = child.attributes['id'].value + 'response';
+			var br = document.createElement('br');
+			preTestOption.innerHTML = null;
+			preTestOption.appendChild(textHold);
+			preTestOption.appendChild(br);
+			preTestOption.appendChild(textEnter);
+		}
+	} else {
+		// Time to clear
+		preTestHolder.style.zIndex = -1;
+		preTestHolder.style.visibility = 'hidden';
+		var blank = document.getElementsByClassName('testHalt')[0];
+		blank.style.zIndex = -2;
+		blank.style.visibility = 'hidden';
+	}
+}
+
+function showPopup()
+{
+	
+}
+
+function hidePopup()
+{
+	
 }
 
 function dragEnd(ev) {
