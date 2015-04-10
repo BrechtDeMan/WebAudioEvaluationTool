@@ -53,10 +53,10 @@ div.comment-div {
 	float: left;
 	margin: 5px;
 }
+
 div.comment-div span {
 	margin-left: 15px;
 }
-
 
 div.popupHolder {
 	width: 500px;
@@ -67,7 +67,7 @@ div.popupHolder {
 	z-index: 2;
 }
 
-button#preTestNext {
+button.popupButton {
 	/* Button for popup window
 	 */
 	width: 50px;

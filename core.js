@@ -22,6 +22,7 @@
 /* create the web audio API context and store in audioContext*/
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
+
 var testXMLSetups; // Hold the parsed test instances
 var testResultsHolders; // Hold the results from each test for publishing to XML
 var currentTestHolder; // Hold an intermediate results during test - metrics

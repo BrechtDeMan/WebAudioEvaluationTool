@@ -13,6 +13,13 @@
  * 
  */
 
+var currentState; // Keep track of the current state (pre/post test, which test, final test? first test?)
+// preTest - In preTest state
+// testRun-ID - In test running, test Id number at the end 'testRun-2'
+// testRunPost-ID - Post test of test ID
+// testRunPre-ID - Pre-test of test ID
+// postTest - End of test, final submission!
+
 
 // Once this is loaded and parsed, begin execution
 loadInterface(projectXML);
@@ -111,38 +118,34 @@ function loadInterface(xmlDoc) {
 	var feedbackHolder = document.createElement('div');
 	feedbackHolder.id = 'feedbackHolder';
 	
-	// Create pre and post test questions
-	
-	// Inject into HTML
+	testContent.style.zIndex = 1;
 	insertPoint.innerHTML = null; // Clear the current schema
-	testContent.appendChild(title); // Insert the title
-	testContent.appendChild(interfaceButtons);
-	testContent.appendChild(sliderBox);
-	testContent.appendChild(feedbackHolder);
-	insertPoint.appendChild(testContent);
+	
+	// Create pre and post test questions
+	var blank = document.createElement('div');
+	blank.className = 'testHalt';
+	
+	var popupHolder = document.createElement('div');
+	popupHolder.id = 'popupHolder';
+	popupHolder.className = 'popupHolder';
+	popupHolder.style.position = 'absolute';
+	popupHolder.style.left = (window.innerWidth/2)-250 + 'px';
+	popupHolder.style.top = (window.innerHeight/2)-125 + 'px';
+	insertPoint.appendChild(popupHolder);
+	insertPoint.appendChild(blank);
+	hidePopup();
 	
 	var preTest = xmlSetup.find('PreTest');
 	var postTest = xmlSetup.find('PostTest');
 	preTest = preTest[0];
 	postTest = postTest[0];
-	if (preTest != undefined || postTest != undefined)
-	{
-		testContent.style.zIndex = 1;
-		var blank = document.createElement('div');
-		blank.className = 'testHalt';
-		insertPoint.appendChild(blank);
-	}
+	
+	currentState = 'preTest';
 	
 	// Create Pre-Test Box
 	if (preTest != undefined && preTest.children.length >= 1)
 	{
-		
-		var popupHolder = document.createElement('div');
-		popupHolder.id = 'popupHolder';
-		popupHolder.className = 'popupHolder';
-		popupHolder.style.position = 'absolute';
-		popupHolder.style.left = (window.innerWidth/2)-250 + 'px';
-		popupHolder.style.top = (window.innerHeight/2)-125 + 'px';
+		showPopup();
 		
 		// Parse the first box
 		var preTestOption = document.createElement('div');
@@ -164,15 +167,21 @@ function loadInterface(xmlDoc) {
 			preTestOption.appendChild(textEnter);
 		}
 		var nextButton = document.createElement('button');
-		nextButton.id = 'preTestNext';
+		nextButton.className = 'popupButton';
 		nextButton.value = '0';
 		nextButton.innerHTML = 'Next';
-		nextButton.onclick = preTestButtonClick;
+		nextButton.onclick = popupButtonClick;
 		
 		popupHolder.appendChild(preTestOption);
 		popupHolder.appendChild(nextButton);
-		insertPoint.appendChild(popupHolder);
 	}
+	
+	// Inject into HTML
+	testContent.appendChild(title); // Insert the title
+	testContent.appendChild(interfaceButtons);
+	testContent.appendChild(sliderBox);
+	testContent.appendChild(feedbackHolder);
+	insertPoint.appendChild(testContent);
 
 	// Load the full interface
 	loadTest(testXMLSetups[0]);
@@ -261,7 +270,17 @@ function loadTest(textXML)
 	});
 }
 
-function preTestButtonClick()
+function popupButtonClick()
+{
+	// Global call from the 'Next' button click
+	if (currentState == 'preTest')
+	{
+		// At the start of the preTest routine!
+		this.value = preTestButtonClick(this.value);
+	}
+}
+
+function preTestButtonClick(index)
 {
 	// Called on click of pre-test button
 	// Need to find and parse preTest again!
@@ -269,19 +288,19 @@ function preTestButtonClick()
 	var preTest = xmlSetup.find('PreTest')[0];
 	var preTestOption = document.getElementById('preTest');
 	// Check if current state is a question!
-	if (preTest.children[this.value].nodeName == 'question') {
-		var questionId = preTest.children[this.value].attributes['id'].value;
+	if (preTest.children[index].nodeName == 'question') {
+		var questionId = preTest.children[index].attributes['id'].value;
 		var questionHold = document.createElement('comment');
 		var questionResponse = document.getElementById(questionId + 'response');
 		questionHold.id = questionId;
 		questionHold.innerHTML = questionResponse.value;
 		preTestQuestions.appendChild(questionHold);
 	}
-	this.value++;
-	if (this.value < preTest.children.length)
+	index++;
+	if (index < preTest.children.length)
 	{
 		// More to process
-		var child = preTest.children[this.value];
+		var child = preTest.children[index];
 		if (child.nodeName == 'statement')
 		{
 			preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
@@ -301,13 +320,15 @@ function preTestButtonClick()
 		// Time to clear
 		preTestOption.innerHTML = null;
 		hidePopup();
+		// Progress the state!
 	}
+	return index;
 }
 
 function showPopup()
 {
 	var popupHolder = document.getElementById('popupHolder');
-	popupHolder.style.zIndex = 2;
+	popupHolder.style.zIndex = 3;
 	popupHolder.style.visibility = 'visible';
 	var blank = document.getElementsByClassName('testHalt')[0];
 	blank.style.zIndex = 2;
