@@ -20,12 +20,15 @@
 
 
 /* create the web audio API context and store in audioContext*/
-var audioContext;
-var projectXML;
-var audioEngineContext;
-var projectReturn;
-var preTestQuestions = document.createElement('PreTest');
-var postTestQuestions = document.createElement('PostTest');
+var audioContext; // Hold the browser web audio API
+var projectXML; // Hold the parsed setup XML
+var testXMLSetups; // Hold the parsed test instances
+var testResultsHolders; // Hold the results from each test for publishing to XML
+var currentTestHolder; // Hold an intermediate results during test - metrics
+var audioEngineContext; // The custome AudioEngine object
+var projectReturn; // Hold the URL for the return
+var preTestQuestions = document.createElement('PreTest'); // Store any pre-test question response
+var postTestQuestions = document.createElement('PostTest'); // Store any post-test question response
 
 window.onload = function() {
 	// Function called once the browser has loaded all files.
@@ -64,6 +67,14 @@ function loadProjectSpecCallback(response) {
 	interfaceJS.setAttribute("type","text/javascript");
 	if (interfaceType.value == 'APE') {
 		interfaceJS.setAttribute("src","ape.js");
+		
+		// APE comes with a css file
+		var css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.type = 'text/css';
+		css.href = 'ape.css';
+		
+		document.getElementsByTagName("head")[0].appendChild(css);
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
 }
