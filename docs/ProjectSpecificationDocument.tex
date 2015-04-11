@@ -66,9 +66,13 @@ This must reside as children in the audioHolder tag. There must be one audioElem
 \item \texttt{ID} - Optional, Number. Give the track a specific ID for the return. This will help if using multiple projects to spread a test across multiple sessions and/or locations, where each test will not use all the samples. If one audioElement is given the ID 3, the next audioElement (assuming it does not have an ID set itself) will have the ID of 4. This continues until the next audioElement with the ID attribute set is reached.
 \end{itemize}
 
-\section{interfaceSetup}
+\section{interface tag}
 
-This is contained within the audioHolder tag and outlines test instance specific requirements. These include the following children tags: title - question title at the top of the page, scaleMin - minimum scale value text, scaleMax - maximum scale value text, scaleMid - halfway scale value text. There is also a preTest tag here allowing for specific questions/statements to be presented before running this specific test.
+This is contained within the audioHolder tag and outlines test instance specific requirements. These include the following children tags:
+\begin{itemize}
+\item 'title' - Contains the test title to be shown at the top of the page
+\item 'scale' - Takes the attribute position to be a value between 0 and 100 indicating where on the scale to place the text contained inside.
+\end{itemize}
 
 \section {CommentQuestion tag}
 
@@ -161,29 +165,51 @@ Here is an example XML structure
 \begin{lstlisting}
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="null" />
-	<AudioHolder hostURL="example_eval/" sampleRate="44100"
-	sampleRateExplicit="true">
-		<audioElements url="0.wav" ID="0"/>
-		<audioElements url="1.wav"/>
-		<audioElements url="2.wav"/>
-		<audioElements url="3.wav"/>
-		<audioElements url="4.wav"/>
-		<audioElements url="5.wav"/>
-		<audioElements url="6.wav"/>
-		<audioElements url="7.wav"/>
-		<audioElements url="8.wav"/>
-		<audioElements url="9.wav"/>
-		<audioElements url="10.wav"/>
-	</AudioHolder>
-	<CommentQuestion>What is your mixing experiance</CommentQuestion>
-	<PreTest>
-		<statement>Please listen to all mixes</statement>
-	</PreTest>
-	<PostTest>
-		<statement>Thank you for taking this listening test.</statement>
-		<question>Please enter your name.</question>
-	</PostTest>
+	<setup interface="APE" projectReturn="null" randomiseOrder='true' collectMetrics='true'>
+		<PreTest>
+			<statement>Please listen to all mixes</statement>
+			<question id="location" mandatory="true">Please enter your listening location</question>
+		</PreTest>
+		<PostTest>
+			<statement>Thank you for taking this listening test.</statement>
+			<question id="SessionID">Please enter your name.</question>
+		</PostTest>
+		<Metric>
+			<metricEnable>testTimer</metricEnable>
+			<metricEnable>elementTimer</metricEnable>
+			<metricEnable>elementTracker</metricEnable>
+			<metricEnable>elementFlagListenedTo</metricEnable>
+			<metricEnable>elementFlagMoved</metricEnable>
+		</Metric>
+	</setup>
+	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='1'>
+		<interface>
+			<title>Example Test Question</title>
+			<scale position="0">Min</scale>
+			<scale position="100">Max</scale>
+			<scale position="50">Middle</scale>
+			<scale position="20">20</scale>
+		</interface>
+		<audioElements url="0.wav" id="0"/>
+		<audioElements url="1.wav" id="1"/>
+		<audioElements url="2.wav" id="2"/>
+		<audioElements url="3.wav" id="3"/>
+		<audioElements url="4.wav" id="4"/>
+		<audioElements url="5.wav" id="5"/>
+		<audioElements url="6.wav" id="6"/>
+		<audioElements url="7.wav" id="7"/>
+		<audioElements url="8.wav" id="8"/>
+		<audioElements url="9.wav" id="9"/>
+		<audioElements url="10.wav" id="10"/>
+		<CommentQuestion id='mixingExperiance'>What is your mixing experiance</CommentQuestion>
+		<PreTest>
+			<statement>Start the Test 3</statement>
+		</PreTest>
+		<PostTest>
+			<statement>Please take a break before the next test</statement>
+			<question id="testComment">How did you find the test</question>
+		</PostTest>
+	</audioHolder>
 </BrowserEvalProjectDocument>
 \end{lstlisting}
 
