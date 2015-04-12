@@ -101,6 +101,7 @@ function loadInterface(xmlDoc) {
 	// Create playback start/stop points
 	var playback = document.createElement("button");
 	playback.innerHTML = 'Start';
+	playback.id = 'playback-button';
 	// onclick function. Check if it is playing or not, call the correct function in the
 	// audioEngine, change the button text to reflect the next state.
 	playback.onclick = function() {
@@ -116,6 +117,7 @@ function loadInterface(xmlDoc) {
 	var submit = document.createElement("button");
 	submit.innerHTML = 'Submit';
 	submit.onclick = buttonSubmitClick;
+	submit.id = 'submit-button';
 	// Append the interface buttons into the interfaceButtons object.
 	interfaceButtons.appendChild(playback);
 	interfaceButtons.appendChild(submit);
@@ -305,11 +307,17 @@ function loadTest(id)
 		trackSliderObj.innerHTML = '<span>'+index+'</span>';
 		trackSliderObj.draggable = true;
 		trackSliderObj.ondragend = dragEnd;
+		trackSliderObj.ondragstart = function()
+		{
+			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
+			audioEngineContext.metric.sliderMoveStart(id);
+		};
 		
 		// Onclick, switch playback to that track
 		trackSliderObj.onclick = function() {
 			// Get the track ID from the object ID
 			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
+			audioEngineContext.metric.sliderPlayed(id);
 			audioEngineContext.selectedTrack(id);
 		};
 		
@@ -492,6 +500,7 @@ function dragEnd(ev) {
 			this.style.left = window.innerWidth-50 + 'px';
 		}
 	}
+	audioEngineContext.metric.sliderMoved();
 }
 
 function advanceState()
@@ -553,9 +562,14 @@ function testEnded(testId)
 
 function buttonSubmitClick()
 {
+	if (audioEngineContext.status == 1) {
+		var playback = document.getElementById('playback-button');
+		playback.click();
 	// This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
+	}
 	if (currentState.substr(0,7) == 'testRun')
 	{
+		audioEngineContext.timer.stopTest();
 		advanceState();
 	}
 }

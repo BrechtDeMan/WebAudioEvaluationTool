@@ -121,6 +121,11 @@ function AudioEngine() {
 	this.outputGain.connect(audioContext.destination);
 	this.fooGain.connect(audioContext.destination);
 	
+	// Create the timer Object
+	this.timer = new timer();
+	// Create session metrics
+	this.metric = new sessionMetrics(this);
+	
 	// Create store for new audioObjects
 	this.audioObjects = [];
 	
@@ -128,6 +133,7 @@ function AudioEngine() {
 		// Send play command to all playback buffers for synchronised start
 		// Also start timer callbacks to detect if playback has finished
 		if (this.status == 0) {
+			this.timer.startTest();
 			// First get current clock
 			var timer = audioContext.currentTime;
 			// Add 3 seconds
@@ -170,7 +176,7 @@ function AudioEngine() {
 		// URLs must either be from the same source OR be setup to 'Access-Control-Allow-Origin'
 		
 		// Create the audioObject with ID of the new track length;
-		audioObjectId = this.audioObjects.length
+		audioObjectId = this.audioObjects.length;
 		this.audioObjects[audioObjectId] = new audioObject(audioObjectId);
 
 		// AudioObject will get track itself.
@@ -185,6 +191,7 @@ function audioObject(id) {
 	this.id = id;
 	this.state = 0; // 0 - no data, 1 - ready
 	this.url = null; // Hold the URL given for the output back to the results.
+	this.metric = new metricTracker();
 	
 	// Create a buffer and external gain control to allow internal patching of effects and volume leveling.
 	this.bufferNode = audioContext.createBufferSource();
@@ -240,4 +247,132 @@ function audioObject(id) {
 		request.send();
 	};
 	
+}
+
+function timer()
+{
+	/* Timer object used in audioEngine to keep track of session timings
+	 * Uses the timer of the web audio API, so sample resolution
+	 */
+	this.testStarted = false;
+	this.testStartTime = 0;
+	this.testDuration = 0;
+	this.minimumTestTime = 0; // No minimum test time
+	this.startTest = function()
+	{
+		if (this.testStarted == false)
+		{
+			this.testStartTime = audioContext.currentTime;
+			this.testStarted = true;
+			this.updateTestTime();
+		}
+	};
+	this.stopTest = function()
+	{
+		if (this.testStarted)
+		{
+			this.testDuration = this.getTestTime();
+			this.testStarted = false;
+		} else {
+			console.log('ERR: Test tried to end before beginning');
+		}
+	};
+	this.updateTestTime = function()
+	{
+		if (this.testStarted)
+		{
+			this.testDuration = audioContext.currentTime - this.testStartTime;
+		}
+	};
+	this.getTestTime = function()
+	{
+		this.updateTestTime();
+		return this.testDuration;
+	};
+}
+
+function sessionMetrics(engine)
+{
+	/* Used by audioEngine to link to audioObjects to minimise the timer call timers;
+	 */
+	this.engine = engine;
+	this.lastClicked = -1;
+	this.data = -1;
+	
+	this.sliderMoveStart = function(id)
+	{
+		if (this.data == -1)
+		{
+			this.data = id;
+		} else {
+			console.log('ERROR: Metric tracker detecting two moves!');
+			this.data = -1;
+		}
+	};
+	this.sliderMoved = function()
+	{
+		var time = engine.timer.getTestTime();
+		var id = this.data;
+		this.data = -1;
+		var sliderObj = document.getElementsByClassName('track-slider')[id];
+		var position = Number(sliderObj.style.left.substr(0,sliderObj.style.left.length-2));
+		if (engine.timer.testStarted)
+		{
+			engine.audioObjects[id].metric.moved(time,position);
+		} else {
+			engine.audioObjects[id].metric.initialised(position);
+		}
+	};
+	
+	this.sliderPlayed = function(id)
+	{
+		var time = engine.timer.getTestTime();
+		if (engine.timer.testStarted)
+		{
+			if (this.lastClicked >= 0)
+			{
+				engine.audioObjects[this.lastClicked].metric.listening(time);
+			}
+			this.lastClicked = id;
+			engine.audioObjects[id].metric.listening(time);
+		}
+	};
+}
+
+function metricTracker()
+{
+	/* Custom object to track and collect metric data
+	 * Used only inside the audioObjects object.
+	 */
+	
+	this.listenedTimer = 0;
+	this.listenStart = 0;
+	this.initialPosition = 0;
+	this.movementTracker = [];
+	this.wasListenedTo = false;
+	this.wasMoved = false;
+	this.hasComments = false;
+	
+	this.initialised = function(position)
+	{
+		this.initialPosition = position;
+	};
+	
+	this.moved = function(time,position)
+	{
+		this.wasMoved = true;
+		this.movementTracker[this.movementTracker.length] = [time, position];
+	};
+	
+	this.listening = function(time)
+	{
+		if (this.listenStart == 0)
+		{
+			this.wasListenedTo = true;
+			this.listenStart = time;
+		} else {
+			this.listenedTimer += (time - this.listenStart);
+			this.listenStart = 0;
+		}
+	};
 }
