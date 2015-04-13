@@ -265,6 +265,7 @@ function timer()
 			this.testStartTime = audioContext.currentTime;
 			this.testStarted = true;
 			this.updateTestTime();
+			audioEngineContext.metric.initialiseTest();
 		}
 	};
 	this.stopTest = function()
@@ -298,51 +299,7 @@ function sessionMetrics(engine)
 	this.engine = engine;
 	this.lastClicked = -1;
 	this.data = -1;
-	
-	this.initialiseTest = function()
-	{
-		var sliders = document.getElementsByClassName('track-slider');
-		for (var i=0; i<sliders.length; i++)
-		{
-			engine.audioObjects[i].metric.initialised(convSliderPosToRate(i));
-		}
-	};
-	
-	this.sliderMoveStart = function(id)
-	{
-		if (this.data == -1)
-		{
-			this.data = id;
-		} else {
-			console.log('ERROR: Metric tracker detecting two moves!');
-			this.data = -1;
-		}
-	};
-	this.sliderMoved = function()
-	{
-		var time = engine.timer.getTestTime();
-		var id = this.data;
-		this.data = -1;
-		var position = convSliderPosToRate(id);
-		if (engine.timer.testStarted)
-		{
-			engine.audioObjects[id].metric.moved(time,position);
-		}
-	};
-	
-	this.sliderPlayed = function(id)
-	{
-		var time = engine.timer.getTestTime();
-		if (engine.timer.testStarted)
-		{
-			if (this.lastClicked >= 0)
-			{
-				engine.audioObjects[this.lastClicked].metric.listening(time);
-			}
-			this.lastClicked = id;
-			engine.audioObjects[id].metric.listening(time);
-		}
-	};
+	this.initialiseTest = function(){};
 }
 
 function metricTracker()

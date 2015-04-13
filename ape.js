@@ -93,6 +93,52 @@ function loadInterface(xmlDoc) {
 		}
 	});
 	
+	// Create APE specific metric functions
+	audioEngineContext.metric.initialiseTest = function()
+	{
+		var sliders = document.getElementsByClassName('track-slider');
+		for (var i=0; i<sliders.length; i++)
+		{
+			audioEngineContext.audioObjects[i].metric.initialised(convSliderPosToRate(i));
+		}
+	};
+	
+	audioEngineContext.metric.sliderMoveStart = function(id)
+	{
+		if (this.data == -1)
+		{
+			this.data = id;
+		} else {
+			console.log('ERROR: Metric tracker detecting two moves!');
+			this.data = -1;
+		}
+	};
+	audioEngineContext.metric.sliderMoved = function()
+	{
+		var time = audioEngineContext.timer.getTestTime();
+		var id = this.data;
+		this.data = -1;
+		var position = convSliderPosToRate(id);
+		if (audioEngineContext.timer.testStarted)
+		{
+			audioEngineContext.audioObjects[id].metric.moved(time,position);
+		}
+	};
+	
+	audioEngineContext.metric.sliderPlayed = function(id)
+	{
+		var time = audioEngineContext.timer.getTestTime();
+		if (audioEngineContext.timer.testStarted)
+		{
+			if (this.lastClicked >= 0)
+			{
+				audioEngineContext.audioObjects[this.lastClicked].metric.listening(time);
+			}
+			this.lastClicked = id;
+			audioEngineContext.audioObjects[id].metric.listening(time);
+		}
+	};
+	
 	// Create the top div for the Title element
 	var titleAttr = xmlSetup[0].attributes['title'];
 	var title = document.createElement('div');
