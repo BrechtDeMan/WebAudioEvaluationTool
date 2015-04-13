@@ -42,26 +42,56 @@ function loadInterface(xmlDoc) {
 	// Should put in an error function here incase of malprocessed or malformed XML
 	
 	// Extract the different test XML DOM trees
-	 var audioHolders = xmlDoc.find('audioHolder');
-	 audioHolders.each(function(index,element) {
-	 	var repeatN = element.attributes['repeatCount'].value;
-	 	for (var r=0; r<=repeatN; r++) {
-	 		testXMLSetups[testXMLSetups.length] = element;
-	 	}
-	 });
+	var audioHolders = xmlDoc.find('audioHolder');
+	audioHolders.each(function(index,element) {
+		var repeatN = element.attributes['repeatCount'].value;
+		for (var r=0; r<=repeatN; r++) {
+			testXMLSetups[testXMLSetups.length] = element;
+		}
+	});
 	 
-	 // New check if we need to randomise the test order
-	 var randomise = xmlSetup[0].attributes['randomiseOrder'];
-	 if (randomise != undefined) {
-	 	randomise = Boolean(randomise.value);
-	 } else {
-	 	randomise = false;
-	 }
-	 if (randomise)
-	 {
-	 	// TODO: Implement Randomisation!!
-	 }
+	// New check if we need to randomise the test order
+	var randomise = xmlSetup[0].attributes['randomiseOrder'];
+	if (randomise != undefined) {
+		randomise = Boolean(randomise.value);
+	} else {
+		randomise = false;
+	}
+	if (randomise)
+	{
+ 		// TODO: Implement Randomisation!!
+	}
 	 
+	// Obtain the metrics enabled
+	var metricNode = xmlSetup.find('Metric');
+	var metricNode = metricNode.find('metricEnable');
+	metricNode.each(function(index,node){
+		var enabled = node.textContent;
+		switch(enabled)
+		{
+		case 'testTimer':
+			sessionMetrics.prototype.enableTestTimer = true;
+			break;
+		case 'elementTimer':
+			sessionMetrics.prototype.enableElementTimer = true;
+			break;
+		case 'elementTracker':
+			sessionMetrics.prototype.enableElementTracker = true;
+			break;
+		case 'elementInitalPosition':
+			sessionMetrics.prototype.enableElementInitialPosition = true;
+			break;
+		case 'elementFlagListenedTo':
+			sessionMetrics.prototype.enableFlagListenedTo = true;
+			break;
+		case 'elementFlagMoved':
+			sessionMetrics.prototype.enableFlagMoved = true;
+			break;
+		case 'elementFlagComments':
+			sessionMetrics.prototype.enableFlagComments = true;
+			break;
+		}
+	});
 	
 	// Create the top div for the Title element
 	var titleAttr = xmlSetup[0].attributes['title'];
@@ -578,6 +608,16 @@ function pageXMLSave(testId)
 {
 	// Saves a specific test page
 	var xmlDoc = currentTestHolder;
+	// Check if any session wide metrics are enabled
+	var metric = document.createElement('metric');
+	if (audioEngineContext.metric.enableTestTimer)
+	{
+		var testTime = document.createElement('metricResult');
+		testTime.id = 'testTime';
+		testTime.textContent = audioEngineContext.timer.testDuration;
+		metric.appendChild(testTime);
+	}
+	xmlDoc.appendChild(metric);
 	var trackSliderObjects = document.getElementsByClassName('track-slider');
 	var commentObjects = document.getElementsByClassName('comment-div');
 	var rateMin = 50;
@@ -600,6 +640,59 @@ function pageXMLSave(testId)
 		comment.appendChild(response);
 		audioElement.appendChild(value);
 		audioElement.appendChild(comment);
+		// Check for any per element metrics
+		var metric = document.createElement('metric');
+		var elementMetric = audioEngineContext.audioObjects[i].metric;
+		if (audioEngineContext.metric.enableElementTimer) {
+			var elementTimer = document.createElement('metricResult');
+			elementTimer.id = 'elementTimer';
+			elementTimer.textContent = elementMetric.listenedTimer;
+			metric.appendChild(elementTimer);
+		}
+		if (audioEngineContext.metric.enableElementTracker) {
+			var elementTrackerFull = document.createElement('metricResult');
+			elementTrackerFull.id = 'elementTrackerFull';
+			var data = elementMetric.movementTracker;
+			for (var k=0; k<data.length; k++)
+			{
+				var timePos = document.createElement('timePos');
+				timePos.id = k;
+				var time = document.createElement('time');
+				time.textContent = data[k][0];
+				var position = document.createElement('position');
+				position.textContent = data[k][1];
+				timePos.appendChild(time);
+				timePos.appendChild(position);
+				elementTrackerFull.appendChild(timePos);
+			}
+			metric.appendChild(elementTrackerFull);
+		}
+		if (audioEngineContext.metric.enableElementInitialPosition) {
+			var elementInitial = document.createElement('metricResult');
+			elementInitial.id = 'elementInitialPosition';
+			elementInitial.textContent = elementMetric.initialPosition;
+			metric.appendChild(elementInitial);
+		}
+		if (audioEngineContext.metric.enableFlagListenedTo) {
+			var flagListenedTo = document.createElement('metricResult');
+			flagListenedTo.id = 'elementFlagListenedTo';
+			flagListenedTo.textContent = elementMetric.wasListenedTo;
+			metric.appendChild(flagListenedTo);
+		}
+		if (audioEngineContext.metric.enableFlagMoved) {
+			var flagMoved = document.createElement('metricResult');
+			flagMoved.id = 'elementFlagMoved';
+			flagMoved.textContent = elementMetric.wasMoved;
+			metric.appendChild(flagMoved);
+		}
+		if (audioEngineContext.metric.enableFlagComments) {
+			var flagComments = document.createElement('metricResult');
+			flagComments.id = 'elementFlagComments';
+			if (response.textContent.length == 0) {flag.textContent = 'false';}
+			else {flag.textContet = 'true';}
+			metric.appendChild(flagComments);
+		}
+		audioElement.appendChild(metric);
 		xmlDoc.appendChild(audioElement);
 	}
 	testResultsHolders[testId] = xmlDoc;

@@ -12,6 +12,7 @@
 		<Metric>
 			<metricEnable>testTimer</metricEnable>
 			<metricEnable>elementTimer</metricEnable>
+			<metricEnable>elementInitalPosition</metricEnable>
 			<metricEnable>elementTracker</metricEnable>
 			<metricEnable>elementFlagListenedTo</metricEnable>
 			<metricEnable>elementFlagMoved</metricEnable>
