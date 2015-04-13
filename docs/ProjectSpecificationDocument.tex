@@ -22,12 +22,7 @@ The root will also contain the following tags: setup and tracks.
 \section{Setup tag}
 
 The setup tag specifies certain global test settings including: the interface type to use, the project return location and any other setup instructions.
-
-An example of this tag could be:
-
-\texttt{<setup interface="APE" projectReturn="http://project.return.url/goes/here" />}
-
-The setup should not have any element or any children.
+Any general pre/post test questions must be specified in the relevant children tag. Any enabled metrics must also be specified in the metric child node.
 
 \subsection{Attributes}
 \begin{itemize}
@@ -62,27 +57,21 @@ This must reside as children in the audioHolder tag. There must be one audioElem
 
 \subsection{Attributes}
 \begin{itemize}
+\item \texttt{id} - Mandatory, String. Must give a string or number to identify each audio element. This id is used in the output to identify each track once randomised.
 \item \texttt{url} - Mandatory, String. Contain the full URL to the track. If the Tracks tag hostURL is set, concatenate this tag with the hostURL attribute to obtain the full URL.
-\item \texttt{ID} - Optional, Number. Give the track a specific ID for the return. This will help if using multiple projects to spread a test across multiple sessions and/or locations, where each test will not use all the samples. If one audioElement is given the ID 3, the next audioElement (assuming it does not have an ID set itself) will have the ID of 4. This continues until the next audioElement with the ID attribute set is reached.
 \end{itemize}
 
 \section{interface tag}
 
 This is contained within the audioHolder tag and outlines test instance specific requirements. These include the following children tags:
 \begin{itemize}
-\item 'title' - Contains the test title to be shown at the top of the page
-\item 'scale' - Takes the attribute position to be a value between 0 and 100 indicating where on the scale to place the text contained inside.
+\item 'title' - Contains the test title to be shown at the top of the page. Can only be one title node per interface.
+\item 'scale' - Takes the attribute position to be a value between 0 and 100 indicating where on the scale to place the text contained inside. Can be multiple scale tags per interface.
 \end{itemize}
 
 \section {CommentQuestion tag}
 
-This is a 1st level tag (same level as AudioHolder and setup). This allows another question and comment box to be presented on the page. The results of these are passed back in the results XML with both the comment and the question.
-
-\subsection{Attributes}
-None.
-
-\subsection{Elements}
-The question to be presented.
+This is a 1st level tag (same level as AudioHolder and setup). This allows another question and comment box to be presented on the page. The results of these are passed back in the results XML with both the comment and the question. The id attribute is set to keep track at the results XML.
 
 \section {PreTest tag and PostTest tag}
 
