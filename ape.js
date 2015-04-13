@@ -521,13 +521,16 @@ function hidePopup()
 function dragEnd(ev) {
 	// Function call when a div has been dropped
 	var slider = document.getElementById('slider');
-	if (ev.x >= 50 && ev.x < window.innerWidth-50) {
-		this.style.left = (ev.x)+'px';
+	var w = slider.style.width;
+	w = Number(w.substr(0,w.length-2));
+	var x = ev.x;
+	if (x >= 42 && x < w+42) {
+		this.style.left = (x)+'px';
 	} else {
-		if (ev.x<50) {
-			this.style.left = '50px';
+		if (x<42) {
+			this.style.left = '42px';
 		} else {
-			this.style.left = window.innerWidth-50 + 'px';
+			this.style.left = (w+42) + 'px';
 		}
 	}
 	audioEngineContext.metric.sliderMoved();
@@ -604,6 +607,17 @@ function buttonSubmitClick()
 	}
 }
 
+function convSliderPosToRate(id)
+{
+	var w = document.getElementById('slider').style.width;
+	var maxPix = w.substr(0,w.length-2);
+	var slider = document.getElementsByClassName('track-slider')[id];
+	var pix = slider.style.left;
+	pix = pix.substr(0,pix.length-2);
+	var rate = (pix-42)/maxPix;
+	return rate;
+}
+
 function pageXMLSave(testId)
 {
 	// Saves a specific test page
@@ -620,17 +634,13 @@ function pageXMLSave(testId)
 	xmlDoc.appendChild(metric);
 	var trackSliderObjects = document.getElementsByClassName('track-slider');
 	var commentObjects = document.getElementsByClassName('comment-div');
-	var rateMin = 50;
-	var rateMax = window.innerWidth-50;
 	for (var i=0; i<trackSliderObjects.length; i++) 
 	{
 		var audioElement = document.createElement('audioElement');
 		audioElement.id = currentTrackOrder[i].attributes['id'].value;
 		audioElement.url = currentTrackOrder[i].attributes['url'].value;
-		var value = document.createElement("value");
-		var rate = Number(trackSliderObjects[i].style.left.substr(0,trackSliderObjects[i].style.left.length-2));
-		rate = (rate-rateMin)/rateMax;
-		value.innerHTML = Math.floor(rate*100);
+		var value = document.createElement('value');
+		value.innerHTML = convSliderPosToRate(i);
 		var comment = document.createElement("comment");
 		var question = document.createElement("question");
 		var response = document.createElement("response");
