@@ -299,6 +299,15 @@ function sessionMetrics(engine)
 	this.lastClicked = -1;
 	this.data = -1;
 	
+	this.initialiseTest = function()
+	{
+		var sliders = document.getElementsByClassName('track-slider');
+		for (var i=0; i<sliders.length; i++)
+		{
+			engine.audioObjects[i].metric.initialised(convSliderPosToRate(i));
+		}
+	};
+	
 	this.sliderMoveStart = function(id)
 	{
 		if (this.data == -1)
@@ -314,13 +323,10 @@ function sessionMetrics(engine)
 		var time = engine.timer.getTestTime();
 		var id = this.data;
 		this.data = -1;
-		var sliderObj = document.getElementsByClassName('track-slider')[id];
-		var position = Number(sliderObj.style.left.substr(0,sliderObj.style.left.length-2));
+		var position = convSliderPosToRate(id);
 		if (engine.timer.testStarted)
 		{
 			engine.audioObjects[id].metric.moved(time,position);
-		} else {
-			engine.audioObjects[id].metric.initialised(position);
 		}
 	};
 	
@@ -347,7 +353,7 @@ function metricTracker()
 	
 	this.listenedTimer = 0;
 	this.listenStart = 0;
-	this.initialPosition = 0;
+	this.initialPosition = -1;
 	this.movementTracker = [];
 	this.wasListenedTo = false;
 	this.wasMoved = false;
@@ -355,7 +361,9 @@ function metricTracker()
 	
 	this.initialised = function(position)
 	{
-		this.initialPosition = position;
+		if (this.initialPosition == -1) {
+			this.initialPosition = position;
+		}
 	};
 	
 	this.moved = function(time,position)
