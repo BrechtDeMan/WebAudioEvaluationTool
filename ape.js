@@ -645,6 +645,13 @@ function buttonSubmitClick()
 		var playback = document.getElementById('playback-button');
 		playback.click();
 	// This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
+	} else
+	{
+		if (audioEngineContext.timer.testStarted == false)
+		{
+			alert('You have not started the test! Please press start to begin the test!');
+			return;
+		}
 	}
 	if (currentState.substr(0,7) == 'testRun')
 	{
