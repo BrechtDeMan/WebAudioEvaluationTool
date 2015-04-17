@@ -59,7 +59,7 @@ function loadInterface(xmlDoc) {
 	}
 	if (randomise)
 	{
- 		// TODO: Implement Randomisation!!
+ 		testXMLSetups = randomiseOrder(testXMLSetups);
 	}
 	 
 	// Obtain the metrics enabled
@@ -341,7 +341,7 @@ function loadTest(id)
 		currentTrackOrder[index] = element;
 	});
 	if (randomise) {
-		// TODO: Randomise order
+		currentTrackOrder = randomiseOrder(currentTrackOrder);
 	}
 	
 	// Find all the audioElements from the audioHolder
