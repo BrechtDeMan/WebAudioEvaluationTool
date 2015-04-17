@@ -341,3 +341,21 @@ function metricTracker()
 		}
 	};
 }
+
+function randomiseOrder(input)
+{
+	// This takes an array of information and randomises the order
+	var N = input.length;
+	var K = N;
+	var holdArr = [];
+	for (var n=0; n<N; n++)
+	{
+		// First pick a random number
+		var r = Math.random();
+		// Multiply and floor by the number of elements left
+		r = Math.floor(r*input.length);
+		// Pick out that element and delete from the array
+		holdArr.push(input.splice(r,1)[0]);
+	}
+	return holdArr;
+}
