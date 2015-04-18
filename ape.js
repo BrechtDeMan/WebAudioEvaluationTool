@@ -322,6 +322,99 @@ function loadTest(id)
 		}
 	}
 	
+	var loopPlayback = textXML.attributes['loop'];
+	if (loopPlayback != undefined)
+	{
+		loopPlayback = loopPlayback.value;
+		if (loopPlayback == 'true') {
+			loopPlayback = true;
+		} else {
+			loopPlayback = false;
+		}
+	} else {
+		loopPlayback = false;
+	}
+	audioEngineContext.loopPlayback = loopPlayback;
+	
+	// Create AudioEngine bindings for playback
+	if (loopPlayback) {
+		audioEngineContext.play = function() {
+			// Send play command to all playback buffers for synchronised start
+			// Also start timer callbacks to detect if playback has finished
+			if (this.status == 0) {
+				this.timer.startTest();
+				// First get current clock
+				var timer = audioContext.currentTime;
+				// Add 3 seconds
+				timer += 3.0;
+				// Send play to all tracks
+				for (var i=0; i<this.audioObjects.length; i++)
+				{
+					this.audioObjects[i].play(timer);
+				}
+				this.status = 1;
+			}
+		};
+		
+		audioEngineContext.stop = function() {
+			// Send stop and reset command to all playback buffers
+			if (this.status == 1) {
+				if (this.loopPlayback) {
+					for (var i=0; i<this.audioObjects.length; i++)
+					{
+						this.audioObjects[i].stop();
+					}
+				}
+				this.status = 0;
+			}
+		};
+		
+		audioEngineContext.selectedTrack = function(id) {
+			for (var i=0; i<this.audioObjects.length; i++)
+			{
+				if (id == i) {
+					this.audioObjects[i].outputGain.gain.value = 1.0;
+				} else {
+					this.audioObjects[i].outputGain.gain.value = 0.0;
+				}
+			}
+		};
+	} else {
+		audioEngineContext.play = function() {
+			// Send play command to all playback buffers for synchronised start
+			// Also start timer callbacks to detect if playback has finished
+			if (this.status == 0) {
+				this.timer.startTest();
+				this.status = 1;
+			}
+		};
+		
+		audioEngineContext.stop = function() {
+			// Send stop and reset command to all playback buffers
+			if (this.status == 1) {
+				if (this.loopPlayback) {
+					for (var i=0; i<this.audioObjects.length; i++)
+					{
+						this.audioObjects[i].stop();
+					}
+				}
+				this.status = 0;
+			}
+		};
+		
+		audioEngineContext.selectedTrack = function(id) {
+			for (var i=0; i<this.audioObjects.length; i++)
+			{
+				if (id == i) {
+					this.audioObjects[i].outputGain.gain.value = 1.0;
+					this.audioObjects[i].play(audioContext.currentTime+0.01);
+				} else {
+					this.audioObjects[i].outputGain.gain.value = 0.0;
+				}
+			}
+		};
+	}
+	
 	currentTestHolder = document.createElement('audioHolder');
 	currentTestHolder.id = textXML.id;
 	currentTestHolder.repeatCount = textXML.attributes['repeatCount'].value;
