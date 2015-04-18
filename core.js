@@ -32,6 +32,9 @@ var projectReturn; // Hold the URL for the return
 var preTestQuestions = document.createElement('PreTest'); // Store any pre-test question response
 var postTestQuestions = document.createElement('PostTest'); // Store any post-test question response
 
+// Add a prototype to the bufferSourceNode to reference to the audioObject holding it
+AudioBufferSourceNode.prototype.owner = undefined;
+
 window.onload = function() {
 	// Function called once the browser has loaded all files.
 	// This should perform any initial commands such as structure / loading documents
@@ -126,49 +129,14 @@ function AudioEngine() {
 	// Create session metrics
 	this.metric = new sessionMetrics(this);
 	
+	this.loopPlayback = false;
+	
 	// Create store for new audioObjects
 	this.audioObjects = [];
 	
-	this.play = function() {
-		// Send play command to all playback buffers for synchronised start
-		// Also start timer callbacks to detect if playback has finished
-		if (this.status == 0) {
-			this.timer.startTest();
-			// First get current clock
-			var timer = audioContext.currentTime;
-			// Add 3 seconds
-			timer += 3.0;
-			
-			// Send play to all tracks
-			for (var i=0; i<this.audioObjects.length; i++)
-			{
-				this.audioObjects[i].play(timer);
-			}
-			this.status = 1;
-		}
-	};
+	this.play = function(){};
 	
-	this.stop = function() {
-		// Send stop and reset command to all playback buffers
-		if (this.status == 1) {
-			for (var i=0; i<this.audioObjects.length; i++)
-			{
-				this.audioObjects[i].stop();
-			}
-			this.status = 0;
-		}
-	};
-	
-	this.selectedTrack = function(id) {
-		for (var i=0; i<this.audioObjects.length; i++)
-		{
-			if (id == i) {
-				this.audioObjects[i].outputGain.gain.value = 1.0;
-			} else {
-				this.audioObjects[i].outputGain.gain.value = 0.0;
-			}
-		}
-	};
+	this.stop = function(){};
 	
 	
 	this.newTrack = function(url) {
@@ -194,14 +162,13 @@ function audioObject(id) {
 	this.metric = new metricTracker();
 	
 	// Create a buffer and external gain control to allow internal patching of effects and volume leveling.
-	this.bufferNode = audioContext.createBufferSource();
+	this.bufferNode = undefined;
 	this.outputGain = audioContext.createGain();
 	
 	// Default output gain to be zero
 	this.outputGain.gain.value = 0.0;
 	
 	// Connect buffer to the audio graph
-	this.bufferNode.connect(this.outputGain);
 	this.outputGain.connect(audioEngineContext.outputGain);
 	
 	// the audiobuffer is not designed for multi-start playback
@@ -209,15 +176,16 @@ function audioObject(id) {
 	this.buffer;
 	
 	this.play = function(startTime) {
+		this.bufferNode = audioContext.createBufferSource();
+		this.bufferNode.connect(this.outputGain);
+		this.bufferNode.buffer = this.buffer;
+		this.bufferNode.loop = audioEngineContext.loopPlayback;
 		this.bufferNode.start(startTime);
 	};
 	
 	this.stop = function() {
 		this.bufferNode.stop(0);
-		this.bufferNode = audioContext.createBufferSource();
-		this.bufferNode.connect(this.outputGain);
-		this.bufferNode.buffer = this.buffer;
-		this.bufferNode.loop = true;
+		this.bufferNode = undefined;
 	};
 
 	this.constructTrack = function(url) {
@@ -232,8 +200,6 @@ function audioObject(id) {
 		request.onloadend = function() {
 			audioContext.decodeAudioData(request.response, function(decodedData) {
 				audioObj.buffer = decodedData;
-				audioObj.bufferNode.buffer = audioObj.buffer;
-				audioObj.bufferNode.loop = true;
 				audioObj.state = 1;
 			}, function(){
 				// Should only be called if there was an error, but sometimes gets called continuously
