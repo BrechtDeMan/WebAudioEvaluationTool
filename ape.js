@@ -428,6 +428,7 @@ function loadTest(id)
 	else {randomise = false;}
 	
 	var audioElements = $(textXML).find('audioElements');
+	currentTrackOrder = [];
 	audioElements.each(function(index,element){
 		// Find any blind-repeats
 		// Not implemented yet, but just incase
@@ -436,6 +437,9 @@ function loadTest(id)
 	if (randomise) {
 		currentTrackOrder = randomiseOrder(currentTrackOrder);
 	}
+	
+	// Delete any previous audioObjects associated with the audioEngine
+	audioEngineContext.audioObjects = [];
 	
 	// Find all the audioElements from the audioHolder
 	$(currentTrackOrder).each(function(index,element){
