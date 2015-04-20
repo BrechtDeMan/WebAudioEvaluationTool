@@ -25,7 +25,7 @@
 
 
 %user defined variables
-\def\papertitle{APE FOR WEB: A BROWSER-BASED EVALUATION TOOL FOR AUDIO} %?
+\def\papertitle{WEB AUDIO EVALUATION TOOL: A BROWSER-BASED LISTENING TEST ENVIRONMENT} %?
 \def\firstauthor{Nicholas Jillings}
 \def\secondauthor{Brecht De Man}
 \def\thirdauthor{David Moffat}
@@ -132,23 +132,32 @@
 \capstarttrue
 %
 \begin{abstract}
-Place your abstract at the top left column on the first page.
-Please write about 150-200 words that specifically highlight the purpose of your work,
-its context, and provide a brief synopsis of your results.
-Avoid equations in this part.\\
-TOTAL PAPER: Minimum 4 pages, 6 preferred, max. 8 (6 for demos/posters)\\ 
+New functionality in HTML5, notably its Web Audio API, allow for increasingly powerful applications in the browser. % is this true?
+Perceptual evaluation tests for audio, where the subject assesses certain qualities of different audio fragments through a graphical user interface and/or text boxes, require playback of audio and rapid switching between different files. % what else? 
+The advantage of a web application is easy deployment on any platform, without requiring any other application or library, easy storing of results on a server. 
+[...]
+%Place your abstract at the top left column on the first page.
+%Please write about 150-200 words that specifically highlight the purpose of your work,
+%its context, and provide a brief synopsis of your results.
+%Avoid equations in this part.\\
+
 \end{abstract}
 %
 
 \section{Introduction}\label{sec:introduction}
+TOTAL PAPER: Minimum 4 pages, 6 preferred, max. 8 (6 for demos/posters)\\ 
+
+NICK: examples of what kind of audio applications HTML5 has made possible, with references to publications (or website)\\
 
 background (types of research where this type of perceptual evaluation of audio is relevant)\\
 
-multiple stimulus perceptual evaluation (reference to Bech etc.)\\
+multiple stimulus perceptual evaluation \cite{bech}\\
 
 prior work: \cite{deman2014b} in MATLAB, much less easy to deploy, and often stops working due to version updates \\ 
 
 goal, what are we trying to do? \\
+
+other background papers (some SMC?)\\
 
 [Previously, due to limited functionality of HTML, ..., it was not possible to design this type of interfaces with such high quality audio... ]
 
@@ -167,26 +176,41 @@ see \cite{deman2014b}: requirements informed by research on music production (se
 
 %section with overview of the structure of the input and output files, perhaps with graph or table
 
-The tool runs entirely inside the browser through the new HTML5 Web Audio API. The API is supported by most major web browsers (except Internet Explorer) and allows for constructing a chain of audio processing elements to produce a high quality, real time signal process to manipulate audio streams. The API supports multi-channel processing and has an accurate playback timer for precise scheduled playback control. The web audio API is controlled through the browser JavaScript and is therefore highly controllable. The Web Audio API processing is all controlled in a separate thread to the main JavaScript thread, meaning there is no blocking due to real time processing.
+The tool runs entirely inside the browser through the new HTML5 Web Audio API. The API is supported by most major web browsers (except Internet Explorer) and allows for constructing a chain of audio processing elements to produce a high quality, real time signal process to manipulate audio streams. The API supports multi-channel processing and has an accurate playback timer for precise scheduled playback control. The Web Audio API is controlled through the browser JavaScript and is therefore highly controllable. The Web Audio API processing is all controlled in a separate thread to the main JavaScript thread, meaning there is no blocking due to real time processing. 
+
+\subsection{Interface}\label{sec:interface} %elsewhere?
+
+[Like \cite{deman2014b}, but others possible]
+
+\begin{figure*}[htbp]
+\begin{center}
+\includegraphics[width=\textwidth]{interface.png}
+\caption{Example of interface, with 1 axis and 10 fragments}
+\label{fig:interface}
+\end{center}
+\end{figure*}
+
+
 
 \subsection{Architecture}\label{sec:architecture}
 
 The web tool itself is split into several files to operate:
 \begin{itemize}
-\item apeTool.html: The main index file to load the scripts, this is the file the browser must request to load
-\item core.js: Contains functions and objects to manage the audio control, audio objects for testing and loading of files
-\item ape.js: Parses setup files to create the interface as instructed, following the same style chain as the MATLAB APE Tool.
+\item \texttt{apeTool.html}: The main index file to load the scripts, this is the file the browser must request to load
+\item \texttt{core.js}: Contains functions and objects to manage the audio control, audio objects for testing and loading of files
+\item \texttt{ape.js}: Parses setup files to create the interface as instructed, following the same style chain as the MATLAB APE Tool \cite{deman2014b}.
 \end{itemize}
 
-The HTML file loads the core.js file with it along with a few other ancillary files (such as the jQuery javascript extensions), the browser JavaScript begins to execute the on page instructions, which gives the URL of the test setup XML document (outlined in the next section). The core.js parses this document and executes the function in ape.js to build the web page with the given audio files. The reason for separating these two files is to allow for further interface designs (such as Mushra or A-B tests) to be used, which would still require the same underlying core functions outlined in core.js
+The HTML file loads the core.js file with it along with a few other ancillary files (such as the jQuery JavaScript extensions), the browser JavaScript begins to execute the on page instructions, which gives the URL of the test setup XML document (outlined in the next section). The core.js parses this document and executes the function in \texttt{ape.js} to build the web page with the given audio files. The reason for separating these two files is to allow for further interface designs (such as MUSHRA \cite{mushra} or A-B tests \cite{bech}) to be used, which would still require the same underlying core functions outlined in \texttt{core.js}.
 
-The ape.js file has only two main functions: loadInterface(xmlDoc) and interfaceXMLSave(). The first function is called to build the interface once the setup document has been loaded. This includes creating the slider interface to rate the tracks and creating the comment boxes bellow. The bars in the slider ranking at the top of the page are randomly spaced. It also instructs the audio engine in the core.js to create the audio objects. The audio objects are custom built audio nodes built on the web audio API. They consist of a bufferSourceNode (a node which holds a buffer of audio samples for playback) and a gainNode. These are then connected to the audioEngine (itself a custom web audio node) containing a gainNode (where the various audio Objects connect to) for summation before passing the output to the destination Node, a fixed node created where the browser then passes the audio information to the system sound device.
+The \texttt{ape.js} file has only two main functions: \textit{loadInterface(xmlDoc)} and \textit{interfaceXMLSave()}. The first function is called to build the interface once the setup document has been loaded. This includes creating the slider interface to rate the tracks and creating the comment boxes bellow. The bars in the slider ranking at the top of the page are randomly spaced. It also instructs the audio engine in the \texttt{core.js} to create the audio objects. The audio objects are custom built audio nodes built on the web audio API. They consist of a \textit{bufferSourceNode} (a node which holds a buffer of audio samples for playback) and a \textit{gainNode}. These are then connected to the \textit{audioEngine} (itself a custom web audio node) containing a \textit{gainNode} (where the various Audio Objects connect to) for summation before passing the output to the destination Node, a fixed node created where the browser then passes the audio information to the system sound device.
 
-When an audioObject is created, the URL of the audio sample to load is given to it. This is downloaded into the browser asynchronously using the XMLHttpRequest object. This allows for downloading of any file into the JavaScript environment for further processing. It is particularly useful for the web audio API because it supports downloading of files in their binary form, allowing a perfect copy. Once the asynchronous download is complete, the file is then decoded using the web audio API offline decoder. This uses the browser available decoding schemes to decode the audio files into raw float32 arrays, which are in-turn passed to the relevant audioObject bufferSourceNode for playback.
+When an \textit{audioObject} is created, the URL of the audio sample to load is given to it. This is downloaded into the browser asynchronously using the \textit{XMLHttpRequest} object. This allows for downloading of any file into the JavaScript environment for further processing. It is particularly useful for the Web Audio API because it supports downloading of files in their binary form, allowing a perfect copy. Once the asynchronous download is complete, the file is then decoded using the Web Audio API offline decoder. This uses the browser available decoding schemes to decode the audio files into raw float32 arrays, which are in-turn passed to the relevant audioObject bufferSourceNode for playback.
 
 Browsers support various audio file formats and are not consistent in any format. One sure format that all browsers support is the WAV format. Although not a compact, web friendly format, most transport systems are of a high enough bandwidth this should not be a problem. However one problem is that of sample rate. On loading, the browser uses the sample rate assigned by the system sound device. The browser does not have the ability to request a different sound rate. Therefore the default operation when an audio file is loaded with a different sample rate to that of the system is to convert the sample rate. To provide a check for this, the desired sample rate can be supplied with the setup XML and checked against. If the sample rates do not match, a browser alert window is shown asking for the sample rate to be correctly adjusted. This happens before any loading or decoding of audio files. Only once the sample rates match will the system actually fetch any files, keeping down requests for the larger files until they are actually needed.
 
-During playback, the playback nodes loop indefinitely until playback is stopped. The gain nodes in the audioObjects enable dynamic muting of nodes. When a bar in the sliding ranking is clicked, the audio engine mutes all audioObjects and un-mutes the clicked one. Therefore, if the audio samples are perfectly aligned up and of the same sample length, they will remain perfectly aligned with each other.
+During playback, the playback nodes loop indefinitely until playback is stopped. The gain nodes in the \textit{audioObject}s enable dynamic muting of nodes. When a bar in the sliding ranking is clicked, the audio engine mutes all \textit{audioObject}s and un-mutes the clicked one. Therefore, if the audio samples are perfectly aligned up and of the same sample length, they will remain perfectly aligned with each other.
+
 
 \subsection{Setup and Results Formats}\label{sec:setupresultsformats}
 
@@ -194,12 +218,20 @@ Setup and the results both use the common XML document format to outline the var
 
 The results file is dynamically generated by the interface upon clicking the submit button. There will be checks, depending on the setup file, to ensure that all tracks have been evaluated and their positions in the slider moved. The XML returned contains a node per audioObject and contains its rating in the slider and any comments written in its associated comment box. The rating returned is normalised to be within a integer range of 0 to 100. This normalises the pixel representation of different browser windows. If a window for instance is only 1280 wide, reporting its pixel position is not representative to a display with a width of 1920.
 
-The pre- and post-test options allow for comments or questions to be presented before or after the test. These are automatically generated based upon the given setup XML and allow nearly any form of question and comment to be included in a window on its own. Questions are stored and presented in the response section labelled 'pretest' and 'posttest' along with the question ID and its response. Questions can be made optionally mandatory. Example questions may involve entering mixing experience or listening environment.
+The pre- and post-test options allow for comments or questions to be presented before or after the test. These are automatically generated based upon the given setup XML and allow nearly any form of question and comment to be included in a window on its own. Questions are stored and presented in the response section labelled 'pretest' and 'posttest' along with the question ID and its response. Questions can be made optionally mandatory. Example questions may involve entering mixing experience or listening environment.\\
+
+[LIST OF OPTIONS]\\
+% loop, snap to corresponding position, comments, 'general' comment, require same sampling rate, different types of randomisation
+
+[LIST OF THINGS THAT ARE LOGGED] (possibly elsewhere)\\
+% time, clicks
 
 The results will also contain information collected by any defined pre/post questions. These are referenced against the setup XML by using the same ID as well as printing in the same question, so readable responses can be obtained. Future development will also evolve to include any session data, such as the browser the tool was used in, how long the test took and any other metrics. Currently the results files are downloaded on the user side of the browser as a .xml file to be manually returned. However the end goal is to allow the XML files to be submitted over the web to a receiving server to store them, allowing for automated collection.
 
 Here is an example of the setup XML and the results XML:
-% Should we include an Example of the input and output XML structure??
+% Should we include an Example of the input and output XML structure?? --> Sure. 
+
+ADD XML STRUCTURE EXAMPLE
 
 \section{Applications}\label{sec:applications} %?
 discussion of use of this toolbox (possibly based on a quick mock test using my research data, to be repeated with a large number of participants and more data later)\\
@@ -208,14 +240,16 @@ discussion of use of this toolbox (possibly based on a quick mock test using my 
 
 In order to reduce the impact of having a non-standardised listening environment and unobservable participants, a series of pre-test standard questions have been put together to ask every participant. The first part of this is that every participant is asked to carry out the test, wherever possible, with a pair of quality headphones.
 
+% I think the following should be different for every type of test, so I think it looks better to say any type of question (with text box, or radio buttons, or dropdown menu?) is possible to add. 
 \begin{itemize}
 \item Name (text box)
-\item I am happy for name to be used in an academic publication (check box)
-\item First Language (text box)
-\item Location eg. country, city (text box)
-\item Playback System (ratio box (Headphones or Speaker))
+%\item I am happy for name to be used in an academic publication (check box) % never really necessary, as far as I'm concerned
+\item First language (text box)
+\item Location: country, city (text box)
+\item Playback system (ratio box: headphone or speaker)
 \item Make and Model of Playback System (text box)
-\item Please assess how good you believe your hearing to be, where 1 is deaf, 10 is professional critical listener (Dropdown box 1-10)
+\item Listening environment (text box)
+%\item Please assess how good you believe your hearing to be, where 1 is deaf, 10 is professional critical listener (Dropdown box 1-10 ) % not sure
 \end{itemize}
 
 
@@ -233,7 +267,7 @@ There are also a series of considerations that have been made towards ensuring t
 \end{itemize}
 
 
-
+[Regarding randomisation: keep the randomisation 'vector' so you can keep track of what subjects are referring to in comment fields]
 
 
 \section{Conclusions and future work}\label{sec:conclusions}
@@ -243,16 +277,19 @@ Specifically, we discussed the use of the toolbox in the context of assessment o
 The purpose of this paper is to outline the design of this tool, to describe our implementation using basic HTML5 functionality, and to discuss design challenges and limitations of our approach. % or something
 
 % future work
-Further work may include the development of other common test designs, such as [...], and [...]. In addition, [...]. 
+Further work may include the development of other common test designs, such as MUSHRA \cite{mushra}, AB, ABX and method of adjustment tests. 
+In addition, [...]. 
 
-\begin{itemize}
-\item Options for MUSHRA style experiment with vertical slide per track, APE style experiment where all tracks are on a single horizontal axis, or AB test
-\end{itemize}
+%\begin{itemize}
+%\item Options for MUSHRA style experiment with vertical slide per track
+%\item APE style experiment where all tracks are on a single horizontal axis % isn't that what we're doing now? 
+%\item AB test
+%\item ABX test
+%\item Method of adjustment tests
+%\end{itemize}
 
 
-...
-
-The source code of this tool can be found on \url{code.soundsoftware.ac.uk/projects/browserevaluationtool}.
+The source code of this tool can be found on \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}. % FIX
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

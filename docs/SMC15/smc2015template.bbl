@@ -21,9 +21,19 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{bech}
+S.~Bech and N.~Zacharov, \emph{Perceptual Audio Evaluation - Theory, Method and
+  Application}.\hskip 1em plus 0.5em minus 0.4em\relax John Wiley \& Sons,
+  2007.
+
 \bibitem{deman2014b}
 B.~De~Man and J.~D. Reiss, ``{APE}: {A}udio {P}erceptual {E}valuation toolbox
   for {MATLAB},'' in \emph{136th Convention of the Audio Engineering Society},
   April 2014.
+
+\bibitem{mushra}
+\emph{Method for the subjective assessment of intermediate quality level of
+  coding systems}.\hskip 1em plus 0.5em minus 0.4em\relax Recommendation {ITU-R
+  BS.1534-1}, 2003.
 
 \end{thebibliography}
