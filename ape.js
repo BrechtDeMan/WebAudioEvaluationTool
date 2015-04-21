@@ -322,6 +322,12 @@ function loadTest(id)
 		}
 	}
 	
+	var commentShow = textXML.attributes['elementComments'];
+	if (commentShow != undefined) {
+		if (commentShow.value == 'false') {commentShow = false;}
+		else {commentShow = true;}
+	} else {commentShow = true;}
+	
 	var loopPlayback = textXML.attributes['loop'];
 	if (loopPlayback != undefined)
 	{
@@ -449,24 +455,27 @@ function loadTest(id)
 		// Now load each audio sample. First create the new track by passing the full URL
 		var trackURL = hostURL + this.attributes['url'].value;
 		audioEngineContext.newTrack(trackURL);
-		// Create document objects to hold the comment boxes
-		var trackComment = document.createElement('div');
-		trackComment.className = 'comment-div';
-		// Create a string next to each comment asking for a comment
-		var trackString = document.createElement('span');
-		trackString.innerHTML = 'Comment on track '+index;
-		// Create the HTML5 comment box 'textarea'
-		var trackCommentBox = document.createElement('textarea');
-		trackCommentBox.rows = '4';
-		trackCommentBox.cols = '100';
-		trackCommentBox.name = 'trackComment'+index;
-		trackCommentBox.className = 'trackComment';
-		var br = document.createElement('br');
-		// Add to the holder.
-		trackComment.appendChild(trackString);
-		trackComment.appendChild(br);
-		trackComment.appendChild(trackCommentBox);
-		feedbackHolder.appendChild(trackComment);
+		
+		if (commentShow) {
+			// Create document objects to hold the comment boxes
+			var trackComment = document.createElement('div');
+			trackComment.className = 'comment-div';
+			// Create a string next to each comment asking for a comment
+			var trackString = document.createElement('span');
+			trackString.innerHTML = 'Comment on track '+index;
+			// Create the HTML5 comment box 'textarea'
+			var trackCommentBox = document.createElement('textarea');
+			trackCommentBox.rows = '4';
+			trackCommentBox.cols = '100';
+			trackCommentBox.name = 'trackComment'+index;
+			trackCommentBox.className = 'trackComment';
+			var br = document.createElement('br');
+			// Add to the holder.
+			trackComment.appendChild(trackString);
+			trackComment.appendChild(br);
+			trackComment.appendChild(trackCommentBox);
+			feedbackHolder.appendChild(trackComment);
+		}
 		
 		// Create a slider per track
 		
