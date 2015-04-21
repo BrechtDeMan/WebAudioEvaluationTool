@@ -583,6 +583,14 @@ function preTestButtonClick(preTest,index)
 		var questionId = preTest.children[index].attributes['id'].value;
 		var questionHold = document.createElement('comment');
 		var questionResponse = document.getElementById(questionId + 'response');
+		var mandatory = preTest.children[index].attributes['mandatory'];
+		if (mandatory != undefined){
+			if (mandatory.value == 'true') {mandatory = true;}
+			else {mandatory = false;}
+		} else {mandatory = false;}
+		if (mandatory == true && questionResponse.value.length == 0) {
+			return index;
+		}
 		questionHold.id = questionId;
 		questionHold.innerHTML = questionResponse.value;
 		postPopupResponse(questionHold);
