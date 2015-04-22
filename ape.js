@@ -3,16 +3,6 @@
  *  Create the APE interface
  */
 
-/*
- * 
- * WARNING!!!
- * 
- * 	YOU ARE VIEWING THE DEV VERSION. THERE IS NO GUARANTEE THIS WILL BE FULLY FUNCTIONAL
- * 
- * WARNING!!!
- * 
- */
-
 var currentState; // Keep track of the current state (pre/post test, which test, final test? first test?)
 // preTest - In preTest state
 // testRun-ID - In test running, test Id number at the end 'testRun-2'

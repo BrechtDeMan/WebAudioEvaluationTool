@@ -5,20 +5,6 @@
  * Also contains all global variables.
  */
 
-
-/*
- * 
- * WARNING!!!
- * 
- * 	YOU ARE VIEWING THE DEV VERSION. THERE IS NO GUARANTEE THIS WILL BE FULLY FUNCTIONAL
- * 
- * WARNING!!!
- * 
- */
-
-
-
-
 /* create the web audio API context and store in audioContext*/
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
