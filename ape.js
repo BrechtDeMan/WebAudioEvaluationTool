@@ -322,6 +322,12 @@ function loadTest(id)
 		}
 	}
 	
+	var commentShow = textXML.attributes['elementComments'];
+	if (commentShow != undefined) {
+		if (commentShow.value == 'false') {commentShow = false;}
+		else {commentShow = true;}
+	} else {commentShow = true;}
+	
 	var loopPlayback = textXML.attributes['loop'];
 	if (loopPlayback != undefined)
 	{
@@ -449,24 +455,27 @@ function loadTest(id)
 		// Now load each audio sample. First create the new track by passing the full URL
 		var trackURL = hostURL + this.attributes['url'].value;
 		audioEngineContext.newTrack(trackURL);
-		// Create document objects to hold the comment boxes
-		var trackComment = document.createElement('div');
-		trackComment.className = 'comment-div';
-		// Create a string next to each comment asking for a comment
-		var trackString = document.createElement('span');
-		trackString.innerHTML = 'Comment on track '+index;
-		// Create the HTML5 comment box 'textarea'
-		var trackCommentBox = document.createElement('textarea');
-		trackCommentBox.rows = '4';
-		trackCommentBox.cols = '100';
-		trackCommentBox.name = 'trackComment'+index;
-		trackCommentBox.className = 'trackComment';
-		var br = document.createElement('br');
-		// Add to the holder.
-		trackComment.appendChild(trackString);
-		trackComment.appendChild(br);
-		trackComment.appendChild(trackCommentBox);
-		feedbackHolder.appendChild(trackComment);
+		
+		if (commentShow) {
+			// Create document objects to hold the comment boxes
+			var trackComment = document.createElement('div');
+			trackComment.className = 'comment-div';
+			// Create a string next to each comment asking for a comment
+			var trackString = document.createElement('span');
+			trackString.innerHTML = 'Comment on track '+index;
+			// Create the HTML5 comment box 'textarea'
+			var trackCommentBox = document.createElement('textarea');
+			trackCommentBox.rows = '4';
+			trackCommentBox.cols = '100';
+			trackCommentBox.name = 'trackComment'+index;
+			trackCommentBox.className = 'trackComment';
+			var br = document.createElement('br');
+			// Add to the holder.
+			trackComment.appendChild(trackString);
+			trackComment.appendChild(br);
+			trackComment.appendChild(trackCommentBox);
+			feedbackHolder.appendChild(trackComment);
+		}
 		
 		// Create a slider per track
 		
@@ -495,6 +504,30 @@ function loadTest(id)
 		};
 		
 		canvas.appendChild(trackSliderObj);
+	});
+	
+	// Append any commentQuestion boxes
+	var commentQuestions = $(textXML).find('CommentQuestion');
+	$(commentQuestions).each(function(index,element) {
+		// Create document objects to hold the comment boxes
+		var trackComment = document.createElement('div');
+		trackComment.className = 'comment-div commentQuestion';
+		trackComment.id = element.attributes['id'].value;
+		// Create a string next to each comment asking for a comment
+		var trackString = document.createElement('span');
+		trackString.innerHTML = element.textContent;
+		// Create the HTML5 comment box 'textarea'
+		var trackCommentBox = document.createElement('textarea');
+		trackCommentBox.rows = '4';
+		trackCommentBox.cols = '100';
+		trackCommentBox.name = 'commentQuestion'+index;
+		trackCommentBox.className = 'trackComment';
+		var br = document.createElement('br');
+		// Add to the holder.
+		trackComment.appendChild(trackString);
+		trackComment.appendChild(br);
+		trackComment.appendChild(trackCommentBox);
+		feedbackHolder.appendChild(trackComment);
 	});
 	
 	// Now process any pre-test commands
@@ -583,6 +616,14 @@ function preTestButtonClick(preTest,index)
 		var questionId = preTest.children[index].attributes['id'].value;
 		var questionHold = document.createElement('comment');
 		var questionResponse = document.getElementById(questionId + 'response');
+		var mandatory = preTest.children[index].attributes['mandatory'];
+		if (mandatory != undefined){
+			if (mandatory.value == 'true') {mandatory = true;}
+			else {mandatory = false;}
+		} else {mandatory = false;}
+		if (mandatory == true && questionResponse.value.length == 0) {
+			return index;
+		}
 		questionHold.id = questionId;
 		questionHold.innerHTML = questionResponse.value;
 		postPopupResponse(questionHold);
@@ -773,6 +814,13 @@ function pageXMLSave(testId)
 	// Saves a specific test page
 	var xmlDoc = currentTestHolder;
 	// Check if any session wide metrics are enabled
+	
+	var commentShow = testXMLSetups[testId].attributes['elementComments'];
+	if (commentShow != undefined) {
+		if (commentShow.value == 'false') {commentShow = false;}
+		else {commentShow = true;}
+	} else {commentShow = true;}
+	
 	var metric = document.createElement('metric');
 	if (audioEngineContext.metric.enableTestTimer)
 	{
@@ -791,15 +839,17 @@ function pageXMLSave(testId)
 		audioElement.url = currentTrackOrder[i].attributes['url'].value;
 		var value = document.createElement('value');
 		value.innerHTML = convSliderPosToRate(i);
-		var comment = document.createElement("comment");
-		var question = document.createElement("question");
-		var response = document.createElement("response");
-		question.textContent = commentObjects[i].children[0].textContent;
-		response.textContent = commentObjects[i].children[2].value;
-		comment.appendChild(question);
-		comment.appendChild(response);
+		if (commentShow) {
+			var comment = document.createElement("comment");
+			var question = document.createElement("question");
+			var response = document.createElement("response");
+			question.textContent = commentObjects[i].children[0].textContent;
+			response.textContent = commentObjects[i].children[2].value;
+			comment.appendChild(question);
+			comment.appendChild(response);
+			audioElement.appendChild(comment);
+		}
 		audioElement.appendChild(value);
-		audioElement.appendChild(comment);
 		// Check for any per element metrics
 		var metric = document.createElement('metric');
 		var elementMetric = audioEngineContext.audioObjects[i].metric;
@@ -855,6 +905,19 @@ function pageXMLSave(testId)
 		audioElement.appendChild(metric);
 		xmlDoc.appendChild(audioElement);
 	}
+	var commentQuestion = document.getElementsByClassName('commentQuestion');
+	for (var i=0; i<commentQuestion.length; i++)
+	{
+		var cqHolder = document.createElement('CommentQuestion');
+		var comment = document.createElement('comment');
+		var question = document.createElement('question');
+		cqHolder.id = commentQuestion[i].id;
+		comment.textContent = commentQuestion[i].children[2].value;
+		question.textContent = commentQuestion[i].children[0].textContent;
+		cqHolder.appendChild(question);
+		cqHolder.appendChild(comment);
+		xmlDoc.appendChild(cqHolder);
+	}
 	testResultsHolders[testId] = xmlDoc;
 }
 
@@ -872,4 +935,3 @@ function interfaceXMLSave(){
 	
 	return xmlDoc;
 }
-

@@ -18,7 +18,7 @@
 			<metricEnable>elementFlagMoved</metricEnable>
 		</Metric>
 	</setup>
-	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='1' loop='true'>
+	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='1' loop='true' elementComments='true'>
 		<interface>
 			<title>Example Test Question</title>
 			<scale position="0">Min</scale>
