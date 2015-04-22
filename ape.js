@@ -814,6 +814,13 @@ function pageXMLSave(testId)
 	// Saves a specific test page
 	var xmlDoc = currentTestHolder;
 	// Check if any session wide metrics are enabled
+	
+	var commentShow = testXMLSetups[testId].attributes['elementComments'];
+	if (commentShow != undefined) {
+		if (commentShow.value == 'false') {commentShow = false;}
+		else {commentShow = true;}
+	} else {commentShow = true;}
+	
 	var metric = document.createElement('metric');
 	if (audioEngineContext.metric.enableTestTimer)
 	{
@@ -832,15 +839,17 @@ function pageXMLSave(testId)
 		audioElement.url = currentTrackOrder[i].attributes['url'].value;
 		var value = document.createElement('value');
 		value.innerHTML = convSliderPosToRate(i);
-		var comment = document.createElement("comment");
-		var question = document.createElement("question");
-		var response = document.createElement("response");
-		question.textContent = commentObjects[i].children[0].textContent;
-		response.textContent = commentObjects[i].children[2].value;
-		comment.appendChild(question);
-		comment.appendChild(response);
+		if (commentShow) {
+			var comment = document.createElement("comment");
+			var question = document.createElement("question");
+			var response = document.createElement("response");
+			question.textContent = commentObjects[i].children[0].textContent;
+			response.textContent = commentObjects[i].children[2].value;
+			comment.appendChild(question);
+			comment.appendChild(response);
+			audioElement.appendChild(comment);
+		}
 		audioElement.appendChild(value);
-		audioElement.appendChild(comment);
 		// Check for any per element metrics
 		var metric = document.createElement('metric');
 		var elementMetric = audioEngineContext.audioObjects[i].metric;
@@ -926,4 +935,3 @@ function interfaceXMLSave(){
 	
 	return xmlDoc;
 }
-
