@@ -741,7 +741,10 @@ function advanceState()
 		var testId = currentState.substr(8,currentState.length-7);
 		// Check if we have any post tests to perform
 		var postXML = $(testXMLSetups[testId]).find('PostTest')[0];
-		if (postXML.children.length > 0)
+		if (postXML == undefined) {
+			testEnded(testId);
+		}
+		else if (postXML.children.length > 0)
 		{
 			currentState = 'testRunPost-'+testId; 
 			showPopup();
@@ -751,7 +754,7 @@ function advanceState()
 		
 		
 			// No post tests, check if we have another test to perform instead
-			testEnded(testId);
+			
 		}
 	}
 	console.log(currentState);
