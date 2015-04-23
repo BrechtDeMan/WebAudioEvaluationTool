@@ -11,3 +11,8 @@ docs/SMC15/smc2015template.synctex.gz
 re:^docs/ExperimentVariableControl\.aux$
 re:^docs/ExperimentVariableControl\.log$
 re:^docs/ExperimentVariableControl\.synctex\.gz$
+*.aux
+*.bbl
+*.gz
+*.log
+*.blg
