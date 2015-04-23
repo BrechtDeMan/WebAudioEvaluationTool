@@ -406,6 +406,7 @@ function loadTest(id)
 					this.audioObjects[i].play(audioContext.currentTime+0.01);
 				} else {
 					this.audioObjects[i].outputGain.gain.value = 0.0;
+					this.audioObjects[i].stop();
 				}
 			}
 		};
