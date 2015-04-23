@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BrowserEvalProjectDocument>
+	<setup interface="APE" projectReturn="null" randomiseOrder='true' collectMetrics='true'>
+		<PreTest>
+			<statement>Please listen to all mixes</statement>
+			<question id="location" mandatory="true">Please enter your listening location</question>
+		</PreTest>
+		<PostTest>
+			<statement>Thank you for taking this listening test.</statement>
+			<question id="SessionID">Please enter your name.</question>
+		</PostTest>
+		<Metric>
+			<metricEnable>testTimer</metricEnable>
+			<metricEnable>elementTimer</metricEnable>
+			<metricEnable>elementInitalPosition</metricEnable>
+			<metricEnable>elementTracker</metricEnable>
+			<metricEnable>elementFlagListenedTo</metricEnable>
+			<metricEnable>elementFlagMoved</metricEnable>
+		</Metric>
+	</setup>
+	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='1' loop='true' elementComments='true'>
+		<interface>
+			<title>Example Test Question</title>
+			<scale position="0">Min</scale>
+			<scale position="100">Max</scale>
+			<scale position="50">Middle</scale>
+			<scale position="20">20</scale>
+		</interface>
+		<audioElements url="0.wav" id="0"/>
+		<audioElements url="1.wav" id="1"/>
+		<audioElements url="2.wav" id="2"/>
+		<audioElements url="3.wav" id="3"/>
+		<audioElements url="4.wav" id="4"/>
+		<audioElements url="5.wav" id="5"/>
+		<audioElements url="6.wav" id="6"/>
+		<audioElements url="7.wav" id="7"/>
+		<audioElements url="8.wav" id="8"/>
+		<audioElements url="9.wav" id="9"/>
+		<audioElements url="10.wav" id="10"/>
+		<CommentQuestion id='mixingExperiance'>What is your mixing experiance</CommentQuestion>
+		<PreTest>
+			<statement>Start the Test 3</statement>
+		</PreTest>
+		<PostTest>
+			<statement>Please take a break before the next test</statement>
+			<question id="testComment">How did you find the test</question>
+	</PostTest>
+	</audioHolder>
+</BrowserEvalProjectDocument>
