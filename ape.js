@@ -140,7 +140,7 @@ function loadInterface(xmlDoc) {
 	if (titleAttr != undefined) {
 		titleSpan.innerHTML = titleAttr.value;
 	} else {
-		titleSpan.innerHTML =  'APE Tool';
+		titleSpan.innerHTML =  'Listening test';
 	}
 	// Insert the titleSpan element into the title div element.
 	title.appendChild(titleSpan);
