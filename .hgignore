@@ -16,3 +16,11 @@ re:^docs/ExperimentVariableControl\.synctex\.gz$
 *.gz
 *.log
 *.blg
+*.DS_Store
+re:^RealismEval/
+re:^SynthReal/
+re:^SynthRealismTest\.html$
+re:^example_eval/paperExample\.xml$
+re:^example_eval/project\.xml\.orig$
+re:^index2\.html$
+re:^realismTest\.html$
