@@ -169,15 +169,6 @@ In case of for instance method of adjustment, where the audio is processed by th
 There are a number of advantages to building a web audio based listening test environment. The ability to easily deploy a flexible and scalable testing environment that requires no proprietary software to run makes the web audio evaluation tool a very flexible testing tool. The ability to host a single test server and create multiple clients not only allows multiple participants to be involved in a trial simultaneously, but also permits participants to be located anywhere in the world. There are limited user experience issues, as all users should have some experience with using existing web technologies.
 
 
-%DAVE: justify:
-%\begin{itemize}
-%\item Easy deployment - no propitiatory software required
-%\item Entirely scalable
-%\item Trial multiple participants simultaneously
-%\item Intuitive environment - everyone uses the internet
-%\item Can be hosted and run from single location with participants worldwide
-%\end{itemize}
-
 [TO ADD: in the following sections, we describe the interface in more detail, discuss the implementation, and go over design considerations and flexibility ... ]
 
 
@@ -187,14 +178,20 @@ At this point, we have implemented the interface of the MATLAB-based APE Percept
 
 However, the back end of this test environment allows for many more established and novel interfaces for listening tests, particularly ones where the subject only assesses audio without manipulating it (i.e. method of adjustment, which would require additional features to be implemented). 
 
-\begin{figure*}[htbp]
+\begin{figure*}[ht]
 \begin{center}
 \includegraphics[width=0.9\textwidth]{interface.png}
 \caption{Example of interface, with 1 axis and 11 fragments}
 \label{fig:interface}
 \end{center}
 \end{figure*}
-[DAVE to make new picture]
+
+
+************ 
+
+[DAVE to make new picture] - Apologies but I am having a few troubles being able to get a good looking example of the interface - The text boxes keep rolling out of bounds - and the resolution on my laptop being far from ideal. Can someone else please make a quick mockup test and take a screenshot. 
+
+************ 
 
 [BRECHT to expand]
 
@@ -238,18 +235,23 @@ As this happens before any loading or decoding of audio files, the system will o
 
 [DAVE: somewhere add input file]
 
-Setup and the results both use the common XML document format to outline the various parameters. The setup file determines which interface to use, the location of audio files, how many pages and other general setup rules to define the testing envrionment. Having one document to modify allows for quick manipulation in a `human readable' form to create new tests, or adjust current ones, without needing to edit multiple web files. % I mean the .js and .html files, though not sure if any better.
-The setup document has several defined nodes and structure which are documented with the source code. For example there is a section for general setup options where the pre-test and post-test questions and statements are defined:
+Setup and the results both use the common XML document format to outline the various parameters. The setup file determines which interface to use, the location of audio files, how many pages and other general setup rules to define the testing environment. Having one document to modify allows for quick manipulation in a `human readable' form to create new tests, or adjust current ones, without needing to edit multiple web files. An example of this XML document is presented in Figure~\ref{fig:xmlIn}% I mean the .js and .html files, though not sure if any better.
 
-\texttt{<question id="location" mandatory="true"> Please enter your listening location \\ </question>}
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{XMLInput.png}
+\caption{An Example Input XML File}
+\label{fig:xmlIn}
+\end{center}
+\end{figure}
 
-From the above example it can be seen that a question box should be generated, with the id 'location' and it is mandatory to answer. The question is in the PreTest node meaning it will appear before any testing will begin. When the result for the  entire test is shown, then this will appear in the PreTest node of the response with the id 'location' allowing it to be found easily. This outlines the importance of having clear and meaningful ID values. Pre- and post-test dialog boxes allow for comments or questions to be presented before or after the test, to convey listening test instructions, gather information about the subject, listening environment, and overall experience of the test.
+The setup document has several defined nodes and structure which are documented with the source code. For example there is a section for general setup options where the pre-test and post-test questions and statements are set up and from the example in Figure~\ref{fig:xmlIn}, it can be seen that a question box should be generated, with the id 'location' and it is mandatory to answer. The question is in the PreTest node meaning it will appear before any testing will begin. When the result for the  entire test is shown, then this will appear in the PreTest node of the response with the id 'location' allowing it to be found easily. This outlines the importance of having clear and meaningful ID values. Pre- and post-test dialog boxes allow for comments or questions to be presented before or after the test, to convey listening test instructions, gather information about the subject, listening environment, and overall experience of the test.
  
 [BRECHT to say we try to cater to as many audiences as possible, simple yet tweakable]
 
 Further options in the setup file are: 
 
-\begin{itemize}
+\begin{itemize} %Should have used a description list for this.
 \item \textbf{Snap to corresponding position}: When this is enabled, and a fragment is playing, the playhead skips to the same position in the next fragment that is clicked. If it is not enabled, every fragment is played from the start. 
 \item \textbf{Loop fragments}: Repeat current fragment when end is reached, until the `Stop audio' or `Submit' button is clicked. 
 \item \textbf{Comments}: Displays a separate comment box for each fragment in the page.
@@ -275,7 +277,15 @@ When one of these options is not included in the setup file, they assume a defau
 
 % loop, snap to corresponding position, comments, 'general' comment, require same sampling rate, different types of randomisation
 
-The results file is dynamically generated by the interface upon clicking the `Submit' button. This also executes checks, depending on the setup file, to ensure that all tracks have been played back, rated and commented on. The XML output returned contains a node per audioObject and contains both the corresponding marker's position and any comments written in the associated comment box. The rating returned is normalised to be a value between 0 and 1, normalising the pixel representation of different browser windows.
+The results file is dynamically generated by the interface upon clicking the `Submit' button. This also executes checks, depending on the setup file, to ensure that all tracks have been played back, rated and commented on. The XML output returned contains a node per audioObject and contains both the corresponding marker's position and any comments written in the associated comment box. The rating returned is normalised to be a value between 0 and 1, normalising the pixel representation of different browser windows. An example output file is presented in Figure~\ref{fig:xmlOut}
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{XMLOutput.png}
+\caption{An Example Output XML File}
+\label{fig:xmlOut}
+\end{center}
+\end{figure}
 
 The results will also contain information collected by any defined pre/post questions. These are referenced against the setup XML by using the same ID so readable responses can be obtained. Taking from the earlier example of setting up a pre-test question, an example reponse would be shown as the following.
 
@@ -285,37 +295,43 @@ Each page of testing is returned with the results of the entire page included in
 
 Future development will also evolve to include any session data, such as the browser the tool was used in. Currently the results files are downloaded on the user side of the browser as a .xml file to be manually returned. However the end goal is to allow the XML files to be submitted over the web to a receiving server to store them, allowing for automated collection.
 
+*********************
+
+Do we want to discuss this in the future of present tense - as it will be a working feature by the time we are published (July at the earliest?) So this can be present tense - as in 'this work has already been done' or should this go into further work?
+
+*********************
+
  % right? 
 
 %Here is an example of the setup XML and the results XML: % perhaps best to refer to each XML after each section (setup <> results)
 % Should we include an Example of the input and output XML structure?? --> Sure. 
 
-An example of the returned \textit{audioElement} node in the results XML file is as follows.
+%An example of the returned \textit{audioElement} node in the results XML file is as follows.
+%
+%\texttt{<audioelement id="8"> \\
+%<comment> \\
+%<question>Comment on track 0</question> \\
+%<response> The drums were punchy </response> \\
+%</comment> \\
+%<value> 0.25169491525423726 </value> \\
+%<metric> \\
+%<metricresult id="elementTimer"> \\ 2.3278004535147385< /metricresult> \\
+%<metricresult id="elementTrackerFull"> \\
+%<timepos id="0"> \\
+%<time>1.7937414965986385</time> \\
+%<position>0.41694915254237286</position> \\
+%</timepos> \\
+%<timepos id="1"> \\
+%<time>2.6993197278911563</time> \\
+%<position>0.45847457627118643</position> \\
+%</timepos> \\</metricresult> \\
+%<metricresult id="elementInitialPosition"> 0.47796610169491527 </metricresult> \\
+%<metricresult id="elementFlagListenedTo"> true< /metricresult> \\
+%<metricresult id="elementFlagMoved"> true </metricresult> \\
+%</metric> \\
+%</audioelement>}
 
-\texttt{<audioelement id="8"> \\
-<comment> \\
-<question>Comment on track 0</question> \\
-<response> The drums were punchy </response> \\
-</comment> \\
-<value> 0.25169491525423726 </value> \\
-<metric> \\
-<metricresult id="elementTimer"> \\ 2.3278004535147385< /metricresult> \\
-<metricresult id="elementTrackerFull"> \\
-<timepos id="0"> \\
-<time>1.7937414965986385</time> \\
-<position>0.41694915254237286</position> \\
-</timepos> \\
-<timepos id="1"> \\
-<time>2.6993197278911563</time> \\
-<position>0.45847457627118643</position> \\
-</timepos> \\</metricresult> \\
-<metricresult id="elementInitialPosition"> 0.47796610169491527 </metricresult> \\
-<metricresult id="elementFlagListenedTo"> true< /metricresult> \\
-<metricresult id="elementFlagMoved"> true </metricresult> \\
-</metric> \\
-</audioelement>}
-
-As can be seen, the parent tag \texttt{audioelement} holds the id of the element passed in from the setup document. The first child element is \texttt{comment} and holds both the question shown and the response from the comment box inside.
+As can be seen from Figure~\ref{fig:xmlOut}, the parent tag \texttt{audioelement} holds the id of the element passed in from the setup document. The first child element is \texttt{comment} and holds both the question shown and the response from the comment box inside.
 The child element \texttt{value} holds the normalised ranking value. Next comes the metric node structure, there is one \texttt{metricresult} node per metric event collected. The id of the node identifies the type of data it contains. For example, the first holds the id \textit{elementTimer} and the data contained represents how long, in seconds, the audio element was listened to. The next holds the id \textit{elementTrackerFull} and contains a pair of elements per entry. This represents the entire movement of the elements' slider giving the time the event took place in seconds from when the current test page started, and the new position. In our example there are three \texttt{timepos} children with their id representing their order. There is one of these \texttt{audioelement} tags per audio element outlined on each test page. 
 
 \section{Conclusions and future work}\label{sec:conclusions}
