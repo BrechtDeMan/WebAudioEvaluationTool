@@ -56,15 +56,16 @@ J.~D. Reiss and C.~Uhle, ``Determined source separation for microphone
   recordings using {IIR} filters,'' in \emph{129th Convention of the Audio
   Engineering Society}, 2010.
 
-\bibitem{song2013b}
-Y.~Song, S.~Dixon, and A.~R. Halpern, ``Do online social tags predict perceived
-  or induced emotional responses to music?'' in \emph{Proceedings of the 14th
-  International Society for Music Information Retrieval (ISMIR2013)}, 2013.
-
 \bibitem{song2013a}
 Y.~Song, S.~Dixon, M.~T. Pearce, and G.~Fazekas, ``Using tags to select stimuli
   in the study of music and emotion,'' \emph{Proceedings of the 3rd
   International Conference on Music \& Emotion (ICME)}, 2013.
+
+\bibitem{eerola2009prediction}
+T.~Eerola, O.~Lartillot, and P.~Toiviainen, ``Prediction of multidimensional
+  emotional ratings in music from audio using multivariate regression models,''
+  in \emph{Proceedings of the 10th International Society for Music Information
+  Retrieval (ISMIR2009)}, 2009, pp. 621--626.
 
 \bibitem{friberg2011comparison}
 A.~Friberg and A.~Hedblad, ``A comparison of perceptual ratings and computed
