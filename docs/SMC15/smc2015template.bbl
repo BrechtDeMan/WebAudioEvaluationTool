@@ -23,8 +23,8 @@
 
 \bibitem{schoeffler2013impact}
 M.~Schoeffler and J.~Herre, ``About the impact of audio quality on overall
-  listening experience,'' in \emph{Proceedings of Sound and Music Computing
-  Conference}, 2013, pp. 48--53.
+  listening experience,'' in \emph{Proceedings of the 10th Sound and Music
+  Computing Conference}, 2013, pp. 48--53.
 
 \bibitem{repp}
 R.~Repp, ``Recording quality ratings by music professionals,'' in
@@ -43,7 +43,8 @@ G.~Durr, L.~Peixoto, M.~Souza, R.~Tanoue, and J.~D. Reiss, ``Implementation and
 
 \bibitem{deman2014a}
 B.~De~Man and J.~D. Reiss, ``Adaptive control of amplitude distortion
-  effects,'' in \emph{53rd Conference of the Audio Engineering Society}, 2014.
+  effects,'' in \emph{Audio Engineering Society Conference: 53rd International
+  Conference: Semantic Audio}, 2014.
 
 \bibitem{mushram}
 E.~Vincent, M.~G. Jafari, and M.~D. Plumbley, ``Preliminary guidelines for
@@ -53,8 +54,7 @@ E.~Vincent, M.~G. Jafari, and M.~D. Plumbley, ``Preliminary guidelines for
 \bibitem{uhlereiss}
 J.~D. Reiss and C.~Uhle, ``Determined source separation for microphone
   recordings using {IIR} filters,'' in \emph{129th Convention of the Audio
-  Engineering Society}.\hskip 1em plus 0.5em minus 0.4em\relax Audio
-  Engineering Society, 2010.
+  Engineering Society}, 2010.
 
 \bibitem{song2013b}
 Y.~Song, S.~Dixon, and A.~R. Halpern, ``Do online social tags predict perceived
@@ -68,8 +68,8 @@ Y.~Song, S.~Dixon, M.~T. Pearce, and G.~Fazekas, ``Using tags to select stimuli
 
 \bibitem{friberg2011comparison}
 A.~Friberg and A.~Hedblad, ``A comparison of perceptual ratings and computed
-  audio features,'' in \emph{Proceedings of the SMC2011, 8th Sound and Music
-  Computing Conference}, 2011, pp. 122--127.
+  audio features,'' in \emph{Proceedings of the 8th Sound and Music Computing
+  Conference}, 2011, pp. 122--127.
 
 \bibitem{deman2014b}
 B.~De~Man and J.~D. Reiss, ``{APE}: {A}udio {P}erceptual {E}valuation toolbox
@@ -83,7 +83,7 @@ S.~Kraft and U.~Z{\"o}lzer, ``{BeaqleJS}: {HTML5} and {JavaScript} based
 
 \bibitem{hulti-gen}
 C.~Gribben and H.~Lee, ``Toward the development of a universal listening test
-  interface generator in max,'' in \emph{138th Convention of the Audio
+  interface generator in {Max},'' in \emph{138th Convention of the Audio
   Engineering Society}, 2015.
 
 \bibitem{scale}
@@ -103,7 +103,7 @@ J.~Berg, ``{OPAQUE} -- {A} tool for the elicitation and grading of audio
 \bibitem{guineapig}
 J.~Hynninen and N.~Zacharov, ``{GuineaPig} - {A} generic subjective test system
   for multichannel audio,'' in \emph{106th Convention of the Audio Engineering
-  Society Convention}, 1999.
+  Society}, 1999.
 
 \bibitem{mushra}
 \emph{Method for the subjective assessment of intermediate quality level of
