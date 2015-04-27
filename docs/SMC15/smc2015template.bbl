@@ -39,13 +39,11 @@ A.~de~G{\"o}tzen, E.~Sikstr{\"o}m, F.~Grani, and S.~Serafin, ``Real, foley or
 \bibitem{durr2015implementation}
 G.~Durr, L.~Peixoto, M.~Souza, R.~Tanoue, and J.~D. Reiss, ``Implementation and
   evaluation of dynamic level of audio detail,'' in \emph{Audio Engineering
-  Society Conference: 56th International Conference: Audio for Games}, February
-  2015.
+  Society Conference: 56th International Conference: Audio for Games}, 2015.
 
 \bibitem{deman2014a}
 B.~De~Man and J.~D. Reiss, ``Adaptive control of amplitude distortion
-  effects,'' in \emph{53rd Conference of the Audio Engineering Society},
-  January 2014.
+  effects,'' in \emph{53rd Conference of the Audio Engineering Society}, 2014.
 
 \bibitem{mushram}
 E.~Vincent, M.~G. Jafari, and M.~D. Plumbley, ``Preliminary guidelines for
@@ -56,7 +54,7 @@ E.~Vincent, M.~G. Jafari, and M.~D. Plumbley, ``Preliminary guidelines for
 J.~D. Reiss and C.~Uhle, ``Determined source separation for microphone
   recordings using {IIR} filters,'' in \emph{129th Convention of the Audio
   Engineering Society}.\hskip 1em plus 0.5em minus 0.4em\relax Audio
-  Engineering Society, November 2010.
+  Engineering Society, 2010.
 
 \bibitem{song2013b}
 Y.~Song, S.~Dixon, and A.~R. Halpern, ``Do online social tags predict perceived
@@ -76,7 +74,7 @@ A.~Friberg and A.~Hedblad, ``A comparison of perceptual ratings and computed
 \bibitem{deman2014b}
 B.~De~Man and J.~D. Reiss, ``{APE}: {A}udio {P}erceptual {E}valuation toolbox
   for {MATLAB},'' in \emph{136th Convention of the Audio Engineering Society},
-  April 2014.
+  2014.
 
 \bibitem{beaqlejs}
 S.~Kraft and U.~Z{\"o}lzer, ``{BeaqleJS}: {HTML5} and {JavaScript} based
@@ -93,29 +91,39 @@ A.~V. Giner, ``Scale - a software tool for listening experiments,'' in
   \emph{AIA/DAGA Conference on Acoustics, Merano (Italy)}, 2013.
 
 \bibitem{whisper}
-S.~Ciba, A.~Wlodarski, and H.-J. Maempel, ``Whis{PER} -- a new tool for
+S.~Ciba, A.~Wlodarski, and H.-J. Maempel, ``Whis{PER} -- {A} new tool for
   performing listening tests,'' in \emph{126th Convention of the Audio
-  Engineering Society}, May 7-10 2009.
+  Engineering Society}, 2009.
 
-\bibitem{mushra}
-\emph{Method for the subjective assessment of intermediate quality level of
-  coding systems}.\hskip 1em plus 0.5em minus 0.4em\relax Recommendation {ITU-R
-  BS.1534-1}, 2003.
+\bibitem{opaque}
+J.~Berg, ``{OPAQUE} -- {A} tool for the elicitation and grading of audio
+  quality attributes,'' in \emph{118th Convention of the Audio Engineering
+  Society}, 2005.
 
 \bibitem{guineapig}
 J.~Hynninen and N.~Zacharov, ``{GuineaPig} - {A} generic subjective test system
   for multichannel audio,'' in \emph{106th Convention of the Audio Engineering
   Society Convention}, 1999.
 
+\bibitem{mushra}
+\emph{Method for the subjective assessment of intermediate quality level of
+  coding systems}.\hskip 1em plus 0.5em minus 0.4em\relax Recommendation {ITU-R
+  BS.1534-1}, 2003.
+
 \bibitem{mason2015compression}
 A.~Mason, N.~Jillings, Z.~Ma, J.~D. Reiss, and F.~Melchior, ``Adaptive audio
   reproduction using personalized compression,'' in \emph{Audio Engineering
   Society Conference: 57th International Conference: The Future of Audio
-  Entertainment Technology -- Cinema, Television and the Internet}, March 2015.
+  Entertainment Technology -- Cinema, Television and the Internet}, 2015.
 
 \bibitem{bech}
 S.~Bech and N.~Zacharov, \emph{Perceptual Audio Evaluation - Theory, Method and
   Application}.\hskip 1em plus 0.5em minus 0.4em\relax John Wiley \& Sons,
   2007.
+
+\bibitem{deman2015a}
+B.~De~Man, M.~Boerum, B.~Leonard, G.~Massenburg, R.~King, and J.~D. Reiss,
+  ``Perceptual evaluation of music mixing practices,'' in \emph{138th
+  Convention of the Audio Engineering Society}, 2015.
 
 \end{thebibliography}
