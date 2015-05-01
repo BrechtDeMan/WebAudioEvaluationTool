@@ -43,7 +43,11 @@ div#slider {
 
 div.sliderScale {
 	width: 100%;
-	min-height: 20px;
+	min-height: 30px;
+}
+
+div.sliderScale span{
+	font-size: 1.2em;
 }
 
 div.sliderScale span {
