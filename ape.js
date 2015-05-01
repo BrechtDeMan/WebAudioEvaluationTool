@@ -3,16 +3,6 @@
  *  Create the APE interface
  */
 
-/*
- * 
- * WARNING!!!
- * 
- * 	YOU ARE VIEWING THE DEV VERSION. THERE IS NO GUARANTEE THIS WILL BE FULLY FUNCTIONAL
- * 
- * WARNING!!!
- * 
- */
-
 var currentState; // Keep track of the current state (pre/post test, which test, final test? first test?)
 // preTest - In preTest state
 // testRun-ID - In test running, test Id number at the end 'testRun-2'
@@ -150,7 +140,7 @@ function loadInterface(xmlDoc) {
 	if (titleAttr != undefined) {
 		titleSpan.innerHTML = titleAttr.value;
 	} else {
-		titleSpan.innerHTML =  'APE Tool';
+		titleSpan.innerHTML =  'Listening test';
 	}
 	// Insert the titleSpan element into the title div element.
 	title.appendChild(titleSpan);
@@ -416,6 +406,7 @@ function loadTest(id)
 					this.audioObjects[i].play(audioContext.currentTime+0.01);
 				} else {
 					this.audioObjects[i].outputGain.gain.value = 0.0;
+					this.audioObjects[i].stop();
 				}
 			}
 		};
