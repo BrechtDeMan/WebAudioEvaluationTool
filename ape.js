@@ -401,14 +401,11 @@ function loadTest(id)
 		audioEngineContext.selectedTrack = function(id) {
 			for (var i=0; i<this.audioObjects.length; i++)
 			{
-				if (id == i) {
-					this.audioObjects[i].outputGain.gain.value = 1.0;
-					this.audioObjects[i].play(audioContext.currentTime+0.01);
-				} else {
-					this.audioObjects[i].outputGain.gain.value = 0.0;
-					this.audioObjects[i].stop();
-				}
+				this.audioObjects[i].outputGain.gain.value = 0.0;
+				this.audioObjects[i].stop();
 			}
+			this.audioObjects[id].outputGain.gain.value = 1.0;
+			this.audioObjects[id].play(audioContext.currentTime+0.01);
 		};
 	}
 	
