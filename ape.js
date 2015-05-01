@@ -388,11 +388,9 @@ function loadTest(id)
 		audioEngineContext.stop = function() {
 			// Send stop and reset command to all playback buffers
 			if (this.status == 1) {
-				if (this.loopPlayback) {
-					for (var i=0; i<this.audioObjects.length; i++)
-					{
-						this.audioObjects[i].stop();
-					}
+				for (var i=0; i<this.audioObjects.length; i++)
+				{
+					this.audioObjects[i].stop();
 				}
 				this.status = 0;
 			}
@@ -404,8 +402,10 @@ function loadTest(id)
 				this.audioObjects[i].outputGain.gain.value = 0.0;
 				this.audioObjects[i].stop();
 			}
-			this.audioObjects[id].outputGain.gain.value = 1.0;
-			this.audioObjects[id].play(audioContext.currentTime+0.01);
+			if (this.status == 1) {
+				this.audioObjects[id].outputGain.gain.value = 1.0;
+				this.audioObjects[id].play(audioContext.currentTime+0.01);
+			}
 		};
 	}
 	
