@@ -55,7 +55,7 @@ div.sliderScale span {
 }
 
 div.track-slider {
-	/* Specify any strcture for the slider objects */
+	/* Specify any structure for the slider objects */
 	position: absolute;
 	height: inherit;
 	width: 12px;

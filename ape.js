@@ -428,7 +428,7 @@ function loadTest(id)
 	currentTrackOrder = [];
 	audioElements.each(function(index,element){
 		// Find any blind-repeats
-		// Not implemented yet, but just incase
+		// Not implemented yet, but just in case
 		currentTrackOrder[index] = element;
 	});
 	if (randomise) {
@@ -492,6 +492,16 @@ function loadTest(id)
 			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
 			audioEngineContext.metric.sliderPlayed(id);
 			audioEngineContext.selectedTrack(id);
+            // Currently playing track red, rest green
+            document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
+            for (var i = 0; i<$(currentTrackOrder).length; i++)
+            {
+                if (i!=index)
+                {
+                    document.getElementById('track-slider-'+i).style.backgroundColor = "rgb(100,200,100)";
+                }
+                              
+            }
 		};
 		
 		canvas.appendChild(trackSliderObj);
