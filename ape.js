@@ -166,17 +166,14 @@ function loadInterface(xmlDoc) {
 	
 	// Create playback start/stop points
 	var playback = document.createElement("button");
-	playback.innerHTML = 'Start';
+	playback.innerHTML = 'Stop';
 	playback.id = 'playback-button';
 	// onclick function. Check if it is playing or not, call the correct function in the
 	// audioEngine, change the button text to reflect the next state.
 	playback.onclick = function() {
-		if (audioEngineContext.status == 0) {
-			audioEngineContext.play();
-			this.innerHTML = 'Stop';
-		} else {
+		if (audioEngineContext.status == 1) {
 			audioEngineContext.stop();
-			this.innerHTML = 'Start';
+			this.innerHTML = 'Stop';
 		}
 	};
 	// Create Submit (save) button
@@ -502,6 +499,7 @@ function loadTest(id)
                 }
                               
             }
+            audioEngineContext.play();
 		};
 		
 		canvas.appendChild(trackSliderObj);
@@ -781,7 +779,7 @@ function testEnded(testId)
 	}
 }
 
-function buttonSubmitClick()
+function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
 	if (audioEngineContext.status == 1) {
 		var playback = document.getElementById('playback-button');
