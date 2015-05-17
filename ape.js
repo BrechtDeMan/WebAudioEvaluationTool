@@ -242,7 +242,7 @@ function loadInterface(xmlDoc) {
 	currentState = 'preTest';
 	
 	// Create Pre-Test Box
-	if (preTest != undefined && preTest.children.length >= 1)
+	if (preTest != undefined && preTest.childElementCount >= 1)
 	{
 		showPopup();
 		preTestPopupStart(preTest);
@@ -537,7 +537,7 @@ function loadTest(id)
 	// Now process any pre-test commands
 	
 	var preTest = $(testXMLSetups[id]).find('PreTest')[0];
-	if (preTest.children.length > 0)
+	if (preTest.childElementCount > 0)
 	{
 		currentState = 'testRunPre-'+id;
 		preTestPopupStart(preTest);
@@ -556,15 +556,15 @@ function preTestPopupStart(preTest)
 	preTestOption.id = 'preTest';
 	preTestOption.style.marginTop = '25px';
 	preTestOption.align = "center";
-	var child = preTest.children[0];
+	var child = $(preTest).children()[0];
 	if (child.nodeName == 'statement')
 	{
-		preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
+		preTestOption.innerHTML = '<span>'+child.textContent+'</span>';
 	} else if (child.nodeName == 'question')
 	{
 		var questionId = child.attributes['id'].value;
 		var textHold = document.createElement('span');
-		textHold.innerHTML = child.innerHTML;
+		textHold.innerHTML = child.textContent;
 		textHold.id = questionId + 'response';
 		var textEnter = document.createElement('textarea');
 		preTestOption.appendChild(textHold);
@@ -616,11 +616,11 @@ function preTestButtonClick(preTest,index)
 	// Need to find and parse preTest again!
 	var preTestOption = document.getElementById('preTest');
 	// Check if current state is a question!
-	if (preTest.children[index].nodeName == 'question') {
-		var questionId = preTest.children[index].attributes['id'].value;
+	if ($(preTest).children()[index].nodeName == 'question') {
+		var questionId = $(preTest).children()[index].attributes['id'].value;
 		var questionHold = document.createElement('comment');
 		var questionResponse = document.getElementById(questionId + 'response');
-		var mandatory = preTest.children[index].attributes['mandatory'];
+		var mandatory = $(preTest).children()[index].attributes['mandatory'];
 		if (mandatory != undefined){
 			if (mandatory.value == 'true') {mandatory = true;}
 			else {mandatory = false;}
@@ -633,17 +633,17 @@ function preTestButtonClick(preTest,index)
 		postPopupResponse(questionHold);
 	}
 	index++;
-	if (index < preTest.children.length)
+	if (index < preTest.childElementCount)
 	{
 		// More to process
-		var child = preTest.children[index];
+		var child = $(preTest).children()[index];
 		if (child.nodeName == 'statement')
 		{
-			preTestOption.innerHTML = '<span>'+child.innerHTML+'</span>';
+			preTestOption.innerHTML = '<span>'+child.textContent+'</span>';
 		} else if (child.nodeName == 'question')
 		{
 			var textHold = document.createElement('span');
-			textHold.innerHTML = child.innerHTML;
+			textHold.innerHTML = child.textContent;
 			var textEnter = document.createElement('textarea');
 			textEnter.id = child.attributes['id'].value + 'response';
 			var br = document.createElement('br');
@@ -748,7 +748,7 @@ function advanceState()
 		if (postXML == undefined) {
 			testEnded(testId);
 		}
-		else if (postXML.children.length > 0)
+		else if (postXML.childElementCount > 0)
 		{
 			currentState = 'testRunPost-'+testId; 
 			showPopup();
