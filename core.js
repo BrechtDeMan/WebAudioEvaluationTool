@@ -170,8 +170,11 @@ function audioObject(id) {
 	};
 	
 	this.stop = function() {
-		this.bufferNode.stop(0);
-		this.bufferNode = undefined;
+		if (this.bufferNode != undefined)
+		{
+			this.bufferNode.stop(0);
+			this.bufferNode = undefined;
+		}
 	};
 
 	this.constructTrack = function(url) {
