@@ -137,6 +137,16 @@ function AudioEngine() {
 		this.audioObjects[audioObjectId].constructTrack(url);
 	};
 	
+	this.checkAllPlayed = function() {
+		arr = [];
+		for (var id=0; id<this.audioObjects.length; id++) {
+			if (this.audioObjects[id].played == false) {
+				arr.push(this.audioObjects[id].id);
+			}
+		}
+		return arr;
+	};
+	
 }
 
 function audioObject(id) {
@@ -146,6 +156,8 @@ function audioObject(id) {
 	this.state = 0; // 0 - no data, 1 - ready
 	this.url = null; // Hold the URL given for the output back to the results.
 	this.metric = new metricTracker();
+	
+	this.played = false;
 	
 	// Create a buffer and external gain control to allow internal patching of effects and volume leveling.
 	this.bufferNode = undefined;
@@ -167,6 +179,7 @@ function audioObject(id) {
 		this.bufferNode.buffer = this.buffer;
 		this.bufferNode.loop = audioEngineContext.loopPlayback;
 		this.bufferNode.start(startTime);
+		this.played = true;
 	};
 	
 	this.stop = function() {

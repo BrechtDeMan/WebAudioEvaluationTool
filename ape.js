@@ -11,10 +11,6 @@ var currentState; // Keep track of the current state (pre/post test, which test,
 // postTest - End of test, final submission!
 
 
-// Create empty array to log whether different samples have been played
-var hasBeenPlayed = []; // HERE?
-
-
 // Once this is loaded and parsed, begin execution
 loadInterface(projectXML);
 
@@ -501,13 +497,10 @@ function loadTest(id)
                               
             }
             audioEngineContext.play();
-            hasBeenPlayed[index] = true; // mark as played
 		};
 		
 		canvas.appendChild(trackSliderObj);
         
-        // Add corresponding element to array to check whether sound has been played
-        hasBeenPlayed.push(false);
 	});
 	
 	// Append any commentQuestion boxes
@@ -736,6 +729,8 @@ function advanceState()
 		// Start the test
 		var testId = currentState.substr(11,currentState.length-10);
 		currentState = 'testRun-'+testId;
+		//audioEngineContext.timer.startTest();
+		audioEngineContext.play();
 	} else if (currentState.substr(0,11) == 'testRunPost')
 	{
 		var testId = currentState.substr(12,currentState.length-11);
@@ -786,29 +781,42 @@ function testEnded(testId)
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-    if (hasBeenPlayed.indexOf(false)==-1)
-        {
-        if (audioEngineContext.status == 1) {
-            var playback = document.getElementById('playback-button');
-            playback.click();
-        // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
-        } else
-        {
-            if (audioEngineContext.timer.testStarted == false)
-            {
-                alert('You have not started the test! Please press start to begin the test!');
-                return;
-            }
-        }
-        if (currentState.substr(0,7) == 'testRun')
-        {
-            hasBeenPlayed = []; // clear array to prepare for next test
-            audioEngineContext.timer.stopTest();
-            advanceState();
-        }
+    hasBeenPlayed = audioEngineContext.checkAllPlayed();
+    if (hasBeenPlayed.length == 0) {
+	    if (audioEngineContext.status == 1) {
+	        var playback = document.getElementById('playback-button');
+	        playback.click();
+	    // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
+	    } else
+	    {
+	        if (audioEngineContext.timer.testStarted == false)
+	        {
+	            alert('You have not started the test! Please press start to begin the test!');
+	            return;
+	        }
+	    }
+	    if (currentState.substr(0,7) == 'testRun')
+	    {
+	        hasBeenPlayed = []; // clear array to prepare for next test
+	        audioEngineContext.timer.stopTest();
+	        advanceState();
+	    }
     } else // if a fragment has not been played yet
     {
-        alert('You have not played fragment ' + hasBeenPlayed.indexOf(false) + ' yet. Please listen, rate and comment all samples before submitting.');
+    	str = "";
+    	if (hasBeenPlayed.length > 1) {
+	    	for (var i=0; i<hasBeenPlayed.length; i++) {
+	    		str = str + hasBeenPlayed[i];
+	    		if (i < hasBeenPlayed.length-2){
+	    			str += ", ";
+	    		} else if (i == hasBeenPlayed.length-2) {
+	    			str += " or ";
+	    		}
+	    	}
+	    	alert('You have not played fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
+       } else {
+       		alert('You have not played fragment ' + hasBeenPlayed[0] + ' yet. Please listen, rate and comment all samples before submitting.');
+       }
         return;
     }
 }
