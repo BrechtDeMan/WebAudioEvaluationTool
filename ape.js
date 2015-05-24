@@ -263,6 +263,11 @@ function loadInterface(xmlDoc) {
 
 function loadTest(id)
 {
+	
+	// Reset audioEngineContext.Metric globals for new test
+	audioEngineContext.metric.lastClicked = -1;
+	audioEngineContext.metric.data = -1;
+	
 	// Used to load a specific test page
 	var textXML = testXMLSetups[id];
 	
@@ -333,7 +338,7 @@ function loadTest(id)
 		loopPlayback = false;
 	}
 	audioEngineContext.loopPlayback = loopPlayback;
-	
+	loopPlayback = false;
 	// Create AudioEngine bindings for playback
 	if (loopPlayback) {
 		audioEngineContext.play = function() {
@@ -491,7 +496,7 @@ function loadTest(id)
 			audioEngineContext.play();
 			// Get the track ID from the object ID
 			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
-			audioEngineContext.metric.sliderPlayed(id);
+			//audioEngineContext.metric.sliderPlayed(id);
 			audioEngineContext.selectedTrack(id);
             // Currently playing track red, rest green
             document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";

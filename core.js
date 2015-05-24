@@ -175,9 +175,16 @@ function audioObject(id) {
 	
 	this.play = function(startTime) {
 		this.bufferNode = audioContext.createBufferSource();
+		this.bufferNode.owner = this;
 		this.bufferNode.connect(this.outputGain);
 		this.bufferNode.buffer = this.buffer;
 		this.bufferNode.loop = audioEngineContext.loopPlayback;
+		if (this.bufferNode.loop == false) {
+			this.bufferNode.onended = function() {
+				this.owner.metric.listening(audioEngineContext.timer.getTestTime());
+			}
+		}
+		this.metric.listening(audioEngineContext.timer.getTestTime());
 		this.bufferNode.start(startTime);
 		this.played = true;
 	};
@@ -187,6 +194,7 @@ function audioObject(id) {
 		{
 			this.bufferNode.stop(0);
 			this.bufferNode = undefined;
+			this.metric.listening(audioEngineContext.timer.getTestTime());
 		}
 	};
 
@@ -278,6 +286,7 @@ function metricTracker()
 	
 	this.listenedTimer = 0;
 	this.listenStart = 0;
+	this.listenHold = false;
 	this.initialPosition = -1;
 	this.movementTracker = [];
 	this.wasListenedTo = false;
@@ -299,13 +308,15 @@ function metricTracker()
 	
 	this.listening = function(time)
 	{
-		if (this.listenStart == 0)
+		if (this.listenHold == false)
 		{
 			this.wasListenedTo = true;
 			this.listenStart = time;
+			this.listenHold = true;
 		} else {
 			this.listenedTimer += (time - this.listenStart);
 			this.listenStart = 0;
+			this.listenHold = false;
 		}
 	};
 }
