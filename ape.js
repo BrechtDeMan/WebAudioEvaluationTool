@@ -482,6 +482,8 @@ function loadTest(id)
 		
 		// Onclick, switch playback to that track
 		trackSliderObj.onclick = function() {
+			// Start the test on first click, that way timings are more accurate.
+			audioEngineContext.play();
 			// Get the track ID from the object ID
 			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
 			audioEngineContext.metric.sliderPlayed(id);
@@ -496,7 +498,6 @@ function loadTest(id)
                 }
                               
             }
-            audioEngineContext.play();
 		};
 		
 		canvas.appendChild(trackSliderObj);
@@ -730,7 +731,7 @@ function advanceState()
 		var testId = currentState.substr(11,currentState.length-10);
 		currentState = 'testRun-'+testId;
 		//audioEngineContext.timer.startTest();
-		audioEngineContext.play();
+		//audioEngineContext.play();
 	} else if (currentState.substr(0,11) == 'testRunPost')
 	{
 		var testId = currentState.substr(12,currentState.length-11);
