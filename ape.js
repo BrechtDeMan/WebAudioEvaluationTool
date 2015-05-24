@@ -43,10 +43,15 @@ function loadInterface(xmlDoc) {
 	// New check if we need to randomise the test order
 	var randomise = xmlSetup[0].attributes['randomiseOrder'];
 	if (randomise != undefined) {
-		randomise = Boolean(randomise.value);
+		if (randomise.value === 'true'){
+			randomise = true;
+		} else {
+			randomise = false;
+		}
 	} else {
 		randomise = false;
 	}
+	
 	if (randomise)
 	{
  		testXMLSetups = randomiseOrder(testXMLSetups);
