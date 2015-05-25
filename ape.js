@@ -265,8 +265,7 @@ function loadTest(id)
 {
 	
 	// Reset audioEngineContext.Metric globals for new test
-	audioEngineContext.metric.lastClicked = -1;
-	audioEngineContext.metric.data = -1;
+	audioEngineContext.newTestPage();
 	
 	// Used to load a specific test page
 	var textXML = testXMLSetups[id];
@@ -341,37 +340,6 @@ function loadTest(id)
 	loopPlayback = false;
 	// Create AudioEngine bindings for playback
 	if (loopPlayback) {
-		audioEngineContext.play = function() {
-			// Send play command to all playback buffers for synchronised start
-			// Also start timer callbacks to detect if playback has finished
-			if (this.status == 0) {
-				this.timer.startTest();
-				// First get current clock
-				var timer = audioContext.currentTime;
-				// Add 3 seconds
-				timer += 3.0;
-				// Send play to all tracks
-				for (var i=0; i<this.audioObjects.length; i++)
-				{
-					this.audioObjects[i].play(timer);
-				}
-				this.status = 1;
-			}
-		};
-		
-		audioEngineContext.stop = function() {
-			// Send stop and reset command to all playback buffers
-			if (this.status == 1) {
-				if (this.loopPlayback) {
-					for (var i=0; i<this.audioObjects.length; i++)
-					{
-						this.audioObjects[i].stop();
-					}
-				}
-				this.status = 0;
-			}
-		};
-		
 		audioEngineContext.selectedTrack = function(id) {
 			for (var i=0; i<this.audioObjects.length; i++)
 			{
@@ -383,26 +351,6 @@ function loadTest(id)
 			}
 		};
 	} else {
-		audioEngineContext.play = function() {
-			// Send play command to all playback buffers for synchronised start
-			// Also start timer callbacks to detect if playback has finished
-			if (this.status == 0) {
-				this.timer.startTest();
-				this.status = 1;
-			}
-		};
-		
-		audioEngineContext.stop = function() {
-			// Send stop and reset command to all playback buffers
-			if (this.status == 1) {
-				for (var i=0; i<this.audioObjects.length; i++)
-				{
-					this.audioObjects[i].stop();
-				}
-				this.status = 0;
-			}
-		};
-		
 		audioEngineContext.selectedTrack = function(id) {
 			for (var i=0; i<this.audioObjects.length; i++)
 			{
@@ -753,7 +701,7 @@ function advanceState()
 		var testId = currentState.substr(8,currentState.length-7);
 		// Check if we have any post tests to perform
 		var postXML = $(testXMLSetups[testId]).find('PostTest')[0];
-		if (postXML == undefined) {
+		if (postXML == undefined || postXML.childElementCount == 0) {
 			testEnded(testId);
 		}
 		else if (postXML.childElementCount > 0)
