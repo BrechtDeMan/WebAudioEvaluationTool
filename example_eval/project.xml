@@ -3,7 +3,10 @@
 	<setup interface="APE" projectReturn="null" randomiseOrder='true' collectMetrics='true'>
 		<PreTest>
 			<statement>Please listen to all mixes</statement>
-			<question id="location" mandatory="true">Please enter your listening location</question>
+			<question id="SessionID">Please enter your name.</question>
+			<question id="location" mandatory="true">Please enter your listening location (Yellow Room/SSL Duality or Red Room/Neve VR). </question>
+			<question id="SessionID">Please enter your name.</question>
+			<question id="location" mandatory="true">Please enter your listening location (Yellow Room/SSL Duality or Red Room/Neve VR). </question>
 		</PreTest>
 		<PostTest>
 			<statement>Thank you for taking this listening test.</statement>
@@ -18,7 +21,7 @@
 			<metricEnable>elementFlagMoved</metricEnable>
 		</Metric>
 	</setup>
-	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='1' loop='false' elementComments='true'>
+	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='false' elementComments='true'>
 		<interface>
 			<title>Example Test Question</title>
 			<scale position="0">Min</scale>
@@ -42,8 +45,8 @@
 			<statement>Start the Test 3</statement>
 		</PreTest>
 		<PostTest>
-			<statement>Please take a break before the next test</statement>
 			<question id="testComment" mandatory="true">How did you find the test</question>
+			<question id="songGenre" mandatory="true">How would you describe the genre of this song? Multiple answers possible. </question>
 	</PostTest>
 	</audioHolder>
 </BrowserEvalProjectDocument>

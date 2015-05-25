@@ -566,12 +566,14 @@ function preTestPopupStart(preTest)
 		preTestOption.innerHTML = '<span>'+child.textContent+'</span>';
 	} else if (child.nodeName == 'question')
 	{
-		var questionId = child.attributes['id'].value;
 		var textHold = document.createElement('span');
 		textHold.innerHTML = child.textContent;
-		textHold.id = questionId + 'response';
 		var textEnter = document.createElement('textarea');
+		textEnter.id = child.attributes['id'].value + 'response';
+		var br = document.createElement('br');
+		preTestOption.innerHTML = null;
 		preTestOption.appendChild(textHold);
+		preTestOption.appendChild(br);
 		preTestOption.appendChild(textEnter);
 	}
 	var nextButton = document.createElement('button');
