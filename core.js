@@ -105,6 +105,7 @@ function AudioEngine() {
 	
 	// Use this to detect playback state: 0 - stopped, 1 - playing
 	this.status = 0;
+	this.audioObjectsReady = false;
 	
 	// Connect both gains to output
 	this.outputGain.connect(audioContext.destination);
@@ -120,9 +121,30 @@ function AudioEngine() {
 	// Create store for new audioObjects
 	this.audioObjects = [];
 	
-	this.play = function(){};
+	this.play = function() {
+		// Start the timer and set the audioEngine state to playing (1)
+		if (this.status == 0) {
+			// Check if all audioObjects are ready
+			if (this.audioObjectsReady == false) {
+				this.audioObjectsReady = this.checkAllReady();
+			}
+			if (this.audioObjectsReady == true) {
+				this.timer.startTest();
+				this.status = 1;
+			}
+		}
+	};
 	
-	this.stop = function(){};
+	this.stop = function() {
+		// Send stop and reset command to all playback buffers and set audioEngine state to stopped (1)
+		if (this.status == 1) {
+			for (var i=0; i<this.audioObjects.length; i++)
+			{
+				this.audioObjects[i].stop();
+			}
+			this.status = 0;
+		}
+	};
 	
 	
 	this.newTrack = function(url) {
@@ -137,6 +159,13 @@ function AudioEngine() {
 		this.audioObjects[audioObjectId].constructTrack(url);
 	};
 	
+	this.newTestPage = function() {
+		this.state = 0;
+		this.audioObjectsReady = false;
+		this.metric.reset();
+		this.audioObjects = [];
+	};
+	
 	this.checkAllPlayed = function() {
 		arr = [];
 		for (var id=0; id<this.audioObjects.length; id++) {
@@ -145,6 +174,18 @@ function AudioEngine() {
 			}
 		}
 		return arr;
+	};
+	
+	this.checkAllReady = function() {
+		var ready = true;
+		for (var i=0; i<this.audioObjects.length; i++) {
+			if (this.audioObjects[i].state == 0) {
+				// Track not ready
+				console.log('WAIT -- audioObject '+i+' not ready yet!');
+				ready = false;
+			};
+		}
+		return ready;
 	};
 	
 }
@@ -182,7 +223,7 @@ function audioObject(id) {
 		if (this.bufferNode.loop == false) {
 			this.bufferNode.onended = function() {
 				this.owner.metric.listening(audioEngineContext.timer.getTestTime());
-			}
+			};
 		}
 		this.metric.listening(audioEngineContext.timer.getTestTime());
 		this.bufferNode.start(startTime);
@@ -275,6 +316,10 @@ function sessionMetrics(engine)
 	this.engine = engine;
 	this.lastClicked = -1;
 	this.data = -1;
+	this.reset = function() {
+		this.lastClicked = -1;
+		this.data = -1;
+	};
 	this.initialiseTest = function(){};
 }
 
