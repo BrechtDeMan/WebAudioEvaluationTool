@@ -270,10 +270,10 @@ function createProjectSave(destURL) {
 	// If destURL is null then download XML in client
 	// Now time to render file locally
 	var xmlDoc = interfaceXMLSave();
+	var parent = document.createElement("div");
+	parent.appendChild(xmlDoc);
+	var file = [parent.innerHTML];
 	if (destURL == "null" || destURL == undefined) {
-		var parent = document.createElement("div");
-		parent.appendChild(xmlDoc);
-		var file = [parent.innerHTML];
 		var bb = new Blob(file,{type : 'application/xml'});
 		var dnlk = window.URL.createObjectURL(bb);
 		var a = document.createElement("a");
@@ -287,6 +287,11 @@ function createProjectSave(destURL) {
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
 		popup.popupContent.appendChild(submitDiv)
+	} else {
+		var xmlhttp = new XMLHttpRequest;
+		xmlhttp.open("POST",destURL,true);
+		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
+		xmlhttp.send(file);
 	}
 	return submitDiv;
 }

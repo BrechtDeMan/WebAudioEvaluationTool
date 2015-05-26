@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="null" randomiseOrder='true' collectMetrics='true'>
+	<setup interface="APE" projectReturn="http://127.0.0.1:8000/save" randomiseOrder='true' collectMetrics='true'>
 		<PreTest>
 			<question id="Location" mandatory="true">Please enter your location.</question>
 			<statement>Please listen to all mixes</statement>
