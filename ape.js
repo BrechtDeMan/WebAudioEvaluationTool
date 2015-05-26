@@ -114,6 +114,7 @@ function loadInterface(xmlDoc) {
 		var id = this.data;
 		this.data = -1;
 		var position = convSliderPosToRate(id);
+        console.log('slider ' + id + ': '+ position + ' (' + time + ')'); // DEBUG/SAFETY: show position and slider id
 		if (audioEngineContext.timer.testStarted)
 		{
 			audioEngineContext.audioObjects[id].metric.moved(time,position);
@@ -132,6 +133,7 @@ function loadInterface(xmlDoc) {
 			this.lastClicked = id;
 			audioEngineContext.audioObjects[id].metric.listening(time);
 		}
+        console.log('slider ' + id + ' played (' + time + ')'); // DEBUG/SAFETY: show played slider id
 	};
 	
 	// Create the top div for the Title element
@@ -179,6 +181,8 @@ function loadInterface(xmlDoc) {
 		if (audioEngineContext.status == 1) {
 			audioEngineContext.stop();
 			this.innerHTML = 'Stop';
+            var time = audioEngineContext.timer.getTestTime();
+            console.log('Stopped at ' + time); // DEBUG/SAFETY
 		}
 	};
 	// Create Submit (save) button
@@ -797,6 +801,7 @@ function pageXMLSave(testId)
 			var response = document.createElement("response");
 			question.textContent = commentObjects[i].children[0].textContent;
 			response.textContent = commentObjects[i].children[2].value;
+            console.log('Comment ' + i + ': ' + commentObjects[i].children[2].value); // DEBUG/SAFETY
 			comment.appendChild(question);
 			comment.appendChild(response);
 			audioElement.appendChild(comment);
@@ -866,6 +871,7 @@ function pageXMLSave(testId)
 		cqHolder.id = commentQuestion[i].id;
 		comment.textContent = commentQuestion[i].children[2].value;
 		question.textContent = commentQuestion[i].children[0].textContent;
+        console.log('Question ' + i + ': ' + commentObjects[i].children[2].value); // DEBUG/SAFETY
 		cqHolder.appendChild(question);
 		cqHolder.appendChild(comment);
 		xmlDoc.appendChild(cqHolder);
