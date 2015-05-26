@@ -2,6 +2,16 @@ import BaseHTTPServer
 from os import walk
 from os import path
 import urllib2
+import pickle
+import datetime
+
+curSaveIndex = 0;
+curFileName = 'test-0.xml'
+while(path.isfile('saves/'+curFileName)):
+	curSaveIndex += 1;
+	curFileName = 'test-'+str(curSaveIndex)+'.xml'
+
+print curFileName
 
 def send404(s):
 	s.send_response(404)
@@ -30,6 +40,22 @@ def processFile(s):
 	s.wfile.write(fileDump.read())
 	fileDump.close()
 	
+def saveFile(self):
+	global curFileName
+	global curSaveIndex
+	varLen = int(self.headers['Content-Length'])
+	postVars = self.rfile.read(varLen)
+	print curFileName
+	file = open('saves/'+curFileName,'w')
+	curSaveIndex += 1;
+	curFileName = 'test-'+str(curSaveIndex)+'.xml'
+	print curFileName
+	file.write(postVars)
+	file.close()
+	self.send_response(200)
+	self.send_header("Content-type", "text/xml")
+	self.end_headers()
+	self.wfile.write('<response><state>OK</state><file>saves/'+curFileName+'</file></response>')
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_HEAD(s):
@@ -44,6 +70,12 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				if (request.path == '/'):
 					request.path = '/index.html'
 				processFile(request)
+		else:
+			send404(request)
+	def do_POST(request):
+		if(request.client_address[0] == "127.0.0.1"):
+			if (request.path == "/save"):
+				saveFile(request)
 		else:
 			send404(request)
 
