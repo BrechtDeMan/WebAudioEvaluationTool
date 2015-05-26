@@ -8,7 +8,8 @@
 /* create the web audio API context and store in audioContext*/
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
-
+var popup; // Hold the interfacePopup object
+var currentState; // Keep track of the current state (pre/post test, which test, final test? first test?)
 var testXMLSetups = []; // Hold the parsed test instances
 var testResultsHolders =[]; // Hold the results from each test for publishing to XML
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
@@ -32,46 +33,203 @@ window.onload = function() {
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine();
+	
+	// Create the popup interface object
+	popup = new interfacePopup();
 };
 
-function createPopup() {
-	// Create popup window interface
-	var insertPoint = document.getElementById("topLevelBody");
-	var blank = document.createElement('div');
-	blank.className = 'testHalt';
+function interfacePopup() {
+	// Creates an object to manage the popup
+	this.popup = null;
+	this.popupContent = null;
+	this.popupButton = null;
+	this.popupOptions = null;
+	this.currentIndex = null;
+	this.responses = null;
+	this.createPopup = function(){
+		// Create popup window interface
+		var insertPoint = document.getElementById("topLevelBody");
+		var blank = document.createElement('div');
+		blank.className = 'testHalt';
+		
+		this.popup = document.createElement('div');
+		this.popup.id = 'popupHolder';
+		this.popup.className = 'popupHolder';
+		this.popup.style.position = 'absolute';
+		this.popup.style.left = (window.innerWidth/2)-250 + 'px';
+		this.popup.style.top = (window.innerHeight/2)-125 + 'px';
+		
+		this.popupContent = document.createElement('div');
+		this.popupContent.id = 'popupContent';
+		this.popupContent.style.marginTop = '25px';
+		this.popupContent.align = 'center';
+		this.popup.appendChild(this.popupContent);
+		
+		this.popupButton = document.createElement('button');
+		this.popupButton.className = 'popupButton';
+		this.popupButton.innerHTML = 'Next';
+		this.popupButton.onclick = function(){popup.buttonClicked();};
+		insertPoint.appendChild(this.popup);
+		insertPoint.appendChild(blank);
+	};
 	
-	var popupHolder = document.createElement('div');
-	popupHolder.id = 'popupHolder';
-	popupHolder.className = 'popupHolder';
-	popupHolder.style.position = 'absolute';
-	popupHolder.style.left = (window.innerWidth/2)-250 + 'px';
-	popupHolder.style.top = (window.innerHeight/2)-125 + 'px';
-	insertPoint.appendChild(popupHolder);
-	insertPoint.appendChild(blank);
-}
-
-function showPopup()
-{
-	var popupHolder = document.getElementById('popupHolder');
-	if (popupHolder == null || popupHolder == undefined) {
-		createPopup();
-		popupHolder = document.getElementById('popupHolder');
+	this.showPopup = function(){
+		if (this.popup == null || this.popup == undefined) {
+			this.createPopup();
+		}
+		this.popup.style.zIndex = 3;
+		this.popup.style.visibility = 'visible';
+		var blank = document.getElementsByClassName('testHalt')[0];
+		blank.style.zIndex = 2;
+		blank.style.visibility = 'visible';
+	};
+	
+	this.hidePopup = function(){
+		this.popup.style.zIndex = -1;
+		this.popup.style.visibility = 'hidden';
+		var blank = document.getElementsByClassName('testHalt')[0];
+		blank.style.zIndex = -2;
+		blank.style.visibility = 'hidden';
+	};
+	
+	this.postNode = function() {
+		// This will take the node from the popupOptions and display it
+		var node = this.popupOptions[this.currentIndex];
+		this.popupContent.innerHTML = null;
+		if (node.nodeName == 'statement') {
+			var span = document.createElement('span');
+			span.textContent = node.textContent;
+			this.popupContent.appendChild(span);
+		} else if (node.nodeName == 'question') {
+			var span = document.createElement('span');
+			span.textContent = node.textContent;
+			var textArea = document.createElement('textarea');
+			var br = document.createElement('br');
+			this.popupContent.appendChild(span);
+			this.popupContent.appendChild(br);
+			this.popupContent.appendChild(textArea);
+		}
+		this.popupContent.appendChild(this.popupButton);
 	}
-	popupHolder.style.zIndex = 3;
-	popupHolder.style.visibility = 'visible';
-	var blank = document.getElementsByClassName('testHalt')[0];
-	blank.style.zIndex = 2;
-	blank.style.visibility = 'visible';
+	
+	this.initState = function(node) {
+		//Call this with your preTest and postTest nodes when needed to
+		// initialise the popup procedure.
+		this.popupOptions = $(node).children();
+		if (this.popupOptions.length > 0) {
+			if (node.nodeName == 'preTest' || node.nodeName == 'PreTest') {
+				this.responses = document.createElement('PreTest');
+			} else if (node.nodeName == 'postTest' || node.nodeName == 'PostTest') {
+				this.responses = document.createElement('PostTest');
+			} else {
+				console.log ('WARNING - popup node neither pre or post!');
+				this.responses = document.createElement('responses');
+			}
+			this.currentIndex = 0;
+			this.showPopup();
+			this.postNode();
+		}
+	}
+	
+	this.buttonClicked = function() {
+		// Each time the popup button is clicked!
+		var node = this.popupOptions[this.currentIndex];
+		if (node.nodeName == 'question') {
+			// Must extract the question data
+			var mandatory = node.attributes['mandatory'];
+			if (mandatory == undefined) {
+				mandatory = false;
+			} else {
+				if (mandatory.value == 'true'){mandatory = true;}
+				else {mandatory = false;}
+			}
+			var textArea = $(popup.popupContent).find('textarea')[0];
+			if (mandatory == true && textArea.value.length == 0) {
+				alert('This question is mandatory');
+				return;
+			} else {
+				// Save the text content
+				var hold = document.createElement('comment');
+				hold.id = node.attributes['id'].value;
+				hold.innerHTML = textArea.value;
+				this.responses.appendChild(hold);
+			}
+		}
+		this.currentIndex++;
+		if (this.currentIndex < this.popupOptions.length) {
+			this.postNode();
+		} else {
+			// Reached the end of the popupOptions
+			this.hidePopup();
+			advanceState();
+		}
+	}
 }
 
-function hidePopup()
+function advanceState()
 {
-	var popupHolder = document.getElementById('popupHolder');
-	popupHolder.style.zIndex = -1;
-	popupHolder.style.visibility = 'hidden';
-	var blank = document.getElementsByClassName('testHalt')[0];
-	blank.style.zIndex = -2;
-	blank.style.visibility = 'hidden';
+	console.log(currentState);
+	if (currentState == 'preTest')
+	{
+		// End of pre-test, begin the test
+		preTestQuestions = popup.responses;
+		loadTest(0);
+	} else if (currentState == 'postTest') {
+		postTestQuestions = popup.responses;
+		console.log('ALL COLLECTED!'); 
+	}else if (currentState.substr(0,10) == 'testRunPre')
+	{
+		// Start the test
+		var testId = currentState.substr(11,currentState.length-10);
+		currentState = 'testRun-'+testId;
+		currentTestHolder.appendChild(popup.responses);
+		//audioEngineContext.timer.startTest();
+		//audioEngineContext.play();
+	} else if (currentState.substr(0,11) == 'testRunPost')
+	{
+		var testId = currentState.substr(12,currentState.length-11);
+		currentTestHolder.appendChild(popup.responses);
+		testEnded(testId);
+	} else if (currentState.substr(0,7) == 'testRun')
+	{
+		var testId = currentState.substr(8,currentState.length-7);
+		// Check if we have any post tests to perform
+		var postXML = $(testXMLSetups[testId]).find('PostTest')[0];
+		if (postXML == undefined || postXML.childElementCount == 0) {
+			testEnded(testId);
+		}
+		else if (postXML.childElementCount > 0)
+		{
+			currentState = 'testRunPost-'+testId; 
+			popup.initState(postXML);
+		}
+		else {
+		
+		
+			// No post tests, check if we have another test to perform instead
+			
+		}
+	}
+	console.log(currentState);
+}
+
+function testEnded(testId)
+{
+	pageXMLSave(testId);
+	if (testXMLSetups.length-1 > testId)
+	{
+		// Yes we have another test to perform
+		testId = (Number(testId)+1);
+		currentState = 'testRun-'+testId;
+		loadTest(testId);
+	} else {
+		console.log('Testing Completed!');
+		currentState = 'postTest';
+		// Check for any post tests
+		var xmlSetup = projectXML.find('setup');
+		var postTest = xmlSetup.find('PostTest')[0];
+		popup.initState(postTest);
+	}
 }
 
 function loadProjectSpec(url) {
