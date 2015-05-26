@@ -34,6 +34,46 @@ window.onload = function() {
 	audioEngineContext = new AudioEngine();
 };
 
+function createPopup() {
+	// Create popup window interface
+	var insertPoint = document.getElementById("topLevelBody");
+	var blank = document.createElement('div');
+	blank.className = 'testHalt';
+	
+	var popupHolder = document.createElement('div');
+	popupHolder.id = 'popupHolder';
+	popupHolder.className = 'popupHolder';
+	popupHolder.style.position = 'absolute';
+	popupHolder.style.left = (window.innerWidth/2)-250 + 'px';
+	popupHolder.style.top = (window.innerHeight/2)-125 + 'px';
+	insertPoint.appendChild(popupHolder);
+	insertPoint.appendChild(blank);
+}
+
+function showPopup()
+{
+	var popupHolder = document.getElementById('popupHolder');
+	if (popupHolder == null || popupHolder == undefined) {
+		createPopup();
+		popupHolder = document.getElementById('popupHolder');
+	}
+	popupHolder.style.zIndex = 3;
+	popupHolder.style.visibility = 'visible';
+	var blank = document.getElementsByClassName('testHalt')[0];
+	blank.style.zIndex = 2;
+	blank.style.visibility = 'visible';
+}
+
+function hidePopup()
+{
+	var popupHolder = document.getElementById('popupHolder');
+	popupHolder.style.zIndex = -1;
+	popupHolder.style.visibility = 'hidden';
+	var blank = document.getElementsByClassName('testHalt')[0];
+	blank.style.zIndex = -2;
+	blank.style.visibility = 'hidden';
+}
+
 function loadProjectSpec(url) {
 	// Load the project document from the given URL, decode the XML and instruct audioEngine to get audio data
 	// If url is null, request client to upload project XML document
