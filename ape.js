@@ -222,18 +222,6 @@ function loadInterface(xmlDoc) {
 	insertPoint.innerHTML = null; // Clear the current schema
 	
 	// Create pre and post test questions
-	var blank = document.createElement('div');
-	blank.className = 'testHalt';
-	
-	var popupHolder = document.createElement('div');
-	popupHolder.id = 'popupHolder';
-	popupHolder.className = 'popupHolder';
-	popupHolder.style.position = 'absolute';
-	popupHolder.style.left = (window.innerWidth/2)-250 + 'px';
-	popupHolder.style.top = (window.innerHeight/2)-125 + 'px';
-	insertPoint.appendChild(popupHolder);
-	insertPoint.appendChild(blank);
-	hidePopup();
 	
 	var preTest = xmlSetup.find('PreTest');
 	var postTest = xmlSetup.find('PostTest');
@@ -638,26 +626,6 @@ function postPopupResponse(response)
 		}
 		store[0].appendChild(response);
 	}
-}
-
-function showPopup()
-{
-	var popupHolder = document.getElementById('popupHolder');
-	popupHolder.style.zIndex = 3;
-	popupHolder.style.visibility = 'visible';
-	var blank = document.getElementsByClassName('testHalt')[0];
-	blank.style.zIndex = 2;
-	blank.style.visibility = 'visible';
-}
-
-function hidePopup()
-{
-	var popupHolder = document.getElementById('popupHolder');
-	popupHolder.style.zIndex = -1;
-	popupHolder.style.visibility = 'hidden';
-	var blank = document.getElementsByClassName('testHalt')[0];
-	blank.style.zIndex = -2;
-	blank.style.visibility = 'hidden';
 }
 
 function dragEnd(ev) {
