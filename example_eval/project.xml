@@ -6,7 +6,7 @@
 		</PreTest>
 		<PostTest>
 			<statement>Thank you for taking this listening test.</statement>
-			<question id="SessionID">Please enter your name.</question>
+			<question id="SessionID" mandatory="true">Please enter your name.</question>
 		</PostTest>
 		<Metric>
 			<metricEnable>testTimer</metricEnable>
@@ -17,7 +17,7 @@
 			<metricEnable>elementFlagMoved</metricEnable>
 		</Metric>
 	</setup>
-	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='1' loop='true' elementComments='true'>
+	<audioHolder id='0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
 		<interface>
 			<title>Example Test Question</title>
 			<scale position="0">Min</scale>

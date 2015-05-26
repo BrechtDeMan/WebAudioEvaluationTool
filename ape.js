@@ -3,7 +3,6 @@
  *  Create the APE interface
  */
 
-var currentState; // Keep track of the current state (pre/post test, which test, final test? first test?)
 // preTest - In preTest state
 // testRun-ID - In test running, test Id number at the end 'testRun-2'
 // testRunPost-ID - Post test of test ID
@@ -237,8 +236,9 @@ function loadInterface(xmlDoc) {
 	// Create Pre-Test Box
 	if (preTest != undefined && preTest.childElementCount >= 1)
 	{
-		showPopup();
-		preTestPopupStart(preTest);
+		//popup.showPopup();
+		//preTestPopupStart(preTest);
+		popup.initState(preTest);
 	}
 	
 	// Inject into HTML
@@ -359,10 +359,6 @@ function loadTest(id)
 	currentTestHolder = document.createElement('audioHolder');
 	currentTestHolder.id = textXML.id;
 	currentTestHolder.repeatCount = textXML.attributes['repeatCount'].value;
-	var currentPreTestHolder = document.createElement('preTest');
-	var currentPostTestHolder = document.createElement('postTest');
-	currentTestHolder.appendChild(currentPreTestHolder);
-	currentTestHolder.appendChild(currentPostTestHolder);
 	
 	var randomise = textXML.attributes['randomiseOrder'];
 	if (randomise != undefined) {randomise = randomise.value;}
@@ -484,12 +480,14 @@ function loadTest(id)
 	if (preTest.childElementCount > 0)
 	{
 		currentState = 'testRunPre-'+id;
-		preTestPopupStart(preTest);
-		showPopup();
+		//preTestPopupStart(preTest);
+		popup.initState(preTest);
+		//popup.showPopup();
 	} else {
 		currentState = 'testRun-'+id;
 	}
 }
+/*
 
 function preTestPopupStart(preTest)
 {
@@ -602,7 +600,7 @@ function preTestButtonClick(preTest,index)
 		// Time to clear
 		preTestOption.innerHTML = null;
 		if (currentState != 'postTest') {
-			hidePopup();
+			popup.hidePopup();
 			// Progress the state!
 			advanceState();
 		} else {
@@ -631,7 +629,7 @@ function postPopupResponse(response)
 		store[0].appendChild(response);
 	}
 }
-
+*/
 function dragEnd(ev) {
 	// Function call when a div has been dropped
 	var slider = document.getElementById('slider');
@@ -648,68 +646,6 @@ function dragEnd(ev) {
 		}
 	}
 	audioEngineContext.metric.sliderMoved();
-}
-
-function advanceState()
-{
-	console.log(currentState);
-	if (currentState == 'preTest')
-	{
-		// End of pre-test, begin the test
-		loadTest(0);
-	} else if (currentState.substr(0,10) == 'testRunPre')
-	{
-		// Start the test
-		var testId = currentState.substr(11,currentState.length-10);
-		currentState = 'testRun-'+testId;
-		//audioEngineContext.timer.startTest();
-		//audioEngineContext.play();
-	} else if (currentState.substr(0,11) == 'testRunPost')
-	{
-		var testId = currentState.substr(12,currentState.length-11);
-		testEnded(testId);
-	} else if (currentState.substr(0,7) == 'testRun')
-	{
-		var testId = currentState.substr(8,currentState.length-7);
-		// Check if we have any post tests to perform
-		var postXML = $(testXMLSetups[testId]).find('PostTest')[0];
-		if (postXML == undefined || postXML.childElementCount == 0) {
-			testEnded(testId);
-		}
-		else if (postXML.childElementCount > 0)
-		{
-			currentState = 'testRunPost-'+testId; 
-			showPopup();
-			preTestPopupStart(postXML);
-		}
-		else {
-		
-		
-			// No post tests, check if we have another test to perform instead
-			
-		}
-	}
-	console.log(currentState);
-}
-
-function testEnded(testId)
-{
-	pageXMLSave(testId);
-	if (testXMLSetups.length-1 > testId)
-	{
-		// Yes we have another test to perform
-		testId = (Number(testId)+1);
-		currentState = 'testRun-'+testId;
-		loadTest(testId);
-	} else {
-		console.log('Testing Completed!');
-		currentState = 'postTest';
-		// Check for any post tests
-		var xmlSetup = projectXML.find('setup');
-		var postTest = xmlSetup.find('PostTest')[0];
-		showPopup();
-		preTestPopupStart(postTest);
-	}
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
