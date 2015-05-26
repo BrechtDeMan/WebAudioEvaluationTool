@@ -487,7 +487,6 @@ function loadTest(id)
 		currentState = 'testRun-'+id;
 	}
 }
-/*
 
 function preTestPopupStart(preTest)
 {
@@ -629,7 +628,8 @@ function postPopupResponse(response)
 		store[0].appendChild(response);
 	}
 }
-*/
+
+
 function dragEnd(ev) {
 	// Function call when a div has been dropped
 	var slider = document.getElementById('slider');
