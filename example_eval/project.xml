@@ -2,11 +2,12 @@
 <BrowserEvalProjectDocument>
 	<setup interface="APE" projectReturn="null" randomiseOrder='true' collectMetrics='true'>
 		<PreTest>
+			<question id="Location" mandatory="true">Please enter your location.</question>
 			<statement>Please listen to all mixes</statement>
 		</PreTest>
 		<PostTest>
-			<statement>Thank you for taking this listening test.</statement>
 			<question id="SessionID" mandatory="true">Please enter your name.</question>
+			<statement>Thank you for taking this listening test.</statement>
 		</PostTest>
 		<Metric>
 			<metricEnable>testTimer</metricEnable>
@@ -41,6 +42,7 @@
 			<statement>Start the Test 3</statement>
 		</PreTest>
 		<PostTest>
+			<question id="genre" mandatory="true">Please enter the genre</question>
 		</PostTest>
 	</audioHolder>
 </BrowserEvalProjectDocument>

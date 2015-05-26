@@ -178,7 +178,8 @@ function advanceState()
 		loadTest(0);
 	} else if (currentState == 'postTest') {
 		postTestQuestions = popup.responses;
-		console.log('ALL COLLECTED!'); 
+		console.log('ALL COLLECTED!');
+		 createProjectSave(projectReturn);
 	}else if (currentState.substr(0,10) == 'testRunPre')
 	{
 		// Start the test
@@ -204,12 +205,6 @@ function advanceState()
 		{
 			currentState = 'testRunPost-'+testId; 
 			popup.initState(postXML);
-		}
-		else {
-		
-		
-			// No post tests, check if we have another test to perform instead
-			
 		}
 	}
 	console.log(currentState);
@@ -289,6 +284,9 @@ function createProjectSave(destURL) {
 		
 		var submitDiv = document.getElementById('download-point');
 		submitDiv.appendChild(a);
+		popup.showPopup();
+		popup.popupContent.innerHTML = null;
+		popup.popupContent.appendChild(submitDiv)
 	}
 	return submitDiv;
 }
