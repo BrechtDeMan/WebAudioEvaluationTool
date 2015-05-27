@@ -200,14 +200,22 @@ function loadInterface(xmlDoc) {
 	var sliderBox = document.createElement('div');
 	sliderBox.className = 'sliderCanvasDiv';
 	sliderBox.id = 'sliderCanvasHolder';
-	sliderBox.align = 'center';
 	
 	// Create the slider box to hold the slider elements
 	var canvas = document.createElement('div');
 	canvas.id = 'slider';
-	// Must have a known EXACT width, as this is used later to determine the ratings
-	canvas.style.width = width - 100 +"px";
 	canvas.align = "left";
+	canvas.addEventListener('dragover',function(event){
+		event.preventDefault();
+		return false;
+	},false);
+	var sliderMargin = document.createAttribute('marginsize');
+	sliderMargin.nodeValue = 42; // Set default margins to 42px either side
+	// Must have a known EXACT width, as this is used later to determine the ratings
+	var w = (Number(sliderMargin.nodeValue)+8)*2;
+	canvas.style.width = width - w +"px";
+	canvas.style.marginLeft = sliderMargin.nodeValue +'px';
+	canvas.setAttributeNode(sliderMargin);
 	sliderBox.appendChild(canvas);
 	
 	// Create the div to hold any scale objects
@@ -275,17 +283,19 @@ function loadTest(id)
 		document.getElementById('pageTitle').textContent = titleNode[0].textContent;
 	}
 	var positionScale = canvas.style.width.substr(0,canvas.style.width.length-2);
-	var offset = 50-8;  // Half the offset of the slider (window width -100) minus the body padding of 8
-	// TODO: AUTOMATE ABOVE!!
+	var offset = Number(document.getElementById('slider').attributes['marginsize'].value);
 	var scale = document.getElementById('sliderScaleHolder');
 	scale.innerHTML = null;
 	interfaceObj.find('scale').each(function(index,scaleObj){
+		var value = document.createAttribute('value');
 		var position = Number(scaleObj.attributes['position'].value)*0.01;
+		value.nodeValue = position;
 		var pixelPosition = (position*positionScale)+offset;
 		var scaleDOM = document.createElement('span');
 		scaleDOM.textContent = scaleObj.textContent;
 		scale.appendChild(scaleDOM);
 		scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
+		scaleDOM.setAttributeNode(value);
 	});
 
 	// Extract the hostURL attribute. If not set, create an empty string.
@@ -492,16 +502,17 @@ function loadTest(id)
 function dragEnd(ev) {
 	// Function call when a div has been dropped
 	var slider = document.getElementById('slider');
+	var marginSize = Number(slider.attributes['marginsize'].value);
 	var w = slider.style.width;
 	w = Number(w.substr(0,w.length-2));
-	var x = ev.x - ev.screenX;
-	if (x >= 42 && x < w+42) {
+	var x = ev.x - ev.view.screenX;
+	if (x >= marginSize && x < w+marginSize) {
 		this.style.left = (x)+'px';
 	} else {
-		if (x<42) {
-			this.style.left = '42px';
+		if (x<marginSize) {
+			this.style.left = marginSize+'px';
 		} else {
-			this.style.left = (w+42) + 'px';
+			this.style.left = (w+marginSize) + 'px';
 		}
 	}
 	audioEngineContext.metric.sliderMoved();
@@ -552,12 +563,46 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 function convSliderPosToRate(id)
 {
 	var w = document.getElementById('slider').style.width;
+	var marginsize = Number(document.getElementById('slider').attributes['marginsize'].value);
 	var maxPix = w.substr(0,w.length-2);
 	var slider = document.getElementsByClassName('track-slider')[id];
 	var pix = slider.style.left;
 	pix = pix.substr(0,pix.length-2);
-	var rate = (pix-42)/maxPix;
+	var rate = (pix-marginsize)/maxPix;
 	return rate;
+}
+
+function resizeWindow(event){
+	// Function called when the window has been resized.
+	// MANDATORY FUNCTION
+	
+	// Store the slider marker values
+	var holdValues = [];
+	$(".track-slider").each(function(index,sliderObj){
+		holdValues.push(convSliderPosToRate(index));
+	});
+	
+	var width = event.target.innerWidth;
+	var canvas = document.getElementById('sliderCanvasHolder');
+	var sliderDiv = canvas.children[0];
+	var sliderScaleDiv = canvas.children[1];
+	var marginsize = Number(sliderDiv.attributes['marginsize'].value);
+	var w = (marginsize+8)*2;
+	sliderDiv.style.width = width - w + 'px';
+	var width = width - w;
+	// Move sliders into new position
+	$(".track-slider").each(function(index,sliderObj){
+		var pos = holdValues[index];
+		var pix = pos * width;
+		sliderObj.style.left = pix+marginsize+'px';
+	});
+	
+	// Move scale labels
+	$(sliderScaleDiv.children).each(function(index,scaleObj){
+		var position = Number(scaleObj.attributes['value'].value);
+		var pixelPosition = (position*width)+marginsize;
+		scaleObj.style.left = Math.floor((pixelPosition-($(scaleObj).width()/2)))+'px';
+	});
 }
 
 function pageXMLSave(testId)
