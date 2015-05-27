@@ -291,6 +291,10 @@ function createProjectSave(destURL) {
 		var xmlhttp = new XMLHttpRequest;
 		xmlhttp.open("POST",destURL,true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
+		xmlhttp.onerror = function(){
+			console.log('Error saving file to server! Presenting download locally');
+			createProjectSave(null);
+		};
 		xmlhttp.send(file);
 	}
 	return submitDiv;
