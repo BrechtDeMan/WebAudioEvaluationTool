@@ -819,6 +819,7 @@ function pageXMLSave(testId)
 function interfaceXMLSave(){
 	// Create the XML string to be exported with results
 	var xmlDoc = document.createElement("BrowserEvaluationResult");
+	xmlDoc.appendChild(returnDateNode());
 	for (var i=0; i<testResultsHolders.length; i++)
 	{
 		xmlDoc.appendChild(testResultsHolders[i]);
