@@ -38,9 +38,11 @@
 		<audioElements url="9.wav" id="9"/>
 		<audioElements url="10.wav" id="10"/>-->
 		<CommentQuestion id='mixingExperiance'>What is your mixing experiance</CommentQuestion>
+		<!--
 		<PreTest>
 			<statement>Start the Test 3</statement>
 		</PreTest>
+		-->
 		<PostTest>
 			<question id="genre" mandatory="true">Please enter the genre</question>
 		</PostTest>
