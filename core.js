@@ -9,15 +9,16 @@
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
 var popup; // Hold the interfacePopup object
+var testState;
 var currentState; // Keep track of the current state (pre/post test, which test, final test? first test?)
-var testXMLSetups = []; // Hold the parsed test instances
-var testResultsHolders =[]; // Hold the results from each test for publishing to XML
+//var testXMLSetups = []; // Hold the parsed test instances
+//var testResultsHolders =[]; // Hold the results from each test for publishing to XML
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
-var currentTestHolder; // Hold any intermediate results during test - metrics
+//var currentTestHolder; // Hold any intermediate results during test - metrics
 var audioEngineContext; // The custome AudioEngine object
 var projectReturn; // Hold the URL for the return
-var preTestQuestions = document.createElement('PreTest'); // Store any pre-test question response
-var postTestQuestions = document.createElement('PostTest'); // Store any post-test question response
+//var preTestQuestions = document.createElement('PreTest'); // Store any pre-test question response
+//var postTestQuestions = document.createElement('PostTest'); // Store any post-test question response
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
@@ -30,6 +31,9 @@ window.onload = function() {
 	// Fixed for cross-browser support
 	var AudioContext = window.AudioContext || window.webkitAudioContext;
 	audioContext = new AudioContext;
+	
+	// Create test state
+	testState = new stateMachine();
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine();
@@ -163,6 +167,11 @@ function interfacePopup() {
 		} else {
 			// Reached the end of the popupOptions
 			this.hidePopup();
+			if (this.responses.nodeName == testState.stateResults[testState.stateIndex].nodeName) {
+				testState.stateResults[testState.stateIndex] = this.responses;
+			} else {
+				testState.stateResults[testState.stateIndex].appendChild(this.responses);
+			}
 			advanceState();
 		}
 	}
@@ -170,44 +179,114 @@ function interfacePopup() {
 
 function advanceState()
 {
-	console.log(currentState);
-	if (currentState == 'preTest')
-	{
-		// End of pre-test, begin the test
-		preTestQuestions = popup.responses;
-		loadTest(0);
-	} else if (currentState == 'postTest') {
-		postTestQuestions = popup.responses;
-		console.log('ALL COLLECTED!');
-		 createProjectSave(projectReturn);
-	}else if (currentState.substr(0,10) == 'testRunPre')
-	{
-		// Start the test
-		var testId = currentState.substr(11,currentState.length-10);
-		currentState = 'testRun-'+testId;
-		currentTestHolder.appendChild(popup.responses);
-		//audioEngineContext.timer.startTest();
-		//audioEngineContext.play();
-	} else if (currentState.substr(0,11) == 'testRunPost')
-	{
-		var testId = currentState.substr(12,currentState.length-11);
-		currentTestHolder.appendChild(popup.responses);
-		testEnded(testId);
-	} else if (currentState.substr(0,7) == 'testRun')
-	{
-		var testId = currentState.substr(8,currentState.length-7);
-		// Check if we have any post tests to perform
-		var postXML = $(testXMLSetups[testId]).find('PostTest')[0];
-		if (postXML == undefined || postXML.childElementCount == 0) {
-			testEnded(testId);
+	// Just for complete clarity
+	testState.advanceState();
+}
+
+function stateMachine()
+{
+	// Object prototype for tracking and managing the test state
+	this.stateMap = [];
+	this.stateIndex = null;
+	this.currentStateMap = [];
+	this.currentIndex = null;
+	this.currentTestId = 0;
+	this.stateResults = [];
+	this.initialise = function(){
+		if (this.stateMap.length > 0) {
+			if(this.stateIndex != null) {
+				console.log('NOTE - State already initialise');
+			}
+			this.stateIndex = -1;
+			var that = this;
+			for (var id=0; id<this.stateMap.length; id++){
+				var name = this.stateMap[id].nodeName;
+				var obj = document.createElement(name);
+				this.stateResults.push(obj);
+			}
+		} else {
+			conolse.log('FATAL - StateMap not correctly constructed. EMPTY_STATE_MAP');
 		}
-		else if (postXML.childElementCount > 0)
-		{
-			currentState = 'testRunPost-'+testId; 
-			popup.initState(postXML);
+	};
+	this.advanceState = function(){
+		if (this.stateIndex == null) {
+			this.initialise();
+		}
+		if (this.stateIndex == -1) {
+			console.log('Starting test...');
+		}
+		if (this.currentIndex == null){
+			if (this.currentStateMap.nodeName == "audioHolder") {
+				// Save current page
+				this.testPageCompleted(this.stateResults[this.stateIndex],this.currentStateMap,this.currentTestId);
+				this.currentTestId++;
+			}
+			this.stateIndex++;
+			if (this.stateIndex >= this.stateMap.length) {
+				console.log('Test Completed');
+				createProjectSave(projectReturn);
+			} else {
+				this.currentStateMap = this.stateMap[this.stateIndex];
+				if (this.currentStateMap.nodeName == "audioHolder") {
+					console.log('Loading test page');
+					loadTest(this.currentStateMap);
+					this.initialiseInnerState(this.currentStateMap);
+				} else if (this.currentStateMap.nodeName == "PreTest" || this.currentStateMap.nodeName == "PostTest") {
+					if (this.currentStateMap.childElementCount >= 1) {
+						popup.initState(this.currentStateMap);
+					} else {
+						this.advanceState();
+					}
+				} else {
+					this.advanceState();
+				}
+			}
+		} else {
+			this.advanceInnerState();
+		}
+	};
+	
+	this.testPageCompleted = function(store, testXML, testId) {
+		// Function called each time a test page has been completed
+		// Can be used to over-rule default behaviour
+		
+		pageXMLSave(store, testXML, testId);
+	}
+	
+	this.initialiseInnerState = function(testXML) {
+		// Parses the received testXML for pre and post test options
+		this.currentStateMap = [];
+		var preTest = $(testXML).find('PreTest')[0];
+		var postTest = $(testXML).find('PostTest')[0];
+		if (preTest == undefined) {preTest = document.createElement("preTest");}
+		if (postTest == undefined){postTest= document.createElement("postTest");}
+		this.currentStateMap.push(preTest);
+		this.currentStateMap.push(testXML);
+		this.currentStateMap.push(postTest);
+		this.currentIndex = -1;
+		this.advanceInnerState();
+	}
+	
+	this.advanceInnerState = function() {
+		this.currentIndex++;
+		if (this.currentIndex >= this.currentStateMap.length) {
+			this.currentIndex = null;
+			this.currentStateMap = this.stateMap[this.stateIndex];
+			this.advanceState();
+		} else {
+			if (this.currentStateMap[this.currentIndex].nodeName == "audioHolder") {
+				console.log("Loading test page"+this.currentTestId);
+			} else if (this.currentStateMap[this.currentIndex].nodeName == "PreTest") {
+				popup.initState(this.currentStateMap[this.currentIndex]);
+			} else if (this.currentStateMap[this.currentIndex].nodeName == "PostTest") {
+				popup.initState(this.currentStateMap[this.currentIndex]);
+			} else {
+				this.advanceInnerState();
+			}
 		}
 	}
-	console.log(currentState);
+	
+	this.previousState = function(){};
 }
 
 function testEnded(testId)
@@ -301,6 +380,19 @@ function createProjectSave(destURL) {
 		xmlhttp.send(file);
 	}
 	return submitDiv;
+}
+
+// Only other global function which must be defined in the interface class. Determines how to create the XML document.
+function interfaceXMLSave(){
+	// Create the XML string to be exported with results
+	var xmlDoc = document.createElement("BrowserEvaluationResult");
+	xmlDoc.appendChild(returnDateNode());
+	for (var i=0; i<testState.stateResults.length; i++)
+	{
+		xmlDoc.appendChild(testState.stateResults[i]);
+	}
+	
+	return xmlDoc;
 }
 
 function AudioEngine() {
