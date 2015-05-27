@@ -590,3 +590,45 @@ function randomiseOrder(input)
 	}
 	return holdArr;
 }
+
+function returnDateNode()
+{
+	// Create an XML Node for the Date and Time a test was conducted
+	// Structure is
+	// <datetime> 
+	//	<date year="##" month="##" day="##">DD/MM/YY</date>
+	//	<time hour="##" minute="##" sec="##">HH:MM:SS</time>
+	// </datetime>
+	var dateTime = new Date();
+	var year = document.createAttribute('year');
+	var month = document.createAttribute('month');
+	var day = document.createAttribute('day');
+	var hour = document.createAttribute('hour');
+	var minute = document.createAttribute('minute');
+	var secs = document.createAttribute('secs');
+	
+	year.nodeValue = dateTime.getFullYear();
+	month.nodeValue = dateTime.getMonth()+1;
+	day.nodeValue = dateTime.getDate();
+	hour.nodeValue = dateTime.getHours();
+	minute.nodeValue = dateTime.getMinutes();
+	secs.nodeValue = dateTime.getSeconds();
+	
+	var hold = document.createElement("datetime");
+	var date = document.createElement("date");
+	date.textContent = year.nodeValue+'/'+month.nodeValue+'/'+day.nodeValue;
+	var time = document.createElement("time");
+	time.textContent = hour.nodeValue+':'+minute.nodeValue+':'+secs.nodeValue;
+	
+	date.setAttributeNode(year);
+	date.setAttributeNode(month);
+	date.setAttributeNode(day);
+	time.setAttributeNode(hour);
+	time.setAttributeNode(minute);
+	time.setAttributeNode(secs);
+	
+	hold.appendChild(date);
+	hold.appendChild(time);
+	return hold
+	
+}
