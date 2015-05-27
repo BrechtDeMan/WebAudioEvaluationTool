@@ -30,12 +30,25 @@ function loadInterface(xmlDoc) {
 	var xmlSetup = xmlDoc.find('setup');
 	// Should put in an error function here incase of malprocessed or malformed XML
 	
+	// Create pre and post test questions
+	
+	var preTest = xmlSetup.find('PreTest');
+	var postTest = xmlSetup.find('PostTest');
+	preTest = preTest[0];
+	postTest = postTest[0];
+	
+	if (preTest == undefined) {preTest = document.createElement("preTest");}
+	if (postTest == undefined){postTest= document.createElement("postTest");}
+	
+	testState.stateMap.push(preTest);
+	
 	// Extract the different test XML DOM trees
 	var audioHolders = xmlDoc.find('audioHolder');
+	var testXMLSetups = [];
 	audioHolders.each(function(index,element) {
 		var repeatN = element.attributes['repeatCount'].value;
 		for (var r=0; r<=repeatN; r++) {
-			testXMLSetups[testXMLSetups.length] = element;
+			testXMLSetups.push(element);
 		}
 	});
 	 
@@ -55,6 +68,12 @@ function loadInterface(xmlDoc) {
 	{
  		testXMLSetups = randomiseOrder(testXMLSetups);
 	}
+	
+	$(testXMLSetups).each(function(index,elem){
+		testState.stateMap.push(elem);
+	})
+	 
+	 testState.stateMap.push(postTest);
 	 
 	// Obtain the metrics enabled
 	var metricNode = xmlSetup.find('Metric');
@@ -232,22 +251,7 @@ function loadInterface(xmlDoc) {
 	testContent.style.zIndex = 1;
 	insertPoint.innerHTML = null; // Clear the current schema
 	
-	// Create pre and post test questions
-	
-	var preTest = xmlSetup.find('PreTest');
-	var postTest = xmlSetup.find('PostTest');
-	preTest = preTest[0];
-	postTest = postTest[0];
-	
 	currentState = 'preTest';
-	
-	// Create Pre-Test Box
-	if (preTest != undefined && preTest.childElementCount >= 1)
-	{
-		//popup.showPopup();
-		//preTestPopupStart(preTest);
-		popup.initState(preTest);
-	}
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
@@ -258,17 +262,17 @@ function loadInterface(xmlDoc) {
 	insertPoint.appendChild(testContent);
 
 	// Load the full interface
-	
+	testState.initialise();
+	testState.advanceState();
 }
 
-function loadTest(id)
+function loadTest(textXML)
 {
 	
 	// Reset audioEngineContext.Metric globals for new test
 	audioEngineContext.newTestPage();
 	
-	// Used to load a specific test page
-	var textXML = testXMLSetups[id];
+	var id = textXML.id;
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
 	var canvas = document.getElementById('slider');
@@ -483,19 +487,6 @@ function loadTest(id)
 		trackComment.appendChild(trackCommentBox);
 		feedbackHolder.appendChild(trackComment);
 	});
-	
-	// Now process any pre-test commands
-	
-	var preTest = $(testXMLSetups[id]).find('PreTest')[0];
-	if (preTest.childElementCount > 0)
-	{
-		currentState = 'testRunPre-'+id;
-		//preTestPopupStart(preTest);
-		popup.initState(preTest);
-		//popup.showPopup();
-	} else {
-		currentState = 'testRun-'+id;
-	}
 }
 
 
@@ -534,12 +525,7 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 	            return;
 	        }
 	    }
-	    if (currentState.substr(0,7) == 'testRun')
-	    {
-	        hasBeenPlayed = []; // clear array to prepare for next test
-	        audioEngineContext.timer.stopTest();
-	        advanceState();
-	    }
+	    testState.advanceState();
     } else // if a fragment has not been played yet
     {
     	str = "";
@@ -605,13 +591,13 @@ function resizeWindow(event){
 	});
 }
 
-function pageXMLSave(testId)
+function pageXMLSave(store, testXML, testId)
 {
 	// Saves a specific test page
-	var xmlDoc = currentTestHolder;
+	var xmlDoc = store;
 	// Check if any session wide metrics are enabled
 	
-	var commentShow = testXMLSetups[testId].attributes['elementComments'];
+	var commentShow = testXML.attributes['elementComments'];
 	if (commentShow != undefined) {
 		if (commentShow.value == 'false') {commentShow = false;}
 		else {commentShow = true;}
@@ -716,21 +702,5 @@ function pageXMLSave(testId)
 		cqHolder.appendChild(comment);
 		xmlDoc.appendChild(cqHolder);
 	}
-	testResultsHolders[testId] = xmlDoc;
-}
-
-// Only other global function which must be defined in the interface class. Determines how to create the XML document.
-function interfaceXMLSave(){
-	// Create the XML string to be exported with results
-	var xmlDoc = document.createElement("BrowserEvaluationResult");
-	xmlDoc.appendChild(returnDateNode());
-	for (var i=0; i<testResultsHolders.length; i++)
-	{
-		xmlDoc.appendChild(testResultsHolders[i]);
-	}
-	// Append Pre/Post Questions
-	xmlDoc.appendChild(preTestQuestions);
-	xmlDoc.appendChild(postTestQuestions);
-	
-	return xmlDoc;
+	store = xmlDoc;
 }
