@@ -343,7 +343,6 @@ function loadTest(textXML)
 		loopPlayback = false;
 	}
 	audioEngineContext.loopPlayback = loopPlayback;
-	loopPlayback = false;
 	// Create AudioEngine bindings for playback
 	if (loopPlayback) {
 		audioEngineContext.selectedTrack = function(id) {

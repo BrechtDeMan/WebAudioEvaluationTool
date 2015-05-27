@@ -432,6 +432,11 @@ function AudioEngine() {
 			}
 			if (this.audioObjectsReady == true) {
 				this.timer.startTest();
+				if (this.loopPlayback) {
+					for(var i=0; i<this.audioObjects.length; i++) {
+						this.audioObjects[i].play(this.timer.getTestTime()+1);
+					}
+				}
 				this.status = 1;
 			}
 		}
