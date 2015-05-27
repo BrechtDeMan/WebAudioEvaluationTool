@@ -349,9 +349,9 @@ function loadTest(textXML)
 			for (var i=0; i<this.audioObjects.length; i++)
 			{
 				if (id == i) {
-					this.audioObjects[i].outputGain.gain.value = 1.0;
+					this.audioObjects[i].loopStart();
 				} else {
-					this.audioObjects[i].outputGain.gain.value = 0.0;
+					this.audioObjects[i].loopStop();
 				}
 			}
 		};

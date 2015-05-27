@@ -521,18 +521,30 @@ function audioObject(id) {
 	// When stopeed, the buffer node is deleted and recreated with the stored buffer.
 	this.buffer;
 	
+	this.loopStart = function() {
+		this.outputGain.gain.value = 1.0;
+		this.metric.startListening(audioEngineContext.timer.getTestTime());
+	}
+	
+	this.loopStop = function() {
+		if (this.outputGain.gain.value != 0.0) {
+			this.outputGain.gain.value = 0.0;
+			this.metric.stopListening(audioEngineContext.timer.getTestTime());
+		}
+	}
+	
 	this.play = function(startTime) {
 		this.bufferNode = audioContext.createBufferSource();
 		this.bufferNode.owner = this;
 		this.bufferNode.connect(this.outputGain);
 		this.bufferNode.buffer = this.buffer;
 		this.bufferNode.loop = audioEngineContext.loopPlayback;
-		if (this.bufferNode.loop == false) {
-			this.bufferNode.onended = function() {
-				this.owner.metric.listening(audioEngineContext.timer.getTestTime());
+		this.bufferNode.onended = function() {
+				this.owner.metric.stopListening(audioEngineContext.timer.getTestTime());
 			};
+		if (this.bufferNode.loop == false) {
+			this.metric.startListening(audioEngineContext.timer.getTestTime());
 		}
-		this.metric.listening(audioEngineContext.timer.getTestTime());
 		this.bufferNode.start(startTime);
 		this.played = true;
 	};
@@ -542,7 +554,7 @@ function audioObject(id) {
 		{
 			this.bufferNode.stop(0);
 			this.bufferNode = undefined;
-			this.metric.listening(audioEngineContext.timer.getTestTime());
+			this.metric.stopListening(audioEngineContext.timer.getTestTime());
 		}
 	};
 
@@ -658,14 +670,20 @@ function metricTracker()
 		this.movementTracker[this.movementTracker.length] = [time, position];
 	};
 	
-	this.listening = function(time)
+	this.startListening = function(time)
 	{
 		if (this.listenHold == false)
 		{
 			this.wasListenedTo = true;
 			this.listenStart = time;
 			this.listenHold = true;
-		} else {
+		} 
+	}
+	
+	this.stopListening = function(time)
+	{
+		if (this.listenHold == true)
+		{
 			this.listenedTimer += (time - this.listenStart);
 			this.listenStart = 0;
 			this.listenHold = false;
