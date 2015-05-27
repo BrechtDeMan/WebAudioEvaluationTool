@@ -263,6 +263,9 @@ function loadProjectSpecCallback(response) {
 		document.getElementsByTagName("head")[0].appendChild(css);
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
+	
+	// Define window callbacks for interface
+	window.onresize = function(event){resizeWindow(event);};
 }
 
 function createProjectSave(destURL) {
