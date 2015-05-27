@@ -807,7 +807,7 @@ function pageXMLSave(testId)
 		cqHolder.id = commentQuestion[i].id;
 		comment.textContent = commentQuestion[i].children[2].value;
 		question.textContent = commentQuestion[i].children[0].textContent;
-        console.log('Question ' + i + ': ' + commentObjects[i].children[2].value); // DEBUG/SAFETY
+        console.log('Question ' + i + ': ' + commentQuestion[i].children[2].value); // DEBUG/SAFETY
 		cqHolder.appendChild(question);
 		cqHolder.appendChild(comment);
 		xmlDoc.appendChild(cqHolder);
