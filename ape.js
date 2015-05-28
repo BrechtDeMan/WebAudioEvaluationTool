@@ -22,6 +22,7 @@ function loadInterface(xmlDoc) {
 	// The injection point into the HTML page
 	var insertPoint = document.getElementById("topLevelBody");
 	var testContent = document.createElement('div');
+	
 	testContent.id = 'testContent';
 	
 	
@@ -264,6 +265,8 @@ function loadInterface(xmlDoc) {
 	// Load the full interface
 	testState.initialise();
 	testState.advanceState();
+	
+	testWaitIndicator();
 }
 
 function loadTest(textXML)
@@ -443,20 +446,23 @@ function loadTest(textXML)
 		trackSliderObj.onclick = function() {
 			// Start the test on first click, that way timings are more accurate.
 			audioEngineContext.play();
-			// Get the track ID from the object ID
-			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
-			//audioEngineContext.metric.sliderPlayed(id);
-			audioEngineContext.selectedTrack(id);
-            // Currently playing track red, rest green
-            document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
-            for (var i = 0; i<$(currentTrackOrder).length; i++)
-            {
-                if (i!=index) // Make all other sliders green
-                {
-                    document.getElementById('track-slider-'+i).style.backgroundColor = "rgb(100,200,100)";
-                }
-                              
-            }
+			if (audioEngineContext.audioObjectsReady) {
+				// Cannot continue to issue play command until audioObjects reported as ready!
+				// Get the track ID from the object ID
+				var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
+				//audioEngineContext.metric.sliderPlayed(id);
+				audioEngineContext.selectedTrack(id);
+	            // Currently playing track red, rest green
+	            document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
+	            for (var i = 0; i<$(currentTrackOrder).length; i++)
+	            {
+	                if (i!=index) // Make all other sliders green
+	                {
+	           	        document.getElementById('track-slider-'+i).style.backgroundColor = "rgb(100,200,100)";
+	                }
+	                              
+	            }
+			}
 		};
 		
 		canvas.appendChild(trackSliderObj);

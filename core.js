@@ -192,6 +192,7 @@ function stateMachine()
 	this.currentIndex = null;
 	this.currentTestId = 0;
 	this.stateResults = [];
+	this.timerCallBackHolders = null;
 	this.initialise = function(){
 		if (this.stateMap.length > 0) {
 			if(this.stateIndex != null) {
@@ -492,6 +493,13 @@ function AudioEngine() {
 				ready = false;
 			};
 		}
+		if (ready == false) {
+			var holder = document.getElementById('testWaitIndicator');
+			holder.style.visibility = "visible";
+			setInterval(function() {
+				document.getElementById('testWaitIndicator').style.visibility = "hidden";
+			}, 10000);
+		}
 		return ready;
 	};
 	
@@ -750,3 +758,23 @@ function returnDateNode()
 	return hold
 	
 }
+
+function testWaitIndicator() {
+	var hold = document.createElement("div");
+	hold.id = "testWaitIndicator";
+	hold.style.position = "absolute";
+	hold.style.left = "100px";
+	hold.style.top = "10px";
+	hold.style.width = "500px";
+	hold.style.height = "100px";
+	hold.style.padding = "20px";
+	hold.style.backgroundColor = "rgb(100,200,200)";
+	hold.style.visibility = "hidden";
+	var span = document.createElement("span");
+	span.textContent = "Please wait! Elements still loading";
+	hold.appendChild(span);
+	var body = document.getElementsByTagName('body')[0];
+	body.appendChild(hold);
+}
+
+var hidetestwait = null;
