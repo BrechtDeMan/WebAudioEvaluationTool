@@ -529,9 +529,14 @@ function audioObject(id) {
 	// When stopeed, the buffer node is deleted and recreated with the stored buffer.
 	this.buffer;
 	
+    this.flagAsPlayed = function() { // to be called explicitly when not in loop mode
+        this.played = true;
+    }
+    
 	this.loopStart = function() {
 		this.outputGain.gain.value = 1.0;
 		this.metric.startListening(audioEngineContext.timer.getTestTime());
+        this.played = true;
 	}
 	
 	this.loopStop = function() {
@@ -554,7 +559,6 @@ function audioObject(id) {
 			this.metric.startListening(audioEngineContext.timer.getTestTime());
 		}
 		this.bufferNode.start(startTime);
-		this.played = true;
 	};
 	
 	this.stop = function() {
