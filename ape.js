@@ -368,6 +368,7 @@ function loadTest(textXML)
 			if (this.status == 1) {
 				this.audioObjects[id].outputGain.gain.value = 1.0;
 				this.audioObjects[id].play(audioContext.currentTime+0.01);
+                this.audioObjects[id].flagAsPlayed(); 
 			}
 		};
 	}
