@@ -511,7 +511,7 @@ function audioObject(id) {
 	this.id = id;
 	this.state = 0; // 0 - no data, 1 - ready
 	this.url = null; // Hold the URL given for the output back to the results.
-	this.metric = new metricTracker();
+	this.metric = new metricTracker(this);
 	
 	this.played = false;
 	
@@ -654,7 +654,7 @@ function sessionMetrics(engine)
 	this.initialiseTest = function(){};
 }
 
-function metricTracker()
+function metricTracker(caller)
 {
 	/* Custom object to track and collect metric data
 	 * Used only inside the audioObjects object.
@@ -668,6 +668,7 @@ function metricTracker()
 	this.wasListenedTo = false;
 	this.wasMoved = false;
 	this.hasComments = false;
+	this.parent = caller;
 	
 	this.initialised = function(position)
 	{
@@ -689,8 +690,9 @@ function metricTracker()
 			this.wasListenedTo = true;
 			this.listenStart = time;
 			this.listenHold = true;
-		} 
-	}
+			console.log('slider ' + this.parent.id + ' played (' + time + ')'); // DEBUG/SAFETY: show played slider id
+		}
+	};
 	
 	this.stopListening = function(time)
 	{
