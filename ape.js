@@ -179,7 +179,13 @@ function loadInterface(xmlDoc) {
 	pagetitle.appendChild(titleSpan);
 	
 	// Store the return URL path in global projectReturn
-	projectReturn = xmlSetup[0].attributes['projectReturn'].value;
+	projectReturn = xmlSetup[0].attributes['projectReturn'];
+	if (projectReturn == undefined) {
+		console.log("WARNING - projectReturn not specified! Will assume null.");
+		projectReturn = "null";
+	} else {
+		projectReturn = projectReturn.value;
+	}
 	
 	// Create Interface buttons!
 	var interfaceButtons = document.createElement('div');
