@@ -110,11 +110,6 @@ function loadInterface(xmlDoc) {
 	// Create APE specific metric functions
 	audioEngineContext.metric.initialiseTest = function()
 	{
-		var sliders = document.getElementsByClassName('track-slider');
-		for (var i=0; i<sliders.length; i++)
-		{
-			audioEngineContext.audioObjects[i].metric.initialised(convSliderPosToRate(i));
-		}
 	};
 	
 	audioEngineContext.metric.sliderMoveStart = function(id)
@@ -374,7 +369,6 @@ function loadTest(textXML)
 			if (this.status == 1) {
 				this.audioObjects[id].outputGain.gain.value = 1.0;
 				this.audioObjects[id].play(audioContext.currentTime+0.01);
-                this.audioObjects[id].flagAsPlayed(); 
 			}
 		};
 	}
@@ -437,9 +431,10 @@ function loadTest(textXML)
 		trackSliderObj.className = 'track-slider';
 		trackSliderObj.id = 'track-slider-'+index;
 		// Distribute it randomnly
-		var w = window.innerWidth - 100;
+		var w = window.innerWidth - (offset+8)*2;
 		w = Math.random()*w;
-		trackSliderObj.style.left = Math.floor(w)+50+'px';
+		w = Math.floor(w+(offset+8));
+		trackSliderObj.style.left = w+'px';
 		trackSliderObj.innerHTML = '<span>'+index+'</span>';
 		trackSliderObj.draggable = true;
 		trackSliderObj.ondragend = dragEnd;
@@ -473,6 +468,7 @@ function loadTest(textXML)
 		};
 		
 		canvas.appendChild(trackSliderObj);
+		audioEngineContext.audioObjects[index].metric.initialised(convSliderPosToRate(index));
         
 	});
 	

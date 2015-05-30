@@ -477,7 +477,7 @@ function AudioEngine() {
 	this.checkAllPlayed = function() {
 		arr = [];
 		for (var id=0; id<this.audioObjects.length; id++) {
-			if (this.audioObjects[id].played == false) {
+			if (this.audioObjects[id].metric.wasListenedTo == false) {
 				arr.push(this.audioObjects[id].id);
 			}
 		}
@@ -513,8 +513,6 @@ function audioObject(id) {
 	this.url = null; // Hold the URL given for the output back to the results.
 	this.metric = new metricTracker(this);
 	
-	this.played = false;
-	
 	// Create a buffer and external gain control to allow internal patching of effects and volume leveling.
 	this.bufferNode = undefined;
 	this.outputGain = audioContext.createGain();
@@ -528,15 +526,10 @@ function audioObject(id) {
 	// the audiobuffer is not designed for multi-start playback
 	// When stopeed, the buffer node is deleted and recreated with the stored buffer.
 	this.buffer;
-	
-    this.flagAsPlayed = function() { // to be called explicitly when not in loop mode
-        this.played = true;
-    }
     
 	this.loopStart = function() {
 		this.outputGain.gain.value = 1.0;
 		this.metric.startListening(audioEngineContext.timer.getTestTime());
-        this.played = true;
 	}
 	
 	this.loopStop = function() {
@@ -553,8 +546,9 @@ function audioObject(id) {
 		this.bufferNode.buffer = this.buffer;
 		this.bufferNode.loop = audioEngineContext.loopPlayback;
 		this.bufferNode.onended = function() {
-				this.owner.metric.stopListening(audioEngineContext.timer.getTestTime());
-			};
+			// Safari does not like using 'this' to reference the calling object!
+			event.srcElement.owner.metric.stopListening(audioEngineContext.timer.getTestTime());
+		};
 		if (this.bufferNode.loop == false) {
 			this.metric.startListening(audioEngineContext.timer.getTestTime());
 		}
