@@ -2,19 +2,19 @@ import xml.etree.ElementTree as ET
 import os
 import csv
 
-# Manually enter song names to extract data for (one or more).
-song_names = ['live-DAW', 'live-LeadMe', 'studio-DAW', 'studio-InTheMeantime']
+# get every XML file in folder
+for file in os.listdir("."): # You have to put this script in folder where output XML files are.
+    if file.endswith(".xml"):
+        tree = ET.parse(file)
+        root = tree.getroot()
 
-for song_name in song_names:    # iterate over songs
-    # create folder [song_name] if not yet created
-    if not os.path.exists(song_name):
-        os.makedirs(song_name)
+        # get list of all songs
+        for audioholder in root.findall("./audioholder"):    # iterate over songs
+            song_name = audioholder.get('id') # get song name
 
-    # get every XML file in folder
-    for file in os.listdir("."): # You have to put this in folder where output XML files are.
-        if file.endswith(".xml"):
-            tree = ET.parse(file)
-            root = tree.getroot()
+            # create folder [song_name] if not yet created
+            if not os.path.exists(song_name):
+                os.makedirs(song_name)
 
             # for song [song_name], print comments related to mix [id]
             for audioelement in root.findall("*/[@id='"+song_name+"']/audioelement"):
