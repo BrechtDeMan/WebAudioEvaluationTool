@@ -547,7 +547,7 @@ function audioObject(id) {
 		this.bufferNode.loop = audioEngineContext.loopPlayback;
 		this.bufferNode.onended = function() {
 			// Safari does not like using 'this' to reference the calling object!
-			this.owner.metric.stopListening(audioEngineContext.timer.getTestTime());
+			event.srcElement.owner.metric.stopListening(audioEngineContext.timer.getTestTime());
 		};
 		if (this.bufferNode.loop == false) {
 			this.metric.startListening(audioEngineContext.timer.getTestTime());
