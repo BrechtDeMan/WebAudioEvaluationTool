@@ -110,11 +110,6 @@ function loadInterface(xmlDoc) {
 	// Create APE specific metric functions
 	audioEngineContext.metric.initialiseTest = function()
 	{
-		var sliders = document.getElementsByClassName('track-slider');
-		for (var i=0; i<sliders.length; i++)
-		{
-			audioEngineContext.audioObjects[i].metric.initialised(convSliderPosToRate(i));
-		}
 	};
 	
 	audioEngineContext.metric.sliderMoveStart = function(id)
