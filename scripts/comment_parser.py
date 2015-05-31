@@ -8,21 +8,21 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
         tree = ET.parse(file)
         root = tree.getroot()
 
-        # get list of all songs
-        for audioholder in root.findall("./audioholder"):    # iterate over songs
-            song_name = audioholder.get('id') # get song name
+        # get list of all page names
+        for audioholder in root.findall("./audioholder"):   # iterate over pages
+            page_name = audioholder.get('id')               # get page name
 
-            # create folder [song_name] if not yet created
-            if not os.path.exists(song_name):
-                os.makedirs(song_name)
+            # create folder [page_name] if not yet created
+            if not os.path.exists(page_name):
+                os.makedirs(page_name)
 
-            # for song [song_name], print comments related to mix [id]
-            for audioelement in root.findall("*/[@id='"+song_name+"']/audioelement"):
+            # for page [page_name], print comments related to fragment [id]
+            for audioelement in root.findall("*/[@id='"+page_name+"']/audioelement"):
                 audio_id = str(audioelement.get('id'))
-                # append to file [song_name]/[song_name]-comments-[id].csv
-                with open(song_name+'/'+song_name+'-comments-'+audio_id+'.csv', 'a') as csvfile:
+                # append to file [page_name]/[page_name]-comments-[id].csv
+                with open(page_name+'/'+page_name+'-comments-'+audio_id+'.csv', 'a') as csvfile:
                     commentstr = root.find("*/[@id='"
-                                           + song_name
+                                           + page_name
                                            + "']/audioelement/[@id='"
                                            + audio_id
                                            + "']/comment/response").text
