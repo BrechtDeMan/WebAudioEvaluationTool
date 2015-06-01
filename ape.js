@@ -407,6 +407,7 @@ function loadTest(textXML)
 			// Create document objects to hold the comment boxes
 			var trackComment = document.createElement('div');
 			trackComment.className = 'comment-div';
+			trackComment.id = 'comment-div-'+index;
 			// Create a string next to each comment asking for a comment
 			var trackString = document.createElement('span');
 			trackString.innerHTML = 'Comment on track '+index;
@@ -429,6 +430,11 @@ function loadTest(textXML)
 		var trackSliderObj = document.createElement('div');
 		trackSliderObj.className = 'track-slider';
 		trackSliderObj.id = 'track-slider-'+index;
+		
+		var trackSliderAOIndex = document.createAttribute('trackIndex');
+		trackSliderAOIndex.nodeValue = index;
+		trackSliderObj.setAttributeNode(trackSliderAOIndex);
+		
 		// Distribute it randomnly
 		var w = window.innerWidth - (offset+8)*2;
 		w = Math.random()*w;
@@ -439,7 +445,7 @@ function loadTest(textXML)
 		trackSliderObj.ondragend = dragEnd;
 		trackSliderObj.ondragstart = function()
 		{
-			var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
+			var id = Number(event.srcElement.attributes['trackIndex'].value);
 			audioEngineContext.metric.sliderMoveStart(id);
 		};
 		
@@ -450,19 +456,16 @@ function loadTest(textXML)
 			if (audioEngineContext.audioObjectsReady) {
 				// Cannot continue to issue play command until audioObjects reported as ready!
 				// Get the track ID from the object ID
-				var id = Number(this.id.substr(13,2)); // Maximum theoretical tracks is 99!
+				var id = Number(event.srcElement.attributes['trackIndex'].value);
 				//audioEngineContext.metric.sliderPlayed(id);
 				audioEngineContext.selectedTrack(id);
 	            // Currently playing track red, rest green
-	            document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
-	            for (var i = 0; i<$(currentTrackOrder).length; i++)
-	            {
-	                if (i!=index) // Make all other sliders green
-	                {
-	           	        document.getElementById('track-slider-'+i).style.backgroundColor = "rgb(100,200,100)";
-	                }
-	                              
-	            }
+	            
+	            //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
+	            $('.track-slider').removeClass('track-slider-playing');
+	            $(event.srcElement).addClass('track-slider-playing');
+	            $('.comment-div').removeClass('comment-box-playing');
+	            $('#comment-div-'+id).addClass('comment-box-playing');
 			}
 		};
 		
