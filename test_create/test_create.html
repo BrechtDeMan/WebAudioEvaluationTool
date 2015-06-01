@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>WAET Create Test</title>
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<meta name="viewport" content="width=device-width; initial-scale=1.0">
+		
+		<script type="text/javascript">
+			// To aid 'one-page set-up' all scripts and CSS must be included directly in this file!
+			var topLevel;
+			window.onload = function() {
+				// Initialise page
+				topLevel = document.getElementById('topLevelBody');
+				var setup = document.createElement('div');
+				setup.id = 'setupTagDiv';
+				
+			};
+			
+			function attributePair(string, type){
+				var id = document.createElement("span");
+				id.textContent = string;
+				var input = document.createElement("input");
+				input.type = type;
+				return [id, input];
+			}
+			
+			function questionNode() {
+				var node = document.createElement("div");
+				node.setAttribute('class','head');
+				node.setAttribute('name','question-node');
+				var nodeTitle = document.createElement("span");
+				nodeTitle.textContent = "Question";
+				var attributes = document.createElement("div");
+				attributes.setAttribute('class','attrib');
+				var id = attributePair("ID:","text");
+				var question = attributePair("Question:","text");
+				node.appendChild(nodeTitle);
+				id.forEach(function(item){attributes.appendChild(item);},false);
+				question.forEach(function(item){attributes.appendChild(item);},false);
+				node.appendChild(attributes);
+				return node;
+			}
+			
+			function statementNode() {
+				var node = document.createElement("div");
+				node.setAttribute('class','head');
+				node.setAttribute('name','question-node');
+				var nodeTitle = document.createElement("span");
+				nodeTitle.textContent = "Statement";
+				var attributes = document.createElement("div");
+				attributes.setAttribute('class','attrib');
+				var statement = attributePair("Statement:","text");
+				node.appendChild(nodeTitle);
+				statement.forEach(function(item){attributes.appendChild(item);},false);
+				node.appendChild(attributes);
+				return node;
+			}
+			
+			function audioHolderNode() {
+				var audioHolderCounts = document.getElementsByName("audio-holder").length;
+				var node = document.createElement("div");
+				node.setAttribute("class","head");
+				node.setAttribute("name","audio-holder");
+				node.setAttribute("id","audio-holder-"+length);
+				var nodeTitle = document.createElement("span");
+				nodeTitle.textContent = "Audio Holder "+(length+1);
+				
+				var attributes = document.createElement("div");
+				attributes.setAttribute('class','attrib');
+				var id = attributePair("ID:","text");
+				id[1].value=length;
+			}
+		</script>
+		<style>
+			div {
+				padding: 2px;
+				margin-top: 2px;
+				margin-bottom: 2px;
+			}
+			div.head{
+				margin-left: 10px;
+				border: black;
+				border-width: 2px;
+				border-style: solid;
+			}
+			div.attrib{
+				margin-left:25px;
+				border: black;
+				border-width: 2px;
+				border-style: dashed;
+				margin-bottom: 10px;
+			}
+		</style>
+		
+	</head>
+
+	<body>
+		<h1>Create Test Setup XML</h1>
+		<div id="topLevelBody" align="left">
+			<!-- Interface goes here -->
+			<div name='test-setup'>
+				<div id="setup" class="head">
+					<h2>Setup Tag</h2>
+					<div id="setup-attribs" class="attrib">
+						<span>Interface</span>
+						<select id="interface">
+							<option value='APE'>APE</option>
+						</select>
+						<span>Project Return</span>
+						<input type="text" id="projectReturn">
+						<span>Randomise Test Page Order</span>
+						<input id="randomisePageOrder" type="checkbox" value="false">
+						<span>Collect Session Metrics</span>
+						<input id="collectMetrics" type="checkbox">
+					</div>
+					<div id="globalPreTest" class="head">
+						<h3>Pre Test</h3>
+						<button id="addPreTestQ" onclick="event.srcElement.parentElement.appendChild(questionNode());">Add Pre Test Question</button>
+						<button id="addPreTestS" onclick="event.srcElement.parentElement.appendChild(statementNode());">Add Pre Test Statement</button>
+					</div>
+					<div id="globalPostTest" class="head">
+						<h3>Post Test</h3>
+						<button id="addPreTestQ" onclick="event.srcElement.parentElement.appendChild(questionNode());">Add Post Test Question</button>
+						<button id="addPreTestS" onclick="event.srcElement.parentElement.appendChild(statementNode());">Add Post Test Statement</button>
+					</div>
+					<div id="globalMetric" class="head">
+						<h3>Global Metrics</h3>
+						<div id="globalMetric-attrib" class="attrib">
+							<span>Test Timer</span>
+							<input type="checkbox" id="testTimer" />
+							<span>Element Playback Timer</span>
+							<input type="checkbox" id="elementTimer" />
+							<span>Element Initial Position</span>
+							<input type="checkbox" id="elementInitialPosition" />
+							<span>Element Tracker</span>
+							<input type="checkbox" id="elementTracker" />
+							<span>Element Flag Listened To</span>
+							<input type="checkbox" id="elementFlagListened" />
+							<span>Element Flag Moved</span>
+							<input type="checkbox" id="elementFlagMoved" />
+						</div>
+					</div>
+					<button id="addAudioHolder">Add AudioHolder / Test Page</button>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
