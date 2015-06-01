@@ -11,14 +11,10 @@ var projectXML; // Hold the parsed setup XML
 var popup; // Hold the interfacePopup object
 var testState;
 var currentState; // Keep track of the current state (pre/post test, which test, final test? first test?)
-//var testXMLSetups = []; // Hold the parsed test instances
-//var testResultsHolders =[]; // Hold the results from each test for publishing to XML
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
-//var currentTestHolder; // Hold any intermediate results during test - metrics
 var audioEngineContext; // The custome AudioEngine object
 var projectReturn; // Hold the URL for the return
-//var preTestQuestions = document.createElement('PreTest'); // Store any pre-test question response
-//var postTestQuestions = document.createElement('PostTest'); // Store any post-test question response
+
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
@@ -112,9 +108,10 @@ function interfacePopup() {
 			this.popupContent.appendChild(span);
 			this.popupContent.appendChild(br);
 			this.popupContent.appendChild(textArea);
+			this.popupContent.childNodes[2].focus();
 		}
 		this.popupContent.appendChild(this.popupButton);
-	}
+	};
 	
 	this.initState = function(node) {
 		//Call this with your preTest and postTest nodes when needed to
@@ -133,7 +130,7 @@ function interfacePopup() {
 			this.showPopup();
 			this.postNode();
 		}
-	}
+	};
 	
 	this.buttonClicked = function() {
 		// Each time the popup button is clicked!
@@ -174,7 +171,7 @@ function interfacePopup() {
 			}
 			advanceState();
 		}
-	}
+	};
 }
 
 function advanceState()
@@ -382,6 +379,9 @@ function createProjectSave(destURL) {
 			createProjectSave(null);
 		};
 		xmlhttp.send(file);
+		if (xmlhttp.status == 404) {
+			createProjectSave(null);
+		}
 	}
 	return submitDiv;
 }
@@ -495,13 +495,6 @@ function AudioEngine() {
 				console.log('WAIT -- audioObject '+i+' not ready yet!');
 				ready = false;
 			};
-		}
-		if (ready == false) {
-			var holder = document.getElementById('testWaitIndicator');
-			holder.style.visibility = "visible";
-			setInterval(function() {
-				document.getElementById('testWaitIndicator').style.visibility = "hidden";
-			}, 10000);
 		}
 		return ready;
 	};
@@ -763,21 +756,25 @@ function returnDateNode()
 }
 
 function testWaitIndicator() {
-	var hold = document.createElement("div");
-	hold.id = "testWaitIndicator";
-	hold.style.position = "absolute";
-	hold.style.left = "100px";
-	hold.style.top = "10px";
-	hold.style.width = "500px";
-	hold.style.height = "100px";
-	hold.style.padding = "20px";
-	hold.style.backgroundColor = "rgb(100,200,200)";
-	hold.style.visibility = "hidden";
-	var span = document.createElement("span");
-	span.textContent = "Please wait! Elements still loading";
-	hold.appendChild(span);
-	var body = document.getElementsByTagName('body')[0];
-	body.appendChild(hold);
+	if (audioEngineContext.checkAllReady() == false) {
+		var hold = document.createElement("div");
+		hold.id = "testWaitIndicator";
+		hold.className = "indicator-box";
+		var span = document.createElement("span");
+		span.textContent = "Please wait! Elements still loading";
+		hold.appendChild(span);
+		var body = document.getElementsByTagName('body')[0];
+		body.appendChild(hold);
+		testWaitTimerIntervalHolder = setInterval(function(){
+			var ready = audioEngineContext.checkAllReady();
+			if (ready) {
+				var elem = document.getElementById('testWaitIndicator');
+				var body = document.getElementsByTagName('body')[0];
+				body.removeChild(elem);
+				clearInterval(testWaitTimerIntervalHolder);
+			}
+		},500,false);
+	}
 }
 
-var hidetestwait = null;
+var testWaitTimerIntervalHolder = null;
