@@ -72,3 +72,11 @@ div.track-slider {
 	background-color: rgb(100,200,100);
 }
 
+div.track-slider-playing {
+	background-color: #FF0000;
+}
+
+div.comment-box-playing {
+	background-color: #FFDDDD;
+}
+
