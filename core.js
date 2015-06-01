@@ -378,10 +378,13 @@ function createProjectSave(destURL) {
 			console.log('Error saving file to server! Presenting download locally');
 			createProjectSave(null);
 		};
+		xmlhttp.onreadystatechange  = function() {
+			console.log(xmlhttp.status);
+			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
+				createProjectSave(null);
+			}
+		};
 		xmlhttp.send(file);
-		if (xmlhttp.status == 404) {
-			createProjectSave(null);
-		}
 	}
 	return submitDiv;
 }
