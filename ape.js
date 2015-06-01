@@ -267,7 +267,6 @@ function loadInterface(xmlDoc) {
 	testState.initialise();
 	testState.advanceState();
 	
-	testWaitIndicator();
 }
 
 function loadTest(textXML)
@@ -495,6 +494,9 @@ function loadTest(textXML)
 		trackComment.appendChild(trackCommentBox);
 		feedbackHolder.appendChild(trackComment);
 	});
+	
+	
+	testWaitIndicator();
 }
 
 
