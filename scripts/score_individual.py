@@ -56,3 +56,4 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
             #exit()
 
             #TODO Save output automatically
+
