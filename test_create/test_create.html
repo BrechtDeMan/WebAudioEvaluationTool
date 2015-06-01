@@ -32,6 +32,10 @@
 				return [id, input];
 			}
 			
+			function removeNode(event) {
+				event.srcElement.parentElement.parentElement.removeChild(event.srcElement.parentElement);
+			}
+			
 			function questionNode() {
 				var node = document.createElement("div");
 				node.setAttribute('class','head');
@@ -46,6 +50,11 @@
 				id.forEach(function(item){attributes.appendChild(item);},false);
 				question.forEach(function(item){attributes.appendChild(item);},false);
 				node.appendChild(attributes);
+				
+				var removeButton = document.createElement("button");
+				removeButton.textContent = "Remove";
+				removeButton.onclick = removeNode;
+				node.appendChild(removeButton);
 				return node;
 			}
 			
@@ -61,6 +70,11 @@
 				node.appendChild(nodeTitle);
 				statement.forEach(function(item){attributes.appendChild(item);},false);
 				node.appendChild(attributes);
+				
+				var removeButton = document.createElement("button");
+				removeButton.textContent = "Remove";
+				removeButton.onclick = removeNode;
+				node.appendChild(removeButton);
 				return node;
 			}
 			
@@ -69,14 +83,140 @@
 				var node = document.createElement("div");
 				node.setAttribute("class","head");
 				node.setAttribute("name","audio-holder");
-				node.setAttribute("id","audio-holder-"+length);
+				node.setAttribute("id","audio-holder-"+audioHolderCounts);
 				var nodeTitle = document.createElement("span");
-				nodeTitle.textContent = "Audio Holder "+(length+1);
+				nodeTitle.textContent = "Audio Holder "+(audioHolderCounts+1);
 				
 				var attributes = document.createElement("div");
 				attributes.setAttribute('class','attrib');
 				var id = attributePair("ID:","text");
-				id[1].value=length;
+				id[1].value=audioHolderCounts;
+				var hostURL = attributePair("Host URL:", "text");
+				var sampleRate = attributePair("Sample Rate:","text");
+				var randomiseOrder = attributePair("Randomise Element Order:","checkbox");
+				var repeatCount = attributePair("Repeat Page Count:","number");
+				repeatCount[1].value = 0;
+				var loop = attributePair("Loop Element Playback","checkbox");
+				var elementComments = attributePair("Enable Comment Boxes","checkbox");
+				id.forEach(function(item){attributes.appendChild(item);},false);
+				hostURL.forEach(function(item){attributes.appendChild(item);},false);
+				sampleRate.forEach(function(item){attributes.appendChild(item);},false);
+				hostURL.forEach(function(item){attributes.appendChild(item);},false);
+				randomiseOrder.forEach(function(item){attributes.appendChild(item);},false);
+				repeatCount.forEach(function(item){attributes.appendChild(item);},false);
+				loop.forEach(function(item){attributes.appendChild(item);},false);
+				elementComments.forEach(function(item){attributes.appendChild(item);},false);
+				
+				node.appendChild(nodeTitle);
+				node.appendChild(attributes);
+				
+				var pretest = document.createElement("div");
+				pretest.setAttribute('class','head');
+				pretest.setAttribute('name','pre-test');
+				var pretestTitle = document.createElement("h4");
+				pretestTitle.textContent = "Pre Test";
+				var buttonAddQ = document.createElement("button");
+				buttonAddQ.textContent = "Add Pre Test Question";
+				buttonAddQ.onclick = function(){event.srcElement.parentElement.appendChild(questionNode());};
+				var buttonAddS = document.createElement("button");
+				buttonAddS.textContent = "Add Pre Test Statement";
+				buttonAddS.onclick = function(){event.srcElement.parentElement.appendChild(statementNode());};
+				pretest.appendChild(pretestTitle);
+				pretest.appendChild(buttonAddQ);
+				pretest.appendChild(buttonAddS);
+				
+				var posttest = document.createElement("div");
+				posttest.setAttribute('class','head');
+				posttest.setAttribute('name','post-test');
+				var posttestTitle = document.createElement("h4");
+				posttestTitle.textContent = "Post Test";
+				var buttonAddQ = document.createElement("button");
+				buttonAddQ.textContent = "Add Post Test Question";
+				buttonAddQ.onclick = function(){event.srcElement.parentElement.appendChild(questionNode());};
+				var buttonAddS = document.createElement("button");
+				buttonAddS.textContent = "Add Post Test Statement";
+				buttonAddS.onclick = function(){event.srcElement.parentElement.appendChild(statementNode());};
+				posttest.appendChild(posttestTitle);
+				posttest.appendChild(buttonAddQ);
+				posttest.appendChild(buttonAddS);
+				
+				node.appendChild(pretest);
+				node.appendChild(posttest);
+				
+				var newAudioElementButton = document.createElement("button");
+				newAudioElementButton.textContent = "Add audio element";
+				newAudioElementButton.onclick = function(){
+					event.srcElement.parentElement.appendChild(audioElementNode());
+				};
+				node.appendChild(newAudioElementButton);
+				
+				var newCommentButton = document.createElement("button");
+				newCommentButton.textContent = "Add Comment Box";
+				newCommentButton.onclick = function() {
+					event.srcElement.parentElement.appendChild(commentBox());
+				};
+				node.appendChild(newCommentButton);
+				
+				var removeButton = document.createElement("button");
+				removeButton.textContent = "Remove Audio Holder";
+				removeButton.onclick = removeNode;
+				node.appendChild(removeButton);
+				return node;
+			}
+			
+			function audioElementNode() {
+				var parentStructure = event.srcElement.parentElement.childNodes;
+				var audioElemCounts = 0;
+				for (var i=0; i<parentStructure.length; i++) {
+					if (parentStructure[i].getAttribute('name') == "audio-element")
+					{audioElemCounts++;}
+				}
+				var node = document.createElement('div');
+				node.setAttribute('class','head');
+				node.setAttribute('name','audio-element');
+				var nodeTitle = document.createElement('span');
+				nodeTitle.textContent = 'Audio Element '+(audioElemCounts+1);
+				
+				var attributes = document.createElement("div");
+				attributes.setAttribute('class','attrib');
+				var id = attributePair("ID:","text");
+				id[1].value = audioElemCounts;
+				var url = attributePair("URL:","text");
+				id.forEach(function(item){attributes.appendChild(item);},false);
+				url.forEach(function(item){attributes.appendChild(item);},false);
+				
+				node.appendChild(nodeTitle);
+				node.appendChild(attributes);
+				
+				var removeButton = document.createElement("button");
+				removeButton.textContent = "Remove Audio Element";
+				removeButton.onclick = removeNode;
+				node.appendChild(removeButton);
+				return node;
+			}
+			
+			function commentBox() {
+				var node = document.createElement('div');
+				node.setAttribute('class','head');
+				node.setAttribute('name','comment-question');
+				var nodeTitle = document.createElement('h4');
+				nodeTitle.textContent = "Comment Box";
+				
+				var attributes = document.createElement('div');
+				attributes.setAttribute('class','attrib');
+				var id = attributePair("ID:",'text');
+				var question = attributePair("Question:",'text');
+				id.forEach(function(item){attributes.appendChild(item);},false);
+				question.forEach(function(item){attributes.appendChild(item);},false);
+				
+				var removeButton = document.createElement("button");
+				removeButton.textContent = "Remove Comment Box";
+				removeButton.onclick = removeNode;
+				
+				node.appendChild(nodeTitle);
+				node.appendChild(attributes);
+				node.appendChild(removeButton);
+				return node;
 			}
 		</script>
 		<style>
@@ -148,7 +288,7 @@
 							<input type="checkbox" id="elementFlagMoved" />
 						</div>
 					</div>
-					<button id="addAudioHolder">Add AudioHolder / Test Page</button>
+					<button id="addAudioHolder" onclick="event.srcElement.parentElement.appendChild(audioHolderNode());">Add AudioHolder / Test Page</button>
 				</div>
 			</div>
 		</div>
