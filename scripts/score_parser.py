@@ -94,3 +94,4 @@ for file in os.listdir("."): # You have to put this in folder where output XML f
 
             # write row: [subject ID, rating fragment ID 1, ..., rating fragment ID M]
             filewriter.writerow(ratingrow)
+

@@ -35,3 +35,4 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
                     #TODO Replace 'new line' with something else?
 
                     #TODO 'Append' means duplicate entries if run several times...
+
