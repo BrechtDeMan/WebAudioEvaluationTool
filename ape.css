@@ -72,44 +72,11 @@ div.track-slider {
 	background-color: rgb(100,200,100);
 }
 
-div.comment-div {
-	border:#444444;
-	border-style:solid;
-	border-width:1px;
-	width: 624px;
-	float: left;
-	margin: 5px;
+div.track-slider-playing {
+	background-color: #FF0000;
 }
 
-div.comment-div span {
-	margin-left: 15px;
+div.comment-box-playing {
+	background-color: #FFDDDD;
 }
 
-div.popupHolder {
-	width: 500px;
-	height: 250px;
-	background-color: #fff;
-	border-radius: 10px;
-	box-shadow: 0px 0px 50px #000;
-	z-index: 2;
-}
-
-button.popupButton {
-	/* Button for popup window
-	 */
-	width: 50px;
-	height: 25px;
-	position: absolute;
-	left: 440px;
-	top: 215px;
-	border-radius: 5px;
-	border: #444;
-	border-width: 1px;
-	border-style: solid;
-	background-color: #fff;
-}
-
-textarea.trackComment {
-	width: 618px;
-	margin-right:15px;
-}
