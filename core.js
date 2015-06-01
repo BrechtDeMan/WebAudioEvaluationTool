@@ -203,6 +203,9 @@ function stateMachine()
 			for (var id=0; id<this.stateMap.length; id++){
 				var name = this.stateMap[id].nodeName;
 				var obj = document.createElement(name);
+				if (name == "audioHolder") {
+					obj.id = this.stateMap[id].id;
+				}
 				this.stateResults.push(obj);
 			}
 		} else {
