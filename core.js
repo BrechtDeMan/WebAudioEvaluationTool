@@ -108,9 +108,10 @@ function interfacePopup() {
 			this.popupContent.appendChild(span);
 			this.popupContent.appendChild(br);
 			this.popupContent.appendChild(textArea);
+			this.popupContent.childNodes[2].focus();
 		}
 		this.popupContent.appendChild(this.popupButton);
-	}
+	};
 	
 	this.initState = function(node) {
 		//Call this with your preTest and postTest nodes when needed to
@@ -129,7 +130,7 @@ function interfacePopup() {
 			this.showPopup();
 			this.postNode();
 		}
-	}
+	};
 	
 	this.buttonClicked = function() {
 		// Each time the popup button is clicked!
@@ -170,7 +171,7 @@ function interfacePopup() {
 			}
 			advanceState();
 		}
-	}
+	};
 }
 
 function advanceState()
