@@ -24,16 +24,74 @@
 				
 			};
 			
-			function attributePair(string, type){
+			function attributePair(string, type, mandatory){
 				var id = document.createElement("span");
 				id.textContent = string;
 				var input = document.createElement("input");
 				input.type = type;
+				if (type == 'text') {
+					if (mandatory == true) {
+						input.setAttribute('mandatory','true');
+					}
+					else {
+						input.setAttribute('mandatory','false');
+					}
+				}
 				return [id, input];
 			}
 			
 			function removeNode(event) {
 				event.srcElement.parentElement.parentElement.removeChild(event.srcElement.parentElement);
+			}
+			
+			function buttonClickedValidate() {
+				var ready = validate();
+				if (ready == false) {
+					var errMsg = document.getElementById('errorMessage');
+					errMsg.textContent = "There were some errors with your XML. Any input boxes highlighted in red are invalid because they are empty. Please fill these in correctly. Any boxes which are yellow are not-invalid but will use the default value.";
+					errMsg.style.visibility = 'visible';
+					document.getElementById('createXML').disabled = true;
+					
+				} else {
+					var errMsg = document.getElementById('errorMessage');
+					errMsg.textContent = "";
+					errMsg.style.visiblity = 'hidden';
+					document.getElementById('createXML').disabled = false;
+				}
+			}
+			
+			function validate() {
+				var canExport = true;
+				// Checks if the XML can be created from the given entries
+				var inputs = document.getElementsByTagName('input');
+				for (var i=0; i<inputs.length; i++) {
+					if (inputs[i].type == 'text') {
+						if (inputs[i].value == "") {
+							var mandatory = inputs[i].getAttribute('mandatory');
+							if (mandatory == "true") {
+								errorInput(inputs[i]);
+								canExport = false;
+							} else {
+								warningInput(inputs[i]);
+							}
+						} else {
+							goodInput(inputs[i]);
+						}
+					}
+				}
+				return canExport;
+			};
+			
+			function errorInput(node) {
+				node.style.backgroundColor = "#FF0000";
+			}
+			
+			function warningInput(node) {
+				node.style.backgroundColor = "#FFFF00";
+			}
+			
+			function goodInput(node) {
+				node.style.backgroundColor = "#FFFFFF";
 			}
 			
 			function questionNode() {
@@ -44,8 +102,8 @@
 				nodeTitle.textContent = "Question";
 				var attributes = document.createElement("div");
 				attributes.setAttribute('class','attrib');
-				var id = attributePair("ID:","text");
-				var question = attributePair("Question:","text");
+				var id = attributePair("ID:","text", true);
+				var question = attributePair("Question:","text", false);
 				node.appendChild(nodeTitle);
 				id.forEach(function(item){attributes.appendChild(item);},false);
 				question.forEach(function(item){attributes.appendChild(item);},false);
@@ -61,12 +119,12 @@
 			function statementNode() {
 				var node = document.createElement("div");
 				node.setAttribute('class','head');
-				node.setAttribute('name','question-node');
+				node.setAttribute('name','statement-node');
 				var nodeTitle = document.createElement("span");
 				nodeTitle.textContent = "Statement";
 				var attributes = document.createElement("div");
 				attributes.setAttribute('class','attrib');
-				var statement = attributePair("Statement:","text");
+				var statement = attributePair("Statement:","text",false);
 				node.appendChild(nodeTitle);
 				statement.forEach(function(item){attributes.appendChild(item);},false);
 				node.appendChild(attributes);
@@ -89,10 +147,10 @@
 				
 				var attributes = document.createElement("div");
 				attributes.setAttribute('class','attrib');
-				var id = attributePair("ID:","text");
+				var id = attributePair("ID:","text",true);
 				id[1].value=audioHolderCounts;
-				var hostURL = attributePair("Host URL:", "text");
-				var sampleRate = attributePair("Sample Rate:","text");
+				var hostURL = attributePair("Host URL:", "text",false);
+				var sampleRate = attributePair("Sample Rate:","text",false);
 				var randomiseOrder = attributePair("Randomise Element Order:","checkbox");
 				var repeatCount = attributePair("Repeat Page Count:","number");
 				repeatCount[1].value = 0;
@@ -179,9 +237,9 @@
 				
 				var attributes = document.createElement("div");
 				attributes.setAttribute('class','attrib');
-				var id = attributePair("ID:","text");
+				var id = attributePair("ID:","text",true);
 				id[1].value = audioElemCounts;
-				var url = attributePair("URL:","text");
+				var url = attributePair("URL:","text",true);
 				id.forEach(function(item){attributes.appendChild(item);},false);
 				url.forEach(function(item){attributes.appendChild(item);},false);
 				
@@ -204,8 +262,8 @@
 				
 				var attributes = document.createElement('div');
 				attributes.setAttribute('class','attrib');
-				var id = attributePair("ID:",'text');
-				var question = attributePair("Question:",'text');
+				var id = attributePair("ID:",'text',true);
+				var question = attributePair("Question:",'text',true);
 				id.forEach(function(item){attributes.appendChild(item);},false);
 				question.forEach(function(item){attributes.appendChild(item);},false);
 				
@@ -244,6 +302,9 @@
 
 	<body>
 		<h1>Create Test Setup XML</h1>
+		<button id="validateXML" onclick="buttonClickedValidate();">Validate</button>
+		<button id="createXML" onclick="buttonClickedValidate();" disabled>Submit</button>
+		<span id="errorMessage" visibility="hidden"></span>
 		<div id="topLevelBody" align="left">
 			<!-- Interface goes here -->
 			<div name='test-setup'>
@@ -255,7 +316,7 @@
 							<option value='APE'>APE</option>
 						</select>
 						<span>Project Return</span>
-						<input type="text" id="projectReturn">
+						<input type="text" id="projectReturn" mandatory="false">
 						<span>Randomise Test Page Order</span>
 						<input id="randomisePageOrder" type="checkbox" value="false">
 						<span>Collect Session Metrics</span>
