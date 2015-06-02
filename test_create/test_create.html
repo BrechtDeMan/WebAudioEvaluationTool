@@ -48,7 +48,7 @@
 				var ready = validate();
 				if (ready == false) {
 					var errMsg = document.getElementById('errorMessage');
-					errMsg.textContent = "There were some errors with your XML. Any input boxes highlighted in red are invalid because they are empty. Please fill these in correctly. Any boxes which are yellow are not-invalid but will use the default value.";
+					errMsg.textContent = "There were some errors with your XML. Any input boxes highlighted in red are invalid because they are empty or because its ID matches another elements ID. Please fill these in correctly. Any boxes which are yellow are not-invalid but will use the default value.";
 					errMsg.style.visibility = 'visible';
 					document.getElementById('createXML').disabled = true;
 					
@@ -57,6 +57,57 @@
 					errMsg.textContent = "";
 					errMsg.style.visiblity = 'hidden';
 					document.getElementById('createXML').disabled = false;
+				}
+			}
+			
+			function buttonClickedSubmit() {
+				var ready = validate();
+				if (ready == true) {
+					var xmlDoc = document.createElement('BrowserEvalProjectDocument');
+					var setup = document.createElement('setup');
+					setup.setAttribute('interface',document.getElementById('interface').value);
+					if (document.getElementById('projectReturn').value == "") {
+						setup.setAttribute('projectReturn',"null");
+					} else {
+						setup.setAttribute('projectReturn',document.getElementById('projectReturn').value);
+					}
+					setup.setAttribute('randomiseOrder',document.getElementById('randomisePageOrder').checked);
+					setup.setAttribute('collectMetrics',document.getElementById('collectMetrics').checked);
+					
+					var globalPreTest = document.createElement('preTest');
+					var options = document.getElementById('globalPreTest').getElementsByClassName('head');
+					constructPrePost(globalPreTest, options);
+					
+					var globalPostTest = document.createElement('postTest');
+					options = document.getElementById('globalPostTest').getElementsByClassName('head');
+					constructPrePost(globalPostTest, options);
+					
+					var globalMetrics = document.createElement('metric');
+					options = document.getElementById('globalMetric').getElementsByClassName('attrib')[0].getElementsByTagName('input');
+					for (var i=0; i<options.length; i++) {
+						if (options[i].checked) {
+							var metric = document.createElement('metricEnable');
+							metric.textContent = options[i].id;
+							globalMetrics.appendChild(metric);
+						}
+					}
+					
+				}
+			}
+			
+			function constructPrePost(parent, options) {
+				for (var i=0; i<options.length; i++) {
+					var elem = options[i];
+					var attributes = elem.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+					if (elem.getAttribute('name') == 'question-node') {
+						var node = document.createElement('question');
+						node.setAttribute('id',attributes[0].value);
+						node.textContent = attributes[1].value;
+					} else if (elem.getAttribute('name') == 'statement-node') {
+						var node = document.createElement('statment');
+						node.textContent = attributes[0].value;
+					}
+					parent.appendChild(node);
 				}
 			}
 			
@@ -76,6 +127,33 @@
 							}
 						} else {
 							goodInput(inputs[i]);
+						}
+					}
+				}
+				
+				var audioHolders = document.getElementsByName('audio-holder');
+				for (var i=0; i<audioHolders.length; i++) {
+					var divs = audioHolders[i].getElementsByClassName('head');
+					var IDs = [];
+					for (var j=0; j<divs.length; j++) {
+						if (divs[j].getAttribute('name') == 'audio-element') {
+							var obj = divs[j].getElementsByClassName('attrib')[0].children[1];
+							var aeID = obj.value;
+							if (aeID != "") {
+								var unique = true;
+								for (var k=0; k<IDs.length; k++) {
+									if (aeID == IDs[k]) {
+										unique = false;
+										break;
+									}
+								}
+								if (unique == true) {
+									IDs.push(aeID);
+								} else {
+									errorInput(obj);
+									canExport = false;
+								}
+							}
 						}
 					}
 				}
@@ -344,7 +422,7 @@
 							<span>Element Tracker</span>
 							<input type="checkbox" id="elementTracker" />
 							<span>Element Flag Listened To</span>
-							<input type="checkbox" id="elementFlagListened" />
+							<input type="checkbox" id="elementFlagListenedTo" />
 							<span>Element Flag Moved</span>
 							<input type="checkbox" id="elementFlagMoved" />
 						</div>
