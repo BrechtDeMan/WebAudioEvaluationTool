@@ -95,7 +95,7 @@ function loadInterface(xmlDoc) {
 		case 'elementListenTracker':
 			sessionMetrics.prototype.enableElementListenTracker = true;
 			break;
-		case 'elementInitalPosition':
+		case 'elementInitialPosition':
 			sessionMetrics.prototype.enableElementInitialPosition = true;
 			break;
 		case 'elementFlagListenedTo':
