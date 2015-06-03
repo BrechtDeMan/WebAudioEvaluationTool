@@ -185,8 +185,9 @@
 						var node = document.createElement('question');
 						node.setAttribute('id',attributes[0].value);
 						node.textContent = attributes[1].value;
+						node.setAttribute('mandatory',attributes[2].checked);
 					} else if (elem.getAttribute('name') == 'statement-node') {
-						var node = document.createElement('statment');
+						var node = document.createElement('statement');
 						node.textContent = attributes[0].value;
 					}
 					parent.appendChild(node);
@@ -264,9 +265,12 @@
 				attributes.setAttribute('class','attrib');
 				var id = attributePair("ID:","text", true);
 				var question = attributePair("Question:","text", false);
+				question[1].style.width = "500px";
+				var mandatory = attributePair("Mandatory:","checkbox", false);
 				node.appendChild(nodeTitle);
 				id.forEach(function(item){attributes.appendChild(item);},false);
 				question.forEach(function(item){attributes.appendChild(item);},false);
+				mandatory.forEach(function(item){attributes.appendChild(item);},false);
 				node.appendChild(attributes);
 				
 				var removeButton = document.createElement("button");
@@ -285,6 +289,7 @@
 				var attributes = document.createElement("div");
 				attributes.setAttribute('class','attrib');
 				var statement = attributePair("Statement:","text",false);
+				statement[1].style.width = "500px";
 				node.appendChild(nodeTitle);
 				statement.forEach(function(item){attributes.appendChild(item);},false);
 				node.appendChild(attributes);
@@ -383,22 +388,15 @@
 			}
 			
 			function audioElementNode() {
-				var parentStructure = event.srcElement.parentElement.childNodes;
-				var audioElemCounts = 0;
-				for (var i=0; i<parentStructure.length; i++) {
-					if (parentStructure[i].getAttribute('name') == "audio-element")
-					{audioElemCounts++;}
-				}
 				var node = document.createElement('div');
 				node.setAttribute('class','head');
 				node.setAttribute('name','audio-element');
 				var nodeTitle = document.createElement('span');
-				nodeTitle.textContent = 'Audio Element '+(audioElemCounts+1);
+				nodeTitle.textContent = 'Audio Element';
 				
 				var attributes = document.createElement("div");
 				attributes.setAttribute('class','attrib');
 				var id = attributePair("ID:","text",true);
-				id[1].value = audioElemCounts;
 				var url = attributePair("URL:","text",true);
 				id.forEach(function(item){attributes.appendChild(item);},false);
 				url.forEach(function(item){attributes.appendChild(item);},false);
@@ -424,6 +422,7 @@
 				attributes.setAttribute('class','attrib');
 				var id = attributePair("ID:",'text',true);
 				var question = attributePair("Question:",'text',true);
+				question[1].style.width = "500px";
 				id.forEach(function(item){attributes.appendChild(item);},false);
 				question.forEach(function(item){attributes.appendChild(item);},false);
 				
@@ -460,14 +459,139 @@
 				
 				// Uses HTML5 FileAPI - https://w3c.github.io/FileAPI/#filereader-interface
 				var reader = new FileReader();
+				reader.onload = function() {
+					var parse = new DOMParser();
+					var xml = parse.parseFromString(reader.result,'text/xml');
+					importXML(xml);
+				};
 				reader.readAsText(file);
-				var parse = new DOMParser();
-				var xml = parse.parseFromString(reader.result,'text/xml');
-				importXML(xml);
+				
 			}
+			var g_XML;
 			
 			function importXML(xml) {
-				console.log(xml);
+				g_XML = xml;
+				
+				var root = xml.getElementsByTagName('BrowserEvalProjectDocument')[0];
+				var setup = xml.getElementsByTagName('setup')[0];
+				document.getElementById('interface').value = setup.getAttribute('interface');
+				document.getElementById('projectReturn').value = setup.getAttribute('projectReturn');
+				document.getElementById('randomisePageOrder').checked = setup.getAttribute('randomiseOrder');
+				document.getElementById('collectMetrics').checked = setup.getAttribute('collectMetrics');
+				
+				var globalPreTest = setup.getElementsByTagName('PreTest')[0];
+				var globalPostTest = setup.getElementsByTagName('PostTest')[0];
+				for (var i=0; i<globalPreTest.childElementCount; i++) {
+					var child = globalPreTest.children[i];
+					var node;
+					if (child.nodeName == "question") {
+						node = questionNode();
+						var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						attribs[0].value = child.id;
+						attribs[1].value = child.textContent;
+						attribs[2].checked = child.getAttribute('mandatory');
+					} else if (child.nodeName == "statement") {
+						node = statementNode();
+						var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						attribs[0].value = child.textContent;
+					}
+					document.getElementById('globalPreTest').appendChild(node);
+				}
+				
+				for (var i=0; i<globalPostTest.childElementCount; i++) {
+					var child = globalPostTest.children[i];
+					var node;
+					if (child.nodeName == "question") {
+						node = questionNode();
+						var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						attribs[0].value = child.id;
+						attribs[1].value = child.textContent;
+						attribs[2].checked = child.getAttribute('mandatory');
+					} else if (child.nodeName == "statement") {
+						node = statementNode();
+						var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						attribs[0].value = child.textContent;
+					}
+					document.getElementById('globalPostTest').appendChild(node);
+				}
+				
+				var audioHolders = root.getElementsByTagName('audioHolder');
+				for (var i=0; i<audioHolders.length; i++) {
+					var audioHolderDOM = audioHolderNode();
+					var attribs = audioHolderDOM.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+					attribs[0].value = audioHolders[i].id;
+					attribs[1].value = audioHolders[i].getAttribute('sampleRate');
+					attribs[2].value = audioHolders[i].getAttribute('hostURL');
+					attribs[3].checked = audioHolders[i].getAttribute('randomiseOrder');
+					attribs[4].value = audioHolders[i].getAttribute('repeatCount');
+					attribs[5].checked = audioHolders[i].getAttribute('loop');
+					attribs[6].checked = audioHolders[i].getAttribute('elementComments');
+					
+					var PreTest = audioHolders[i].getElementsByTagName('PreTest');
+					var PostTest = audioHolders[i].getElementsByTagName('PostTest');
+					if (PreTest.length != 0) {
+						PreTest = PreTest[0];
+						for (var j=0; j<PreTest.childElementCount; j++) {
+							var child = PreTest.children[j];
+							var node;
+							if (child.nodeName == "question") {
+								node = questionNode();
+								var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+								attribs[0].value = child.id;
+								attribs[1].value = child.textContent;
+								attribs[2].checked = child.getAttribute('mandatory');
+							} else if (child.nodeName == "statement") {
+								node = statementNode();
+								var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+								attribs[0].value = child.textContent;
+							}
+							audioHolderDOM.children[2].appendChild(node);
+						}
+					}
+					if (PostTest.length != 0) {
+						PostTest = PostTest[0];
+						for (var j=0; j<PostTest.childElementCount; j++) {
+							var child = PostTest.children[j];
+							var node;
+							if (child.nodeName == "question") {
+								node = questionNode();
+								var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+								attribs[0].value = child.id;
+								attribs[1].value = child.textContent;
+								attribs[2].checked = child.getAttribute('mandatory');
+							} else if (child.nodeName == "statement") {
+								node = statementNode();
+								var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+								attribs[0].value = child.textContent;
+							}
+							audioHolderDOM.children[3].appendChild(node);
+						}
+					}
+					
+					// Process audio-element
+					var audioElements = audioHolders[i].getElementsByTagName('audioElements');
+					for (var j=0; j<audioElements.length; j++) {
+						var node = audioElementNode();
+						var child = audioElements[j];
+						var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						attribs[0].value = child.id;
+						attribs[1].value = child.getAttribute('url');
+						audioHolderDOM.appendChild(node);
+					}
+					
+					// Process comment-question
+					var commentQuestion = audioHolders[0].getElementsByTagName('CommentQuestion');
+					for (var j=0; j<commentQuestion.length; j++) {
+						var node = commentBox();
+						var child = commentQuestion[j];
+						var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						attribs[0].value = child.id;
+						attribs[1].value = child.textContent;
+						audioHolderDOM.appendChild(node);
+					}
+					
+					document.getElementById('setup').appendChild(audioHolderDOM);
+				}
 			}
 		</script>
 		<style>
