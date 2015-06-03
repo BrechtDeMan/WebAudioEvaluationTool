@@ -22,6 +22,12 @@
 				var setup = document.createElement('div');
 				setup.id = 'setupTagDiv';
 				
+				// Setup drag/drop handles
+				var dropBody = document.getElementById('dragFile');
+				dropBody.addEventListener('dragover', handleDragOver, false);
+				dropBody.addEventListener('dragenter',handleDragEnter,false);
+				dropBody.addEventListener('dragleave',handleDragLeave,false);
+				dropBody.addEventListener('drop', handleDrop,false);
 			};
 			
 			function attributePair(string, type, mandatory){
@@ -430,6 +436,39 @@
 				node.appendChild(removeButton);
 				return node;
 			}
+			
+			
+			function handleDragOver(e) {
+				e.stopPropagation();
+				e.preventDefault();
+			}
+			function handleDragEnter(e) {
+				e.stopPropagation();
+				e.preventDefault();
+				this.style.backgroundColor = '#AAFFAA';
+			}
+			function handleDragLeave(e) {
+				e.stopPropagation();
+				e.preventDefault();
+				this.style.backgroundColor = "#FFFFFF";
+			}
+			function handleDrop(e) {
+				e.stopPropagation();
+				e.preventDefault();
+				
+				var file = e.dataTransfer.files[0];
+				
+				// Uses HTML5 FileAPI - https://w3c.github.io/FileAPI/#filereader-interface
+				var reader = new FileReader();
+				reader.readAsText(file);
+				var parse = new DOMParser();
+				var xml = parse.parseFromString(reader.result,'text/xml');
+				importXML(xml);
+			}
+			
+			function importXML(xml) {
+				console.log(xml);
+			}
 		</script>
 		<style>
 			div {
@@ -450,12 +489,21 @@
 				border-style: dashed;
 				margin-bottom: 10px;
 			}
+			div#dragFile{
+				height:100px;
+				border-width: 2px;
+				border-style: dashed;
+				margin-bottom: 10px;
+			}
 		</style>
 		
 	</head>
 
 	<body>
 		<h1>Create Test Setup XML</h1>
+		<div id="dragFile">
+			<span>Drag and Drop an XML specification file here to auto-load.</span>
+		</div>
 		<button id="validateXML" onclick="buttonClickedValidate();">Validate</button>
 		<button id="createXML" onclick="buttonClickedSubmit();" disabled>Submit</button>
 		<span id="errorMessage" visibility="hidden"></span>
