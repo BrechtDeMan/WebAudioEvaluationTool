@@ -562,6 +562,27 @@ function audioObject(id) {
 			this.metric.stopListening(audioEngineContext.timer.getTestTime());
 		}
 	};
+	
+	this.getCurrentPosition = function() {
+		var time = audioEngineContext.timer.getTestTime();
+		if (this.bufferNode != undefined) {
+			if (this.bufferNode.loop == true) {
+				if (audioEngineContext.status  == 1) {
+					return time%this.buffer.duration;
+				} else {
+					return 0;
+				}
+			} else {
+				if (this.metric.listenHold) {
+					return time - this.metric.listenStart;
+				} else {
+					return 0;
+				}
+			}
+		} else {
+			return 0;
+		}
+	};
 
 	this.constructTrack = function(url) {
 		var request = new XMLHttpRequest();
@@ -658,6 +679,7 @@ function metricTracker(caller)
 	this.listenHold = false;
 	this.initialPosition = -1;
 	this.movementTracker = [];
+	this.listenTracker =[];
 	this.wasListenedTo = false;
 	this.wasMoved = false;
 	this.hasComments = false;
@@ -683,6 +705,16 @@ function metricTracker(caller)
 			this.wasListenedTo = true;
 			this.listenStart = time;
 			this.listenHold = true;
+			
+			var evnt = document.createElement('event');
+			var testTime = document.createElement('testTime');
+			testTime.setAttribute('start',time);
+			var bufferTime = document.createElement('bufferTime');
+			bufferTime.setAttribute('start',this.parent.getCurrentPosition());
+			evnt.appendChild(testTime);
+			evnt.appendChild(bufferTime);
+			this.listenTracker.push(evnt);
+			
 			console.log('slider ' + this.parent.id + ' played (' + time + ')'); // DEBUG/SAFETY: show played slider id
 		}
 	};
@@ -691,9 +723,17 @@ function metricTracker(caller)
 	{
 		if (this.listenHold == true)
 		{
-			this.listenedTimer += (time - this.listenStart);
+			var diff = time - this.listenStart;
+			this.listenedTimer += (diff);
 			this.listenStart = 0;
 			this.listenHold = false;
+			
+			var evnt = this.listenTracker[this.listenTracker.length-1];
+			var testTime = evnt.getElementsByTagName('testTime')[0];
+			var bufferTime = evnt.getElementsByTagName('bufferTime')[0];
+			testTime.setAttribute('stop',time);
+			bufferTime.setAttribute('stop',this.parent.getCurrentPosition());
+			console.log('slider ' + this.parent.id + ' played for (' + diff + ')'); // DEBUG/SAFETY: show played slider id
 		}
 	};
 }

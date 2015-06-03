@@ -92,6 +92,9 @@ function loadInterface(xmlDoc) {
 		case 'elementTracker':
 			sessionMetrics.prototype.enableElementTracker = true;
 			break;
+		case 'elementListenTracker':
+			sessionMetrics.prototype.enableElementListenTracker = true;
+			break;
 		case 'elementInitalPosition':
 			sessionMetrics.prototype.enableElementInitialPosition = true;
 			break;
@@ -672,6 +675,15 @@ function pageXMLSave(store, testXML, testId)
 				elementTrackerFull.appendChild(timePos);
 			}
 			metric.appendChild(elementTrackerFull);
+		}
+		if (audioEngineContext.metric.enableElementListenTracker) {
+			var elementListenTracker = document.createElement('metricResult');
+			elementListenTracker.id = 'elementListenTracker';
+			var obj = elementMetric.listenTracker;
+			for (var k=0; k<obj.length; k++) {
+				elementListenTracker.appendChild(obj[k]);
+			}
+			metric.appendChild(elementListenTracker);
 		}
 		if (audioEngineContext.metric.enableElementInitialPosition) {
 			var elementInitial = document.createElement('metricResult');
