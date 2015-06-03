@@ -515,6 +515,14 @@
 					document.getElementById('globalPostTest').appendChild(node);
 				}
 				
+				// Metric Enable Flags
+				var mEnable = setup.getElementsByTagName('Metric')[0].getElementsByTagName('metricEnable');
+				for (var i=0; i<mEnable.length; i++) {
+					var node = mEnable[i];
+					var enabled = node.textContent;
+					document.getElementById(enabled).checked = true;
+				}
+				
 				var audioHolders = root.getElementsByTagName('audioHolder');
 				for (var i=0; i<audioHolders.length; i++) {
 					var audioHolderDOM = audioHolderNode();
@@ -669,6 +677,8 @@
 							<input type="checkbox" id="elementInitialPosition" />
 							<span>Element Tracker</span>
 							<input type="checkbox" id="elementTracker" />
+							<span>Element Listen Tracker</span>
+							<input type="checkbox" id="elementListenTracker" />
 							<span>Element Flag Listened To</span>
 							<input type="checkbox" id="elementFlagListenedTo" />
 							<span>Element Flag Moved</span>
