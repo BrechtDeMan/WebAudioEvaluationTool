@@ -63,92 +63,112 @@
 			function buttonClickedSubmit() {
 				var ready = validate();
 				if (ready == true) {
-					var xmlDoc = document.createElement('BrowserEvalProjectDocument');
-					var setup = document.createElement('setup');
-					setup.setAttribute('interface',document.getElementById('interface').value);
-					if (document.getElementById('projectReturn').value == "") {
-						setup.setAttribute('projectReturn',"null");
-					} else {
-						setup.setAttribute('projectReturn',document.getElementById('projectReturn').value);
-					}
-					setup.setAttribute('randomiseOrder',document.getElementById('randomisePageOrder').checked);
-					setup.setAttribute('collectMetrics',document.getElementById('collectMetrics').checked);
-					
-					var globalPreTest = document.createElement('preTest');
-					var options = document.getElementById('globalPreTest').getElementsByClassName('head');
-					constructPrePost(globalPreTest, options);
-					
-					var globalPostTest = document.createElement('postTest');
-					options = document.getElementById('globalPostTest').getElementsByClassName('head');
-					constructPrePost(globalPostTest, options);
-					
-					var globalMetrics = document.createElement('metric');
-					options = document.getElementById('globalMetric').getElementsByClassName('attrib')[0].getElementsByTagName('input');
-					for (var i=0; i<options.length; i++) {
-						if (options[i].checked) {
-							var metric = document.createElement('metricEnable');
-							metric.textContent = options[i].id;
-							globalMetrics.appendChild(metric);
-						}
-					}
-					setup.appendChild(globalPreTest);
-					setup.appendChild(globalPostTest);
-					setup.appendChild(globalMetrics);
-					xmlDoc.appendChild(setup);
-					
-					var audioHolders = document.getElementsByName('audio-holder');
-					for (var i=0; i<audioHolders.length; i++) {
-						var audioHolder = document.createElement('audioHolder');
-						var audioHolderDOM = audioHolders[i];
-						var attribs = audioHolderDOM.getElementsByClassName('attrib')[0].getElementsByTagName('input');
-						audioHolder.id = attribs[0].value;
-						if (attribs[1].value != "") {audioHolder.setAttribute('sampleRate',attribs[1].value);}
-						if (attribs[2].value != "") {audioHolder.setAttribute('hostURL',attribs[2].value);}
-						audioHolder.setAttribute('randomiseOrder',attribs[3].checked);
-						audioHolder.setAttribute('repeatCount',attribs[4].checked);
-						audioHolder.setAttribute('loop',attribs[5].checked);
-						audioHolder.setAttribute('elementComments',attribs[6].checked);
-						
-						// Audio-Holder PreTests
-						var audioHolderPreTest = document.createElement('preTest');
-						var audioHolderPostTest = document.createElement('postTest');
-						options = audioHolderDOM.childNodes[2].getElementsByClassName('head');
-						constructPrePost(audioHolderPreTest, options);
-						options = audioHolderDOM.childNodes[3].getElementsByClassName('head');
-						constructPrePost(audioHolderPostTest, options);
-						
-						audioHolder.appendChild(audioHolderPreTest);
-						audioHolder.appendChild(audioHolderPostTest);
-						
-						// audio-Elements
-						var audioElementsDOM = [];
-						var commentQuestionDOM = [];
-						for (var j=0; j<audioHolderDOM.childElementCount; j++) {
-							var child = audioHolderDOM.childNodes[j];
-							var name = child.getAttribute('name');
-							if (name == 'audio-element') {audioElementsDOM.push(child);}
-							else if (name == 'comment-question') {commentQuestionDOM.push(child);}
-						}
-						
-						for (var j=0; j<audioElementsDOM.length; j++) {
-							var audioElement = document.createElement('audioElement');
-							attribs = audioElementsDOM[j].getElementsByClassName('attrib')[0].getElementsByTagName('input');
-							audioElement.id = attribs[0].value;
-							audioElement.setAttribute('url',attribs[1].value);
-							audioHolder.appendChild(audioElement);
-						}
-						
-						for (var j=0; j<commentQuestionDOM.length; j++) {
-							var commentQuestion = document.createElement('commentQuestion');
-							attribs = commentQuestionDOM[j].getElementsByClassName('attrib')[0].getElementsByTagName('input');
-							commentQuestion.id = attribs[0].value;
-							commentQuestion.textContent = attribs[1].value;
-							audioHolder.appendChild(commentQuestion);
-						}
-						xmlDoc.appendChild(audioHolder);
-					}
-					return xmlDoc;
+					var xmlDoc = buildXML();
+					var inject = document.getElementById('errorMessage');
+					createProjectSave(xmlDoc, inject);
 				}
+			}
+			
+			function createProjectSave(xmlDoc, injectPoint) {
+				var parent = document.createElement("div");
+				parent.appendChild(xmlDoc);
+				var file = [parent.innerHTML];
+				var bb = new Blob(file,{type : 'application/xml'});
+				var dnlk = window.URL.createObjectURL(bb);
+				var a = document.createElement("a");
+				a.hidden = '';
+				a.href = dnlk;
+				a.download = "save.xml";
+				a.textContent = "Save File";
+				injectPoint.appendChild(a);
+			}
+			
+			function buildXML() {
+				var xmlDoc = document.createElement('BrowserEvalProjectDocument');
+				var setup = document.createElement('setup');
+				setup.setAttribute('interface',document.getElementById('interface').value);
+				if (document.getElementById('projectReturn').value == "") {
+					setup.setAttribute('projectReturn',"null");
+				} else {
+					setup.setAttribute('projectReturn',document.getElementById('projectReturn').value);
+				}
+				setup.setAttribute('randomiseOrder',document.getElementById('randomisePageOrder').checked);
+				setup.setAttribute('collectMetrics',document.getElementById('collectMetrics').checked);
+				
+				var globalPreTest = document.createElement('preTest');
+				var options = document.getElementById('globalPreTest').getElementsByClassName('head');
+				constructPrePost(globalPreTest, options);
+				
+				var globalPostTest = document.createElement('postTest');
+				options = document.getElementById('globalPostTest').getElementsByClassName('head');
+				constructPrePost(globalPostTest, options);
+				
+				var globalMetrics = document.createElement('metric');
+				options = document.getElementById('globalMetric').getElementsByClassName('attrib')[0].getElementsByTagName('input');
+				for (var i=0; i<options.length; i++) {
+					if (options[i].checked) {
+						var metric = document.createElement('metricEnable');
+						metric.textContent = options[i].id;
+						globalMetrics.appendChild(metric);
+					}
+				}
+				setup.appendChild(globalPreTest);
+				setup.appendChild(globalPostTest);
+				setup.appendChild(globalMetrics);
+				xmlDoc.appendChild(setup);
+				
+				var audioHolders = document.getElementsByName('audio-holder');
+				for (var i=0; i<audioHolders.length; i++) {
+					var audioHolder = document.createElement('audioHolder');
+					var audioHolderDOM = audioHolders[i];
+					var attribs = audioHolderDOM.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+					audioHolder.id = attribs[0].value;
+					if (attribs[1].value != "") {audioHolder.setAttribute('sampleRate',attribs[1].value);}
+					if (attribs[2].value != "") {audioHolder.setAttribute('hostURL',attribs[2].value);}
+					audioHolder.setAttribute('randomiseOrder',attribs[3].checked);
+					audioHolder.setAttribute('repeatCount',attribs[4].checked);
+					audioHolder.setAttribute('loop',attribs[5].checked);
+					audioHolder.setAttribute('elementComments',attribs[6].checked);
+					
+					// Audio-Holder PreTests
+					var audioHolderPreTest = document.createElement('preTest');
+					var audioHolderPostTest = document.createElement('postTest');
+					options = audioHolderDOM.childNodes[2].getElementsByClassName('head');
+					constructPrePost(audioHolderPreTest, options);
+					options = audioHolderDOM.childNodes[3].getElementsByClassName('head');
+					constructPrePost(audioHolderPostTest, options);
+					
+					audioHolder.appendChild(audioHolderPreTest);
+					audioHolder.appendChild(audioHolderPostTest);
+					
+					// audio-Elements
+					var audioElementsDOM = [];
+					var commentQuestionDOM = [];
+					for (var j=0; j<audioHolderDOM.childElementCount; j++) {
+						var child = audioHolderDOM.childNodes[j];
+						var name = child.getAttribute('name');
+						if (name == 'audio-element') {audioElementsDOM.push(child);}
+						else if (name == 'comment-question') {commentQuestionDOM.push(child);}
+					}
+					
+					for (var j=0; j<audioElementsDOM.length; j++) {
+						var audioElement = document.createElement('audioElement');
+						attribs = audioElementsDOM[j].getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						audioElement.id = attribs[0].value;
+						audioElement.setAttribute('url',attribs[1].value);
+						audioHolder.appendChild(audioElement);
+					}
+					
+					for (var j=0; j<commentQuestionDOM.length; j++) {
+						var commentQuestion = document.createElement('commentQuestion');
+						attribs = commentQuestionDOM[j].getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						commentQuestion.id = attribs[0].value;
+						commentQuestion.textContent = attribs[1].value;
+						audioHolder.appendChild(commentQuestion);
+					}
+					xmlDoc.appendChild(audioHolder);
+				}
+				return xmlDoc;
 			}
 			
 			function constructPrePost(parent, options) {
@@ -437,7 +457,7 @@
 	<body>
 		<h1>Create Test Setup XML</h1>
 		<button id="validateXML" onclick="buttonClickedValidate();">Validate</button>
-		<button id="createXML" onclick="buttonClickedValidate();" disabled>Submit</button>
+		<button id="createXML" onclick="buttonClickedSubmit();" disabled>Submit</button>
 		<span id="errorMessage" visibility="hidden"></span>
 		<div id="topLevelBody" align="left">
 			<!-- Interface goes here -->
