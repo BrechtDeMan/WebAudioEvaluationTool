@@ -8,6 +8,7 @@
 /* create the web audio API context and store in audioContext*/
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
+var specification;
 var popup; // Hold the interfacePopup object
 var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
@@ -35,6 +36,9 @@ window.onload = function() {
 	
 	// Create the popup interface object
 	popup = new interfacePopup();
+	
+	// Create the specification object
+	specification = new Specification();
 };
 
 function interfacePopup() {
@@ -45,6 +49,7 @@ function interfacePopup() {
 	this.popupOptions = null;
 	this.currentIndex = null;
 	this.responses = null;
+	
 	this.createPopup = function(){
 		// Create popup window interface
 		var insertPoint = document.getElementById("topLevelBody");
@@ -68,12 +73,16 @@ function interfacePopup() {
 		this.popupButton.className = 'popupButton';
 		this.popupButton.innerHTML = 'Next';
 		this.popupButton.onclick = function(){popup.buttonClicked();};
+		this.popup.style.zIndex = -1;
+		this.popup.style.visibility = 'hidden';
+		blank.style.zIndex = -2;
+		blank.style.visibility = 'hidden';
 		insertPoint.appendChild(this.popup);
 		insertPoint.appendChild(blank);
 	};
 	
 	this.showPopup = function(){
-		if (this.popup == null || this.popup == undefined) {
+		if (this.popup == null) {
 			this.createPopup();
 		}
 		this.popup.style.zIndex = 3;
@@ -95,13 +104,13 @@ function interfacePopup() {
 		// This will take the node from the popupOptions and display it
 		var node = this.popupOptions[this.currentIndex];
 		this.popupContent.innerHTML = null;
-		if (node.nodeName == 'statement') {
+		if (node.type == 'statement') {
 			var span = document.createElement('span');
-			span.textContent = node.textContent;
+			span.textContent = node.statement;
 			this.popupContent.appendChild(span);
-		} else if (node.nodeName == 'question') {
+		} else if (node.type == 'question') {
 			var span = document.createElement('span');
-			span.textContent = node.textContent;
+			span.textContent = node.question;
 			var textArea = document.createElement('textarea');
 			var br = document.createElement('br');
 			this.popupContent.appendChild(span);
@@ -115,11 +124,11 @@ function interfacePopup() {
 	this.initState = function(node) {
 		//Call this with your preTest and postTest nodes when needed to
 		// initialise the popup procedure.
-		this.popupOptions = $(node).children();
+		this.popupOptions = node.options;
 		if (this.popupOptions.length > 0) {
-			if (node.nodeName == 'preTest' || node.nodeName == 'PreTest') {
+			if (node.type == 'pretest') {
 				this.responses = document.createElement('PreTest');
-			} else if (node.nodeName == 'postTest' || node.nodeName == 'PostTest') {
+			} else if (node.type == 'posttest') {
 				this.responses = document.createElement('PostTest');
 			} else {
 				console.log ('WARNING - popup node neither pre or post!');
@@ -128,29 +137,24 @@ function interfacePopup() {
 			this.currentIndex = 0;
 			this.showPopup();
 			this.postNode();
+		} else {
+			advanceState();
 		}
 	};
 	
 	this.buttonClicked = function() {
 		// Each time the popup button is clicked!
 		var node = this.popupOptions[this.currentIndex];
-		if (node.nodeName == 'question') {
+		if (node.type == 'question') {
 			// Must extract the question data
-			var mandatory = node.attributes['mandatory'];
-			if (mandatory == undefined) {
-				mandatory = false;
-			} else {
-				if (mandatory.value == 'true'){mandatory = true;}
-				else {mandatory = false;}
-			}
 			var textArea = $(popup.popupContent).find('textarea')[0];
-			if (mandatory == true && textArea.value.length == 0) {
+			if (node.mandatory == true && textArea.value.length == 0) {
 				alert('This question is mandatory');
 				return;
 			} else {
 				// Save the text content
 				var hold = document.createElement('comment');
-				hold.id = node.attributes['id'].value;
+				hold.id = node.id;
 				hold.innerHTML = textArea.value;
 				console.log("Question: "+ node.textContent);
 				console.log("Question Response: "+ textArea.value);
@@ -197,11 +201,8 @@ function stateMachine()
 			this.stateIndex = -1;
 			var that = this;
 			for (var id=0; id<this.stateMap.length; id++){
-				var name = this.stateMap[id].nodeName;
+				var name = this.stateMap[id].type;
 				var obj = document.createElement(name);
-				if (name == "audioHolder") {
-					obj.id = this.stateMap[id].id;
-				}
 				this.stateResults.push(obj);
 			}
 		} else {
@@ -216,7 +217,7 @@ function stateMachine()
 			console.log('Starting test...');
 		}
 		if (this.currentIndex == null){
-			if (this.currentStateMap.nodeName == "audioHolder") {
+			if (this.currentStateMap.type == "audioHolder") {
 				// Save current page
 				this.testPageCompleted(this.stateResults[this.stateIndex],this.currentStateMap,this.currentTestId);
 				this.currentTestId++;
@@ -227,12 +228,12 @@ function stateMachine()
 				createProjectSave(projectReturn);
 			} else {
 				this.currentStateMap = this.stateMap[this.stateIndex];
-				if (this.currentStateMap.nodeName == "audioHolder") {
+				if (this.currentStateMap.type == "audioHolder") {
 					console.log('Loading test page');
 					loadTest(this.currentStateMap);
 					this.initialiseInnerState(this.currentStateMap);
-				} else if (this.currentStateMap.nodeName == "PreTest" || this.currentStateMap.nodeName == "PostTest") {
-					if (this.currentStateMap.childElementCount >= 1) {
+				} else if (this.currentStateMap.type == "pretest" || this.currentStateMap.type == "posttest") {
+					if (this.currentStateMap.options.length >= 1) {
 						popup.initState(this.currentStateMap);
 					} else {
 						this.advanceState();
@@ -250,18 +251,18 @@ function stateMachine()
 		// Function called each time a test page has been completed
 		// Can be used to over-rule default behaviour
 		
-		pageXMLSave(store, testXML, testId);
+		pageXMLSave(store, testXML);
 	};
 	
-	this.initialiseInnerState = function(testXML) {
+	this.initialiseInnerState = function(node) {
 		// Parses the received testXML for pre and post test options
 		this.currentStateMap = [];
-		var preTest = $(testXML).find('PreTest')[0];
-		var postTest = $(testXML).find('PostTest')[0];
+		var preTest = node.preTest;
+		var postTest = node.postTest;
 		if (preTest == undefined) {preTest = document.createElement("preTest");}
 		if (postTest == undefined){postTest= document.createElement("postTest");}
 		this.currentStateMap.push(preTest);
-		this.currentStateMap.push(testXML);
+		this.currentStateMap.push(node);
 		this.currentStateMap.push(postTest);
 		this.currentIndex = -1;
 		this.advanceInnerState();
@@ -274,11 +275,11 @@ function stateMachine()
 			this.currentStateMap = this.stateMap[this.stateIndex];
 			this.advanceState();
 		} else {
-			if (this.currentStateMap[this.currentIndex].nodeName == "audioHolder") {
+			if (this.currentStateMap[this.currentIndex].type == "audioHolder") {
 				console.log("Loading test page"+this.currentTestId);
-			} else if (this.currentStateMap[this.currentIndex].nodeName == "PreTest") {
+			} else if (this.currentStateMap[this.currentIndex].type == "pretest") {
 				popup.initState(this.currentStateMap[this.currentIndex]);
-			} else if (this.currentStateMap[this.currentIndex].nodeName == "PostTest") {
+			} else if (this.currentStateMap[this.currentIndex].type == "posttest") {
 				popup.initState(this.currentStateMap[this.currentIndex]);
 			} else {
 				this.advanceInnerState();
@@ -327,61 +328,27 @@ function loadProjectSpecCallback(response) {
 	var parse = new DOMParser();
 	projectXML = parse.parseFromString(response,'text/xml');
 	
-	// Now extract the setup tag
-	var xmlSetup = projectXML.find('setup');
+	// Build the specification
+	specification.decode();
 	
-	
-	// Create pre and post test questions
-	
-	var preTest = xmlSetup.find('PreTest');
-	var postTest = xmlSetup.find('PostTest');
-	preTest = preTest[0];
-	postTest = postTest[0];
-	
-	if (preTest == undefined) {preTest = document.createElement("preTest");}
-	if (postTest == undefined){postTest= document.createElement("postTest");}
-	
-	testState.stateMap.push(preTest);
-	
-	// Extract the different test XML DOM trees
-	var audioHolders = projectXML.find('audioHolder');
-	var testXMLSetups = [];
-	audioHolders.each(function(index,element) {
-		var repeatN = element.attributes['repeatCount'].value;
-		for (var r=0; r<=repeatN; r++) {
-			testXMLSetups.push(element);
-		}
-	});
+	testState.stateMap.push(specification.preTest);
 	 
 	// New check if we need to randomise the test order
-	var randomise = xmlSetup[0].attributes['randomiseOrder'];
-	if (randomise != undefined) {
-		if (randomise.value === 'true'){
-			randomise = true;
-		} else {
-			randomise = false;
-		}
-	} else {
-		randomise = false;
-	}
-	
-	if (randomise)
+	if (specification.randomiseOrder)
 	{
- 		testXMLSetups = randomiseOrder(testXMLSetups);
+ 		specification.audioHolders = randomiseOrder(specification.audioHolders);
 	}
 	
-	$(testXMLSetups).each(function(index,elem){
+	$(specification.audioHolders).each(function(index,elem){
 		testState.stateMap.push(elem);
 	});
 	 
-	 testState.stateMap.push(postTest);
+	 testState.stateMap.push(specification.postTest);
 	 
 	// Obtain the metrics enabled
-	var metricNode = xmlSetup.find('Metric');
-	var metricNode = metricNode.find('metricEnable');
-	metricNode.each(function(index,node){
+	$(specification.metrics).each(function(index,node){
 		var enabled = node.textContent;
-		switch(enabled)
+		switch(node.enabled)
 		{
 		case 'testTimer':
 			sessionMetrics.prototype.enableTestTimer = true;
@@ -413,10 +380,9 @@ function loadProjectSpecCallback(response) {
 	
 	
 	// Detect the interface to use and load the relevant javascripts.
-	var interfaceType = xmlSetup[0].attributes['interface'];
 	var interfaceJS = document.createElement('script');
 	interfaceJS.setAttribute("type","text/javascript");
-	if (interfaceType.value == 'APE') {
+	if (specification.interfaceType == 'APE') {
 		interfaceJS.setAttribute("src","ape.js");
 		
 		// APE comes with a css file
@@ -450,11 +416,9 @@ function createProjectSave(destURL) {
 		a.download = "save.xml";
 		a.textContent = "Save File";
 		
-		var submitDiv = document.getElementById('download-point');
-		submitDiv.appendChild(a);
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
-		popup.popupContent.appendChild(submitDiv)
+		popup.popupContent.appendChild(a)
 	} else {
 		var xmlhttp = new XMLHttpRequest;
 		xmlhttp.open("POST",destURL,true);
@@ -1003,13 +967,13 @@ function Specification() {
 		} else {this.setup.collectMetrics = false;}
 		var metricCollection = setupNode.getElementsByTagName('Metric');
 		
-		this.preTest = new this.prepostNode('pre',setupNode.getElementsByTagName('PreTest'));
-		this.postTest = new this.prepostNode('post',setupNode.getElementsByTagName('PostTest'));
+		this.preTest = new this.prepostNode('pretest',setupNode.getElementsByTagName('PreTest'));
+		this.postTest = new this.prepostNode('posttest',setupNode.getElementsByTagName('PostTest'));
 		
 		if (metricCollection.length > 0) {
 			metricCollection = metricCollection[0].getElementsByTagName('metricEnable');
 			for (var i=0; i<metricCollection.length; i++) {
-				this.metrics.push(new this.metricNode(metricCollection[0].textContent));
+				this.metrics.push(new this.metricNode(metricCollection[i].textContent));
 			}
 		}
 		
@@ -1033,7 +997,7 @@ function Specification() {
 				else {this.mandatory = false;}
 				this.question = child.textContent;
 			} else if (child.nodeName == "statement") {
-				this.statment = child.textContent;
+				this.statement = child.textContent;
 			}
 		};
 		
@@ -1052,6 +1016,7 @@ function Specification() {
 	};
 	
 	this.audioHolderNode = function(parent,xml) {
+		this.type = 'audioHolder';
 		this.interfaceNode = function(DOM) {
 			var title = DOM.getElementsByTagName('title');
 			if (title.length == 0) {this.title = null;}
@@ -1090,8 +1055,8 @@ function Specification() {
 		if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
 		else {this.elementComments = false;}
 		
-		this.preTest = new parent.prepostNode('pre',xml.getElementsByTagName('PreTest'));
-		this.postTest = new parent.prepostNode('post',xml.getElementsByTagName('PostTest'));
+		this.preTest = new parent.prepostNode('pretest',xml.getElementsByTagName('PreTest'));
+		this.postTest = new parent.prepostNode('posttest',xml.getElementsByTagName('PostTest'));
 		
 		this.interfaces = [];
 		var interfaceDOM = xml.getElementsByTagName('interface');
