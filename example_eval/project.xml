@@ -26,6 +26,7 @@
 			<scale position="100">Max</scale>
 			<scale position="50">Middle</scale>
 			<scale position="20">20</scale>
+			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
 		</interface>
 		<audioElements url="0.wav" id="0"/>
 		<audioElements url="1.wav" id="1"/>
@@ -38,7 +39,7 @@
 		<audioElements url="8.wav" id="8"/>
 		<audioElements url="9.wav" id="9"/>
 		<audioElements url="10.wav" id="10"/>-->
-		<CommentQuestion id='mixingExperiance'>What is your mixing experiance</CommentQuestion>
+		<CommentQuestion id='mixingExperience'>What is your mixing experience</CommentQuestion>
 		<!--
 		<PreTest>
 			<statement>Start the Test 3</statement>

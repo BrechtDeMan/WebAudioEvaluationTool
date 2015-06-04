@@ -307,6 +307,13 @@ function loadTest(textXML)
 		scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
 		scaleDOM.setAttributeNode(value);
 	});
+	
+	var commentBoxPrefix = interfaceObj.find('commentBoxPrefix');
+	if (commentBoxPrefix.length != 0) {
+		commentBoxPrefix = commentBoxPrefix[0].textContent;
+	} else {
+		commentBoxPrefix = "Comment on track";
+	}
 
 	// Extract the hostURL attribute. If not set, create an empty string.
 	var hostURL = textXML.attributes['hostURL'];
@@ -413,7 +420,7 @@ function loadTest(textXML)
 			trackComment.id = 'comment-div-'+index;
 			// Create a string next to each comment asking for a comment
 			var trackString = document.createElement('span');
-			trackString.innerHTML = 'Comment on track '+index;
+			trackString.innerHTML = commentBoxPrefix+' '+index;
 			// Create the HTML5 comment box 'textarea'
 			var trackCommentBox = document.createElement('textarea');
 			trackCommentBox.rows = '4';
