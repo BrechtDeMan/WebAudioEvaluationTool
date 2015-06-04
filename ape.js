@@ -177,39 +177,40 @@ function loadTest(audioHolderObject)
 	canvas.innerHTML = null;
 	
 	// Setup question title
-	var interfaceObj = $(audioHolderObject).find('interface');
-	var titleNode = interfaceObj.find('title');
-	if (titleNode[0] != undefined)
-	{
-		document.getElementById('pageTitle').textContent = titleNode[0].textContent;
-	}
-	var positionScale = canvas.style.width.substr(0,canvas.style.width.length-2);
-	var offset = Number(document.getElementById('slider').attributes['marginsize'].value);
-	var scale = document.getElementById('sliderScaleHolder');
-	scale.innerHTML = null;
-	interfaceObj.find('scale').each(function(index,scaleObj){
-		var value = document.createAttribute('value');
-		var position = Number(scaleObj.attributes['position'].value)*0.01;
-		value.nodeValue = position;
-		var pixelPosition = (position*positionScale)+offset;
-		var scaleDOM = document.createElement('span');
-		scaleDOM.textContent = scaleObj.textContent;
-		scale.appendChild(scaleDOM);
-		scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
-		scaleDOM.setAttributeNode(value);
-	});
-	
-	var commentBoxPrefix = interfaceObj.find('commentBoxPrefix');
-	if (commentBoxPrefix.length != 0) {
-		commentBoxPrefix = commentBoxPrefix[0].textContent;
-	} else {
-		commentBoxPrefix = "Comment on track";
+	var interfaceObj = audioHolderObject.interfaces;
+	var commentBoxPrefix = "Comment on track";
+	if (interfaceObj.length != 0) {
+		interfaceObj = interfaceObj[0];
+		var titleNode = interfaceObj.title;
+		if (titleNode != undefined)
+		{
+			document.getElementById('pageTitle').textContent = titleNode;
+		}
+		var positionScale = canvas.style.width.substr(0,canvas.style.width.length-2);
+		var offset = Number(document.getElementById('slider').attributes['marginsize'].value);
+		var scale = document.getElementById('sliderScaleHolder');
+		scale.innerHTML = null;
+		$(interfaceObj.scale).each(function(index,scaleObj){
+			var value = document.createAttribute('value');
+			var position = Number(scaleObj[0])*0.01;
+			value.nodeValue = position;
+			var pixelPosition = (position*positionScale)+offset;
+			var scaleDOM = document.createElement('span');
+			scaleDOM.textContent = scaleObj[1];
+			scale.appendChild(scaleDOM);
+			scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
+			scaleDOM.setAttributeNode(value);
+		});
+		
+		if (interfaceObj.commentBoxPrefix != undefined) {
+			commentBoxPrefix = interfaceObj.commentBoxPrefix;
+		}
 	}
 
 	/// CHECK FOR SAMPLE RATE COMPATIBILITY
 	if (audioHolderObject.sampleRate != undefined) {
 		if (Number(audioHolderObject.sampleRate) != audioContext.sampleRate) {
-			var errStr = 'Sample rates do not match! Requested '+Number(hostFs)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
+			var errStr = 'Sample rates do not match! Requested '+Number(audioHolderObject.sampleRate)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
 			alert(errStr);
 			return;
 		}

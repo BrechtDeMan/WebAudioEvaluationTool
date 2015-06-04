@@ -976,10 +976,10 @@ function Specification() {
 		this.projectReturn = setupNode.getAttribute('projectReturn');
 		if (setupNode.getAttribute('randomiseOrder') == "true") {
 			this.randomiseOrder = true;
-		} else {this.setup.randomiseOrder = false;}
+		} else {this.randomiseOrder = false;}
 		if (setupNode.getAttribute('collectMetrics') == "true") {
 			this.collectMetrics = true;
-		} else {this.setup.collectMetrics = false;}
+		} else {this.collectMetrics = false;}
 		var metricCollection = setupNode.getElementsByTagName('Metric');
 		
 		this.preTest = new this.prepostNode('pretest',setupNode.getElementsByTagName('PreTest'));
