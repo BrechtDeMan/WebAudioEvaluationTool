@@ -20,7 +20,7 @@ function loadInterface() {
 	var height = window.innerHeight;
 	
 	// The injection point into the HTML page
-	var insertPoint = document.getElementById("topLevelBody");
+	interfaceContext.insertPoint = document.getElementById("topLevelBody");
 	var testContent = document.createElement('div');
 	
 	testContent.id = 'testContent';
@@ -157,7 +157,7 @@ function loadInterface() {
 	feedbackHolder.id = 'feedbackHolder';
 	
 	testContent.style.zIndex = 1;
-	insertPoint.innerHTML = null; // Clear the current schema
+	interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
@@ -165,7 +165,7 @@ function loadInterface() {
 	testContent.appendChild(interfaceButtons);
 	testContent.appendChild(sliderBox);
 	testContent.appendChild(feedbackHolder);
-	insertPoint.appendChild(testContent);
+	interfaceContext.insertPoint.appendChild(testContent);
 
 	// Load the full interface
 	testState.initialise();
@@ -278,29 +278,10 @@ function loadTest(audioHolderObject)
 		
 		// Now load each audio sample. First create the new track by passing the full URL
 		var trackURL = audioHolderObject.hostURL + element.url;
-		var audioObject = audioEngineContext.newTrack(trackURL);
+		var audioObject = audioEngineContext.newTrack(element);
 		
 		if (commentShow) {
-			// Create document objects to hold the comment boxes
-			var trackComment = document.createElement('div');
-			trackComment.className = 'comment-div';
-			trackComment.id = 'comment-div-'+index;
-			// Create a string next to each comment asking for a comment
-			var trackString = document.createElement('span');
-			trackString.innerHTML = commentBoxPrefix+' '+index;
-			// Create the HTML5 comment box 'textarea'
-			var trackCommentBox = document.createElement('textarea');
-			trackCommentBox.rows = '4';
-			trackCommentBox.cols = '100';
-			trackCommentBox.name = 'trackComment'+index;
-			trackCommentBox.className = 'trackComment';
-			var br = document.createElement('br');
-			// Add to the holder.
-			trackComment.appendChild(trackString);
-			trackComment.appendChild(br);
-			trackComment.appendChild(trackCommentBox);
-			feedbackHolder.appendChild(trackComment);
-			audioObject.commentDOM = trackComment;
+			var node = interfaceContext.createCommentBox(audioObject);
 		}
 		
 		// Create a slider per track
@@ -354,6 +335,9 @@ function loadTest(audioHolderObject)
 		audioObject.metric.initialised(convSliderPosToRate(index));
         
 	});
+	if (commentShow) {
+		interfaceContext.showCommentBoxes(feedbackHolder,true);
+	}
 	
 	// Append any commentQuestion boxes
 	$(audioHolderObject.commentQuestions).each(function(index,element) {

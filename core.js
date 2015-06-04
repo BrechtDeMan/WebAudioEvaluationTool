@@ -9,6 +9,7 @@
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
 var specification;
+var interfaceContext;
 var popup; // Hold the interfacePopup object
 var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
@@ -39,6 +40,9 @@ window.onload = function() {
 	
 	// Create the specification object
 	specification = new Specification();
+	
+	// Create the interface object
+	interfaceContext = new Interface(specification);
 };
 
 function interfacePopup() {
@@ -225,7 +229,7 @@ function stateMachine()
 			this.stateIndex++;
 			if (this.stateIndex >= this.stateMap.length) {
 				console.log('Test Completed');
-				createProjectSave(projectReturn);
+				createProjectSave(specification.projectReturn);
 			} else {
 				this.currentStateMap = this.stateMap[this.stateIndex];
 				if (this.currentStateMap.type == "audioHolder") {
@@ -418,7 +422,7 @@ function createProjectSave(destURL) {
 		
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
-		popup.popupContent.appendChild(a)
+		popup.popupContent.appendChild(a);
 	} else {
 		var xmlhttp = new XMLHttpRequest;
 		xmlhttp.open("POST",destURL,true);
@@ -435,7 +439,6 @@ function createProjectSave(destURL) {
 		};
 		xmlhttp.send(file);
 	}
-	return submitDiv;
 }
 
 // Only other global function which must be defined in the interface class. Determines how to create the XML document.
@@ -510,7 +513,7 @@ function AudioEngine() {
 	};
 	
 	
-	this.newTrack = function(url) {
+	this.newTrack = function(element) {
 		// Pull data from given URL into new audio buffer
 		// URLs must either be from the same source OR be setup to 'Access-Control-Allow-Origin'
 		
@@ -519,7 +522,8 @@ function AudioEngine() {
 		this.audioObjects[audioObjectId] = new audioObject(audioObjectId);
 
 		// AudioObject will get track itself.
-		this.audioObjects[audioObjectId].constructTrack(url);
+		this.audioObjects[audioObjectId].specification = element;
+		this.audioObjects[audioObjectId].constructTrack(element.parent.hostURL + element.url);
 		return this.audioObjects[audioObjectId];
 	};
 	
@@ -557,6 +561,7 @@ function AudioEngine() {
 function audioObject(id) {
 	// The main buffer object with common control nodes to the AudioEngine
 	
+	this.specification;
 	this.id = id;
 	this.state = 0; // 0 - no data, 1 - ready
 	this.url = null; // Hold the URL given for the output back to the results.
@@ -1032,9 +1037,10 @@ function Specification() {
 			}
 		};
 		
-		this.audioElementNode = function(xml) {
+		this.audioElementNode = function(parent,xml) {
 			this.url = xml.getAttribute('url');
 			this.id = xml.id;
+			this.parent = parent;
 		};
 		
 		this.commentQuestionNode = function(xml) {
@@ -1074,7 +1080,7 @@ function Specification() {
 		this.audioElements  =[];
 		var audioElementsDOM = xml.getElementsByTagName('audioElements');
 		for (var i=0; i<audioElementsDOM.length; i++) {
-			this.audioElements.push(new this.audioElementNode(audioElementsDOM[i]));
+			this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
 		}
 		
 		this.commentQuestions = [];
@@ -1085,8 +1091,63 @@ function Specification() {
 	};
 }
 
-function Interface() {
+function Interface(specificationObject) {
 	// This handles the bindings between the interface and the audioEngineContext;
+	this.specification = specificationObject;
+	this.insertPoint = document.getElementById("topLevelBody");
 	
+	// Bounded by interface!!
+	// Interface object MUST have an exportXMLDOM method which returns the various DOM levels
+	// For example, APE returns  the slider position normalised in a <value> tag.
+	this.interfaceObjects = [];
+	this.interfaceObject = function(){};
+	
+	this.commentBoxes = [];
+	this.commentBox = function(audioObject) {
+		var element = audioObject.specification;
+		this.id = audioObject.id;
+		var audioHolderObject = audioObject.specification.parent;
+		// Create document objects to hold the comment boxes
+		this.trackComment = document.createElement('div');
+		this.trackComment.className = 'comment-div';
+		this.trackComment.id = 'comment-div-'+audioObject.id;
+		// Create a string next to each comment asking for a comment
+		var trackString = document.createElement('span');
+		trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.id;
+		// Create the HTML5 comment box 'textarea'
+		var trackCommentBox = document.createElement('textarea');
+		trackCommentBox.rows = '4';
+		trackCommentBox.cols = '100';
+		trackCommentBox.name = 'trackComment'+audioObject.id;
+		trackCommentBox.className = 'trackComment';
+		var br = document.createElement('br');
+		// Add to the holder.
+		this.trackComment.appendChild(trackString);
+		this.trackComment.appendChild(br);
+		this.trackComment.appendChild(trackCommentBox);
+	};
+	
+	this.createCommentBox = function(audioObject) {
+		var node = new this.commentBox(audioObject);
+		this.commentBoxes.push(node);
+		audioObject.commentDOM = node;
+		return node;
+	};
+	
+	this.sortCommentBoxes = function() {
+		var holder = [];
+		while (this.commentBoxes.length > 0) {
+			var node = this.commentBoxes.pop(0);
+			holder[node.id] = node;
+		}
+		this.commentBoxes = holder;
+	};
+	
+	this.showCommentBoxes = function(inject, sort) {
+		if (sort) {interfaceContext.sortCommentBoxes();}
+		for (var i=0; i<interfaceContext.commentBoxes.length; i++) {
+			inject.appendChild(this.commentBoxes[i].trackComment);
+		}
+	};
 }
 
