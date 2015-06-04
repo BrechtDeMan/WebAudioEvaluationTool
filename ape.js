@@ -334,6 +334,7 @@ function loadTest(textXML)
 		// Now load each audio sample. First create the new track by passing the full URL
 		var trackURL = hostURL + this.attributes['url'].value;
 		audioEngineContext.newTrack(trackURL);
+		audioEngineContext.audioObjects[index].id = this.attributes['id'].value;
 		
 		if (commentShow) {
 			// Create document objects to hold the comment boxes
@@ -355,7 +356,7 @@ function loadTest(textXML)
 			trackComment.appendChild(br);
 			trackComment.appendChild(trackCommentBox);
 			feedbackHolder.appendChild(trackComment);
-			audioEngineContext.audioObjects[index].commentDOM = trackCommentBox;
+			audioEngineContext.audioObjects[index].commentDOM = trackComment;
 		}
 		
 		// Create a slider per track
@@ -561,22 +562,21 @@ function pageXMLSave(store, testXML, testId)
 		metric.appendChild(testTime);
 	}
 	xmlDoc.appendChild(metric);
-	var trackSliderObjects = document.getElementsByClassName('track-slider');
-	var commentObjects = document.getElementsByClassName('comment-div');
-	for (var i=0; i<trackSliderObjects.length; i++) 
+	var audioObjects = audioEngineContext.audioObjects;
+	for (var i=0; i<audioObjects.length; i++) 
 	{
 		var audioElement = document.createElement('audioElement');
-		audioElement.id = currentTrackOrder[i].attributes['id'].value;
-		audioElement.setAttribute('url',currentTrackOrder[i].attributes['url'].value);
+		audioElement.id = audioObjects[i].id;
+		audioElement.setAttribute('url',audioObjects[i].url);
 		var value = document.createElement('value');
 		value.innerHTML = convSliderPosToRate(i);
 		if (commentShow) {
 			var comment = document.createElement("comment");
 			var question = document.createElement("question");
 			var response = document.createElement("response");
-			question.textContent = commentObjects[i].children[0].textContent;
-			response.textContent = commentObjects[i].children[2].value;
-            console.log('Comment ' + i + ': ' + commentObjects[i].children[2].value); // DEBUG/SAFETY
+			question.textContent = audioObjects[i].commentDOM.children[0].textContent;
+			response.textContent = audioObjects[i].commentDOM.children[2].value;
+            console.log('Comment ' + i + ': ' + response.textContent); // DEBUG/SAFETY
 			comment.appendChild(question);
 			comment.appendChild(response);
 			audioElement.appendChild(comment);
@@ -584,7 +584,7 @@ function pageXMLSave(store, testXML, testId)
 		audioElement.appendChild(value);
 		// Check for any per element metrics
 		
-		audioElement.appendChild(audioEngineContext.audioObjects[i].metric.exportXMLDOM());
+		audioElement.appendChild(audioObjects[i].metric.exportXMLDOM());
 		xmlDoc.appendChild(audioElement);
 	}
 	var commentQuestion = document.getElementsByClassName('commentQuestion');

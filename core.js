@@ -694,7 +694,6 @@ function audioObject(id) {
 		};
 		request.send();
 	};
-	
 }
 
 function timer()
