@@ -30,85 +30,7 @@ function loadInterface(xmlDoc) {
 	// xmlDoc MUST already be parsed by jQuery!
 	var xmlSetup = xmlDoc.find('setup');
 	// Should put in an error function here incase of malprocessed or malformed XML
-	
-	// Create pre and post test questions
-	
-	var preTest = xmlSetup.find('PreTest');
-	var postTest = xmlSetup.find('PostTest');
-	preTest = preTest[0];
-	postTest = postTest[0];
-	
-	if (preTest == undefined) {preTest = document.createElement("preTest");}
-	if (postTest == undefined){postTest= document.createElement("postTest");}
-	
-	testState.stateMap.push(preTest);
-	
-	// Extract the different test XML DOM trees
-	var audioHolders = xmlDoc.find('audioHolder');
-	var testXMLSetups = [];
-	audioHolders.each(function(index,element) {
-		var repeatN = element.attributes['repeatCount'].value;
-		for (var r=0; r<=repeatN; r++) {
-			testXMLSetups.push(element);
-		}
-	});
-	 
-	// New check if we need to randomise the test order
-	var randomise = xmlSetup[0].attributes['randomiseOrder'];
-	if (randomise != undefined) {
-		if (randomise.value === 'true'){
-			randomise = true;
-		} else {
-			randomise = false;
-		}
-	} else {
-		randomise = false;
-	}
-	
-	if (randomise)
-	{
- 		testXMLSetups = randomiseOrder(testXMLSetups);
-	}
-	
-	$(testXMLSetups).each(function(index,elem){
-		testState.stateMap.push(elem);
-	})
-	 
-	 testState.stateMap.push(postTest);
-	 
-	// Obtain the metrics enabled
-	var metricNode = xmlSetup.find('Metric');
-	var metricNode = metricNode.find('metricEnable');
-	metricNode.each(function(index,node){
-		var enabled = node.textContent;
-		switch(enabled)
-		{
-		case 'testTimer':
-			sessionMetrics.prototype.enableTestTimer = true;
-			break;
-		case 'elementTimer':
-			sessionMetrics.prototype.enableElementTimer = true;
-			break;
-		case 'elementTracker':
-			sessionMetrics.prototype.enableElementTracker = true;
-			break;
-		case 'elementListenTracker':
-			sessionMetrics.prototype.enableElementListenTracker = true;
-			break;
-		case 'elementInitialPosition':
-			sessionMetrics.prototype.enableElementInitialPosition = true;
-			break;
-		case 'elementFlagListenedTo':
-			sessionMetrics.prototype.enableFlagListenedTo = true;
-			break;
-		case 'elementFlagMoved':
-			sessionMetrics.prototype.enableFlagMoved = true;
-			break;
-		case 'elementFlagComments':
-			sessionMetrics.prototype.enableFlagComments = true;
-			break;
-		}
-	});
+
 	
 	// Create APE specific metric functions
 	audioEngineContext.metric.initialiseTest = function()
@@ -255,8 +177,6 @@ function loadInterface(xmlDoc) {
 	
 	testContent.style.zIndex = 1;
 	insertPoint.innerHTML = null; // Clear the current schema
-	
-	currentState = 'preTest';
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title

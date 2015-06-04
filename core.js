@@ -10,7 +10,6 @@ var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
 var popup; // Hold the interfacePopup object
 var testState;
-var currentState; // Keep track of the current state (pre/post test, which test, final test? first test?)
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var audioEngineContext; // The custome AudioEngine object
 var projectReturn; // Hold the URL for the return
@@ -252,7 +251,7 @@ function stateMachine()
 		// Can be used to over-rule default behaviour
 		
 		pageXMLSave(store, testXML, testId);
-	}
+	};
 	
 	this.initialiseInnerState = function(testXML) {
 		// Parses the received testXML for pre and post test options
@@ -266,7 +265,7 @@ function stateMachine()
 		this.currentStateMap.push(postTest);
 		this.currentIndex = -1;
 		this.advanceInnerState();
-	}
+	};
 	
 	this.advanceInnerState = function() {
 		this.currentIndex++;
@@ -285,7 +284,7 @@ function stateMachine()
 				this.advanceInnerState();
 			}
 		}
-	}
+	};
 	
 	this.previousState = function(){};
 }
@@ -327,6 +326,89 @@ function loadProjectSpecCallback(response) {
 	
 	// Now extract the setup tag
 	var xmlSetup = projectXML.find('setup');
+	
+	
+	// Create pre and post test questions
+	
+	var preTest = xmlSetup.find('PreTest');
+	var postTest = xmlSetup.find('PostTest');
+	preTest = preTest[0];
+	postTest = postTest[0];
+	
+	if (preTest == undefined) {preTest = document.createElement("preTest");}
+	if (postTest == undefined){postTest= document.createElement("postTest");}
+	
+	testState.stateMap.push(preTest);
+	
+	// Extract the different test XML DOM trees
+	var audioHolders = projectXML.find('audioHolder');
+	var testXMLSetups = [];
+	audioHolders.each(function(index,element) {
+		var repeatN = element.attributes['repeatCount'].value;
+		for (var r=0; r<=repeatN; r++) {
+			testXMLSetups.push(element);
+		}
+	});
+	 
+	// New check if we need to randomise the test order
+	var randomise = xmlSetup[0].attributes['randomiseOrder'];
+	if (randomise != undefined) {
+		if (randomise.value === 'true'){
+			randomise = true;
+		} else {
+			randomise = false;
+		}
+	} else {
+		randomise = false;
+	}
+	
+	if (randomise)
+	{
+ 		testXMLSetups = randomiseOrder(testXMLSetups);
+	}
+	
+	$(testXMLSetups).each(function(index,elem){
+		testState.stateMap.push(elem);
+	});
+	 
+	 testState.stateMap.push(postTest);
+	 
+	// Obtain the metrics enabled
+	var metricNode = xmlSetup.find('Metric');
+	var metricNode = metricNode.find('metricEnable');
+	metricNode.each(function(index,node){
+		var enabled = node.textContent;
+		switch(enabled)
+		{
+		case 'testTimer':
+			sessionMetrics.prototype.enableTestTimer = true;
+			break;
+		case 'elementTimer':
+			sessionMetrics.prototype.enableElementTimer = true;
+			break;
+		case 'elementTracker':
+			sessionMetrics.prototype.enableElementTracker = true;
+			break;
+		case 'elementListenTracker':
+			sessionMetrics.prototype.enableElementListenTracker = true;
+			break;
+		case 'elementInitialPosition':
+			sessionMetrics.prototype.enableElementInitialPosition = true;
+			break;
+		case 'elementFlagListenedTo':
+			sessionMetrics.prototype.enableFlagListenedTo = true;
+			break;
+		case 'elementFlagMoved':
+			sessionMetrics.prototype.enableFlagMoved = true;
+			break;
+		case 'elementFlagComments':
+			sessionMetrics.prototype.enableFlagComments = true;
+			break;
+		}
+	});
+	
+	
+	
 	// Detect the interface to use and load the relevant javascripts.
 	var interfaceType = xmlSetup[0].attributes['interface'];
 	var interfaceJS = document.createElement('script');
