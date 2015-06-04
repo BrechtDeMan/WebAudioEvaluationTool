@@ -594,6 +594,10 @@ function audioObject(id) {
 	this.url = null; // Hold the URL given for the output back to the results.
 	this.metric = new metricTracker(this);
 	
+	// Bindings for GUI
+	this.sliderDOM = null;
+	this.commentDOM = null;
+	
 	// Create a buffer and external gain control to allow internal patching of effects and volume leveling.
 	this.bufferNode = undefined;
 	this.outputGain = audioContext.createGain();
@@ -611,14 +615,14 @@ function audioObject(id) {
 	this.loopStart = function() {
 		this.outputGain.gain.value = 1.0;
 		this.metric.startListening(audioEngineContext.timer.getTestTime());
-	}
+	};
 	
 	this.loopStop = function() {
 		if (this.outputGain.gain.value != 0.0) {
 			this.outputGain.gain.value = 0.0;
 			this.metric.stopListening(audioEngineContext.timer.getTestTime());
 		}
-	}
+	};
 	
 	this.play = function(startTime) {
 		this.bufferNode = audioContext.createBufferSource();
@@ -817,6 +821,72 @@ function metricTracker(caller)
 			bufferTime.setAttribute('stop',this.parent.getCurrentPosition());
 			console.log('slider ' + this.parent.id + ' played for (' + diff + ')'); // DEBUG/SAFETY: show played slider id
 		}
+	};
+	
+	this.exportXMLDOM = function() {
+		var root = document.createElement('metric');
+		if (audioEngineContext.metric.enableElementTimer) {
+			var mElementTimer = document.createElement('metricresult');
+			mElementTimer.setAttribute('name','enableElementTimer');
+			mElementTimer.textContent = this.listenedTimer;
+			root.appendChild(mElementTimer);
+		}
+		if (audioEngineContext.metric.enableElementTracker) {
+			var elementTrackerFull = document.createElement('metricResult');
+			elementTrackerFull.setAttribute('name','elementTrackerFull');
+			for (var k=0; k<this.movementTracker.length; k++)
+			{
+				var timePos = document.createElement('timePos');
+				timePos.id = k;
+				var time = document.createElement('time');
+				time.textContent = this.movementTracker[k][0];
+				var position = document.createElement('position');
+				position.textContent = this.movementTracker[k][1];
+				timePos.appendChild(time);
+				timePos.appendChild(position);
+				elementTrackerFull.appendChild(timePos);
+			}
+			root.appendChild(elementTrackerFull);
+		}
+		if (audioEngineContext.metric.enableElementListenTracker) {
+			var elementListenTracker = document.createElement('metricResult');
+			elementListenTracker.setAttribute('name','elementListenTracker');
+			for (var k=0; k<this.listenTracker.length; k++) {
+				elementListenTracker.appendChild(this.listenTracker[k]);
+			}
+			root.appendChild(elementListenTracker);
+		}
+		if (audioEngineContext.metric.enableElementInitialPosition) {
+			var elementInitial = document.createElement('metricResult');
+			elementInitial.setAttribute('name','elementInitialPosition');
+			elementInitial.textContent = this.initialPosition;
+			root.appendChild(elementInitial);
+		}
+		if (audioEngineContext.metric.enableFlagListenedTo) {
+			var flagListenedTo = document.createElement('metricResult');
+			flagListenedTo.setAttribute('name','elementFlagListenedTo');
+			flagListenedTo.textContent = this.wasListenedTo;
+			root.appendChild(flagListenedTo);
+		}
+		if (audioEngineContext.metric.enableFlagMoved) {
+			var flagMoved = document.createElement('metricResult');
+			flagMoved.setAttribute('name','elementFlagMoved');
+			flagMoved.textContent = this.wasMoved;
+			root.appendChild(flagMoved);
+		}
+		if (audioEngineContext.metric.enableFlagComments) {
+			var flagComments = document.createElement('metricResult');
+			flagComments.setAttribute('name','elementFlagComments');
+			if (this.parent.commentDOM == null)
+				{flag.textContent = 'false';}
+			else if (this.parent.commentDOM.textContent.length == 0) 
+				{flag.textContent = 'false';}
+			else 
+				{flag.textContet = 'true';}
+			root.appendChild(flagComments);
+		}
+		
+		return root;
 	};
 }
 

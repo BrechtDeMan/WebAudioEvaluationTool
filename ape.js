@@ -75,6 +75,8 @@ function loadInterface(xmlDoc) {
         console.log('slider ' + id + ' played (' + time + ')'); // DEBUG/SAFETY: show played slider id
 	};
 	
+	// Bindings for audioObjects
+	
 	// Create the top div for the Title element
 	var titleAttr = xmlSetup[0].attributes['title'];
 	var title = document.createElement('div');
@@ -353,6 +355,7 @@ function loadTest(textXML)
 			trackComment.appendChild(br);
 			trackComment.appendChild(trackCommentBox);
 			feedbackHolder.appendChild(trackComment);
+			audioEngineContext.audioObjects[index].commentDOM = trackCommentBox;
 		}
 		
 		// Create a slider per track
@@ -398,6 +401,9 @@ function loadTest(textXML)
 	            $('#comment-div-'+id).addClass('comment-box-playing');
 			}
 		};
+		
+		// Attach binding
+		audioEngineContext.audioObjects[index].sliderDOM = trackSliderObj;
 		
 		canvas.appendChild(trackSliderObj);
 		audioEngineContext.audioObjects[index].metric.initialised(convSliderPosToRate(index));
@@ -561,7 +567,7 @@ function pageXMLSave(store, testXML, testId)
 	{
 		var audioElement = document.createElement('audioElement');
 		audioElement.id = currentTrackOrder[i].attributes['id'].value;
-		audioElement.url = currentTrackOrder[i].attributes['url'].value;
+		audioElement.setAttribute('url',currentTrackOrder[i].attributes['url'].value);
 		var value = document.createElement('value');
 		value.innerHTML = convSliderPosToRate(i);
 		if (commentShow) {
@@ -577,67 +583,8 @@ function pageXMLSave(store, testXML, testId)
 		}
 		audioElement.appendChild(value);
 		// Check for any per element metrics
-		var metric = document.createElement('metric');
-		var elementMetric = audioEngineContext.audioObjects[i].metric;
-		if (audioEngineContext.metric.enableElementTimer) {
-			var elementTimer = document.createElement('metricResult');
-			elementTimer.id = 'elementTimer';
-			elementTimer.textContent = elementMetric.listenedTimer;
-			metric.appendChild(elementTimer);
-		}
-		if (audioEngineContext.metric.enableElementTracker) {
-			var elementTrackerFull = document.createElement('metricResult');
-			elementTrackerFull.id = 'elementTrackerFull';
-			var data = elementMetric.movementTracker;
-			for (var k=0; k<data.length; k++)
-			{
-				var timePos = document.createElement('timePos');
-				timePos.id = k;
-				var time = document.createElement('time');
-				time.textContent = data[k][0];
-				var position = document.createElement('position');
-				position.textContent = data[k][1];
-				timePos.appendChild(time);
-				timePos.appendChild(position);
-				elementTrackerFull.appendChild(timePos);
-			}
-			metric.appendChild(elementTrackerFull);
-		}
-		if (audioEngineContext.metric.enableElementListenTracker) {
-			var elementListenTracker = document.createElement('metricResult');
-			elementListenTracker.id = 'elementListenTracker';
-			var obj = elementMetric.listenTracker;
-			for (var k=0; k<obj.length; k++) {
-				elementListenTracker.appendChild(obj[k]);
-			}
-			metric.appendChild(elementListenTracker);
-		}
-		if (audioEngineContext.metric.enableElementInitialPosition) {
-			var elementInitial = document.createElement('metricResult');
-			elementInitial.id = 'elementInitialPosition';
-			elementInitial.textContent = elementMetric.initialPosition;
-			metric.appendChild(elementInitial);
-		}
-		if (audioEngineContext.metric.enableFlagListenedTo) {
-			var flagListenedTo = document.createElement('metricResult');
-			flagListenedTo.id = 'elementFlagListenedTo';
-			flagListenedTo.textContent = elementMetric.wasListenedTo;
-			metric.appendChild(flagListenedTo);
-		}
-		if (audioEngineContext.metric.enableFlagMoved) {
-			var flagMoved = document.createElement('metricResult');
-			flagMoved.id = 'elementFlagMoved';
-			flagMoved.textContent = elementMetric.wasMoved;
-			metric.appendChild(flagMoved);
-		}
-		if (audioEngineContext.metric.enableFlagComments) {
-			var flagComments = document.createElement('metricResult');
-			flagComments.id = 'elementFlagComments';
-			if (response.textContent.length == 0) {flag.textContent = 'false';}
-			else {flag.textContet = 'true';}
-			metric.appendChild(flagComments);
-		}
-		audioElement.appendChild(metric);
+		
+		audioElement.appendChild(audioEngineContext.audioObjects[i].metric.exportXMLDOM());
 		xmlDoc.appendChild(audioElement);
 	}
 	var commentQuestion = document.getElementsByClassName('commentQuestion');
