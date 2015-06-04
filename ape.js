@@ -11,9 +11,9 @@
 
 
 // Once this is loaded and parsed, begin execution
-loadInterface(projectXML);
+loadInterface();
 
-function loadInterface(xmlDoc) {
+function loadInterface() {
 	
 	// Get the dimensions of the screen available to the page
 	var width = window.innerWidth;
@@ -24,12 +24,6 @@ function loadInterface(xmlDoc) {
 	var testContent = document.createElement('div');
 	
 	testContent.id = 'testContent';
-	
-	
-	// Decode parts of the xmlDoc that are needed
-	// xmlDoc MUST already be parsed by jQuery!
-	var xmlSetup = xmlDoc.find('setup');
-	// Should put in an error function here incase of malprocessed or malformed XML
 
 	
 	// Create APE specific metric functions
@@ -78,7 +72,7 @@ function loadInterface(xmlDoc) {
 	// Bindings for audioObjects
 	
 	// Create the top div for the Title element
-	var titleAttr = xmlSetup[0].attributes['title'];
+	var titleAttr = specification.title;
 	var title = document.createElement('div');
 	title.className = "title";
 	title.align = "center";
@@ -86,9 +80,9 @@ function loadInterface(xmlDoc) {
 	
 	// Set title to that defined in XML, else set to default
 	if (titleAttr != undefined) {
-		titleSpan.innerHTML = titleAttr.value;
+		titleSpan.textContent = titleAttr;
 	} else {
-		titleSpan.innerHTML =  'Listening test';
+		titleSpan.textContent =  'Listening test';
 	}
 	// Insert the titleSpan element into the title div element.
 	title.appendChild(titleSpan);
@@ -100,23 +94,9 @@ function loadInterface(xmlDoc) {
 	titleSpan.id = "pageTitle";
 	pagetitle.appendChild(titleSpan);
 	
-	// Store the return URL path in global projectReturn
-	projectReturn = xmlSetup[0].attributes['projectReturn'];
-	if (projectReturn == undefined) {
-		console.log("WARNING - projectReturn not specified! Will assume null.");
-		projectReturn = "null";
-	} else {
-		projectReturn = projectReturn.value;
-	}
-	
 	// Create Interface buttons!
 	var interfaceButtons = document.createElement('div');
 	interfaceButtons.id = 'interface-buttons';
-	
-	// MANUAL DOWNLOAD POINT
-	// If project return is null, this MUST be specified as the location to create the download link
-	var downloadPoint = document.createElement('div');
-	downloadPoint.id = 'download-point';
 	
 	// Create playback start/stop points
 	var playback = document.createElement("button");
@@ -140,7 +120,6 @@ function loadInterface(xmlDoc) {
 	// Append the interface buttons into the interfaceButtons object.
 	interfaceButtons.appendChild(playback);
 	interfaceButtons.appendChild(submit);
-	interfaceButtons.appendChild(downloadPoint);
 	
 	// Now create the slider and HTML5 canvas boxes
 	
@@ -194,13 +173,13 @@ function loadInterface(xmlDoc) {
 	
 }
 
-function loadTest(textXML)
+function loadTest(audioHolderObject)
 {
 	
 	// Reset audioEngineContext.Metric globals for new test
 	audioEngineContext.newTestPage();
 	
-	var id = textXML.id;
+	var id = audioHolderObject.id;
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
 	var canvas = document.getElementById('slider');
@@ -208,7 +187,7 @@ function loadTest(textXML)
 	canvas.innerHTML = null;
 	
 	// Setup question title
-	var interfaceObj = $(textXML).find('interface');
+	var interfaceObj = $(audioHolderObject).find('interface');
 	var titleNode = interfaceObj.find('title');
 	if (titleNode[0] != undefined)
 	{
@@ -237,46 +216,19 @@ function loadTest(textXML)
 		commentBoxPrefix = "Comment on track";
 	}
 
-	// Extract the hostURL attribute. If not set, create an empty string.
-	var hostURL = textXML.attributes['hostURL'];
-	if (hostURL == undefined) {
-		hostURL = "";
-	} else {
-		hostURL = hostURL.value;
-	}
-	// Extract the sampleRate. If set, convert the string to a Number.
-	var hostFs = textXML.attributes['sampleRate'];
-	if (hostFs != undefined) {
-		hostFs = Number(hostFs.value);
-	}
-	
 	/// CHECK FOR SAMPLE RATE COMPATIBILITY
-	if (hostFs != undefined) {
-		if (Number(hostFs) != audioContext.sampleRate) {
+	if (audioHolderObject.sampleRate != undefined) {
+		if (Number(audioHolderObject.sampleRate) != audioContext.sampleRate) {
 			var errStr = 'Sample rates do not match! Requested '+Number(hostFs)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
 			alert(errStr);
 			return;
 		}
 	}
 	
-	var commentShow = textXML.attributes['elementComments'];
-	if (commentShow != undefined) {
-		if (commentShow.value == 'false') {commentShow = false;}
-		else {commentShow = true;}
-	} else {commentShow = true;}
+	var commentShow = audioHolderObject.elementComments;
 	
-	var loopPlayback = textXML.attributes['loop'];
-	if (loopPlayback != undefined)
-	{
-		loopPlayback = loopPlayback.value;
-		if (loopPlayback == 'true') {
-			loopPlayback = true;
-		} else {
-			loopPlayback = false;
-		}
-	} else {
-		loopPlayback = false;
-	}
+	var loopPlayback = audioHolderObject.loop;
+
 	audioEngineContext.loopPlayback = loopPlayback;
 	// Create AudioEngine bindings for playback
 	if (loopPlayback) {
@@ -305,36 +257,28 @@ function loadTest(textXML)
 	}
 	
 	currentTestHolder = document.createElement('audioHolder');
-	currentTestHolder.id = textXML.id;
-	currentTestHolder.repeatCount = textXML.attributes['repeatCount'].value;
+	currentTestHolder.id = audioHolderObject.id;
+	currentTestHolder.repeatCount = audioHolderObject.repeatCount;
 	
-	var randomise = textXML.attributes['randomiseOrder'];
-	if (randomise != undefined) {randomise = randomise.value;}
-	else {randomise = false;}
+	var randomise = audioHolderObject.randomiseOrder;
 	
-	var audioElements = $(textXML).find('audioElements');
+	var audioElements = audioHolderObject.audioElements;
 	currentTrackOrder = [];
-	audioElements.each(function(index,element){
-		// Find any blind-repeats
-		// Not implemented yet, but just in case
-		currentTrackOrder[index] = element;
-	});
 	if (randomise) {
-		currentTrackOrder = randomiseOrder(currentTrackOrder);
+		audioHolderObject.audioElements = randomiseOrder(audioHolderObject.audioElements);
 	}
 	
 	// Delete any previous audioObjects associated with the audioEngine
 	audioEngineContext.audioObjects = [];
 	
 	// Find all the audioElements from the audioHolder
-	$(currentTrackOrder).each(function(index,element){
+	$(audioHolderObject.audioElements).each(function(index,element){
 		// Find URL of track
 		// In this jQuery loop, variable 'this' holds the current audioElement.
 		
 		// Now load each audio sample. First create the new track by passing the full URL
-		var trackURL = hostURL + this.attributes['url'].value;
+		var trackURL = audioHolderObject.hostURL + element.url;
 		var audioObject = audioEngineContext.newTrack(trackURL);
-		audioObject.id = this.attributes['id'].value;
 		
 		if (commentShow) {
 			// Create document objects to hold the comment boxes
@@ -412,15 +356,14 @@ function loadTest(textXML)
 	});
 	
 	// Append any commentQuestion boxes
-	var commentQuestions = $(textXML).find('CommentQuestion');
-	$(commentQuestions).each(function(index,element) {
+	$(audioHolderObject.commentQuestions).each(function(index,element) {
 		// Create document objects to hold the comment boxes
 		var trackComment = document.createElement('div');
 		trackComment.className = 'comment-div commentQuestion';
-		trackComment.id = element.attributes['id'].value;
+		trackComment.id = element.id;
 		// Create a string next to each comment asking for a comment
 		var trackString = document.createElement('span');
-		trackString.innerHTML = element.textContent;
+		trackString.innerHTML = element.question;
 		// Create the HTML5 comment box 'textarea'
 		var trackCommentBox = document.createElement('textarea');
 		trackCommentBox.rows = '4';
@@ -541,17 +484,13 @@ function resizeWindow(event){
 	});
 }
 
-function pageXMLSave(store, testXML, testId)
+function pageXMLSave(store, testXML)
 {
 	// Saves a specific test page
 	var xmlDoc = store;
 	// Check if any session wide metrics are enabled
 	
-	var commentShow = testXML.attributes['elementComments'];
-	if (commentShow != undefined) {
-		if (commentShow.value == 'false') {commentShow = false;}
-		else {commentShow = true;}
-	} else {commentShow = true;}
+	var commentShow = testXML.elementComments;
 	
 	var metric = document.createElement('metric');
 	if (audioEngineContext.metric.enableTestTimer)
