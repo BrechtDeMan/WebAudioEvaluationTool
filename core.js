@@ -321,8 +321,11 @@ function loadProjectSpec(url) {
 
 function loadProjectSpecCallback(response) {
 	// Function called after asynchronous download of XML project specification
-	var decode = $.parseXML(response);
-	projectXML = $(decode);
+	//var decode = $.parseXML(response);
+	//projectXML = $(decode);
+	
+	var parse = new DOMParser();
+	projectXML = parse.parseFromString(response,'text/xml');
 	
 	// Now extract the setup tag
 	var xmlSetup = projectXML.find('setup');
@@ -973,3 +976,152 @@ function testWaitIndicator() {
 }
 
 var testWaitTimerIntervalHolder = null;
+
+function Specification() {
+	// Handles the decoding of the project specification XML into a simple JavaScript Object.
+	
+	this.interfaceType;
+	this.projectReturn;
+	this.randomiseOrder;
+	this.collectMetrics;
+	this.preTest;
+	this.postTest;
+	this.metrics =[];
+	
+	this.audioHolders = [];
+	
+	this.decode = function() {
+		// projectXML - DOM Parsed document
+		var setupNode = projectXML.getElementsByTagName('setup')[0];
+		this.interfaceType = setupNode.getAttribute('interface');
+		this.projectReturn = setupNode.getAttribute('projectReturn');
+		if (setupNode.getAttribute('randomiseOrder') == "true") {
+			this.randomiseOrder = true;
+		} else {this.setup.randomiseOrder = false;}
+		if (setupNode.getAttribute('collectMetrics') == "true") {
+			this.collectMetrics = true;
+		} else {this.setup.collectMetrics = false;}
+		var metricCollection = setupNode.getElementsByTagName('Metric');
+		
+		this.preTest = new this.prepostNode('pre',setupNode.getElementsByTagName('PreTest'));
+		this.postTest = new this.prepostNode('post',setupNode.getElementsByTagName('PostTest'));
+		
+		if (metricCollection.length > 0) {
+			metricCollection = metricCollection[0].getElementsByTagName('metricEnable');
+			for (var i=0; i<metricCollection.length; i++) {
+				this.metrics.push(new this.metricNode(metricCollection[0].textContent));
+			}
+		}
+		
+		var audioHolders = projectXML.getElementsByTagName('audioHolder');
+		for (var i=0; i<audioHolders.length; i++) {
+			this.audioHolders.push(new this.audioHolderNode(this,audioHolders[i]));
+		}
+		
+	};
+	
+	this.prepostNode = function(type,Collection) {
+		this.type = type;
+		this.options = [];
+		
+		this.OptionNode = function(child) {
+			this.type = child.nodeName;
+			if (child.nodeName == "question") {
+				this.id = child.id;
+				this.mandatory;
+				if (child.getAttribute('mandatory') == "true") {this.mandatory = true;}
+				else {this.mandatory = false;}
+				this.question = child.textContent;
+			} else if (child.nodeName == "statement") {
+				this.statment = child.textContent;
+			}
+		};
+		
+		// On construction:
+		if (Collection.length != 0) {
+			Collection = Collection[0];
+			for (var i=0; i<Collection.childElementCount; i++) {
+				var child = Collection.children[i];
+				this.options.push(new this.OptionNode(child));
+			}
+		}
+	};
+	
+	this.metricNode = function(name) {
+		this.enabled = name;
+	};
+	
+	this.audioHolderNode = function(parent,xml) {
+		this.interfaceNode = function(DOM) {
+			var title = DOM.getElementsByTagName('title');
+			if (title.length == 0) {this.title = null;}
+			else {this.title = title[0].textContent;}
+			
+			var scale = DOM.getElementsByTagName('scale');
+			this.scale = [];
+			for (var i=0; i<scale.length; i++) {
+				var arr = [null, null];
+				arr[0] = scale[i].getAttribute('position');
+				arr[1] = scale[i].textContent;
+				this.scale.push(arr);
+			}
+		};
+		
+		this.audioElementNode = function(xml) {
+			this.url = xml.getAttribute('url');
+			this.id = xml.id;
+		};
+		
+		this.commentQuestionNode = function(xml) {
+			this.id = xml.id;
+			if (xml.getAttribute('mandatory') == 'true') {this.mandatory = true;}
+			else {this.mandatory = false;}
+			this.question = xml.textContent;
+		};
+		
+		this.id = xml.id;
+		this.hostURL = xml.getAttribute('hostURL');
+		this.sampleRate = xml.getAttribute('sampleRate');
+		if (xml.getAttribute('randomiseOrder') == "true") {this.randomiseOrder = true;}
+		else {this.randomiseOrder = false;}
+		this.repeatCount = xml.getAttribute('repeatCount');
+		if (xml.getAttribute('loop') == 'true') {this.loop = true;}
+		else {this.loop == false;}
+		if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
+		else {this.elementComments = false;}
+		
+		this.preTest = new parent.prepostNode('pre',xml.getElementsByTagName('PreTest'));
+		this.postTest = new parent.prepostNode('post',xml.getElementsByTagName('PostTest'));
+		
+		this.interfaces = [];
+		var interfaceDOM = xml.getElementsByTagName('interface');
+		for (var i=0; i<interfaceDOM.length; i++) {
+			this.interfaces.push(new this.interfaceNode(interfaceDOM[i]));
+		}
+		
+		this.commentBoxPrefix = xml.getElementsByTagName('commentBoxPrefix');
+		if (this.commentBoxPrefix.length != 0) {
+			this.commentBoxPrefix = this.commentBoxPrefix[0].textContent;
+		} else {
+			this.commentBoxPrefix = "Comment on track";
+		}
+		
+		this.audioElements  =[];
+		var audioElementsDOM = xml.getElementsByTagName('audioElements');
+		for (var i=0; i<audioElementsDOM.length; i++) {
+			this.audioElements.push(new this.audioElementNode(audioElementsDOM[i]));
+		}
+		
+		this.commentQuestions = [];
+		var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
+		for (var i=0; i<commentQuestionsDOM.length; i++) {
+			this.commentQuestions.push(new this.commentQuestionNode(commentQuestionsDOM[i]));
+		}
+	};
+}
+
+function Interface() {
+	// This handles the bindings between the interface and the audioEngineContext;
+	
+}
+
