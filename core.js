@@ -553,6 +553,7 @@ function AudioEngine() {
 
 		// AudioObject will get track itself.
 		this.audioObjects[audioObjectId].constructTrack(url);
+		return this.audioObjects[audioObjectId];
 	};
 	
 	this.newTestPage = function() {
