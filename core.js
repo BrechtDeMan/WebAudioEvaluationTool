@@ -568,7 +568,7 @@ function audioObject(id) {
 	this.metric = new metricTracker(this);
 	
 	// Bindings for GUI
-	this.sliderDOM = null;
+	this.interfaceDOM = null;
 	this.commentDOM = null;
 	
 	// Create a buffer and external gain control to allow internal patching of effects and volume leveling.
@@ -666,6 +666,16 @@ function audioObject(id) {
 			});
 		};
 		request.send();
+	};
+	
+	this.exportXMLDOM = function() {
+		var root = document.createElement('audioElement');
+		root.id = this.specification.id;
+		root.setAttribute('url',this.url);
+		root.appendChild(this.interfaceDOM.exportXMLDOM());
+		root.appendChild(this.commentDOM.exportXMLDOM());
+		root.appendChild(this.metric.exportXMLDOM());
+		return root;
 	};
 }
 
@@ -1105,6 +1115,7 @@ function Interface(specificationObject) {
 	this.commentBoxes = [];
 	this.commentBox = function(audioObject) {
 		var element = audioObject.specification;
+		this.audioObject = audioObject;
 		this.id = audioObject.id;
 		var audioHolderObject = audioObject.specification.parent;
 		// Create document objects to hold the comment boxes
@@ -1112,19 +1123,32 @@ function Interface(specificationObject) {
 		this.trackComment.className = 'comment-div';
 		this.trackComment.id = 'comment-div-'+audioObject.id;
 		// Create a string next to each comment asking for a comment
-		var trackString = document.createElement('span');
-		trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.id;
+		this.trackString = document.createElement('span');
+		this.trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.id;
 		// Create the HTML5 comment box 'textarea'
-		var trackCommentBox = document.createElement('textarea');
-		trackCommentBox.rows = '4';
-		trackCommentBox.cols = '100';
-		trackCommentBox.name = 'trackComment'+audioObject.id;
-		trackCommentBox.className = 'trackComment';
+		this.trackCommentBox = document.createElement('textarea');
+		this.trackCommentBox.rows = '4';
+		this.trackCommentBox.cols = '100';
+		this.trackCommentBox.name = 'trackComment'+audioObject.id;
+		this.trackCommentBox.className = 'trackComment';
 		var br = document.createElement('br');
 		// Add to the holder.
-		this.trackComment.appendChild(trackString);
+		this.trackComment.appendChild(this.trackString);
 		this.trackComment.appendChild(br);
-		this.trackComment.appendChild(trackCommentBox);
+		this.trackComment.appendChild(this.trackCommentBox);
+		
+		this.exportXMLDOM = function() {
+			var root = document.createElement('comment');
+			if (this.audioObject.specification.parent.elementComments) {
+				var question = document.createElement('question');
+				question.textContent = this.trackString.textContent;
+				var response = document.createElement('response');
+				response.textContent = this.trackCommentBox.value;
+				root.appendChild(question);
+				root.appendChild(response);
+			}
+			return root;
+		};
 	};
 	
 	this.createCommentBox = function(audioObject) {
