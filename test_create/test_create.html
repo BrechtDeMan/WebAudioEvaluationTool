@@ -147,14 +147,37 @@
 					audioHolder.appendChild(audioHolderPreTest);
 					audioHolder.appendChild(audioHolderPostTest);
 					
+					// Interface Nodes
+					
 					// audio-Elements
 					var audioElementsDOM = [];
 					var commentQuestionDOM = [];
+					var interfacesDOM = [];
 					for (var j=0; j<audioHolderDOM.childElementCount; j++) {
 						var child = audioHolderDOM.childNodes[j];
 						var name = child.getAttribute('name');
 						if (name == 'audio-element') {audioElementsDOM.push(child);}
 						else if (name == 'comment-question') {commentQuestionDOM.push(child);}
+						else if (name == 'interface-options') {interfacesDOM.push(child);}
+					}
+					
+					for (var j=0; j<interfacesDOM.length; j++) {
+						var interfaceNode = document.createElement('interface');
+						attribs = interfacesDOM[j].getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						var title = document.createElement('title');
+						title.textContent = attribs[0].value;
+						interfaceNode.appendChild(title);
+						
+						
+						var markers = interfacesDOM[j].getElementsByClassName('head');
+						for (var k=0; k<markers.length; k++) {
+							var markerNode = document.createElement('scale');
+							attribs = markers[k].getElementsByClassName('attrib')[0].getElementsByTagName('input');
+							markerNode.textContent = attribs[0].value;
+							markerNode.setAttribute('position',attribs[1].value);
+							interfaceNode.appendChild(markerNode);
+						}
+						audioHolder.appendChild(interfaceNode);
 					}
 					
 					for (var j=0; j<audioElementsDOM.length; j++) {
@@ -380,6 +403,13 @@
 				};
 				node.appendChild(newCommentButton);
 				
+				var newInterface = document.createElement("button");
+				newInterface.textContent = "Add Interface";
+				newInterface.onclick = function() {
+					event.srcElement.parentElement.appendChild(interfaceNode());
+				};
+				node.appendChild(newInterface);
+				
 				var removeButton = document.createElement("button");
 				removeButton.textContent = "Remove Audio Holder";
 				removeButton.onclick = removeNode;
@@ -436,6 +466,61 @@
 				return node;
 			}
 			
+			function interfaceNode() {
+				var selectedInterface = document.getElementById('interface').value;
+				var node = document.createElement('div');
+				node.setAttribute('class','head');
+				node.setAttribute('name','interface-options');
+				var nodeTitle = document.createElement('h4');
+				nodeTitle.textContent = "Interface";
+				
+				var attributes = document.createElement('div');
+				attributes.setAttribute('class','attrib');
+				var title = attributePair('Title: ','text',false);
+				title[1].style.width = "500px";
+				
+				var addMarker = document.createElement('button');
+				addMarker.textContent = "Add Scale Marker";
+				addMarker.onclick = function() {
+					event.srcElement.parentElement.appendChild(newScaleMarker());
+				};
+				
+				title.forEach(function(item){attributes.appendChild(item);},false);
+				
+				var removeButton = document.createElement("button");
+				removeButton.textContent = "Remove Interface";
+				removeButton.onclick = removeNode;
+				
+				node.appendChild(nodeTitle);
+				node.appendChild(attributes);
+				node.appendChild(addMarker);
+				node.appendChild(removeButton);
+				return node;
+			}
+			
+			function newScaleMarker() {
+				var node = document.createElement('div');
+				node.setAttribute('class','head');
+				node.setAttribute('name','interface-options');
+				var nodeTitle = document.createElement('span');
+				nodeTitle.textContent = "Marker";
+				var attributes = document.createElement('div');
+				attributes.setAttribute('class','attrib');
+				var text = attributePair('Text: ','text',true);
+				var position = attributePair('Positon','number',true);
+				
+				text.forEach(function(item){attributes.appendChild(item);},false);
+				position.forEach(function(item){attributes.appendChild(item);},false);
+				
+				var removeButton = document.createElement("button");
+				removeButton.textContent = "Remove Marker";
+				removeButton.onclick = removeNode;
+				
+				node.appendChild(nodeTitle);
+				node.appendChild(attributes);
+				node.appendChild(removeButton);
+				return node;
+			}
 			
 			function handleDragOver(e) {
 				e.stopPropagation();
@@ -575,6 +660,25 @@
 							audioHolderDOM.children[3].appendChild(node);
 						}
 					}
+					// Process interface
+					var interfaceNodes = audioHolders[i].getElementsByTagName('interface');
+					for (var j=0; j<interfaceNodes.length; j++) {
+						var node = interfaceNode();
+						var child = interfaceNodes[j];
+						var attribs = node.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+						attribs[0].value = child.getElementsByTagName('title')[0].textContent;
+						
+						var markers = child.getElementsByTagName('scale');
+						for (var k=0; k<markers.length; k++) {
+							var markerNode = newScaleMarker();
+							attribs = markerNode.getElementsByClassName('attrib')[0].getElementsByTagName('input');
+							attribs[0].value = markers[k].textContent;
+							attribs[1].value = markers[k].getAttribute('position');
+							node.appendChild(markerNode);
+						}
+						audioHolderDOM.appendChild(node);
+					}
+					
 					
 					// Process audio-element
 					var audioElements = audioHolders[i].getElementsByTagName('audioElements');
