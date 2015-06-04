@@ -31,19 +31,9 @@ function loadInterface() {
 	{
 	};
 	
-	audioEngineContext.metric.sliderMoveStart = function(id)
-	{
-		if (this.data == -1)
-		{
-			this.data = id;
-		} else {
-			console.log('ERROR: Metric tracker detecting two moves!');
-			this.data = -1;
-		}
-	};
 	audioEngineContext.metric.sliderMoved = function()
 	{
-		var time = audioEngineContext.timer.getTestTime();
+		
 		var id = this.data;
 		this.data = -1;
 		var position = convSliderPosToRate(id);
@@ -285,54 +275,16 @@ function loadTest(audioHolderObject)
 		}
 		
 		// Create a slider per track
-		
-		var trackSliderObj = document.createElement('div');
-		trackSliderObj.className = 'track-slider';
-		trackSliderObj.id = 'track-slider-'+index;
-		
-		var trackSliderAOIndex = document.createAttribute('trackIndex');
-		trackSliderAOIndex.nodeValue = index;
-		trackSliderObj.setAttributeNode(trackSliderAOIndex);
+		audioObject.interfaceDOM = new sliderObject(audioObject);
 		
 		// Distribute it randomnly
 		var w = window.innerWidth - (offset+8)*2;
 		w = Math.random()*w;
 		w = Math.floor(w+(offset+8));
-		trackSliderObj.style.left = w+'px';
-		trackSliderObj.innerHTML = '<span>'+index+'</span>';
-		trackSliderObj.draggable = true;
-		trackSliderObj.ondragend = dragEnd;
-		trackSliderObj.ondragstart = function()
-		{
-			var id = Number(event.srcElement.attributes['trackIndex'].value);
-			audioEngineContext.metric.sliderMoveStart(id);
-		};
+		audioObject.interfaceDOM.trackSliderObj.style.left = w+'px';
 		
-		// Onclick, switch playback to that track
-		trackSliderObj.onclick = function() {
-			// Start the test on first click, that way timings are more accurate.
-			audioEngineContext.play();
-			if (audioEngineContext.audioObjectsReady) {
-				// Cannot continue to issue play command until audioObjects reported as ready!
-				// Get the track ID from the object ID
-				var id = Number(event.srcElement.attributes['trackIndex'].value);
-				//audioEngineContext.metric.sliderPlayed(id);
-				audioEngineContext.selectedTrack(id);
-	            // Currently playing track red, rest green
-	            
-	            //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
-	            $('.track-slider').removeClass('track-slider-playing');
-	            $(event.srcElement).addClass('track-slider-playing');
-	            $('.comment-div').removeClass('comment-box-playing');
-	            $('#comment-div-'+id).addClass('comment-box-playing');
-			}
-		};
-		
-		// Attach binding
-		audioObject.sliderDOM = trackSliderObj;
-		
-		canvas.appendChild(trackSliderObj);
-		audioObject.metric.initialised(convSliderPosToRate(index));
+		canvas.appendChild(audioObject.interfaceDOM.trackSliderObj);
+		audioObject.metric.initialised(convSliderPosToRate(audioObject.interfaceDOM.trackSliderObj));
         
 	});
 	if (commentShow) {
@@ -366,6 +318,45 @@ function loadTest(audioHolderObject)
 	testWaitIndicator();
 }
 
+function sliderObject(audioObject) {
+	// Create a new slider object;
+	this.parent = audioObject;
+	this.trackSliderObj = document.createElement('div');
+	this.trackSliderObj.className = 'track-slider';
+	this.trackSliderObj.id = 'track-slider-'+audioObject.id;
+
+	this.trackSliderObj.setAttribute('trackIndex',audioObject.id);
+	this.trackSliderObj.innerHTML = '<span>'+audioObject.id+'</span>';
+	this.trackSliderObj.draggable = true;
+	this.trackSliderObj.ondragend = dragEnd;
+
+	// Onclick, switch playback to that track
+	this.trackSliderObj.onclick = function() {
+		// Start the test on first click, that way timings are more accurate.
+		audioEngineContext.play();
+		if (audioEngineContext.audioObjectsReady) {
+			// Cannot continue to issue play command until audioObjects reported as ready!
+			// Get the track ID from the object ID
+			var id = Number(event.srcElement.attributes['trackIndex'].value);
+			//audioEngineContext.metric.sliderPlayed(id);
+			audioEngineContext.selectedTrack(id);
+            // Currently playing track red, rest green
+            
+            //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
+            $('.track-slider').removeClass('track-slider-playing');
+            $(event.srcElement).addClass('track-slider-playing');
+            $('.comment-div').removeClass('comment-box-playing');
+            $('#comment-div-'+id).addClass('comment-box-playing');
+		}
+	};
+	
+	this.exportXMLDOM = function() {
+		// Called by the audioObject holding this element. Must be present
+		var node = document.createElement('value');
+		node.textContent = convSliderPosToRate(this.trackSliderObj);
+		return node;
+	};
+}
 
 function dragEnd(ev) {
 	// Function call when a div has been dropped
@@ -383,7 +374,9 @@ function dragEnd(ev) {
 			this.style.left = (w+marginSize) + 'px';
 		}
 	}
-	audioEngineContext.metric.sliderMoved();
+	var time = audioEngineContext.timer.getTestTime();
+	var id = Number(ev.srcElement.getAttribute('trackindex'));
+	audioEngineContext.audioObjects[id].metric.moved(time,convSliderPosToRate(ev.srcElement));
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
@@ -423,12 +416,11 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
     }
 }
 
-function convSliderPosToRate(id)
+function convSliderPosToRate(slider)
 {
 	var w = document.getElementById('slider').style.width;
 	var marginsize = Number(document.getElementById('slider').attributes['marginsize'].value);
 	var maxPix = w.substr(0,w.length-2);
-	var slider = document.getElementsByClassName('track-slider')[id];
 	var pix = slider.style.left;
 	pix = pix.substr(0,pix.length-2);
 	var rate = (pix-marginsize)/maxPix;
@@ -488,26 +480,7 @@ function pageXMLSave(store, testXML)
 	var audioObjects = audioEngineContext.audioObjects;
 	for (var i=0; i<audioObjects.length; i++) 
 	{
-		var audioElement = document.createElement('audioElement');
-		audioElement.id = audioObjects[i].id;
-		audioElement.setAttribute('url',audioObjects[i].url);
-		var value = document.createElement('value');
-		value.innerHTML = convSliderPosToRate(i);
-		if (commentShow) {
-			var comment = document.createElement("comment");
-			var question = document.createElement("question");
-			var response = document.createElement("response");
-			question.textContent = audioObjects[i].commentDOM.children[0].textContent;
-			response.textContent = audioObjects[i].commentDOM.children[2].value;
-            console.log('Comment ' + i + ': ' + response.textContent); // DEBUG/SAFETY
-			comment.appendChild(question);
-			comment.appendChild(response);
-			audioElement.appendChild(comment);
-		}
-		audioElement.appendChild(value);
-		// Check for any per element metrics
-		
-		audioElement.appendChild(audioObjects[i].metric.exportXMLDOM());
+		var audioElement = audioEngineContext.audioObjects[i].exportXMLDOM();
 		xmlDoc.appendChild(audioElement);
 	}
 	var commentQuestion = document.getElementsByClassName('commentQuestion');
