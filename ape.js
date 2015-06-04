@@ -333,8 +333,8 @@ function loadTest(textXML)
 		
 		// Now load each audio sample. First create the new track by passing the full URL
 		var trackURL = hostURL + this.attributes['url'].value;
-		audioEngineContext.newTrack(trackURL);
-		audioEngineContext.audioObjects[index].id = this.attributes['id'].value;
+		var audioObject = audioEngineContext.newTrack(trackURL);
+		audioObject.id = this.attributes['id'].value;
 		
 		if (commentShow) {
 			// Create document objects to hold the comment boxes
@@ -356,7 +356,7 @@ function loadTest(textXML)
 			trackComment.appendChild(br);
 			trackComment.appendChild(trackCommentBox);
 			feedbackHolder.appendChild(trackComment);
-			audioEngineContext.audioObjects[index].commentDOM = trackComment;
+			audioObject.commentDOM = trackComment;
 		}
 		
 		// Create a slider per track
@@ -404,10 +404,10 @@ function loadTest(textXML)
 		};
 		
 		// Attach binding
-		audioEngineContext.audioObjects[index].sliderDOM = trackSliderObj;
+		audioObject.sliderDOM = trackSliderObj;
 		
 		canvas.appendChild(trackSliderObj);
-		audioEngineContext.audioObjects[index].metric.initialised(convSliderPosToRate(index));
+		audioObject.metric.initialised(convSliderPosToRate(index));
         
 	});
 	
