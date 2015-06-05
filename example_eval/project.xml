@@ -2,7 +2,7 @@
 <BrowserEvalProjectDocument>
 	<setup interface="APE" projectReturn="/save" randomiseOrder='true' collectMetrics='true'>
 		<PreTest>
-			<question id="Location" mandatory="true">Please enter your location.</question>
+			<question id="Location" mandatory="true" boxsize="large">Please enter your location.</question>
 			<checkbox id="experience">
 				<statement>Check options which are relevant to you</statement>
 				<option id="digital">Digital Consoles</option>

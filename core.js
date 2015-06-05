@@ -116,6 +116,24 @@ function interfacePopup() {
 			var span = document.createElement('span');
 			span.textContent = node.question;
 			var textArea = document.createElement('textarea');
+			switch (node.boxsize) {
+			case 'small':
+				textArea.cols = "20";
+				textArea.rows = "1";
+				break;
+			case 'normal':
+				textArea.cols = "30";
+				textArea.rows = "2";
+				break;
+			case 'large':
+				textArea.cols = "40";
+				textArea.rows = "5";
+				break;
+			case 'huge':
+				textArea.cols = "50";
+				textArea.rows = "10";
+				break;
+			}
 			var br = document.createElement('br');
 			this.popupContent.appendChild(span);
 			this.popupContent.appendChild(br);
@@ -1100,7 +1118,7 @@ function Specification() {
 				this.id = element.id;
 				this.name = element.getAttribute('name');
 				this.text = element.textContent;
-			}
+			};
 			
 			this.type = child.nodeName;
 			if (child.nodeName == "question") {
@@ -1109,6 +1127,11 @@ function Specification() {
 				if (child.getAttribute('mandatory') == "true") {this.mandatory = true;}
 				else {this.mandatory = false;}
 				this.question = child.textContent;
+				if (child.getAttribute('boxsize') == null) {
+					this.boxsize = 'normal';
+				} else {
+					this.boxsize = child.getAttribute('boxsize');
+				}
 			} else if (child.nodeName == "statement") {
 				this.statement = child.textContent;
 			} else if (child.nodeName == "checkbox" || child.nodeName == "radio") {
