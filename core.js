@@ -144,6 +144,31 @@ function interfacePopup() {
 				optHold.appendChild(hold);
 			}
 			this.popupContent.appendChild(optHold);
+		} else if (node.type == 'radio') {
+			var span = document.createElement('span');
+			span.textContent = node.statement;
+			this.popupContent.appendChild(span);
+			var optHold = document.createElement('div');
+			optHold.id = 'option-holder';
+			optHold.align = 'none';
+			optHold.style.float = 'left';
+			optHold.style.width = "100%";
+			for (var i=0; i<node.options.length; i++) {
+				var option = node.options[i];
+				var input = document.createElement('input');
+				input.id = option.name;
+				input.type = 'radio';
+				input.name = node.id;
+				var span = document.createElement('span');
+				span.textContent = option.text;
+				var hold = document.createElement('div');
+				hold.setAttribute('name','option');
+				hold.style.padding = '4px';
+				hold.appendChild(input);
+				hold.appendChild(span);
+				optHold.appendChild(hold);
+			}
+			this.popupContent.appendChild(optHold);
 		}
 		this.popupContent.appendChild(this.popupButton);
 	};
@@ -192,6 +217,7 @@ function interfacePopup() {
 			var optHold = document.getElementById('option-holder');
 			var hold = document.createElement('checkbox');
 			console.log("Checkbox: "+ node.statement);
+			hold.id = node.id;
 			for (var i=0; i<optHold.childElementCount; i++) {
 				var input = optHold.childNodes[i].getElementsByTagName('input')[0];
 				var statement = optHold.childNodes[i].getElementsByTagName('span')[0];
@@ -201,6 +227,22 @@ function interfacePopup() {
 				hold.appendChild(response);
 				console.log(input.id +': '+ input.checked);
 			}
+			this.responses.appendChild(hold);
+		} else if (node.type == "radio") {
+			var optHold = document.getElementById('option-holder');
+			var hold = document.createElement('radio');
+			var responseID = null;
+			var i=0;
+			while(responseID == null) {
+				var input = optHold.childNodes[i].getElementsByTagName('input')[0];
+				if (input.checked == true) {
+					responseID = i;
+				}
+				i++;
+			}
+			hold.id = node.id;
+			hold.setAttribute('name',node.options[responseID].name);
+			hold.textContent = node.options[responseID].text;
 			this.responses.appendChild(hold);
 		}
 		this.currentIndex++;
@@ -1056,6 +1098,7 @@ function Specification() {
 			this.childOption = function(element) {
 				this.type = 'option';
 				this.id = element.id;
+				this.name = element.getAttribute('name');
 				this.text = element.textContent;
 			}
 			
@@ -1068,11 +1111,12 @@ function Specification() {
 				this.question = child.textContent;
 			} else if (child.nodeName == "statement") {
 				this.statement = child.textContent;
-			} else if (child.nodeName == "checkbox") {
+			} else if (child.nodeName == "checkbox" || child.nodeName == "radio") {
 				var element = child.firstElementChild;
+				this.id = child.id;
 				if (element == null) {
-					console.log('Malformed checkbox entry');
-					this.statement = 'Malformed checkbox entry';
+					console.log('Malformed' +child.nodeName+ 'entry');
+					this.statement = 'Malformed' +child.nodeName+ 'entry';
 					this.type = 'statement';
 				} else {
 					this.options = [];
