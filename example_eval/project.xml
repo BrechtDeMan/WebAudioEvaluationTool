@@ -11,6 +11,13 @@
 				<option id="studio">Studio Mixing</option>
 				<option id="player">Play an instrument</option>
 			</checkbox>
+			<radio id="rating">
+				<statement>Please rate this interface</statement>
+				<option name="bad">Bad</option>
+				<option name="OK">OK</option>
+				<option name="Good">Good</option>
+				<option name="Great">Great</option>
+			</radio>
 			<statement>Please listen to all mixes</statement>
 		</PreTest>
 		<PostTest>
@@ -48,16 +55,7 @@
 		<audioElements url="9.wav" id="9"/>
 		<audioElements url="10.wav" id="10"/>-->
 		<CommentQuestion id='mixingExperience'>What is your mixing experience</CommentQuestion>
-		<PreTest>
-			<checkbox id="experience">
-				<statement>Check options which are relevant to you</statement>
-				<option id="digital">Digital Consoles</option>
-				<option id="analog">Analog Consoles</option>
-				<option id="live">Live Mixing</option>
-				<option id="studio">Studio Mixing</option>
-				<option id="player">Play an instrument</option>
-			</checkbox>
-		</PreTest>
+		<PreTest/>
 		<PostTest>
 			<question id="genre" mandatory="true">Please enter the genre</question>
 		</PostTest>
