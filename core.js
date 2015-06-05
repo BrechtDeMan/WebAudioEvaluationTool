@@ -121,6 +121,29 @@ function interfacePopup() {
 			this.popupContent.appendChild(br);
 			this.popupContent.appendChild(textArea);
 			this.popupContent.childNodes[2].focus();
+		} else if (node.type == 'checkbox') {
+			var span = document.createElement('span');
+			span.textContent = node.statement;
+			this.popupContent.appendChild(span);
+			var optHold = document.createElement('div');
+			optHold.id = 'option-holder';
+			optHold.align = 'left';
+			for (var i=0; i<node.options.length; i++) {
+				var option = node.options[i];
+				var input = document.createElement('input');
+				input.id = option.id;
+				input.type = 'checkbox';
+				var span = document.createElement('span');
+				span.textContent = option.text;
+				var hold = document.createElement('div');
+				hold.setAttribute('name','option');
+				hold.style.float = 'left';
+				hold.style.padding = '4px';
+				hold.appendChild(input);
+				hold.appendChild(span);
+				optHold.appendChild(hold);
+			}
+			this.popupContent.appendChild(optHold);
 		}
 		this.popupContent.appendChild(this.popupButton);
 	};
@@ -164,6 +187,21 @@ function interfacePopup() {
 				console.log("Question Response: "+ textArea.value);
 				this.responses.appendChild(hold);
 			}
+		} else if (node.type == 'checkbox') {
+			// Must extract checkbox data
+			var optHold = document.getElementById('option-holder');
+			var hold = document.createElement('checkbox');
+			console.log("Checkbox: "+ node.statement);
+			for (var i=0; i<optHold.childElementCount; i++) {
+				var input = optHold.childNodes[i].getElementsByTagName('input')[0];
+				var statement = optHold.childNodes[i].getElementsByTagName('span')[0];
+				var response = document.createElement('option');
+				response.setAttribute('id',input.id);
+				response.setAttribute('checked',input.checked);
+				hold.appendChild(response);
+				console.log(input.id +': '+ input.checked);
+			}
+			this.responses.appendChild(hold);
 		}
 		this.currentIndex++;
 		if (this.currentIndex < this.popupOptions.length) {
@@ -1014,6 +1052,13 @@ function Specification() {
 		this.options = [];
 		
 		this.OptionNode = function(child) {
+			
+			this.childOption = function(element) {
+				this.type = 'option';
+				this.id = element.id;
+				this.text = element.textContent;
+			}
+			
 			this.type = child.nodeName;
 			if (child.nodeName == "question") {
 				this.id = child.id;
@@ -1023,6 +1068,23 @@ function Specification() {
 				this.question = child.textContent;
 			} else if (child.nodeName == "statement") {
 				this.statement = child.textContent;
+			} else if (child.nodeName == "checkbox") {
+				var element = child.firstElementChild;
+				if (element == null) {
+					console.log('Malformed checkbox entry');
+					this.statement = 'Malformed checkbox entry';
+					this.type = 'statement';
+				} else {
+					this.options = [];
+					while (element != null) {
+						if (element.nodeName == 'statement' && this.statement == undefined){
+							this.statement = element.textContent;
+						} else if (element.nodeName == 'option') {
+							this.options.push(new this.childOption(element));
+						}
+						element = element.nextElementSibling;
+					}
+				}
 			}
 		};
 		
