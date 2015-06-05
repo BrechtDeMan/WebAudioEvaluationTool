@@ -937,17 +937,24 @@ function testWaitIndicator() {
 		var hold = document.createElement("div");
 		hold.id = "testWaitIndicator";
 		hold.className = "indicator-box";
+		hold.style.zIndex = 3;
 		var span = document.createElement("span");
 		span.textContent = "Please wait! Elements still loading";
 		hold.appendChild(span);
+		var blank = document.createElement('div');
+		blank.className = 'testHalt';
+		blank.id = "testHaltBlank";
 		var body = document.getElementsByTagName('body')[0];
 		body.appendChild(hold);
+		body.appendChild(blank);
 		testWaitTimerIntervalHolder = setInterval(function(){
 			var ready = audioEngineContext.checkAllReady();
 			if (ready) {
 				var elem = document.getElementById('testWaitIndicator');
+				var blank = document.getElementById('testHaltBlank');
 				var body = document.getElementsByTagName('body')[0];
 				body.removeChild(elem);
+				body.removeChild(blank);
 				clearInterval(testWaitTimerIntervalHolder);
 			}
 		},500,false);
