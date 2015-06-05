@@ -1026,9 +1026,13 @@ function Specification() {
 		// On construction:
 		if (Collection.length != 0) {
 			Collection = Collection[0];
-			for (var i=0; i<Collection.childElementCount; i++) {
-				var child = Collection.children[i];
+			if (Collection.childElementCount != 0) {
+				var child = Collection.firstElementChild;
 				this.options.push(new this.OptionNode(child));
+				while (child.nextElementSibling != null) {
+					child = child.nextElementSibling;
+					this.options.push(new this.OptionNode(child));
+				}
 			}
 		}
 	};
