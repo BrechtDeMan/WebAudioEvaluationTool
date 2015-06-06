@@ -64,8 +64,7 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
         plt.ylabel('Rating')
         plt.ylim(0,1)
 
-        plt.show()
+        #plt.show() # show plot
         #exit()
 
-        #TODO Save output automatically
-
+        plt.savefig(rating_folder+page_name+"-ind.png")
