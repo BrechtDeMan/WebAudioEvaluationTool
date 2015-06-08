@@ -49,7 +49,7 @@ function interfacePopup() {
 	// Creates an object to manage the popup
 	this.popup = null;
 	this.popupContent = null;
-	this.popupButton = null;
+	this.buttonProceed = null;
 	this.popupOptions = null;
 	this.currentIndex = null;
 	this.responses = null;
@@ -73,10 +73,10 @@ function interfacePopup() {
 		this.popupContent.align = 'center';
 		this.popup.appendChild(this.popupContent);
 		
-		this.popupButton = document.createElement('button');
-		this.popupButton.className = 'popupButton';
-		this.popupButton.innerHTML = 'Next';
-		this.popupButton.onclick = function(){popup.buttonClicked();};
+		this.buttonProceed = document.createElement('button');
+		this.buttonProceed.className = 'popupButton';
+		this.buttonProceed.innerHTML = 'Next';
+		this.buttonProceed.onclick = function(){popup.proceedClicked();};
 		this.popup.style.zIndex = -1;
 		this.popup.style.visibility = 'hidden';
 		blank.style.zIndex = -2;
@@ -199,7 +199,7 @@ function interfacePopup() {
 			if (node.step != null) {input.step = node.step;}
 			this.popupContent.appendChild(input);
 		}
-		this.popupContent.appendChild(this.popupButton);
+		this.popupContent.appendChild(this.buttonProceed);
 	};
 	
 	this.initState = function(node) {
@@ -223,7 +223,7 @@ function interfacePopup() {
 		}
 	};
 	
-	this.buttonClicked = function() {
+	this.proceedClicked = function() {
 		// Each time the popup button is clicked!
 		var node = this.popupOptions[this.currentIndex];
 		if (node.type == 'question') {
@@ -276,7 +276,20 @@ function interfacePopup() {
 		} else if (node.type == "number") {
 			var input = this.popupContent.getElementsByTagName('input')[0];
 			if (node.mandatory == true && input.value.length == 0) {
-				alert('This question is mandatory');
+				alert('This question is mandatory. Please enter a number');
+				return;
+			}
+			var enteredNumber = Number(input.value);
+			if (enteredNumber == undefined) {
+				alert('Please enter a valid number');
+				return;
+			}
+			if (enteredNumber < node.min && node.min != null) {
+				alert('Number is below the minimum value of '+node.min);
+				return;
+			}
+			if (enteredNumber > node.max && node.max != null) {
+				alert('Number is above the maximum value of '+node.max);
 				return;
 			}
 			var hold = document.createElement('number');
@@ -286,6 +299,9 @@ function interfacePopup() {
 		}
 		this.currentIndex++;
 		if (this.currentIndex < this.popupOptions.length) {
+			if(this.currentIndex+1 == this.popupOptions.length) {
+				this.buttonProceed.textContent = 'Submit';
+			}
 			this.postNode();
 		} else {
 			// Reached the end of the popupOptions

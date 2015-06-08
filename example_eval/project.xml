@@ -11,7 +11,7 @@
 				<option id="studio">Studio Mixing</option>
 				<option id="player">Play an instrument</option>
 			</checkbox>
-			<number id="age">Please enter your age</number>
+			<number id="age" min="0">Please enter your age</number>
 			<statement>Please listen to all mixes</statement>
 		</PreTest>
 		<PostTest>
