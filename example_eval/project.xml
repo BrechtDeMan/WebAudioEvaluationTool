@@ -54,7 +54,15 @@
 		<audioElements url="8.wav" id="8"/>
 		<audioElements url="9.wav" id="9"/>
 		<audioElements url="10.wav" id="10"/>-->
-		<CommentQuestion id='mixingExperience'>What is your mixing experience</CommentQuestion>
+		<CommentQuestion id='mixingExperience' type="text">What is your mixing experience</CommentQuestion>
+		<CommentQuestion id="preference" type="radio">
+			<statement>Please enter your ranking preference on this song</statement>
+			<option name="worst">Very Bad</option>
+			<option name="bad"></option>
+			<option name="OK">OK</option>
+			<option name="Good"></option>
+			<option name="Great">Great</option>
+		</CommentQuestion>
 		<PreTest/>
 		<PostTest>
 			<question id="genre" mandatory="true">Please enter the genre</question>
