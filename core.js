@@ -226,7 +226,7 @@ function interfacePopup() {
 				var hold = document.createElement('comment');
 				hold.id = node.id;
 				hold.innerHTML = textArea.value;
-				console.log("Question: "+ node.textContent);
+				console.log("Question: "+ node.question);
 				console.log("Question Response: "+ textArea.value);
 				this.responses.appendChild(hold);
 			}
@@ -240,8 +240,8 @@ function interfacePopup() {
 				var input = optHold.childNodes[i].getElementsByTagName('input')[0];
 				var statement = optHold.childNodes[i].getElementsByTagName('span')[0];
 				var response = document.createElement('option');
-				response.setAttribute('id',input.id);
-				response.setAttribute('checked',input.checked);
+				response.setAttribute('name',input.id);
+				response.textContent = input.checked;
 				hold.appendChild(response);
 				console.log(input.id +': '+ input.checked);
 			}
@@ -1222,6 +1222,19 @@ function Specification() {
 					}
 					child = child.nextElementSibling;
 				}
+				break;
+			case 'checkbox':
+				var child = xml.firstElementChild;
+				this.options = [];
+				while (child != undefined) {
+					if (child.nodeName == 'statement' && this.statement == undefined) {
+						this.statement = child.textContent;
+					} else if (child.nodeName == 'option') {
+						this.options.push(new this.childOption(child));
+					}
+					child = child.nextElementSibling;
+				}
+				break;
 			}
 		};
 		
@@ -1422,12 +1435,88 @@ function Interface(specificationObject) {
 				response.textContent = this.options[i].getAttribute('setvalue');
 				response.setAttribute('number',i);
 			}
+			console.log('Comment: '+question.textContent);
+			console.log('Response: '+response.textContent);
 			root.appendChild(question);
 			root.appendChild(response);
 			return root;
 		};
 	};
 	
+	this.checkboxBox = function(commentQuestion) {
+		this.specification = commentQuestion;
+		// Create document objects to hold the comment boxes
+		this.holder = document.createElement('div');
+		this.holder.className = 'comment-div';
+		// Create a string next to each comment asking for a comment
+		this.string = document.createElement('span');
+		this.string.innerHTML = commentQuestion.statement;
+		var br = document.createElement('br');
+		// Add to the holder.
+		this.holder.appendChild(this.string);
+		this.holder.appendChild(br);
+		this.options = [];
+		this.inputs = document.createElement('div');
+		this.span = document.createElement('div');
+		this.inputs.align = 'center';
+		this.inputs.style.marginLeft = '12px';
+		this.span.style.marginLeft = '12px';
+		this.span.align = 'center';
+		this.span.style.marginTop = '15px';
+		
+		var optCount = commentQuestion.options.length;
+		var spanMargin = Math.floor(((600-(optCount*100))/(optCount))/2)+'px';
+		console.log(spanMargin);
+		for (var i=0; i<optCount; i++)
+		{
+			var div = document.createElement('div');
+			div.style.width = '100px';
+			div.style.float = 'left';
+			div.style.marginRight = spanMargin;
+			div.style.marginLeft = spanMargin;
+			var input = document.createElement('input');
+			input.type = 'checkbox';
+			input.name = commentQuestion.id;
+			input.setAttribute('setvalue',commentQuestion.options[i].name);
+			input.className = 'comment-radio';
+			div.appendChild(input);
+			this.inputs.appendChild(div);
+			
+			
+			div = document.createElement('div');
+			div.style.width = '100px';
+			div.style.float = 'left';
+			div.style.marginRight = spanMargin;
+			div.style.marginLeft = spanMargin;
+			div.align = 'center';
+			var span = document.createElement('span');
+			span.textContent = commentQuestion.options[i].text;
+			span.className = 'comment-radio-span';
+			div.appendChild(span);
+			this.span.appendChild(div);
+			this.options.push(input);
+		}
+		this.holder.appendChild(this.span);
+		this.holder.appendChild(this.inputs);
+		
+		this.exportXMLDOM = function() {
+			var root = document.createElement('comment');
+			root.id = this.specification.id;
+			root.setAttribute('type',this.specification.type);
+			var question = document.createElement('question');
+			question.textContent = this.string.textContent;
+			root.appendChild(question);
+			console.log('Comment: '+question.textContent);
+			for (var i=0; i<this.options.length; i++) {
+				var response = document.createElement('response');
+				response.textContent = this.options[i].checked;
+				response.setAttribute('name',this.options[i].getAttribute('setvalue'));
+				root.appendChild(response);
+				console.log('Response '+response.getAttribute('name') +': '+response.textContent);
+			}
+			return root;
+		};
+	};
 
 	this.createCommentBox = function(audioObject) {
 		var node = new this.elementCommentBox(audioObject);
@@ -1458,6 +1547,8 @@ function Interface(specificationObject) {
 			node = new this.commentBox(element);
 		} else if (element.type == 'radio') {
 			node = new this.radioBox(element);
+		} else if (element.type == 'checkbox') {
+			node = new this.checkboxBox(element);
 		}
 		this.commentQuestions.push(node);
 		return node;

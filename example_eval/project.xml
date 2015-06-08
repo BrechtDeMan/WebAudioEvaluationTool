@@ -63,6 +63,14 @@
 			<option name="Good"></option>
 			<option name="Great">Great</option>
 		</CommentQuestion>
+		<CommentQuestion id="preference" type="checkbox">
+			<statement>Describe this song</statement>
+			<option name="bright">Bright</option>
+			<option name="punchy">Punchy</option>
+			<option name="dark">Dark</option>
+			<option name="moody">Moody</option>
+			<option name="dull">Dull</option>
+		</CommentQuestion>
 		<PreTest/>
 		<PostTest>
 			<question id="genre" mandatory="true">Please enter the genre</question>
