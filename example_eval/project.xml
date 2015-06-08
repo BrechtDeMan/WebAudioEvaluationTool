@@ -11,6 +11,11 @@
 				<option id="studio">Studio Mixing</option>
 				<option id="player">Play an instrument</option>
 			</checkbox>
+			<number id="age">Please enter your age</number>
+			<statement>Please listen to all mixes</statement>
+		</PreTest>
+		<PostTest>
+			<question id="SessionID" mandatory="true">Please enter your name.</question>
 			<radio id="rating">
 				<statement>Please rate this interface</statement>
 				<option name="bad">Bad</option>
@@ -18,10 +23,6 @@
 				<option name="Good">Good</option>
 				<option name="Great">Great</option>
 			</radio>
-			<statement>Please listen to all mixes</statement>
-		</PreTest>
-		<PostTest>
-			<question id="SessionID" mandatory="true">Please enter your name.</question>
 			<statement>Thank you for taking this listening test.</statement>
 		</PostTest>
 		<Metric>

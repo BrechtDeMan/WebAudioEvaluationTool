@@ -187,6 +187,17 @@ function interfacePopup() {
 				optHold.appendChild(hold);
 			}
 			this.popupContent.appendChild(optHold);
+		} else if (node.type == 'number') {
+			var span = document.createElement('span');
+			span.textContent = node.statement;
+			this.popupContent.appendChild(span);
+			this.popupContent.appendChild(document.createElement('br'));
+			var input = document.createElement('input');
+			input.type = 'number';
+			if (node.min != null) {input.min = node.min;}
+			if (node.max != null) {input.max = node.max;}
+			if (node.step != null) {input.step = node.step;}
+			this.popupContent.appendChild(input);
 		}
 		this.popupContent.appendChild(this.popupButton);
 	};
@@ -261,6 +272,16 @@ function interfacePopup() {
 			hold.id = node.id;
 			hold.setAttribute('name',node.options[responseID].name);
 			hold.textContent = node.options[responseID].text;
+			this.responses.appendChild(hold);
+		} else if (node.type == "number") {
+			var input = this.popupContent.getElementsByTagName('input')[0];
+			if (node.mandatory == true && input.value.length == 0) {
+				alert('This question is mandatory');
+				return;
+			}
+			var hold = document.createElement('number');
+			hold.id = node.id;
+			hold.textContent = input.value;
 			this.responses.appendChild(hold);
 		}
 		this.currentIndex++;
@@ -1152,6 +1173,12 @@ function Specification() {
 						element = element.nextElementSibling;
 					}
 				}
+			} else if (child.nodeName == "number") {
+				this.statement = child.textContent;
+				this.id = child.id;
+				this.min = child.getAttribute('min');
+				this.max = child.getAttribute('max');
+				this.step = child.getAttribute('step');
 			}
 		};
 		
