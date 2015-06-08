@@ -116,6 +116,24 @@ function interfacePopup() {
 			var span = document.createElement('span');
 			span.textContent = node.question;
 			var textArea = document.createElement('textarea');
+			switch (node.boxsize) {
+			case 'small':
+				textArea.cols = "20";
+				textArea.rows = "1";
+				break;
+			case 'normal':
+				textArea.cols = "30";
+				textArea.rows = "2";
+				break;
+			case 'large':
+				textArea.cols = "40";
+				textArea.rows = "5";
+				break;
+			case 'huge':
+				textArea.cols = "50";
+				textArea.rows = "10";
+				break;
+			}
 			var br = document.createElement('br');
 			this.popupContent.appendChild(span);
 			this.popupContent.appendChild(br);
@@ -1100,7 +1118,7 @@ function Specification() {
 				this.id = element.id;
 				this.name = element.getAttribute('name');
 				this.text = element.textContent;
-			}
+			};
 			
 			this.type = child.nodeName;
 			if (child.nodeName == "question") {
@@ -1109,6 +1127,11 @@ function Specification() {
 				if (child.getAttribute('mandatory') == "true") {this.mandatory = true;}
 				else {this.mandatory = false;}
 				this.question = child.textContent;
+				if (child.getAttribute('boxsize') == null) {
+					this.boxsize = 'normal';
+				} else {
+					this.boxsize = child.getAttribute('boxsize');
+				}
 			} else if (child.nodeName == "statement") {
 				this.statement = child.textContent;
 			} else if (child.nodeName == "checkbox" || child.nodeName == "radio") {
@@ -1174,10 +1197,32 @@ function Specification() {
 		};
 		
 		this.commentQuestionNode = function(xml) {
+			this.childOption = function(element) {
+				this.type = 'option';
+				this.name = element.getAttribute('name');
+				this.text = element.textContent;
+			};
 			this.id = xml.id;
 			if (xml.getAttribute('mandatory') == 'true') {this.mandatory = true;}
 			else {this.mandatory = false;}
-			this.question = xml.textContent;
+			this.type = xml.getAttribute('type');
+			if (this.type == undefined) {this.type = 'text';}
+			switch (this.type) {
+			case 'text':
+				this.question = xml.textContent;
+				break;
+			case 'radio':
+				var child = xml.firstElementChild;
+				this.options = [];
+				while (child != undefined) {
+					if (child.nodeName == 'statement' && this.statement == undefined) {
+						this.statement = child.textContent;
+					} else if (child.nodeName == 'option') {
+						this.options.push(new this.childOption(child));
+					}
+					child = child.nextElementSibling;
+				}
+			}
 		};
 		
 		this.id = xml.id;
@@ -1233,7 +1278,7 @@ function Interface(specificationObject) {
 	this.interfaceObject = function(){};
 	
 	this.commentBoxes = [];
-	this.commentBox = function(audioObject) {
+	this.elementCommentBox = function(audioObject) {
 		var element = audioObject.specification;
 		this.audioObject = audioObject;
 		this.id = audioObject.id;
@@ -1271,8 +1316,121 @@ function Interface(specificationObject) {
 		};
 	};
 	
+	this.commentQuestions = [];
+	
+	this.commentBox = function(commentQuestion) {
+		this.specification = commentQuestion;
+		// Create document objects to hold the comment boxes
+		this.holder = document.createElement('div');
+		this.holder.className = 'comment-div';
+		// Create a string next to each comment asking for a comment
+		this.string = document.createElement('span');
+		this.string.innerHTML = commentQuestion.question;
+		// Create the HTML5 comment box 'textarea'
+		this.textArea = document.createElement('textarea');
+		this.textArea.rows = '4';
+		this.textArea.cols = '100';
+		this.textArea.className = 'trackComment';
+		var br = document.createElement('br');
+		// Add to the holder.
+		this.holder.appendChild(this.string);
+		this.holder.appendChild(br);
+		this.holder.appendChild(this.textArea);
+		
+		this.exportXMLDOM = function() {
+			var root = document.createElement('comment');
+			root.id = this.specification.id;
+			root.setAttribute('type',this.specification.type);
+			root.textContent = this.textArea.value;
+			return root;
+		};
+	};
+	
+	this.radioBox = function(commentQuestion) {
+		this.specification = commentQuestion;
+		// Create document objects to hold the comment boxes
+		this.holder = document.createElement('div');
+		this.holder.className = 'comment-div';
+		// Create a string next to each comment asking for a comment
+		this.string = document.createElement('span');
+		this.string.innerHTML = commentQuestion.statement;
+		var br = document.createElement('br');
+		// Add to the holder.
+		this.holder.appendChild(this.string);
+		this.holder.appendChild(br);
+		this.options = [];
+		this.inputs = document.createElement('div');
+		this.span = document.createElement('div');
+		this.inputs.align = 'center';
+		this.inputs.style.marginLeft = '12px';
+		this.span.style.marginLeft = '12px';
+		this.span.align = 'center';
+		this.span.style.marginTop = '15px';
+		
+		var optCount = commentQuestion.options.length;
+		var spanMargin = Math.floor(((600-(optCount*100))/(optCount))/2)+'px';
+		console.log(spanMargin);
+		for (var i=0; i<optCount; i++)
+		{
+			var div = document.createElement('div');
+			div.style.width = '100px';
+			div.style.float = 'left';
+			div.style.marginRight = spanMargin;
+			div.style.marginLeft = spanMargin;
+			var input = document.createElement('input');
+			input.type = 'radio';
+			input.name = commentQuestion.id;
+			input.setAttribute('setvalue',commentQuestion.options[i].name);
+			input.className = 'comment-radio';
+			div.appendChild(input);
+			this.inputs.appendChild(div);
+			
+			
+			div = document.createElement('div');
+			div.style.width = '100px';
+			div.style.float = 'left';
+			div.style.marginRight = spanMargin;
+			div.style.marginLeft = spanMargin;
+			div.align = 'center';
+			var span = document.createElement('span');
+			span.textContent = commentQuestion.options[i].text;
+			span.className = 'comment-radio-span';
+			div.appendChild(span);
+			this.span.appendChild(div);
+			this.options.push(input);
+		}
+		this.holder.appendChild(this.span);
+		this.holder.appendChild(this.inputs);
+		
+		this.exportXMLDOM = function() {
+			var root = document.createElement('comment');
+			root.id = this.specification.id;
+			root.setAttribute('type',this.specification.type);
+			var question = document.createElement('question');
+			question.textContent = this.string.textContent;
+			var response = document.createElement('response');
+			var i=0;
+			while(this.options[i].checked == false) {
+				i++;
+				if (i >= this.options.length) {
+					break;
+				}
+			}
+			if (i >= this.options.length) {
+				response.textContent = 'null';
+			} else {
+				response.textContent = this.options[i].getAttribute('setvalue');
+				response.setAttribute('number',i);
+			}
+			root.appendChild(question);
+			root.appendChild(response);
+			return root;
+		};
+	};
+	
+
 	this.createCommentBox = function(audioObject) {
-		var node = new this.commentBox(audioObject);
+		var node = new this.elementCommentBox(audioObject);
 		this.commentBoxes.push(node);
 		audioObject.commentDOM = node;
 		return node;
@@ -1292,6 +1450,17 @@ function Interface(specificationObject) {
 		for (var i=0; i<interfaceContext.commentBoxes.length; i++) {
 			inject.appendChild(this.commentBoxes[i].trackComment);
 		}
+	};
+	
+	this.createCommentQuestion = function(element) {
+		var node;
+		if (element.type == 'text') {
+			node = new this.commentBox(element);
+		} else if (element.type == 'radio') {
+			node = new this.radioBox(element);
+		}
+		this.commentQuestions.push(node);
+		return node;
 	};
 }
 

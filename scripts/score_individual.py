@@ -9,7 +9,7 @@ colormap = ['b', 'r', 'g', 'c', 'm', 'y', 'k'] # colormap for to cycle through
 markerlist = ["x", ".", "o", "*", "+", "v", ">", "<", "8", "s", "p"]
 
 # get every csv file in folder
-for file in os.listdir(rating_folder): # You have to put this in folder where rating csv files are.
+for file in os.listdir(rating_folder):
     if file.endswith(".csv"):
         page_name = file[:-4] # file name (without extension) is page ID
 
@@ -47,13 +47,14 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
 
             plt.legend(linehandles, legendnames,
                        loc='upper right',
-                       bbox_to_anchor=(1.1, 1), borderaxespad=0.)
+                       bbox_to_anchor=(1.1, 1),
+                       borderaxespad=0.,
+                       numpoints=1 # remove extra marker
+                       )
 
             #TODO Put legend outside of box
-            #TODO Why two markers in legend?
 
-            plt.show()
+            #plt.show() # show plot
             #exit()
 
-            #TODO Save output automatically
-
+            plt.savefig(rating_folder+page_name+"-ind.png")

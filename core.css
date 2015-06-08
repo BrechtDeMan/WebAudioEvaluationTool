@@ -27,6 +27,7 @@ div.comment-div {
 	width: 624px;
 	float: left;
 	margin: 5px;
+	height: 90px;
 }
 
 div.comment-div span {
