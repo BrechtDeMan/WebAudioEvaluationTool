@@ -51,15 +51,11 @@ div.sliderScale {
 	min-height: 30px;
 }
 
-div.sliderScale span{
-	font-size: 1.2em;
-}
-
 div.sliderScale span {
 	/* Any formatting of text below scale */
+	font-size: 1.2em;
 	min-width: 5px;
 	height: 20px;
-	height: 100%;
 	position: absolute;
 }
 

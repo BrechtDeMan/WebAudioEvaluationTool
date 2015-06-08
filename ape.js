@@ -292,27 +292,9 @@ function loadTest(audioHolderObject)
 		interfaceContext.showCommentBoxes(feedbackHolder,true);
 	}
 	
-	// Append any commentQuestion boxes
 	$(audioHolderObject.commentQuestions).each(function(index,element) {
-		// Create document objects to hold the comment boxes
-		var trackComment = document.createElement('div');
-		trackComment.className = 'comment-div commentQuestion';
-		trackComment.id = element.id;
-		// Create a string next to each comment asking for a comment
-		var trackString = document.createElement('span');
-		trackString.innerHTML = element.question;
-		// Create the HTML5 comment box 'textarea'
-		var trackCommentBox = document.createElement('textarea');
-		trackCommentBox.rows = '4';
-		trackCommentBox.cols = '100';
-		trackCommentBox.name = 'commentQuestion'+index;
-		trackCommentBox.className = 'trackComment';
-		var br = document.createElement('br');
-		// Add to the holder.
-		trackComment.appendChild(trackString);
-		trackComment.appendChild(br);
-		trackComment.appendChild(trackCommentBox);
-		feedbackHolder.appendChild(trackComment);
+		var node = interfaceContext.createCommentQuestion(element);
+		feedbackHolder.appendChild(node.holder);
 	});
 	
 	
@@ -484,19 +466,10 @@ function pageXMLSave(store, testXML)
 		var audioElement = audioEngineContext.audioObjects[i].exportXMLDOM();
 		xmlDoc.appendChild(audioElement);
 	}
-	var commentQuestion = document.getElementsByClassName('commentQuestion');
-	for (var i=0; i<commentQuestion.length; i++)
-	{
-		var cqHolder = document.createElement('CommentQuestion');
-		var comment = document.createElement('comment');
-		var question = document.createElement('question');
-		cqHolder.id = commentQuestion[i].id;
-		comment.textContent = commentQuestion[i].children[2].value;
-		question.textContent = commentQuestion[i].children[0].textContent;
-        console.log('Question ' + i + ': ' + commentQuestion[i].children[2].value); // DEBUG/SAFETY
-		cqHolder.appendChild(question);
-		cqHolder.appendChild(comment);
-		xmlDoc.appendChild(cqHolder);
-	}
+	
+	$(interfaceContext.commentQuestions).each(function(index,element){
+		var node = element.exportXMLDOM();
+		xmlDoc.appendChild(node);
+	});
 	store = xmlDoc;
 }
