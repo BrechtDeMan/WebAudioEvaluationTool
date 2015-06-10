@@ -1651,5 +1651,60 @@ function Interface(specificationObject) {
 		this.commentQuestions.push(node);
 		return node;
 	};
+	
+	this.playhead = new function()
+	{
+		this.object = document.createElement('div');
+		this.object.className = 'playhead';
+		this.object.align = 'left';
+		var curTime = document.createElement('div');
+		curTime.style.width = '50px';
+		this.curTimeSpan = document.createElement('span');
+		this.curTimeSpan.textContent = '00:00';
+		curTime.appendChild(this.curTimeSpan);
+		this.object.appendChild(curTime);
+		this.scrubberTrack = document.createElement('div');
+		this.scrubberTrack.className = 'playhead-scrub-track';
+		
+		this.scrubberHead = document.createElement('div');
+		this.scrubberHead.id = 'playhead-scrubber';
+		this.scrubberTrack.appendChild(this.scrubberHead);
+		this.object.appendChild(this.scrubberTrack);
+		
+		this.timePerPixel = 0;
+		this.maxTime = 0;
+		
+		this.startPlay = function(maxTime) {
+			//maxTime must be in seconds
+			var width = 490; //500 - 10, 5 each side of the tracker head
+			this.timePerPixel = maxTime/490;
+			this.maxTime = maxTime;
+			if (maxTime < 60) {
+				this.curTimeSpan.textContent = '0.00';
+			} else {
+				this.curTimeSpan.textContent = '00:00';
+			}
+		};
+		
+		this.update = function(time) {
+			// Update the playhead position, startPlay must be called
+			if (this.timePerPixel > 0) {
+				var width = 490;
+				var pix = Math.floor(width*time);
+				this.scrubberHead.style.left = pix+'px';
+				if (this.maxTime > 60.0) {
+					var secs = time%60;
+					var mins = Math.floor((time-secs)/60);
+					secs = secs.toString();
+					secs = secs.substr(0,2);
+					mins = mins.toString();
+					this.curTimeSpan.textContent = mins+':'+secs;
+				} else {
+					time = time.toString();
+					this.curTimeSpan.textContent = time.substr(0,4);
+				}
+			}
+		};
+	};
 }
 
