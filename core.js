@@ -50,6 +50,7 @@ function interfacePopup() {
 	this.popup = null;
 	this.popupContent = null;
 	this.buttonProceed = null;
+	this.buttonPrevious = null;
 	this.popupOptions = null;
 	this.currentIndex = null;
 	this.responses = null;
@@ -75,8 +76,18 @@ function interfacePopup() {
 		
 		this.buttonProceed = document.createElement('button');
 		this.buttonProceed.className = 'popupButton';
+		this.buttonProceed.style.left = '440px';
+		this.buttonProceed.style.top = '215px';
 		this.buttonProceed.innerHTML = 'Next';
 		this.buttonProceed.onclick = function(){popup.proceedClicked();};
+		
+		this.buttonPrevious = document.createElement('button');
+		this.buttonPrevious.className = 'popupButton';
+		this.buttonPrevious.style.left = '10px';
+		this.buttonPrevious.style.top = '215px';
+		this.buttonPrevious.innerHTML = 'Back';
+		this.buttonPrevious.onclick = function(){popup.previousClick();};
+		
 		this.popup.style.zIndex = -1;
 		this.popup.style.visibility = 'hidden';
 		blank.style.zIndex = -2;
@@ -200,6 +211,13 @@ function interfacePopup() {
 			this.popupContent.appendChild(input);
 		}
 		this.popupContent.appendChild(this.buttonProceed);
+		if(this.currentIndex+1 == this.popupOptions.length) {
+			this.buttonProceed.textContent = 'Submit';
+		} else {
+			this.buttonProceed.textContent = 'Next';
+		}
+		if(this.currentIndex > 0)
+			this.popupContent.appendChild(this.buttonPrevious);
 	};
 	
 	this.initState = function(node) {
@@ -299,9 +317,6 @@ function interfacePopup() {
 		}
 		this.currentIndex++;
 		if (this.currentIndex < this.popupOptions.length) {
-			if(this.currentIndex+1 == this.popupOptions.length) {
-				this.buttonProceed.textContent = 'Submit';
-			}
 			this.postNode();
 		} else {
 			// Reached the end of the popupOptions
@@ -312,6 +327,46 @@ function interfacePopup() {
 				testState.stateResults[testState.stateIndex].appendChild(this.responses);
 			}
 			advanceState();
+		}
+	};
+	
+	this.previousClick = function() {
+		// Triggered when the 'Back' button is clicked in the survey
+		if (this.currentIndex > 0) {
+			this.currentIndex--;
+			var node = this.popupOptions[this.currentIndex];
+			if (node.type != 'statement') {
+				var prevResp = this.responses.childNodes[this.responses.childElementCount-1];
+				this.responses.removeChild(prevResp);
+			}
+			this.postNode();
+			if (node.type == 'question') {
+				this.popupContent.getElementsByTagName('textarea')[0].value = prevResp.textContent;
+			} else if (node.type == 'checkbox') {
+				var options = this.popupContent.getElementsByTagName('input');
+				var savedOptions = prevResp.getElementsByTagName('option');
+				for (var i=0; i<options.length; i++) {
+					var id = options[i].id;
+					for (var j=0; j<savedOptions.length; j++) {
+						if (savedOptions[j].getAttribute('name') == id) {
+							if (savedOptions[j].textContent == 'true') {options[i].checked = true;}
+							else {options[i].checked = false;}
+							break;
+						}
+					}
+				}
+			} else if (node.type == 'number') {
+				this.popupContent.getElementsByTagName('input')[0].value = prevResp.textContent;
+			} else if (node.type == 'radio') {
+				var options = this.popupContent.getElementsByTagName('input');
+				var name = prevResp.getAttribute('name');
+				for (var i=0; i<options.length; i++) {
+					if (options[i].id == name) {
+						options[i].checked = true;
+						break;
+					}
+				}
+			}
 		}
 	};
 }
