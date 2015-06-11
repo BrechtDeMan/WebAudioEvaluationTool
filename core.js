@@ -688,7 +688,11 @@ function AudioEngine() {
 			}
 		}
 		if (this.status== 1) {
-			if (id == undefined) {id = -1;}
+			if (id == undefined) {
+				id = -1;
+			} else {
+				interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
+			}
 			if (this.loopPlayback) {
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
@@ -711,6 +715,7 @@ function AudioEngine() {
 					}
 				}
 			}
+			interfaceContext.playhead.start();
 		}
 	};
 	
@@ -721,6 +726,7 @@ function AudioEngine() {
 			{
 				this.audioObjects[i].stop();
 			}
+			interfaceContext.playhead.stop();
 			this.status = 0;
 		}
 	};
@@ -1699,23 +1705,27 @@ function Interface(specificationObject) {
 		this.timePerPixel = 0;
 		this.maxTime = 0;
 		
-		this.startPlay = function(maxTime) {
+		this.playbackObject;
+		
+		this.setTimePerPixel = function(audioObject) {
 			//maxTime must be in seconds
+			this.playbackObject = audioObject;
+			this.maxTime = audioObject.buffer.duration;
 			var width = 490; //500 - 10, 5 each side of the tracker head
-			this.timePerPixel = maxTime/490;
-			this.maxTime = maxTime;
-			if (maxTime < 60) {
+			this.timePerPixel = this.maxTime/490;
+			if (this.maxTime < 60) {
 				this.curTimeSpan.textContent = '0.00';
 			} else {
 				this.curTimeSpan.textContent = '00:00';
 			}
 		};
 		
-		this.update = function(time) {
+		this.update = function() {
 			// Update the playhead position, startPlay must be called
 			if (this.timePerPixel > 0) {
+				var time = this.playbackObject.getCurrentPosition();
 				var width = 490;
-				var pix = Math.floor(width*time);
+				var pix = Math.floor(time/this.timePerPixel);
 				this.scrubberHead.style.left = pix+'px';
 				if (this.maxTime > 60.0) {
 					var secs = time%60;
@@ -1729,6 +1739,18 @@ function Interface(specificationObject) {
 					this.curTimeSpan.textContent = time.substr(0,4);
 				}
 			}
+		};
+		
+		this.interval = undefined;
+		
+		this.start = function() {
+			if (this.playbackObject != undefined && this.interval == undefined) {
+				this.interval = setInterval(function(){interfaceContext.playhead.update();},100);
+			}
+		};
+		this.stop = function() {
+			clearInterval(this.interval);
+			this.interval = undefined;
 		};
 	};
 }
