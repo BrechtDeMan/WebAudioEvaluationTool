@@ -675,7 +675,7 @@ function AudioEngine() {
 	// Create store for new audioObjects
 	this.audioObjects = [];
 	
-	this.play = function() {
+	this.play = function(id) {
 		// Start the timer and set the audioEngine state to playing (1)
 		if (this.status == 0) {
 			// Check if all audioObjects are ready
@@ -684,12 +684,32 @@ function AudioEngine() {
 			}
 			if (this.audioObjectsReady == true) {
 				this.timer.startTest();
-				if (this.loopPlayback) {
-					for(var i=0; i<this.audioObjects.length; i++) {
-						this.audioObjects[i].play(this.timer.getTestTime()+1);
+				this.status = 1;
+			}
+		}
+		if (this.status== 1) {
+			if (id == undefined) {id = -1;}
+			if (this.loopPlayback) {
+				for (var i=0; i<this.audioObjects.length; i++)
+				{
+					this.audioObjects[i].play(this.timer.getTestTime()+1);
+					if (id == i) {
+						this.audioObjects[i].loopStart();
+					} else {
+						this.audioObjects[i].loopStop();
 					}
 				}
-				this.status = 1;
+			} else {
+				for (var i=0; i<this.audioObjects.length; i++)
+				{
+					if (i != id) {
+						this.audioObjects[i].outputGain.gain.value = 0.0;
+						this.audioObjects[i].stop();
+					} else if (i == id) {
+						this.audioObjects[id].outputGain.gain.value = 1.0;
+						this.audioObjects[id].play(audioContext.currentTime+0.01);
+					}
+				}
 			}
 		}
 	};
@@ -704,7 +724,6 @@ function AudioEngine() {
 			this.status = 0;
 		}
 	};
-	
 	
 	this.newTrack = function(element) {
 		// Pull data from given URL into new audio buffer
@@ -791,19 +810,21 @@ function audioObject(id) {
 	};
 	
 	this.play = function(startTime) {
-		this.bufferNode = audioContext.createBufferSource();
-		this.bufferNode.owner = this;
-		this.bufferNode.connect(this.outputGain);
-		this.bufferNode.buffer = this.buffer;
-		this.bufferNode.loop = audioEngineContext.loopPlayback;
-		this.bufferNode.onended = function() {
-			// Safari does not like using 'this' to reference the calling object!
-			event.srcElement.owner.metric.stopListening(audioEngineContext.timer.getTestTime());
-		};
-		if (this.bufferNode.loop == false) {
-			this.metric.startListening(audioEngineContext.timer.getTestTime());
+		if (this.bufferNode == undefined) {
+			this.bufferNode = audioContext.createBufferSource();
+			this.bufferNode.owner = this;
+			this.bufferNode.connect(this.outputGain);
+			this.bufferNode.buffer = this.buffer;
+			this.bufferNode.loop = audioEngineContext.loopPlayback;
+			this.bufferNode.onended = function() {
+				// Safari does not like using 'this' to reference the calling object!
+				event.srcElement.owner.metric.stopListening(audioEngineContext.timer.getTestTime());
+			};
+			if (this.bufferNode.loop == false) {
+				this.metric.startListening(audioEngineContext.timer.getTestTime());
+			}
+			this.bufferNode.start(startTime);
 		}
-		this.bufferNode.start(startTime);
 	};
 	
 	this.stop = function() {

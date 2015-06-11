@@ -227,30 +227,9 @@ function loadTest(audioHolderObject)
 
 	audioEngineContext.loopPlayback = loopPlayback;
 	// Create AudioEngine bindings for playback
-	if (loopPlayback) {
-		audioEngineContext.selectedTrack = function(id) {
-			for (var i=0; i<this.audioObjects.length; i++)
-			{
-				if (id == i) {
-					this.audioObjects[i].loopStart();
-				} else {
-					this.audioObjects[i].loopStop();
-				}
-			}
-		};
-	} else {
-		audioEngineContext.selectedTrack = function(id) {
-			for (var i=0; i<this.audioObjects.length; i++)
-			{
-				this.audioObjects[i].outputGain.gain.value = 0.0;
-				this.audioObjects[i].stop();
-			}
-			if (this.status == 1) {
-				this.audioObjects[id].outputGain.gain.value = 1.0;
-				this.audioObjects[id].play(audioContext.currentTime+0.01);
-			}
-		};
-	}
+	audioEngineContext.selectedTrack = function(id) {
+		console.log('Deprecated');
+	};
 	
 	currentTestHolder = document.createElement('audioHolder');
 	currentTestHolder.id = audioHolderObject.id;
@@ -327,7 +306,7 @@ function sliderObject(audioObject) {
 			// Get the track ID from the object ID
 			var id = Number(event.srcElement.attributes['trackIndex'].value);
 			//audioEngineContext.metric.sliderPlayed(id);
-			audioEngineContext.selectedTrack(id);
+			audioEngineContext.play(id);
             // Currently playing track red, rest green
             
             //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
