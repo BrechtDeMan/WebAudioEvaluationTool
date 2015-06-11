@@ -818,7 +818,7 @@ function audioObject(id) {
 			this.bufferNode.loop = audioEngineContext.loopPlayback;
 			this.bufferNode.onended = function() {
 				// Safari does not like using 'this' to reference the calling object!
-				event.srcElement.owner.metric.stopListening(audioEngineContext.timer.getTestTime());
+				event.srcElement.owner.metric.stopListening(audioEngineContext.timer.getTestTime(),event.srcElement.owner.getCurrentPosition());
 			};
 			if (this.bufferNode.loop == false) {
 				this.metric.startListening(audioEngineContext.timer.getTestTime());
@@ -830,9 +830,9 @@ function audioObject(id) {
 	this.stop = function() {
 		if (this.bufferNode != undefined)
 		{
+			this.metric.stopListening(audioEngineContext.timer.getTestTime(),this.getCurrentPosition());
 			this.bufferNode.stop(0);
 			this.bufferNode = undefined;
-			this.metric.stopListening(audioEngineContext.timer.getTestTime());
 		}
 	};
 	
@@ -1001,7 +1001,7 @@ function metricTracker(caller)
 		}
 	};
 	
-	this.stopListening = function(time)
+	this.stopListening = function(time,bufferStopTime)
 	{
 		if (this.listenHold == true)
 		{
@@ -1014,7 +1014,11 @@ function metricTracker(caller)
 			var testTime = evnt.getElementsByTagName('testTime')[0];
 			var bufferTime = evnt.getElementsByTagName('bufferTime')[0];
 			testTime.setAttribute('stop',time);
-			bufferTime.setAttribute('stop',this.parent.getCurrentPosition());
+			if (bufferStopTime == undefined) {
+				bufferTime.setAttribute('stop',this.parent.getCurrentPosition());
+			} else {
+				bufferTime.setAttribute('stop',bufferStopTime);
+			}
 			console.log('slider ' + this.parent.id + ' played for (' + diff + ')'); // DEBUG/SAFETY: show played slider id
 		}
 	};
