@@ -11,6 +11,9 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
         # get list of all page names
         for audioholder in root.findall("./audioholder"):   # iterate over pages
             page_name = audioholder.get('id')               # get page name
+            
+            if page_name is None: # ignore 'empty' audio_holders
+                break
 
             # create folder [page_name] if not yet created
             if not os.path.exists(page_name):
@@ -18,21 +21,26 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
 
             # for page [page_name], print comments related to fragment [id]
             for audioelement in root.findall("*/[@id='"+page_name+"']/audioelement"):
-                audio_id = str(audioelement.get('id'))
-                # append to file [page_name]/[page_name]-comments-[id].csv
-                with open(page_name+'/'+page_name+'-comments-'+audio_id+'.csv', 'a') as csvfile:
-                    commentstr = root.find("*/[@id='"
-                                           + page_name
-                                           + "']/audioelement/[@id='"
-                                           + audio_id
-                                           + "']/comment/response").text
-                    writer = csv.writer(csvfile, delimiter=',')
-                    writer.writerow([commentstr.encode("utf-8")])
-                    #TODO Comma doesn't act as delimiter now!
-                    # (when adding more than just a comment per line):
-                    # writer.writerow([file + ',' + commentstr.encode("utf-8")])
+                if audioelement is not None: # Check it exists
+                    audio_id = str(audioelement.get('id'))
 
-                    #TODO Replace 'new line' with something else?
+                    # append to file [page_name]/[page_name]-comments-[id].csv
+                    with open(page_name+'/'+page_name+'-comments-'+audio_id+'.csv', 'a') as csvfile:
+                        writer = csv.writer(csvfile, delimiter=',')
+                        commentstr = root.find("*/[@id='"
+                                               + page_name
+                                               + "']/audioelement/[@id='"
+                                               + audio_id
+                                               + "']/comment/response").text
+                        if commentstr is None:
+                            writer.writerow([''])
+                        else:
+                            writer.writerow([commentstr.encode("utf-8")])
+                        #TODO Comma doesn't act as delimiter now!
+                        # (when adding more than just a comment per line):
+                        # writer.writerow([file + ',' + commentstr.encode("utf-8")])
 
-                    #TODO 'Append' means duplicate entries if run several times...
+                        #TODO Replace 'new line' with something else?
+
+                        #TODO 'Append' means duplicate entries if run several times...
 

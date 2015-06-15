@@ -67,4 +67,5 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
         #plt.show() # show plot
         #exit()
 
-        plt.savefig(rating_folder+page_name+"-ind.png")
+        plt.savefig(rating_folder+page_name+"-box.png")
+        plt.close()

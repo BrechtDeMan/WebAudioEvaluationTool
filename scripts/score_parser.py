@@ -18,6 +18,9 @@ for file in os.listdir("."): # You have to put this in folder where output XML f
         for audioholder in root.findall("./audioholder"):    # iterate over pages
             page_name = audioholder.get('id') # get page name
             #print ["DEBUG    page " + page_name]
+            
+            if page_name is None: # ignore 'empty' audio_holders
+                break
 
             file_name = 'ratings/'+page_name+'-ratings.csv' # score file name
 
