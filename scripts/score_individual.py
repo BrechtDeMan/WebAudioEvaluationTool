@@ -8,9 +8,12 @@ rating_folder = 'ratings/' # folder with rating csv files
 colormap = ['b', 'r', 'g', 'c', 'm', 'y', 'k'] # colormap for to cycle through
 markerlist = ["x", ".", "o", "*", "+", "v", ">", "<", "8", "s", "p"]
 
+show_legend = False
+
 # get every csv file in folder
 for file in os.listdir(rating_folder):
     if file.endswith(".csv"):
+        
         page_name = file[:-4] # file name (without extension) is page ID
 
         with open(rating_folder+file, 'r') as readfile: # read this csv file
@@ -34,7 +37,7 @@ for file in os.listdir(rating_folder):
                         )
                 increment += 1 # increase counter
                 linehandles.append(plothandle)
-                legendnames.append(subject_id)
+                legendnames.append(subject_id.decode("utf-8")) # avoid decoding problems
 
 
             plt.xlabel('Fragment')
@@ -45,16 +48,18 @@ for file in os.listdir(rating_folder):
             plt.ylabel('Rating')
             plt.ylim(0,1)
 
-            plt.legend(linehandles, legendnames,
-                       loc='upper right',
-                       bbox_to_anchor=(1.1, 1),
-                       borderaxespad=0.,
-                       numpoints=1 # remove extra marker
-                       )
+            if show_legend:
+                plt.legend(linehandles, legendnames,
+                           loc='upper right',
+                           bbox_to_anchor=(1.1, 1),
+                           borderaxespad=0.,
+                           numpoints=1 # remove extra marker
+                           )
 
             #TODO Put legend outside of box
 
             #plt.show() # show plot
             #exit()
-
+            
             plt.savefig(rating_folder+page_name+"-ind.png")
+            plt.close()
