@@ -1358,6 +1358,21 @@ function Specification() {
 			this.url = xml.getAttribute('url');
 			this.id = xml.id;
 			this.parent = parent;
+			this.anchor = xml.getAttribute('anchor');
+			if (this.anchor == 'true') {this.anchor = true;}
+			else {this.anchor = false;}
+			
+			this.reference = xml.getAttribute('reference');
+			if (this.reference == 'true') {this.anchor = true;}
+			else {this.reference = false;}
+			
+			if (this.anchor == true && this.reference == true) {
+				console.log('ERROR - Cannot have one audioElement be both the reference and anchor!')
+				console.log(this);
+				console.log('Neither will be enabled');
+				this.anchor = false;
+				this.reference = false;
+			}
 		};
 		
 		this.commentQuestionNode = function(xml) {
