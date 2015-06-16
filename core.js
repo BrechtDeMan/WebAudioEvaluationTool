@@ -1680,6 +1680,10 @@ function Interface(specificationObject) {
 		}
 	};
 	
+	this.deleteCommentBoxes = function() {
+		this.commentBoxes = [];
+	}
+	
 	this.createCommentQuestion = function(element) {
 		var node;
 		if (element.type == 'text') {

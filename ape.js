@@ -245,6 +245,7 @@ function loadTest(audioHolderObject)
 	
 	// Delete any previous audioObjects associated with the audioEngine
 	audioEngineContext.audioObjects = [];
+	interfaceContext.deleteCommentBoxes();
 	
 	// Find all the audioElements from the audioHolder
 	$(audioHolderObject.audioElements).each(function(index,element){
