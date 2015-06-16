@@ -59,6 +59,94 @@ function loadInterface() {
         console.log('slider ' + id + ' played (' + time + ')'); // DEBUG/SAFETY: show played slider id
 	};
 	
+	// Bindings for interfaceContext
+	Interface.prototype.checkAllPlayed = function()
+	{
+		hasBeenPlayed = audioEngineContext.checkAllPlayed();
+		if (hasBeenPlayed.length > 0) // if a fragment has not been played yet
+	    {
+	    	str = "";
+	    	if (hasBeenPlayed.length > 1) {
+		    	for (var i=0; i<hasBeenPlayed.length; i++) {
+		    		str = str + hasBeenPlayed[i];
+		    		if (i < hasBeenPlayed.length-2){
+		    			str += ", ";
+		    		} else if (i == hasBeenPlayed.length-2) {
+		    			str += " or ";
+		    		}
+		    	}
+		    	alert('You have not played fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
+	       } else {
+	       		alert('You have not played fragment ' + hasBeenPlayed[0] + ' yet. Please listen, rate and comment all samples before submitting.');
+	       }
+	        return false;
+	    }
+	    return true;
+	}
+	
+	Interface.prototype.checkAllMoved = function() {
+		var audioObjs = audioEngineContext.audioObjects;
+		var state = true;
+		var strNums = [];
+		for (var i=0; i<audioObjs.length; i++)
+		{
+			if (audioObjs[i].metric.wasMoved == false) {
+				state = false;
+				strNums.push(i);
+			}
+		}
+		if (state == false) {
+			if (strNums.length > 1) {
+				var str = "";
+		    	for (var i=0; i<strNums.length; i++) {
+		    		str = str + strNums[i];
+		    		if (i < strNums.length-2){
+		    			str += ", ";
+		    		} else if (i == strNums.length-2) {
+		    			str += " or ";
+		    		}
+		    	}
+		    	alert('You have not moved fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
+	       } else {
+	       		alert('You have not moved fragment ' + strNums[0] + ' yet. Please listen, rate and comment all samples before submitting.');
+	       }
+		}
+		return state;
+	}
+	
+	Interface.prototype.checkAllCommented = function() {
+		var audioObjs = audioEngineContext.audioObjects;
+		var audioHolder = testState.stateMap[testState.stateIndex];
+		var state = true;
+		if (audioHolder.elementComments) {
+			var strNums = [];
+			for (var i=0; i<audioObjs.length; i++)
+			{
+				if (audioObjs[i].commentDOM.trackCommentBox.value.length == 0) {
+					state = false;
+					strNums.push(i);
+				}
+			}
+			if (state == false) {
+				if (strNums.length > 1) {
+					var str = "";
+			    	for (var i=0; i<strNums.length; i++) {
+			    		str = str + strNums[i];
+			    		if (i < strNums.length-2){
+			    			str += ", ";
+			    		} else if (i == strNums.length-2) {
+			    			str += " or ";
+			    		}
+			    	}
+			    	alert('You have not commented on fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
+		       } else {
+		       		alert('You have not commented on fragment ' + strNums[0] + ' yet. Please listen, rate and comment all samples before submitting.');
+		       }
+			}
+		}
+		return state;
+	}
+	
 	// Bindings for audioObjects
 	
 	// Create the top div for the Title element
@@ -353,8 +441,39 @@ function dragEnd(ev) {
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-    hasBeenPlayed = audioEngineContext.checkAllPlayed();
-    if (hasBeenPlayed.length == 0) {
+	var checks = specification.commonInterface.options;
+	var canContinue = true;
+	for (var i=0; i<checks.length; i++) {
+		if (checks[i].type == 'check')
+		{
+			switch(checks[i].check) {
+			case 'fragmentPlayed':
+				// Check if all fragments have been played
+				var checkState = interfaceContext.checkAllPlayed();
+				if (checkState == false) {canContinue = false;}
+				break;
+			case  'fragmentFullPlayback':
+				// Check all fragments have been played to their full length
+				var checkState = interfaceContext.checkAllPlayed();
+				if (checkState == false) {canContinue = false;}
+				console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
+				break;
+			case 'fragmentMoved':
+				// Check all fragment sliders have been moved.
+				var checkState = interfaceContext.checkAllMoved();
+				if (checkState == false) {canContinue = false;}
+				break;
+			case 'fragmentComments':
+				// Check all fragment sliders have been moved.
+				var checkState = interfaceContext.checkAllCommented();
+				if (checkState == false) {canContinue = false;}
+				break;
+			}
+
+		}
+	}
+   
+    if (canContinue) {
 	    if (audioEngineContext.status == 1) {
 	        var playback = document.getElementById('playback-button');
 	        playback.click();
@@ -368,24 +487,7 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 	        }
 	    }
 	    testState.advanceState();
-    } else // if a fragment has not been played yet
-    {
-    	str = "";
-    	if (hasBeenPlayed.length > 1) {
-	    	for (var i=0; i<hasBeenPlayed.length; i++) {
-	    		str = str + hasBeenPlayed[i];
-	    		if (i < hasBeenPlayed.length-2){
-	    			str += ", ";
-	    		} else if (i == hasBeenPlayed.length-2) {
-	    			str += " or ";
-	    		}
-	    	}
-	    	alert('You have not played fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
-       } else {
-       		alert('You have not played fragment ' + hasBeenPlayed[0] + ' yet. Please listen, rate and comment all samples before submitting.');
-       }
-        return;
-    }
+    } 
 }
 
 function convSliderPosToRate(slider)
