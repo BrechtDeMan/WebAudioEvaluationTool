@@ -35,8 +35,9 @@
 			<metricEnable>elementListenTracker</metricEnable>
 		</Metric>
 		<interface>
+			<check name="fragmentPlayed"/>
 			<check name="fragmentFullPlayback"/>
-			<check name="fragmentMovement"/>
+			<check name="fragmentMoved"/>
 			<check name="fragmentComments"/>
 		</interface>
 	</setup>
