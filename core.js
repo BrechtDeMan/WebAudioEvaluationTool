@@ -1201,6 +1201,7 @@ function Specification() {
 	// Handles the decoding of the project specification XML into a simple JavaScript Object.
 	
 	this.interfaceType;
+	this.commonInterface;
 	this.projectReturn;
 	this.randomiseOrder;
 	this.collectMetrics;
@@ -1232,6 +1233,30 @@ function Specification() {
 				this.metrics.push(new this.metricNode(metricCollection[i].textContent));
 			}
 		}
+		
+		var commonInterfaceNode = setupNode.getElementsByTagName('interface');
+		if (commonInterfaceNode.length > 0) {
+			commonInterfaceNode = commonInterfaceNode[0];
+		} else {
+			commonInterfaceNode = undefined;
+		}
+		
+		this.commonInterface = new function() {
+			this.OptionNode = function(child) {
+				this.type = child.nodeName;
+				if (this.type == 'check') {
+					this.check = child.getAttribute('name');
+				}
+			}
+			this.options = [];
+			if (commonInterfaceNode != undefined) {
+				var child = commonInterfaceNode.firstElementChild;
+				while (child != undefined) {
+					this.options.push(new this.OptionNode(child));
+					child = child.nextElementSibling;
+				}
+			}
+		};
 		
 		var audioHolders = projectXML.getElementsByTagName('audioHolder');
 		for (var i=0; i<audioHolders.length; i++) {

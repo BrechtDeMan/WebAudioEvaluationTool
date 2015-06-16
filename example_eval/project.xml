@@ -34,6 +34,11 @@
 			<metricEnable>elementFlagMoved</metricEnable>
 			<metricEnable>elementListenTracker</metricEnable>
 		</Metric>
+		<interface>
+			<check name="fragmentFullPlayback"/>
+			<check name="fragmentMovement"/>
+			<check name="fragmentComments"/>
+		</interface>
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
 		<interface>
