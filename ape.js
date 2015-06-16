@@ -302,14 +302,20 @@ function sliderObject(audioObject) {
 		if (audioEngineContext.audioObjectsReady) {
 			// Cannot continue to issue play command until audioObjects reported as ready!
 			// Get the track ID from the object ID
-			var id = Number(event.srcElement.attributes['trackIndex'].value);
+			var element;
+			if (event.srcElement.nodeName == "SPAN") {
+				element = event.srcElement.parentNode;
+			} else {
+				element = event.srcElement;
+			}
+			var id = Number(element.attributes['trackIndex'].value);
 			//audioEngineContext.metric.sliderPlayed(id);
 			audioEngineContext.play(id);
             // Currently playing track red, rest green
             
             //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
             $('.track-slider').removeClass('track-slider-playing');
-            $(event.srcElement).addClass('track-slider-playing');
+            $(element).addClass('track-slider-playing');
             $('.comment-div').removeClass('comment-box-playing');
             $('#comment-div-'+id).addClass('comment-box-playing');
 		}
