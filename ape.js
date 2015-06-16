@@ -255,9 +255,7 @@ function loadTest(audioHolderObject)
 		var trackURL = audioHolderObject.hostURL + element.url;
 		var audioObject = audioEngineContext.newTrack(element);
 		
-		if (commentShow) {
-			var node = interfaceContext.createCommentBox(audioObject);
-		}
+		var node = interfaceContext.createCommentBox(audioObject);
 		
 		// Create a slider per track
 		audioObject.interfaceDOM = new sliderObject(audioObject);

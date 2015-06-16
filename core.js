@@ -1100,8 +1100,14 @@ function randomiseOrder(input)
 {
 	// This takes an array of information and randomises the order
 	var N = input.length;
-	var K = N;
+	
+	var inputSequence = []; // For safety purposes: keep track of randomisation
+	for (var counter = 0; counter < N; ++counter) 
+		inputSequence.push(counter) // Fill array
+	var inputSequenceClone = inputSequence.slice(0);
+	
 	var holdArr = [];
+	var outputSequence = [];
 	for (var n=0; n<N; n++)
 	{
 		// First pick a random number
@@ -1110,7 +1116,11 @@ function randomiseOrder(input)
 		r = Math.floor(r*input.length);
 		// Pick out that element and delete from the array
 		holdArr.push(input.splice(r,1)[0]);
+		// Do the same with sequence
+		outputSequence.push(inputSequence.splice(r,1)[0]);
 	}
+	console.log(inputSequenceClone.toString()); // print original array to console
+	console.log(outputSequence.toString()); 	// print randomised array to console
 	return holdArr;
 }
 
