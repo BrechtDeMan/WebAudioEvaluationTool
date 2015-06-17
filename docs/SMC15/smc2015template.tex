@@ -188,8 +188,8 @@ Various listening test design tools are already available, see Table \ref{tab:in
 
 Many are MATLAB-based, useful for easily processing and visualising the data produced by the listening tests, but requiring MATLAB to be installed to run or - in the case of an executable created with MATLAB - at least create the test. 
 Furthermore, compatibility is usually limited across different versions of MATLAB. 
-Similarly, Max requires little or no programming background but it is proprietary software as well, which is especially undesirable when tests need to be deployed at different sites. 
-More recently, BeaqleJS \cite{beaqlejs} makes use of the HTML5 audio capabilities and comes with a number of predefined, established test interfaces such as ABX and MUSHRA \cite{mushra}. % 
+Similarly, Max requires little or no programming background but it is proprietary software as well, which is especially undesirable when tests need to be deployed at different sites.
+More recently, BeaqleJS \cite{beaqlejs} makes use of the HTML5 audio capabilities and comes with a number of predefined, established test interfaces such as ABX and MUSHRA \cite{mushra}. BeaqleJS provides a number of similar features including saving of test data to a web server. The main differences are: BeaqleJS configuration is done through writting a JavaScript file holding a JavaScript Object of the notation. Instead our presented system uses the XML document standard, which allows configuration outside of a web-centric editor. The results are also presented in XML again allowing 3rd party editors and programs to easily access. Finally the presented system does not require web access to run, instead being deployed with a Python server script. This is particularly useful in studios where machines may not, by design, be web connected, or use in locations where web access is limited.
 
 A browser-based perceptual evaluation tool for audio has a number of advantages. First of all, it doesn't need any other software than a browser, meaning deployment is very easy and cheap. As such, it can also run on a variety of devices and platforms. The test can be hosted on a central server with subjects all over the world, who can simply go to a webpage. This means that multiple participants can take the test simultaneously, potentially in their usual listening environment if this is beneficial for the test. Naturally, the constraints on the listening environment and other variables still need to be controlled if they are important to the experiment. Depending on the requirements a survey or a variety of tests preceding the experiment could establish whether remote participants and their environments are adequate for the experiment at hand. 
 
@@ -317,8 +317,8 @@ We try to cater to a diverse audience with this toolbox, while ensuring it is si
 \item \textbf{Reference}: Allows for a separate sample (outside of the axis) to be the `reference', which the subject can play back during the test to help with the task at hand \cite{mushra}. 
 \item \textbf{Hidden reference}: Whether or not an explicit `reference' is provided, the `hidden reference' should be rated above a certain value \cite{mushra} - this can be enforced. 
 \item \textbf{Hidden anchor}: The `hidden anchor' should be rated lower than a certain value \cite{mushra} - this can be enforced. 
-\item \textbf{Show scrub bar}: Display a playhead on a scrub bar to show the position in the current fragment. 
-\item \textbf{Drag playhead}: If scrub bar is visible, allow dragging to move back or forward in a fragment. 
+\item \textbf{Show scrub bar}: Display a playhead on a scrub bar to show the position in the current fragment.
+%\item \textbf{Drag playhead}: If scrub bar is visible, allow dragging to move back or forward in a fragment. 
 \end{itemize}
 
 When one of these options is not included in the setup file, they assume a default value. As a result, the input file can be kept very compact if default values suffice for the test.  
