@@ -40,7 +40,6 @@
 			<check name="fragmentMoved"/>
 			<check name="fragmentComments"/>
 			<anchor>20</anchor>
-			<reference>80</reference>
 		</interface>
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>

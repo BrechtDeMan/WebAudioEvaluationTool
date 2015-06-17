@@ -1246,8 +1246,10 @@ function Specification() {
 				this.type = child.nodeName;
 				if (this.type == 'check') {
 					this.check = child.getAttribute('name');
+				} else if (this.type == 'anchor' || this.type == 'reference') {
+					this.value = Number(child.textContent);
 				}
-			}
+			};
 			this.options = [];
 			if (commonInterfaceNode != undefined) {
 				var child = commonInterfaceNode.firstElementChild;
@@ -1427,6 +1429,38 @@ function Specification() {
 		else {this.loop == false;}
 		if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
 		else {this.elementComments = false;}
+		
+		this.anchor = xml.getElementsByTagName('anchor');
+		if (this.anchor.length == 0) {
+			// Find anchor in commonInterface;
+			for (var i=0; i<parent.commonInterface.options.length; i++) {
+				if(parent.commonInterface.options[i].type == 'anchor') {
+					this.anchor = parent.commonInterface.options[i].value;
+					break;
+				}
+			}
+			if (typeof(this.anchor) == "object") {
+				this.reference = null;
+			}
+		} else {
+			this.anchor = this.anchor[0].textContent;
+		}
+		
+		this.reference = xml.getElementsByTagName('reference');
+		if (this.reference.length == 0) {
+			// Find anchor in commonInterface;
+			for (var i=0; i<parent.commonInterface.options.length; i++) {
+				if(parent.commonInterface.options[i].type == 'reference') {
+					this.reference = parent.commonInterface.options[i].value;
+					break;
+				}
+			}
+			if (typeof(this.reference) == "object") {
+				this.reference = null;
+			}
+		} else {
+			this.reference = this.reference[0].textContent;
+		}
 		
 		this.preTest = new parent.prepostNode('pretest',xml.getElementsByTagName('PreTest'));
 		this.postTest = new parent.prepostNode('posttest',xml.getElementsByTagName('PostTest'));
