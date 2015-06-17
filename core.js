@@ -892,8 +892,8 @@ function audioObject(id) {
 		var root = document.createElement('audioElement');
 		root.id = this.specification.id;
 		root.setAttribute('url',this.url);
-		root.appendChild(this.interfaceDOM.exportXMLDOM());
-		root.appendChild(this.commentDOM.exportXMLDOM());
+		root.appendChild(this.interfaceDOM.exportXMLDOM(this));
+		root.appendChild(this.commentDOM.exportXMLDOM(this));
 		root.appendChild(this.metric.exportXMLDOM());
 		return root;
 	};
@@ -1365,15 +1365,21 @@ function Specification() {
 			else {this.anchor = false;}
 			
 			this.reference = xml.getAttribute('reference');
-			if (this.reference == 'true') {this.anchor = true;}
+			if (this.reference == 'true') {this.reference = true;}
 			else {this.reference = false;}
 			
 			if (this.anchor == true && this.reference == true) {
-				console.log('ERROR - Cannot have one audioElement be both the reference and anchor!')
+				console.log('ERROR - Cannot have one audioElement be both the reference and anchor!');
 				console.log(this);
-				console.log('Neither will be enabled');
+				console.log('Neither reference nor anchor will be enabled on this fragment');
 				this.anchor = false;
 				this.reference = false;
+			}
+			if (this.anchor == true) {
+				this.marker = anchor;
+			}
+			if (this.reference == true) {
+				this.marker = reference;
 			}
 		};
 		
@@ -1430,36 +1436,44 @@ function Specification() {
 		if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
 		else {this.elementComments = false;}
 		
-		this.anchor = xml.getElementsByTagName('anchor');
-		if (this.anchor.length == 0) {
+		var anchor = xml.getElementsByTagName('anchor');
+		if (anchor.length == 0) {
 			// Find anchor in commonInterface;
 			for (var i=0; i<parent.commonInterface.options.length; i++) {
 				if(parent.commonInterface.options[i].type == 'anchor') {
-					this.anchor = parent.commonInterface.options[i].value;
+					anchor = parent.commonInterface.options[i].value;
 					break;
 				}
 			}
-			if (typeof(this.anchor) == "object") {
-				this.reference = null;
+			if (typeof(anchor) == "object") {
+				anchor = null;
 			}
 		} else {
-			this.anchor = this.anchor[0].textContent;
+			anchor = anchor[0].textContent;
 		}
 		
-		this.reference = xml.getElementsByTagName('reference');
-		if (this.reference.length == 0) {
+		var reference = xml.getElementsByTagName('anchor');
+		if (reference.length == 0) {
 			// Find anchor in commonInterface;
 			for (var i=0; i<parent.commonInterface.options.length; i++) {
 				if(parent.commonInterface.options[i].type == 'reference') {
-					this.reference = parent.commonInterface.options[i].value;
+					reference = parent.commonInterface.options[i].value;
 					break;
 				}
 			}
-			if (typeof(this.reference) == "object") {
-				this.reference = null;
+			if (typeof(reference) == "object") {
+				reference = null;
 			}
 		} else {
-			this.reference = this.reference[0].textContent;
+			reference = reference[0].textContent;
+		}
+		
+		if (typeof(anchor) == 'number') {
+			if (anchor > 1 && anchor < 100) {anchor /= 100.0;}
+		}
+		
+		if (typeof(reference) == 'number') {
+			if (reference > 1 && reference < 100) {reference /= 100.0;}
 		}
 		
 		this.preTest = new parent.prepostNode('pretest',xml.getElementsByTagName('PreTest'));
@@ -1482,6 +1496,34 @@ function Specification() {
 		var audioElementsDOM = xml.getElementsByTagName('audioElements');
 		for (var i=0; i<audioElementsDOM.length; i++) {
 			this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+		}
+		
+		// Check only one anchor and one reference per audioNode
+		var anchor = [];
+		var reference = [];
+		for (var i=0; i<this.audioElements.length; i++)
+		{
+			if (this.audioElements[i].anchor == true) {anchor.push(i);}
+			if (this.audioElements[i].reference == true) {reference.push(i);}
+		}
+		
+		if (anchor.length > 1) {
+			console.log('Error - cannot have more than one anchor!');
+			console.log('Each anchor node will be a normal mode to continue the test');
+			for (var i=0; i<anchor.length; i++)
+			{
+				this.audioElements[anchor[i]].anchor = false;
+				this.audioElements[anchor[i]].value = undefined;
+			}
+		}
+		if (reference.length > 1) {
+			console.log('Error - cannot have more than one anchor!');
+			console.log('Each anchor node will be a normal mode to continue the test');
+			for (var i=0; i<reference.length; i++)
+			{
+				this.audioElements[reference[i]].reference = false;
+				this.audioElements[reference[i]].value = undefined;
+			}
 		}
 		
 		this.commentQuestions = [];

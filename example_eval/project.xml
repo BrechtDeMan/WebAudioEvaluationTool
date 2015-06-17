@@ -35,11 +35,12 @@
 			<metricEnable>elementListenTracker</metricEnable>
 		</Metric>
 		<interface>
-			<check name="fragmentPlayed"/>
+			<!--<check name="fragmentPlayed"/>
 			<check name="fragmentFullPlayback"/>
 			<check name="fragmentMoved"/>
-			<check name="fragmentComments"/>
+			<check name="fragmentComments"/>-->
 			<anchor>20</anchor>
+			<reference>80</reference>
 		</interface>
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
@@ -93,8 +94,8 @@
             <scale position="75">75</scale>
             <commentBoxPrefix>Comment on fragment</commentBoxPrefix>
         </interface>
-        <audioElements url="0.wav" id="0"/>
-        <audioElements url="1.wav" id="1"/>
+        <audioElements url="0.wav" id="0" reference="true"/>
+        <audioElements url="1.wav" id="1" anchor="true"/>
         <audioElements url="2.wav" id="2"/>
         <audioElements url="3.wav" id="3"/>
         <audioElements url="4.wav" id="4"/>
