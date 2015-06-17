@@ -264,11 +264,11 @@ function loadTest(audioHolderObject)
 	feedbackHolder.innerHTML = null;
 	canvas.innerHTML = null;
 	
-	var playbackHolder = document.createElement('div');
-	playbackHolder.style.width = "100%";
-	playbackHolder.align = 'center';
-	playbackHolder.appendChild(interfaceContext.playhead.object);
-	feedbackHolder.appendChild(playbackHolder);
+	//var playbackHolder = document.createElement('div');
+	//playbackHolder.style.width = "100%";
+	//playbackHolder.align = 'center';
+	//playbackHolder.appendChild(interfaceContext.playhead.object);
+	//feedbackHolder.appendChild(playbackHolder);
 	// Setup question title
 	var interfaceObj = audioHolderObject.interfaces;
 	var commentBoxPrefix = "Comment on track";
@@ -418,7 +418,7 @@ function sliderObject(audioObject) {
 	};
 	this.getValue = function() {
 		return convSliderPosToRate(this.trackSliderObj);
-	}
+	};
 }
 
 function dragEnd(ev) {
