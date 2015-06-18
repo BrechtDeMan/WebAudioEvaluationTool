@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+		<title>Web Audio Evaluation Tool</title>
+		<meta name="description" content="" />
+		<meta name="author" content="" />
+		
+		<!-- Load up the default core JS and CSS files-->
+		<link rel='stylesheet' type='text/css' href='core.css'>
+		<!-- Use jQuery hosted from Google CDN -->
+		<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>-->
+		<script src="jquery-2.1.4.js"></script>
+		<script src='core.js'></script>
+		<script type="text/javascript">
+			window.onbeforeunload = function() {
+				return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
+			};
+		</script>
+		<!-- Uncomment the following script for automatic loading of projects -->
+		<script>
+			url = 'example_eval/project.xml'; //Project XML document location
+			loadProjectSpec(url);
+		</script>
+		
+	</head>
+
+	<body>
+		<!-- Load up the default page interface allowing for project setting loads, even if hard-coded-->
+		<!-- Actual test interface design should be contained in the .js for ease of dynamic content-->
+		<div id='topLevelBody'>
+			<p>HTML5 APE Tool</p>
+		</div>
+	</body>
+</html>
