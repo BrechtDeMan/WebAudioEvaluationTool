@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="/save" randomiseOrder='true' collectMetrics='true'>
+	<setup interface="APE" projectReturn="/save" randomiseOrder='false' collectMetrics='true'>
 		<PreTest>
 			<question id="Location" mandatory="true" boxsize="large">Please enter your location.</question>
 			<checkbox id="experience">
@@ -52,20 +52,20 @@
 			<scale position="20">20</scale>
 			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
 		</interface>
-		<audioElements url="0.wav" id="0" anchor='true'/>
+		<audioElements url="0.wav" id="0"/>
 		<audioElements url="1.wav" id="1"/>
 		<audioElements url="2.wav" id="2"/>
 		<audioElements url="3.wav" id="3"/>
-		<!--<audioElements url="4.wav" id="4"/>
+		<audioElements url="4.wav" id="4"/>
 		<audioElements url="5.wav" id="5"/>
 		<audioElements url="6.wav" id="6"/>
-		<audioElements url="7.wav" id="7"/>
+		<!--<audioElements url="7.wav" id="7"/>
 		<audioElements url="8.wav" id="8"/>
 		<audioElements url="9.wav" id="9"/>
 		<audioElements url="10.wav" id="10"/>-->
-		<CommentQuestion id='mixingExperience' type="text">What is your mixing experience</CommentQuestion>
+		<CommentQuestion id='generalExperience' type="text">General Comments</CommentQuestion>
 		<CommentQuestion id="preference" type="radio">
-			<statement>Please enter your ranking preference on this song</statement>
+			<statement>What do you think of the song?</statement>
 			<option name="worst">Very Bad</option>
 			<option name="bad"></option>
 			<option name="OK">OK</option>
@@ -73,7 +73,7 @@
 			<option name="Great">Great</option>
 		</CommentQuestion>
 		<CommentQuestion id="preference" type="checkbox">
-			<statement>Describe this song</statement>
+			<statement>This song is... </statement>
 			<option name="bright">Bright</option>
 			<option name="punchy">Punchy</option>
 			<option name="dark">Dark</option>
@@ -94,8 +94,8 @@
             <scale position="75">75</scale>
             <commentBoxPrefix>Comment on fragment</commentBoxPrefix>
         </interface>
-        <audioElements url="0.wav" id="0" reference="true"/>
-        <audioElements url="1.wav" id="1" anchor="true"/>
+        <audioElements url="0.wav" id="0"/>
+        <audioElements url="1.wav" id="1"/>
         <audioElements url="2.wav" id="2"/>
         <audioElements url="3.wav" id="3"/>
         <audioElements url="4.wav" id="4"/>

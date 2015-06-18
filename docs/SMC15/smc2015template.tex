@@ -10,7 +10,16 @@
 \usepackage[english]{babel}
 \usepackage{cite}
 \usepackage{enumitem}
+\usepackage{listings}
 \setitemize{noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt}
+
+
+
+\usepackage{color}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+
 
 \hyphenation{Java-script}
 
@@ -237,11 +246,10 @@ See Figure \ref{fig:interface} for an example of the interface, with six fragmen
 %For instance, the option to provide free-text comment fields allows for tests with individual vocabulary methods, as opposed to only allowing quantitative scales associated to a fixed set of descriptors.
 
 \begin{figure*}[ht]
-\begin{center}
-\includegraphics[width=1.0\textwidth]{interface2.png}
-\caption{Example of interface, with 1 axis, 6 fragments and 1 extra comment in Chrome browser}
+\centering
+\includegraphics[width=.9\textwidth]{interface.png}
+\caption{Example of interface, with 1 axis, 7 fragments and a text, radio button and check box style comment.}
 \label{fig:interface}
-\end{center}
 \end{figure*}
 
 
@@ -282,23 +290,86 @@ This happens before any loading or decoding of audio files so the browser will o
 
 \section{Input and result files}\label{sec:setupresultsformats}
 
-The setup and result files both use the common XML document format to outline the various parameters. The setup file determines the interface to use, the location of audio files, the number of pages and other parameters to define the testing environment. Having one document to modify allows for quick manipulation in a `human readable' form to create new tests, or adjust current ones, without needing to edit multiple web files. Furthermore, we also provide a simple web page to enter all these settings without needing to manipulate the raw XML. An example of this XML document is presented in Figure~\ref{fig:xmlIn}. % I mean the .js and .html files, though not sure if any better.
+The setup and result files both use the common XML document format to outline the various parameters. The setup file determines the interface to use, the location of audio files, the number of pages and other parameters to define the testing environment. Having one document to modify allows for quick manipulation in a `human readable' form to create new tests, or adjust current ones, without needing to edit multiple web files. Furthermore, we also provide a simple web page to enter all these settings without needing to manipulate the raw XML. An example of this XML document is presented below. % I mean the .js and .html files, though not sure if any better.
+
+
+
+
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  showstringspaces=false,
+  commentstyle=\color{gray}\upshape
+}
+
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  stringstyle=\color{black} \bfseries,
+  identifierstyle=\color{darkblue} \bfseries,
+  keywordstyle=\color{cyan} \bfseries,
+  morekeywords={xmlns,version,type}, 
+  breaklines=true% list your attributes here
+}
+\tiny
+\lstset{language=XML}
+
+\begin{lstlisting}
+<?xml version="1.0" encoding="utf-8"?>
+<BrowserEvalProjectDocument>
+	<setup interface="APE" projectReturn="/save" randomiseOrder='false' collectMetrics='true'>
+		<PreTest>
+			<question id="location" mandatory="true">Please enter your location.</question>
+			<number id="age" min="0">Please enter your age</number>
+		</PreTest>
+		<PostTest>
+			<statement>Thank you for taking this listening test!</statement>
+		</PostTest>
+		<Metric>
+			<metricEnable>testTimer</metricEnable>
+			<metricEnable>elementTimer</metricEnable>
+			<metricEnable>elementInitialPosition</metricEnable>
+			<metricEnable>elementTracker</metricEnable>
+			<metricEnable>elementFlagListenedTo</metricEnable>
+			<metricEnable>elementFlagMoved</metricEnable>
+			<metricEnable>elementListenTracker</metricEnable>
+		</Metric>
+		<interface>
+			<anchor>20</anchor>
+			<reference>80</reference>
+		</interface>
+	</setup>
+	<audioHolder id="test-0" hostURL="example_eval/" randomiseOrder='true'>
+		<interface>
+			<title>Example Test Question</title>
+			<scale position="0">Min</scale>
+			<scale position="100">Max</scale>
+			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+		</interface>
+		<audioElements url="0.wav" id="0"/>
+		<audioElements url="1.wav" id="1"/>
+		<audioElements url="2.wav" id="2"/>
+		<audioElements url="3.wav" id="3"/>
+		<CommentQuestion id="generalExperience" type="text">General Comments</CommentQuestion>
+		<PreTest/>
+		<PostTest>
+			<question id="genre" mandatory="true">Please enter the genre of the song.</question>
+		</PostTest>
+	</audioHolder>
+
+\end{lstlisting}
+
+\normalsize
 
 \subsection{Setup and configurability}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[width=0.5\textwidth]{XMLInput2.png}
-\caption{An example input XML file}
-\label{fig:xmlIn}
-\end{center}
-\end{figure}
 
 The setup document has several defined nodes and structure which are documented with the source code. For example, there is a section for general setup options where any pre-test and post-test questions and statements can be defined. Pre- and post-test dialogue boxes allow for comments or questions to be presented before or after the test, to convey listening test instructions, and gather information about the subject, listening environment, and overall experience of the test. In the example in Figure~\ref{fig:xmlIn}, a question box with the id `location' is added, which is set to be mandatory to answer. The question is in the PreTest node meaning it will appear before any testing will begin. When the result for the  entire test is shown, the response will appear in the PreTest node with the id `location' allowing it to be found easily, provided the id values are meaningful.
 
 We try to cater to a diverse audience with this toolbox, while ensuring it is simple, elegant and straightforward. To that end, we currently include the following options that can be easily switched on and off, by setting the value in the input XML file. 
 
-\begin{itemize} %Should have used a description list for this.
+\begin{itemize}[leftmargin=*]%Should have used a description list for this.
 \item \textbf{Snap to corresponding position}: When this is enabled, and a fragment is playing, the playhead skips to the same position in the next fragment that is clicked. If it is not enabled, every fragment is played from the start. 
 \item \textbf{Loop fragments}: Repeat current fragment when end is reached, until the `Stop audio' or `Submit' button is clicked. 
 \item \textbf{Comments}: Displays a separate comment box for each fragment in the page.
@@ -327,17 +398,20 @@ When one of these options is not included in the setup file, they assume a defau
 
 \subsection{Results}
 
-The results file is dynamically generated by the interface upon clicking the `Submit' button. This also executes checks, depending on the setup file, to ensure that all tracks have been played back, rated and commented on. The XML output returned contains a node per audioObject and contains both the corresponding marker's position and any comments written in the associated comment box. The rating returned is normalised to be a value between 0 and 1, normalising the pixel representation of different browser windows. An example output file is presented in Figure~\ref{fig:xmlOut}.
+The results file is dynamically generated by the interface upon clicking the `Submit' button. This also executes checks, depending on the setup file, to ensure that all tracks have been played back, rated and commented on. The XML output returned contains a node per audioObject and contains both the corresponding marker's position and any comments written in the associated comment box. The rating returned is normalised to be a value between 0 and 1, normalising the pixel representation of different browser windows. An example output file is presented below.
 
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[width=0.5\textwidth]{XMLOutput2.png}
-\caption{An example output XML file}
-\label{fig:xmlOut}
-\end{center}
-\end{figure}
+\tiny
+\lstset{language=XML}
 
-The results also contain information collected by any defined pre/post questions. These are referenced against the setup XML by using the same ID so readable responses can be obtained. Taking from the earlier example of setting up a pre-test question, an example response can be seen in Figure \ref{fig:xmlOut}.
+\begin{lstlisting}
+ADD XML HERE
+
+\end{lstlisting}
+
+\normalsize
+
+
+The results also contain information collected by any defined pre/post questions. These are referenced against the setup XML by using the same ID so readable responses can be obtained. Taking from the earlier example of setting up a pre-test question, an example response can be seen above. %MAKE SURE THERE IS ONE!
 
 Each page of testing is returned with the results of the entire page included in the structure. One `audioElement' node is created per audio fragment per page, along with its ID. This includes several child nodes including the rating between 0 and 1, the comment, and any other collected metrics including how long the element was listened for, the initial position, boolean flags if the element was listened to, if the element was moved and if the element comment box had any comment. Furthermore, each user action (manipulation of any interface element, such as playback or moving a marker) can be logged along with a the corresponding time code.
 We also store session data such as the browser the tool was used in. 
@@ -376,7 +450,15 @@ The child element \texttt{value} holds the normalised ranking value. Next comes 
 
 % BRECHT: scripts
 
-Python scripts are included to easily store ratings and comments in a CSV file, and to display graphs of numerical ratings or the test's timeline. 
+\begin{figure}[htpb]
+\begin{center}
+\includegraphics[width=.45\textwidth]{boxplot2.png}
+\caption{An example boxplot showing ratings by different subjects on fragments labeled `A' through `G'. }
+\label{fig:boxplot}
+\end{center}
+\end{figure}
+
+Python scripts are included to easily store ratings and comments in a CSV file, and to display graphs of numerical ratings (see Figure \ref{fig:boxplot}) or the test's timeline. 
 Visualisation of plots requires the free matplotlib library. 
 
 
@@ -387,7 +469,7 @@ Specifically, we discussed the use of the toolbox in the context of assessment o
 The purpose of this paper is to outline the design of this tool, to describe our implementation using basic HTML5 functionality, and to discuss design challenges and limitations of our approach. This tool differentiates itself from other perceptual audio tools by enabling web technologies for multiple participants to perform the test without the need for proprietary software such as MATLAB. The tool also allows for any interface to be built using HTML5 elements to create a variety of dynamic, multiple-stimulus listening test interfaces. It enables quick setup of simple tests with the ability to manage complex tests through a single file. Finally it uses the XML document format to store the results allowing for processing and analysis of results in various third party software such as MATLAB or Python.
 
 % future work
-Further work may include the development of other common test designs, such as MUSHRA \cite{mushra}, 2D valence and arousal/activity \cite{ratingeerola2009prediction}, and others. We will add functionality to assist with setting up large-scale tests with remote subjects, so this becomes straightforward and intuitive. 
+Further work may include the development of other common test designs, such as MUSHRA \cite{mushra}, 2D valence and arousal/activity \cite{eerola2009prediction}, and others. We will add functionality to assist with setting up large-scale tests with remote subjects, so this becomes straightforward and intuitive. 
 In addition, we will keep on improving and expanding the tool, and highly welcome feedback and contributions from the community. 
 
 The source code of this tool can be found on \\ \texttt{code.soundsoftware.ac.uk/projects/}\\ \texttt{webaudioevaluationtool}. 
