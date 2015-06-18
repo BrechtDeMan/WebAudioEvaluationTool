@@ -204,7 +204,7 @@ function interfacePopup() {
 			this.popupContent.appendChild(span);
 			this.popupContent.appendChild(document.createElement('br'));
 			var input = document.createElement('input');
-			input.type = 'number';
+			input.type = 'textarea';
 			if (node.min != null) {input.min = node.min;}
 			if (node.max != null) {input.max = node.max;}
 			if (node.step != null) {input.step = node.step;}
@@ -298,7 +298,7 @@ function interfacePopup() {
 				return;
 			}
 			var enteredNumber = Number(input.value);
-			if (enteredNumber == undefined) {
+			if (isNaN(enteredNumber)) {
 				alert('Please enter a valid number');
 				return;
 			}
