@@ -24,3 +24,6 @@ re:^example_eval/paperExample\.xml$
 re:^example_eval/project\.xml\.orig$
 re:^index2\.html$
 re:^realismTest\.html$
+saves/*.xml
+saves/timelines
+saves/timelines-old
