@@ -476,7 +476,7 @@ function dragEnd(ev) {
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-	var checks = specification.commonInterface.options;
+	var checks = testState.currentStateMap[testState.currentIndex].interfaces[0].options;
 	var canContinue = true;
 	
 	// Check that the anchor and reference objects are correctly placed
