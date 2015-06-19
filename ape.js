@@ -147,6 +147,38 @@ function loadInterface() {
 		return state;
 	};
 	
+	Interface.prototype.checkScaleRange = function()
+	{
+		var audioObjs = audioEngineContext.audioObjects;
+		var audioHolder = testState.stateMap[testState.stateIndex];
+		var interfaces = audioHolder.interfaces;
+		
+		var minRanking = audioObjs[0].interfaceDOM.getValue();
+		var maxRanking = minRanking;
+		
+		var minScale;
+		var maxScale;
+		for (var i=0; i<interfaces[0].options.length; i++)
+		{
+			if (interfaces[0].options[i].check == "scalerange") {
+				minScale = interfaces[0].options[i].min;
+				maxScale = interfaces[0].options[i].max;
+			}
+		}
+		
+		for (var i=1; i<audioObjs.length; i++){
+			var ranking = audioObjs[i].interfaceDOM.getValue();
+			if (ranking < minRanking) { minRanking = ranking;}
+			if (ranking > maxRanking) { maxRanking = ranking;}
+		}
+		if (minRanking > minScale || maxRanking < maxScale) {
+			alert('Please use the full width of the scale');
+			return false;
+		} else {
+			return true;
+		}
+	};
+	
 	// Bindings for audioObjects
 	
 	// Create the top div for the Title element
@@ -530,9 +562,15 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 				var checkState = interfaceContext.checkAllCommented();
 				if (checkState == false) {canContinue = false;}
 				break;
+			case 'scalerange':
+				// Check the scale is used to its full width outlined by the node
+				var checkState = interfaceContext.checkScaleRange();
+				if (checkState == false) {canContinue = false;}
+				break;
 			}
 
 		}
+		if (!canContinue) {break;}
 	}
    
     if (canContinue) {

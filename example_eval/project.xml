@@ -39,6 +39,7 @@
 			<check name="fragmentFullPlayback"/>
 			<check name="fragmentMoved"/>
 			<check name="fragmentComments"/>-->
+			<check name="scalerange" min="25" max="75"/>
 			<anchor>20</anchor>
 			<reference>80</reference>
 		</interface>
@@ -92,6 +93,7 @@
             <scale position="100">Max</scale>
             <scale position="50">Middle</scale>
             <scale position="75">75</scale>
+            <scalerange min="25" max="75"/>
             <commentBoxPrefix>Comment on fragment</commentBoxPrefix>
         </interface>
         <audioElements url="0.wav" id="0" reference="true"/>
