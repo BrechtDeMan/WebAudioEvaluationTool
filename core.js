@@ -1246,6 +1246,22 @@ function Specification() {
 				this.type = child.nodeName;
 				if (this.type == 'check') {
 					this.check = child.getAttribute('name');
+					if (this.check == 'scalerange') {
+						this.min = child.getAttribute('min');
+						this.max = child.getAttribute('max');
+						if (this.min == null) {this.min = 1;}
+						else if (Number(this.min) > 1 && this.min != null) {
+							this.min = Number(this.min)/100;
+						} else {
+							this.min = Number(this.min);
+						}
+						if (this.max == null) {this.max = 0;}
+						else if (Number(this.max) > 1 && this.max != null) {
+							this.max = Number(this.max)/100;
+						} else {
+							this.max = Number(this.max);
+						}
+					}
 				} else if (this.type == 'anchor' || this.type == 'reference') {
 					this.value = Number(child.textContent);
 				}
@@ -1345,7 +1361,7 @@ function Specification() {
 			var title = DOM.getElementsByTagName('title');
 			if (title.length == 0) {this.title = null;}
 			else {this.title = title[0].textContent;}
-			
+			this.options = parent.commonInterface.options;
 			var scale = DOM.getElementsByTagName('scale');
 			this.scale = [];
 			for (var i=0; i<scale.length; i++) {
