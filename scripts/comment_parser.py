@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import xml.etree.ElementTree as ET
 import os
 import csv
@@ -23,10 +25,16 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
             for audioelement in root.findall("*/[@id='"+page_name+"']/audioelement"):
                 if audioelement is not None: # Check it exists
                     audio_id = str(audioelement.get('id'))
+                    
+                    
+                    csv_name = page_name+'/'+page_name+'-comments-'+audio_id+'.csv'
 
-                    # append to file [page_name]/[page_name]-comments-[id].csv
-                    with open(page_name+'/'+page_name+'-comments-'+audio_id+'.csv', 'a') as csvfile:
-                        writer = csv.writer(csvfile, delimiter=',')
+                    # append (!) to file [page_name]/[page_name]-comments-[id].csv
+                    with open(csv_name, 'a') as csvfile:
+                        writer = csv.writer(csvfile, 
+                                            delimiter=',', 
+                                            dialect="excel",
+                                            quoting=csv.QUOTE_ALL)
                         commentstr = root.find("*/[@id='"
                                                + page_name
                                                + "']/audioelement/[@id='"
@@ -35,12 +43,13 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
                         if commentstr is None:
                             writer.writerow([''])
                         else:
-                            writer.writerow([commentstr.encode("utf-8")])
-                        #TODO Comma doesn't act as delimiter now!
-                        # (when adding more than just a comment per line):
-                        # writer.writerow([file + ',' + commentstr.encode("utf-8")])
+                        	# anonymous comments:
+                            writer.writerow([commentstr]) 
+                            # comments with (file) name:
+                            #writer.writerow([file[:-4]] + [commentstr]) 
 
-                        #TODO Replace 'new line' with something else?
-
-                        #TODO 'Append' means duplicate entries if run several times...
-
+                        #TODO Replace 'new line' in comment with something else?
+                        
+# PRO TIP: Change from csv to txt by running this in bash: 
+# $ cd folder_where_csvs_are/
+# $ for i in *.csv; do mv "$i" "${i/.csv}".txt; done
