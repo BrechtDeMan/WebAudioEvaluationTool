@@ -22,6 +22,7 @@
 
 
 \hyphenation{Java-script}
+\hyphenation{OPA-QUE}
 
 %%%%%%%%%%%%%%%%%%%%%%%% Some useful packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%% See related documentation %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -229,8 +230,6 @@ In the following sections, we describe the included interface in more detail, di
 %\begin{itemize}
 %\item 
 %\end{itemize}
-
-
 \section{Interface}\label{sec:interface}
 
 At this point, we have implemented the interface of the MATLAB-based APE (Audio Perceptual Evaluation) toolbox \cite{deman2014b}. This shows one marker for each simultaneously evaluated audio fragment on one or more horizontal axes, that can be moved to rate or rank the respective fragments in terms of any subjective property, as well as a comment box for every marker, and any extra text boxes for extra comments. 
@@ -334,7 +333,6 @@ The setup and result files both use the common XML document format to outline th
 			<metricEnable>elementTracker</metricEnable>
 			<metricEnable>elementFlagListenedTo</metricEnable>
 			<metricEnable>elementFlagMoved</metricEnable>
-			<metricEnable>elementListenTracker</metricEnable>
 		</Metric>
 		<interface>
 			<anchor>20</anchor>
@@ -348,16 +346,17 @@ The setup and result files both use the common XML document format to outline th
 			<scale position="100">Max</scale>
 			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
 		</interface>
-		<audioElements url="0.wav" id="0"/>
-		<audioElements url="1.wav" id="1"/>
-		<audioElements url="2.wav" id="2"/>
-		<audioElements url="3.wav" id="3"/>
+		<audioElements url="0.wav" id="elem0"/>
+		<audioElements url="1.wav" id="elem1"/>
+		<audioElements url="2.wav" id="elem2"/>
+		<audioElements url="3.wav" id="elem3"/>
 		<CommentQuestion id="generalExperience" type="text">General Comments</CommentQuestion>
 		<PreTest/>
 		<PostTest>
-			<question id="genre" mandatory="true">Please enter the genre of the song.</question>
+			<question id="songGenre" mandatory="true">Please enter the genre of the song.</question>
 		</PostTest>
 	</audioHolder>
+</BrowserEvalProjectDocument>
 
 \end{lstlisting}
 
@@ -365,22 +364,21 @@ The setup and result files both use the common XML document format to outline th
 
 \subsection{Setup and configurability}
 
-The setup document has several defined nodes and structure which are documented with the source code. For example, there is a section for general setup options where any pre-test and post-test questions and statements can be defined. Pre- and post-test dialogue boxes allow for comments or questions to be presented before or after the test, to convey listening test instructions, and gather information about the subject, listening environment, and overall experience of the test. In the example in Figure~\ref{fig:xmlIn}, a question box with the id `location' is added, which is set to be mandatory to answer. The question is in the PreTest node meaning it will appear before any testing will begin. When the result for the  entire test is shown, the response will appear in the PreTest node with the id `location' allowing it to be found easily, provided the id values are meaningful.
+The setup document has several defined nodes and structure which are documented with the source code. For example, there is a section for general setup options where any pre-test and post-test questions and statements can be defined. Pre- and post-test dialogue boxes allow for comments or questions to be presented before or after the test, to convey listening test instructions, and gather information about the subject, listening environment, and overall experience of the test. In the example set up document above, a question box with the id `location' is added, which is set to be mandatory to answer. The question is in the PreTest node meaning it will appear before any testing will begin. When the result for the  entire test is shown, the response will appear in the PreTest node with the id `location' allowing it to be found easily, provided the id values are meaningful.
 
 We try to cater to a diverse audience with this toolbox, while ensuring it is simple, elegant and straightforward. To that end, we currently include the following options that can be easily switched on and off, by setting the value in the input XML file. 
 
 \begin{itemize}[leftmargin=*]%Should have used a description list for this.
-\item \textbf{Snap to corresponding position}: When this is enabled, and a fragment is playing, the playhead skips to the same position in the next fragment that is clicked. If it is not enabled, every fragment is played from the start. 
-\item \textbf{Loop fragments}: Repeat current fragment when end is reached, until the `Stop audio' or `Submit' button is clicked. 
+\item \textbf{Snap to corresponding position}: When enabled and a fragment is playing, the playhead skips to the same position in the next fragment that is clicked, otherwise each fragment is played from the start. 
+\item \textbf{Loop fragments}: Repeat current fragment when end is reached, until the `Submit' button is clicked. 
 \item \textbf{Comments}: Displays a separate comment box for each fragment in the page.
-\item \textbf{General comment}: One comment box, additional to the individual comment boxes, to comment on the test or a feature that some or all of the fragments share. 
+\item \textbf{General comment}: Create additional comment boxes to the fragment comment boxes, with a custom question and various input formats such as checkbox or radio.
 \item \textbf{Resampling}: When this is enabled, tracks are resampled to match the subject's system's sample rate (a default feature of the Web Audio API). When it is not, an error is shown when the system does not match the requested sample rate. 
 \item \textbf{Randomise page order}: Randomises the order in which different `pages' are presented. % are we calling this 'pages'?
-\item \textbf{Randomise fragment order}: Randomises the order and numbering of the markers and comment boxes corresponding to the fragments. This permutation is stored as well, to be able to interpret references to the numbers in the comments (such as `this is much [brighter] then 4'). 
-\item \textbf{Require playback}: Require that each fragment has been played at least once, if not in full. 
-\item \textbf{Require full playback}: If `Require playback' is active, require that each fragment has been played in full. 
+\item \textbf{Randomise fragment order}: Randomises the order and numbering of the markers and comment boxes corresponding to the fragments. Fragments are referenced to their give ID so referencing is possible (such as `this is much [brighter] then 4'). 
+\item \textbf{Require (full) playback}: Require that each fragment has been played at least once, if not in full. 
 \item \textbf{Require moving}: Require that each marker is moved (dragged) at least once. 
-\item \textbf{Require comments}: This option allows requiring the subject to require a comment for each track. 
+\item \textbf{Require comments}: Require the subject to write a comment for each track. 
 \item \textbf{Repeat test}: Number of times each page in the test should be repeated (none by default), to allow familiarisation with the content and experiment, and to investigate consistency of user and variability due to familiarity. In the setup, each 'page' can be given a repeat count. These are all gathered before shuffling the order so repeated tests are not back-to-back if possible.
 \item \textbf{Returning to previous pages}: Indicates whether it is possible to go back to a previous `page' in the test. 
 \item \textbf{Lowest rating below [value]}: To enforce a certain use of the rating scale, it can be required to rate at least one sample below a specified value. 
@@ -398,23 +396,56 @@ When one of these options is not included in the setup file, they assume a defau
 
 \subsection{Results}
 
-The results file is dynamically generated by the interface upon clicking the `Submit' button. This also executes checks, depending on the setup file, to ensure that all tracks have been played back, rated and commented on. The XML output returned contains a node per audioObject and contains both the corresponding marker's position and any comments written in the associated comment box. The rating returned is normalised to be a value between 0 and 1, normalising the pixel representation of different browser windows. An example output file is presented below.
+The results file is dynamically generated by the interface upon clicking the `Submit' button. This also executes checks, depending on the setup file, to ensure that all tracks have been played back, rated and commented on. The XML output returned contains a node per fragment and contains both the corresponding marker's position and any comments written in the associated comment box. The rating returned is normalised to be a value between 0 and 1, normalising the pixel representation of different browser windows. The results also contain information collected by any defined pre/post questions. An excerpt of an output file is presented below detailing the data collected for a single audioElement.
 
 \tiny
 \lstset{language=XML}
 
 \begin{lstlisting}
-ADD XML HERE
+<browserevaluationresult>
+	<datetime>
+		<date year="2015" month="5" day="28">2015/5/28</date>
+		<time hour="13" minute="19" secs="17">13:19:17</time>
+	</datetime>
+	<pretest>
+		<comment id="location">Control Room</comment>
+	</pretest>
+	<audioholder>
+		<pretest></pretest>
+		<posttest>
+			<comment id="songGenre">Alternative-Rock</comment>
+		</posttest>
+		<metric>
+			<metricresult id="testTime">813.328</metricresult>
+		</metric>
+		<audioelement id="elem0">
+			<comment>
+				<question>Comment on track 0</question>
+				<response>Like the reverb length and style, however Vocals get lost in the mix.</response>
+			</comment>
+			<value>0.639010989010989</value>
+			<metric>
+				<metricresult id="elementTimer">111.05066666666663</metricresult>
+				<metricresult id="elementTrackerFull">
+					<timepos id="0">
+						<time>61.602666666666664</time>
+						<position>0.639010989010989</position>
+					</timepos>
+				</metricresult>
+				<metricresult id="elementInitialPosition">0.6571428571428571</metricresult>
+				<metricresult id="elementFlagListenedTo">true</metricresult>
+				<metricresult id="elementFlagMoved">true</metricresult>
+			</metric>
+		</audioelement>
+	</audioHolder>
+</browserevaluationresult>
 
 \end{lstlisting}
 
 \normalsize
 
-
-The results also contain information collected by any defined pre/post questions. These are referenced against the setup XML by using the same ID so readable responses can be obtained. Taking from the earlier example of setting up a pre-test question, an example response can be seen above. %MAKE SURE THERE IS ONE!
-
-Each page of testing is returned with the results of the entire page included in the structure. One `audioElement' node is created per audio fragment per page, along with its ID. This includes several child nodes including the rating between 0 and 1, the comment, and any other collected metrics including how long the element was listened for, the initial position, boolean flags if the element was listened to, if the element was moved and if the element comment box had any comment. Furthermore, each user action (manipulation of any interface element, such as playback or moving a marker) can be logged along with a the corresponding time code.
-We also store session data such as the browser the tool was used in. 
+Each page of testing is returned with the results of the entire page included in the structure. One \texttt{audioelement} node is created per audio fragment per page, along with its ID. This includes several child nodes including the rating between 0 and 1, the comment, and any other collected metrics including how long the element was listened for, the initial position, boolean flags if the element was listened to, if the element was moved and if the element comment box had any comment. Furthermore, each user action (manipulation of any interface element, such as playback or moving a marker) can be logged along with a the corresponding time code.
+We also store session data such as the time the test took place and the duration of the test.
 We provide the option to store the results locally, and/or to have them sent to a server. 
 
 %Here is an example of the set up XML and the results XML: % perhaps best to refer to each XML after each section (set up <> results)
@@ -444,9 +475,6 @@ We provide the option to store the results locally, and/or to have them sent to 
 %<metricresult id="elementFlagMoved"> true </metricresult> \\
 %</metric> \\
 %</audioelement>}
-
-The parent tag \texttt{audioelement} holds the ID of the element passed in from the setup document. The first child element is \texttt{comment} and holds both the question shown and the response from the comment box inside. 
-The child element \texttt{value} holds the normalised ranking value. Next comes the metric node structure, with one metric result node per metric event collected. The id of the node identifies the type of data it contains. For example, the first holds the id \textit{elementTimer} and the data contained represents how long, in seconds, the audio element was listened to. There is one \texttt{audioelement} tag per audio element on each test page. 
 
 % BRECHT: scripts
 
