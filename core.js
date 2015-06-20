@@ -892,6 +892,12 @@ function audioObject(id) {
 		var root = document.createElement('audioElement');
 		root.id = this.specification.id;
 		root.setAttribute('url',this.url);
+		var file = document.createElement('file');
+		file.setAttribute('sampleRate',this.buffer.sampleRate);
+		file.setAttribute('channels',this.buffer.channels);
+		file.setAttribute('sampleCount',this.buffer.length);
+		file.setAttribute('duration',this.buffer.duration);
+		root.appendChild(file);
 		root.appendChild(this.interfaceDOM.exportXMLDOM(this));
 		root.appendChild(this.commentDOM.exportXMLDOM(this));
 		root.appendChild(this.metric.exportXMLDOM());
