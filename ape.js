@@ -355,14 +355,6 @@ function loadTest(audioHolderObject)
 	currentTestHolder.id = audioHolderObject.id;
 	currentTestHolder.repeatCount = audioHolderObject.repeatCount;
 	
-	var randomise = audioHolderObject.randomiseOrder;
-	
-	var audioElements = audioHolderObject.audioElements;
-	currentTrackOrder = [];
-	if (randomise) {
-		audioHolderObject.audioElements = randomiseOrder(audioHolderObject.audioElements);
-	}
-	
 	// Delete any previous audioObjects associated with the audioEngine
 	audioEngineContext.audioObjects = [];
 	interfaceContext.deleteCommentBoxes();
@@ -480,62 +472,8 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 	var canContinue = true;
 	
 	// Check that the anchor and reference objects are correctly placed
-	var audioObjs = audioEngineContext.audioObjects;
-	var audioHolder = testState.stateMap[testState.stateIndex];
-	var anchorId = null;
-	var referenceId = null;
-	for (var i=0; i<audioObjs.length; i++) {
-		if (audioObjs[i].specification.anchor == true && anchorId == null) {anchorId = i;}
-		if (audioObjs[i].specification.reference == true && referenceId == null) {referenceId = i;}
-	}
-	if (anchorId != null) {
-		if (audioObjs[anchorId].specification.marker != null) {
-			if (audioObjs[anchorId].interfaceDOM.getValue() > audioObjs[anchorId].specification.marker)
-			{
-				// Anchor is not set below
-				console.log('Anchor node not below marker value');
-				alert('Please keep listening');
-				return;
-			}
-		} else {
-			// No marker value given, ensure it is the minimum value
-			var anchorVal = audioObjs[anchorId].interfaceDOM.getValue();
-			for (var i=0; i<audioObjs.length; i++) {
-				if (i != anchorId) {
-					if (anchorVal > audioObjs[i].interfaceDOM.getValue()) {
-						// Anchor not the minimum
-						console.log('No marker set, anchor node not the minimum');
-						alert('Please keep listening');
-						return;
-					}
-				}
-			}
-		}
-	}
-	if (referenceId != null) {
-		if (audioObjs[referenceId].specification.marker != null) {
-			if (audioObjs[referenceId].interfaceDOM.getValue() < audioObjs[referenceId].specification.marker)
-			{
-				// Anchor is not set below
-				console.log('Reference node not above marker value');
-				alert('Please keep listening');
-				return;
-			}
-		} else {
-			// No marker value given, ensure it is the minimum value
-			var referenceVal = audioObjs[referenceId].interfaceDOM.getValue();
-			for (var i=0; i<audioObjs.length; i++) {
-				if (i != referenceId) {
-					if (referenceVal > audioObjs[i].interfaceDOM.getValue()) {
-						// Anchor not the minimum
-						console.log('No marker set, reference node not the maximum');
-						alert('Please keep listening');
-						return;
-					}
-				}
-			}
-		}
-	}
+	if (interfaceContext.checkHiddenAnchor() == false) {return;}
+	if (interfaceContext.checkHiddenReference() == false) {return;}
 	
 	for (var i=0; i<checks.length; i++) {
 		if (checks[i].type == 'check')

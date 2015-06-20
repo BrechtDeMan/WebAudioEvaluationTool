@@ -40,8 +40,6 @@
 			<check name="fragmentMoved"/>
 			<check name="fragmentComments"/>-->
 			<check name="scalerange" min="25" max="75"/>
-			<anchor>20</anchor>
-			<reference>80</reference>
 		</interface>
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
@@ -53,7 +51,7 @@
 			<scale position="20">20</scale>
 			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
 		</interface>
-		<audioElements url="0.wav" id="0" anchor='true'/>
+		<audioElements url="0.wav" id="0" type="anchor" marker="20"/>
 		<audioElements url="1.wav" id="1"/>
 		<audioElements url="2.wav" id="2"/>
 		<audioElements url="3.wav" id="3"/>
@@ -96,8 +94,8 @@
             <scalerange min="25" max="75"/>
             <commentBoxPrefix>Comment on fragment</commentBoxPrefix>
         </interface>
-        <audioElements url="0.wav" id="0" reference="true"/>
-        <audioElements url="1.wav" id="1" anchor="true"/>
+        <audioElements url="0.wav" id="0" type="reference" marker="80"/>
+        <audioElements url="1.wav" id="1" type="anchor" marker="20"/>
         <audioElements url="2.wav" id="2"/>
         <audioElements url="3.wav" id="3"/>
         <audioElements url="4.wav" id="4"/>
