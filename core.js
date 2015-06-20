@@ -894,12 +894,14 @@ function audioObject(id) {
 		root.setAttribute('url',this.url);
 		var file = document.createElement('file');
 		file.setAttribute('sampleRate',this.buffer.sampleRate);
-		file.setAttribute('channels',this.buffer.channels);
+		file.setAttribute('channels',this.buffer.numberOfChannels);
 		file.setAttribute('sampleCount',this.buffer.length);
 		file.setAttribute('duration',this.buffer.duration);
 		root.appendChild(file);
-		root.appendChild(this.interfaceDOM.exportXMLDOM(this));
-		root.appendChild(this.commentDOM.exportXMLDOM(this));
+		if (this.specification.type != 'outsidereference') {
+			root.appendChild(this.interfaceDOM.exportXMLDOM(this));
+			root.appendChild(this.commentDOM.exportXMLDOM(this));
+		}
 		root.appendChild(this.metric.exportXMLDOM());
 		return root;
 	};
@@ -1516,8 +1518,19 @@ function Specification() {
 		
 		this.audioElements  =[];
 		var audioElementsDOM = xml.getElementsByTagName('audioElements');
+		this.outsideReference = null;
 		for (var i=0; i<audioElementsDOM.length; i++) {
-			this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+			if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
+				if (this.outsideReference == null) {
+					this.outsideReference = new this.audioElementNode(this,audioElementsDOM[i]);
+				} else {
+					console.log('Error only one audioelement can be of type outsidereference per audioholder');
+					this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+					console.log('Element id '+audioElementsDOM[i].id+' made into normal node');
+				}
+			} else {
+				this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+			}
 		}
 		
 		if (this.randomiseOrder) {
