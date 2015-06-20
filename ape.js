@@ -167,9 +167,11 @@ function loadInterface() {
 		}
 		
 		for (var i=1; i<audioObjs.length; i++){
-			var ranking = audioObjs[i].interfaceDOM.getValue();
-			if (ranking < minRanking) { minRanking = ranking;}
-			if (ranking > maxRanking) { maxRanking = ranking;}
+			if (audioObjs[i].specification.type != 'outsidereference') {
+				var ranking = audioObjs[i].interfaceDOM.getValue();
+				if (ranking < minRanking) { minRanking = ranking;}
+				if (ranking > maxRanking) { maxRanking = ranking;}
+			}
 		}
 		if (minRanking > minScale || maxRanking < maxScale) {
 			alert('Please use the full width of the scale');
@@ -392,6 +394,31 @@ function loadTest(audioHolderObject)
 		feedbackHolder.appendChild(node.holder);
 	});
 	
+	// Construct outside reference;
+	if (audioHolderObject.outsideReference != null) {
+		var outsideReferenceHolder = document.createElement('div');
+		outsideReferenceHolder.id = 'outside-reference';
+		outsideReferenceHolderspan = document.createElement('span');
+		outsideReferenceHolderspan.textContent = 'Reference';
+		outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
+		
+		var audioObject = audioEngineContext.newTrack(audioHolderObject.outsideReference);
+		
+		outsideReferenceHolder.onclick = function()
+		{
+			audioEngineContext.play(audioEngineContext.audioObjects.length-1);
+			$('.track-slider').removeClass('track-slider-playing');
+            $('.comment-div').removeClass('comment-box-playing');
+            if (event.srcElement.nodeName == 'DIV') {
+            	$(event.srcElement).addClass('track-slider-playing');
+            } else {
+            	$(event.srcElement.parentElement).addClass('track-slider-playing');
+            }
+		};
+		
+		document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
+	}
+	
 	
 	testWaitIndicator();
 }
@@ -431,6 +458,9 @@ function sliderObject(audioObject) {
             $(element).addClass('track-slider-playing');
             $('.comment-div').removeClass('comment-box-playing');
             $('#comment-div-'+id).addClass('comment-box-playing');
+            var outsideReference = document.getElementById('outside-reference');
+            if (outsideReference != undefined)
+            $(outsideReference).removeClass('track-slider-playing');
 		}
 	};
 	
