@@ -655,6 +655,7 @@ function pageXMLSave(store, testXML)
 	for (var i=0; i<audioObjects.length; i++) 
 	{
 		var audioElement = audioEngineContext.audioObjects[i].exportXMLDOM();
+		audioElement.setAttribute('presentedId',i);
 		xmlDoc.appendChild(audioElement);
 	}
 	
