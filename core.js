@@ -1839,7 +1839,7 @@ function Interface(specificationObject) {
 	
 	this.deleteCommentBoxes = function() {
 		this.commentBoxes = [];
-	}
+	};
 	
 	this.createCommentQuestion = function(element) {
 		var node;
@@ -1852,6 +1852,11 @@ function Interface(specificationObject) {
 		}
 		this.commentQuestions.push(node);
 		return node;
+	};
+	
+	this.deleteCommentQuestions = function()
+	{
+		this.commentQuestions = [];
 	};
 	
 	this.playhead = new function()
