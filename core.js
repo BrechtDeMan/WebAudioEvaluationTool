@@ -1813,6 +1813,11 @@ function Interface(specificationObject) {
 		return node;
 	};
 	
+	this.deleteCommentQuestions = function()
+	{
+		this.commentQuestions = [];
+	};
+	
 	this.playhead = new function()
 	{
 		this.object = document.createElement('div');
