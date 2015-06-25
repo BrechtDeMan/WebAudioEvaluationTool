@@ -638,6 +638,7 @@ function createProjectSave(destURL) {
 function interfaceXMLSave(){
 	// Create the XML string to be exported with results
 	var xmlDoc = document.createElement("BrowserEvaluationResult");
+	xmlDoc.appendChild(specification.projectXML);
 	xmlDoc.appendChild(returnDateNode());
 	for (var i=0; i<testState.stateResults.length; i++)
 	{
@@ -1221,6 +1222,7 @@ function Specification() {
 	
 	this.decode = function() {
 		// projectXML - DOM Parsed document
+		this.projectXML = projectXML.childNodes[0];
 		var setupNode = projectXML.getElementsByTagName('setup')[0];
 		this.interfaceType = setupNode.getAttribute('interface');
 		this.projectReturn = setupNode.getAttribute('projectReturn');
