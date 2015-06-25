@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import xml.etree.ElementTree as ET
 import os
@@ -22,7 +23,7 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
                 os.makedirs(page_name)
 
             # for page [page_name], print comments related to fragment [id]
-            for audioelement in root.findall("*/[@id='"+page_name+"']/audioelement"):
+            for audioelement in root.findall("*/[@id='"+page_name+"']/audioelement"): #TODO in audioholder.findall(...)
                 if audioelement is not None: # Check it exists
                     audio_id = str(audioelement.get('id'))
                     
@@ -44,9 +45,9 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
                             writer.writerow([''])
                         else:
                         	# anonymous comments:
-                            writer.writerow([commentstr]) 
+                            writer.writerow([commentstr.encode("utf-8")]) 
                             # comments with (file) name:
-                            #writer.writerow([file[:-4]] + [commentstr]) 
+                            #writer.writerow([file[:-4]] + [commentstr.encode("utf-8")]) 
 
                         #TODO Replace 'new line' in comment with something else?
                         
