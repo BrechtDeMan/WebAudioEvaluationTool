@@ -1,2 +1,2 @@
-This folder is where the python2.py server will save the received test results
+This folder is where the pythonServer.py server will save the received test results
 Files will return as test-#.xml where # is the number they were received!
