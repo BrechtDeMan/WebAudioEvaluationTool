@@ -638,7 +638,9 @@ function createProjectSave(destURL) {
 function interfaceXMLSave(){
 	// Create the XML string to be exported with results
 	var xmlDoc = document.createElement("BrowserEvaluationResult");
-	xmlDoc.appendChild(specification.projectXML);
+	var projectDocument = specification.projectXML;
+	projectDocument.setAttribute('file-name',url);
+	xmlDoc.appendChild(projectDocument);
 	xmlDoc.appendChild(returnDateNode());
 	for (var i=0; i<testState.stateResults.length; i++)
 	{
