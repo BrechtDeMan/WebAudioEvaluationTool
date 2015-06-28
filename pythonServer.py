@@ -1,9 +1,16 @@
 import BaseHTTPServer
 from os import walk
 from os import path
+from os import listdir
 import urllib2
 import pickle
 import datetime
+
+PSEUDO_PATH = 'example_eval/'
+pseudo_files = []
+for filename in listdir(PSEUDO_PATH):
+    if filename.endswith('.xml'):
+        pseudo_files.append(filename)
 
 curSaveIndex = 0;
 curFileName = 'test-0.xml'
@@ -11,7 +18,9 @@ while(path.isfile('saves/'+curFileName)):
 	curSaveIndex += 1;
 	curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
-print curFileName
+print "Next save - " + curFileName
+pseudo_index = curSaveIndex % len(pseudo_files)
+print "Next test - " + pseudo_files[pseudo_index]
 
 def send404(s):
 	s.send_response(404)
@@ -59,19 +68,28 @@ def saveFile(self):
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_HEAD(s):
-			s.send_response(200)
-			s.send_header("Content-type", "text/html")
-			s.end_headers()
+		s.send_response(200)
+		s.send_header("Content-type", "text/html")
+		s.end_headers()
 	def do_GET(request):
+		global pseudo_index
+		global pseudo_files
+		global PSEUDO_PATH
 		if(request.client_address[0] == "127.0.0.1"):
 			if (request.path == "/favicon.ico"):
 				send404(request)
 			else:
 				if (request.path == '/'):
 					request.path = '/index.html'
+				elif (request.path == '/pseudo.xml'):
+					request.path = '/'+PSEUDO_PATH + pseudo_files[pseudo_index]
+					print request.path
+					pseudo_index += 1
+					pseudo_index %= len(pseudo_files)
 				processFile(request)
 		else:
 			send404(request)
+
 	def do_POST(request):
 		if(request.client_address[0] == "127.0.0.1"):
 			if (request.path == "/save"):
