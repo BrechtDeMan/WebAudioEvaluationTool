@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import xml.etree.ElementTree as ET
 import os
 import csv
@@ -12,16 +14,15 @@ for file in os.listdir(folder_name): # You have to put this in folder where outp
     if file.endswith(".xml"):
         tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
-        #print ["DEBUG Reading " + file + "..."]
+        #print "DEBUG Reading " + file + "..."
 
         # get subject ID from XML file
-        subject_id = file # file name as subject ID
+        subject_id = file[:-4] # file name (without extension) as subject ID
 
         # get list of all pages this subject evaluated
         for audioholder in root.findall("./audioholder"):    # iterate over pages
             page_name = audioholder.get('id') # get page name
-            #print ["DEBUG    page " + page_name]
-            
+                       
             if page_name is None: # ignore 'empty' audio_holders
                 break
 
@@ -46,28 +47,32 @@ for file in os.listdir(folder_name): # You have to put this in folder where outp
 
             # if file exists, get header and add 'new' fragments
             if os.path.isfile(file_name):
-                #print ["DEBUG file " + file_name + " already exists - reading header"]
+                #print "DEBUG file " + file_name + " already exists - reading header"
                 with open(file_name, 'r') as readfile:
                     filereader = csv.reader(readfile, delimiter=',')
                     headerrow = filereader.next()
-                    #headerrow = headerrow[1:] # remove first column (empty)
 
-                    # Which of the fragmentes are in fragmentnamelist but not in headerrow?
-                    newfragments = list(set(fragmentnamelist)-set(headerrow))
-                    newfragments = sorted(newfragments) # new fragments in alphabetical order
-                    # If not empty, read file and rewrite adding extra columns
-                    if newfragments: # if not empty
-                        print ["DEBUG New fragments found: " + str(newfragments)]
-                        with open('temp.csv', 'w') as writefile:
-                            filewriter = csv.writer(writefile, delimiter=',')
-                            filewriter.writerow(headerrow + newfragments) # write new header
+                # Which of the fragmentes are in fragmentnamelist but not in headerrow?
+                newfragments = list(set(fragmentnamelist)-set(headerrow))
+                newfragments = sorted(newfragments) # new fragments in alphabetical order
+                # If not empty, read file and rewrite adding extra columns
+                if newfragments: # if not empty
+                    print '        '+page_name+','+file_name+','+subject_id
+                    #print "DEBUG New fragments found: " + str(newfragments)
+                    with open('temp.csv', 'w') as writefile:
+                        filewriter = csv.writer(writefile, delimiter=',')
+                        filewriter.writerow(headerrow + newfragments) # write new header
+                        #print "        "+str(headerrow + newfragments) # DEBUG
+                        with open(file_name, 'r') as readfile:
+                            filereader = csv.reader(readfile, delimiter=',')
+                            filereader.next() # skip header
                             for row in filereader: # rewrite row plus empty cells for every new fragment name
-                                #print ["DEBUG Old row: " + str(row)]
+                                #print "            Old row: " + str(row) # DEBUG
                                 filewriter.writerow(row + ['']*len(newfragments))
-                                #print ["DEBUG New row: " + str(row + ['']*len(newfragments))]
-                        os.rename('temp.csv', file_name) # replace old file with temp file
-                        headerrow = headerrow + newfragments
-                        print ["DEBUG New header row: " + str(headerrow)]
+                                #print "            New row: " + str(row + ['']*len(newfragments)) # DEBUG
+                    os.rename('temp.csv', file_name) # replace old file with temp file
+                    headerrow = headerrow + newfragments
+                    #print "DEBUG New header row: " + str(headerrow)
 
             # if not, create file and make header
             else:
