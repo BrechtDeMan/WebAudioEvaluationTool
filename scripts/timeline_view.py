@@ -1,20 +1,36 @@
+#!/usr/bin/python
+
 import xml.etree.ElementTree as ET
 import os
 import matplotlib.pyplot as plt
 
-colormap = ['b', 'r', 'g', 'c', 'm', 'y', 'k'] # colormap for to cycle through
+# CONFIGURATION 
 
-timeline_folder = 'timelines/' # folder where to store timelines, e.g. 'timelines/'
+# XML results files location (modify as needed):
+folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
 
+# Folder where to store timelines
+timeline_folder = folder_name + '/timelines/'    # Stores in 'saves/timelines/'
+
+# Font settings
+font = {'weight' : 'bold',
+        'size'   : 16}
+plt.rc('font', **font)
+
+# Colormap for to cycle through
+colormap = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
+
+
+# CODE
 
 # create timeline_folder if not yet created
 if not os.path.exists(timeline_folder):
     os.makedirs(timeline_folder)
 
 # get every XML file in folder
-for file in os.listdir("."): # You have to put this script in folder where output XML files are.
+for file in os.listdir(folder_name): # You have to put this script in folder where output XML files are.
     if file.endswith(".xml"):
-        tree = ET.parse(file)
+        tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
         subject_id = file[:-4] # drop '.xml'
         
@@ -28,7 +44,7 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
                 break
 
             # SORT AUDIO ELEMENTS ALPHABETICALLY
-            audioelements = root.findall("*/[@id='"+page_name+"']/audioelement")
+            audioelements = audioholder.findall("./audioelement")
             
             data = []
             for elem in audioelements: # from http://effbot.org/zone/element-sort.htm
@@ -48,11 +64,7 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
                     audioelements_names.append(audio_id)
                     
                     # for this audioelement, loop over all listen events
-                    listen_events = root.findall("*/[@id='"
-                                           + page_name
-                                           + "']/audioelement/[@id='"
-                                           + audio_id
-                                           + "']/metric/metricresult/[@name='elementListenTracker']/event")
+                    listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
                     for event in listen_events:
                         # get testtime: start and stop
                         start_time = event.find('testtime').get('start')
