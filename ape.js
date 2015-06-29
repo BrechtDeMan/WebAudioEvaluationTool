@@ -147,6 +147,40 @@ function loadInterface() {
 		return state;
 	};
 	
+	Interface.prototype.checkScaleRange = function()
+	{
+		var audioObjs = audioEngineContext.audioObjects;
+		var audioHolder = testState.stateMap[testState.stateIndex];
+		var interfaces = audioHolder.interfaces;
+		
+		var minRanking = audioObjs[0].interfaceDOM.getValue();
+		var maxRanking = minRanking;
+		
+		var minScale;
+		var maxScale;
+		for (var i=0; i<interfaces[0].options.length; i++)
+		{
+			if (interfaces[0].options[i].check == "scalerange") {
+				minScale = interfaces[0].options[i].min;
+				maxScale = interfaces[0].options[i].max;
+			}
+		}
+		
+		for (var i=1; i<audioObjs.length; i++){
+			if (audioObjs[i].specification.type != 'outsidereference') {
+				var ranking = audioObjs[i].interfaceDOM.getValue();
+				if (ranking < minRanking) { minRanking = ranking;}
+				if (ranking > maxRanking) { maxRanking = ranking;}
+			}
+		}
+		if (minRanking > minScale || maxRanking < maxScale) {
+			alert('Please use the full width of the scale');
+			return false;
+		} else {
+			return true;
+		}
+	};
+	
 	// Bindings for audioObjects
 	
 	// Create the top div for the Title element
@@ -264,11 +298,11 @@ function loadTest(audioHolderObject)
 	feedbackHolder.innerHTML = null;
 	canvas.innerHTML = null;
 	
-	//var playbackHolder = document.createElement('div');
-	//playbackHolder.style.width = "100%";
-	//playbackHolder.align = 'center';
-	//playbackHolder.appendChild(interfaceContext.playhead.object);
-	//feedbackHolder.appendChild(playbackHolder);
+	var playbackHolder = document.createElement('div');
+	playbackHolder.style.width = "100%";
+	playbackHolder.align = 'center';
+	playbackHolder.appendChild(interfaceContext.playhead.object);
+	feedbackHolder.appendChild(playbackHolder);
 	// Setup question title
 	var interfaceObj = audioHolderObject.interfaces;
 	var commentBoxPrefix = "Comment on track";
@@ -323,14 +357,6 @@ function loadTest(audioHolderObject)
 	currentTestHolder.id = audioHolderObject.id;
 	currentTestHolder.repeatCount = audioHolderObject.repeatCount;
 	
-	var randomise = audioHolderObject.randomiseOrder;
-	
-	var audioElements = audioHolderObject.audioElements;
-	currentTrackOrder = [];
-	if (randomise) {
-		audioHolderObject.audioElements = randomiseOrder(audioHolderObject.audioElements);
-	}
-	
 	// Delete any previous audioObjects associated with the audioEngine
 	audioEngineContext.audioObjects = [];
 	interfaceContext.deleteCommentBoxes();
@@ -368,6 +394,31 @@ function loadTest(audioHolderObject)
 		var node = interfaceContext.createCommentQuestion(element);
 		feedbackHolder.appendChild(node.holder);
 	});
+	
+	// Construct outside reference;
+	if (audioHolderObject.outsideReference != null) {
+		var outsideReferenceHolder = document.createElement('div');
+		outsideReferenceHolder.id = 'outside-reference';
+		outsideReferenceHolderspan = document.createElement('span');
+		outsideReferenceHolderspan.textContent = 'Reference';
+		outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
+		
+		var audioObject = audioEngineContext.newTrack(audioHolderObject.outsideReference);
+		
+		outsideReferenceHolder.onclick = function()
+		{
+			audioEngineContext.play(audioEngineContext.audioObjects.length-1);
+			$('.track-slider').removeClass('track-slider-playing');
+            $('.comment-div').removeClass('comment-box-playing');
+            if (event.srcElement.nodeName == 'DIV') {
+            	$(event.srcElement).addClass('track-slider-playing');
+            } else {
+            	$(event.srcElement.parentElement).addClass('track-slider-playing');
+            }
+		};
+		
+		document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
+	}
 	
 	
 	testWaitIndicator();
@@ -408,6 +459,9 @@ function sliderObject(audioObject) {
             $(element).addClass('track-slider-playing');
             $('.comment-div').removeClass('comment-box-playing');
             $('#comment-div-'+id).addClass('comment-box-playing');
+            var outsideReference = document.getElementById('outside-reference');
+            if (outsideReference != undefined)
+            $(outsideReference).removeClass('track-slider-playing');
 		}
 	};
 	
@@ -445,66 +499,12 @@ function dragEnd(ev) {
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-	var checks = specification.commonInterface.options;
+	var checks = testState.currentStateMap[testState.currentIndex].interfaces[0].options;
 	var canContinue = true;
 	
 	// Check that the anchor and reference objects are correctly placed
-	var audioObjs = audioEngineContext.audioObjects;
-	var audioHolder = testState.stateMap[testState.stateIndex];
-	var anchorId = null;
-	var referenceId = null;
-	for (var i=0; i<audioObjs.length; i++) {
-		if (audioObjs[i].specification.anchor == true && anchorId == null) {anchorId = i;}
-		if (audioObjs[i].specification.reference == true && referenceId == null) {referenceId = i;}
-	}
-	if (anchorId != null) {
-		if (audioObjs[anchorId].specification.marker != null) {
-			if (audioObjs[anchorId].interfaceDOM.getValue() > audioObjs[anchorId].specification.marker)
-			{
-				// Anchor is not set below
-				console.log('Anchor node not below marker value');
-				alert('Please keep listening');
-				return;
-			}
-		} else {
-			// No marker value given, ensure it is the minimum value
-			var anchorVal = audioObjs[anchorId].interfaceDOM.getValue();
-			for (var i=0; i<audioObjs.length; i++) {
-				if (i != anchorId) {
-					if (anchorVal > audioObjs[i].interfaceDOM.getValue()) {
-						// Anchor not the minimum
-						console.log('No marker set, anchor node not the minimum');
-						alert('Please keep listening');
-						return;
-					}
-				}
-			}
-		}
-	}
-	if (referenceId != null) {
-		if (audioObjs[referenceId].specification.marker != null) {
-			if (audioObjs[referenceId].interfaceDOM.getValue() < audioObjs[referenceId].specification.marker)
-			{
-				// Anchor is not set below
-				console.log('Reference node not above marker value');
-				alert('Please keep listening');
-				return;
-			}
-		} else {
-			// No marker value given, ensure it is the minimum value
-			var referenceVal = audioObjs[referenceId].interfaceDOM.getValue();
-			for (var i=0; i<audioObjs.length; i++) {
-				if (i != referenceId) {
-					if (referenceVal > audioObjs[i].interfaceDOM.getValue()) {
-						// Anchor not the minimum
-						console.log('No marker set, reference node not the maximum');
-						alert('Please keep listening');
-						return;
-					}
-				}
-			}
-		}
-	}
+	if (interfaceContext.checkHiddenAnchor() == false) {return;}
+	if (interfaceContext.checkHiddenReference() == false) {return;}
 	
 	for (var i=0; i<checks.length; i++) {
 		if (checks[i].type == 'check')
@@ -531,9 +531,15 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 				var checkState = interfaceContext.checkAllCommented();
 				if (checkState == false) {canContinue = false;}
 				break;
+			case 'scalerange':
+				// Check the scale is used to its full width outlined by the node
+				var checkState = interfaceContext.checkScaleRange();
+				if (checkState == false) {canContinue = false;}
+				break;
 			}
 
 		}
+		if (!canContinue) {break;}
 	}
    
     if (canContinue) {
@@ -618,6 +624,7 @@ function pageXMLSave(store, testXML)
 	for (var i=0; i<audioObjects.length; i++) 
 	{
 		var audioElement = audioEngineContext.audioObjects[i].exportXMLDOM();
+		audioElement.setAttribute('presentedId',i);
 		xmlDoc.appendChild(audioElement);
 	}
 	

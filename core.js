@@ -204,7 +204,7 @@ function interfacePopup() {
 			this.popupContent.appendChild(span);
 			this.popupContent.appendChild(document.createElement('br'));
 			var input = document.createElement('input');
-			input.type = 'number';
+			input.type = 'textarea';
 			if (node.min != null) {input.min = node.min;}
 			if (node.max != null) {input.max = node.max;}
 			if (node.step != null) {input.step = node.step;}
@@ -298,7 +298,7 @@ function interfacePopup() {
 				return;
 			}
 			var enteredNumber = Number(input.value);
-			if (enteredNumber == undefined) {
+			if (isNaN(enteredNumber)) {
 				alert('Please enter a valid number');
 				return;
 			}
@@ -638,6 +638,9 @@ function createProjectSave(destURL) {
 function interfaceXMLSave(){
 	// Create the XML string to be exported with results
 	var xmlDoc = document.createElement("BrowserEvaluationResult");
+	var projectDocument = specification.projectXML;
+	projectDocument.setAttribute('file-name',url);
+	xmlDoc.appendChild(projectDocument);
 	xmlDoc.appendChild(returnDateNode());
 	for (var i=0; i<testState.stateResults.length; i++)
 	{
@@ -892,8 +895,16 @@ function audioObject(id) {
 		var root = document.createElement('audioElement');
 		root.id = this.specification.id;
 		root.setAttribute('url',this.url);
-		root.appendChild(this.interfaceDOM.exportXMLDOM(this));
-		root.appendChild(this.commentDOM.exportXMLDOM(this));
+		var file = document.createElement('file');
+		file.setAttribute('sampleRate',this.buffer.sampleRate);
+		file.setAttribute('channels',this.buffer.numberOfChannels);
+		file.setAttribute('sampleCount',this.buffer.length);
+		file.setAttribute('duration',this.buffer.duration);
+		root.appendChild(file);
+		if (this.specification.type != 'outsidereference') {
+			root.appendChild(this.interfaceDOM.exportXMLDOM(this));
+			root.appendChild(this.commentDOM.exportXMLDOM(this));
+		}
 		root.appendChild(this.metric.exportXMLDOM());
 		return root;
 	};
@@ -1213,6 +1224,7 @@ function Specification() {
 	
 	this.decode = function() {
 		// projectXML - DOM Parsed document
+		this.projectXML = projectXML.childNodes[0];
 		var setupNode = projectXML.getElementsByTagName('setup')[0];
 		this.interfaceType = setupNode.getAttribute('interface');
 		this.projectReturn = setupNode.getAttribute('projectReturn');
@@ -1246,6 +1258,22 @@ function Specification() {
 				this.type = child.nodeName;
 				if (this.type == 'check') {
 					this.check = child.getAttribute('name');
+					if (this.check == 'scalerange') {
+						this.min = child.getAttribute('min');
+						this.max = child.getAttribute('max');
+						if (this.min == null) {this.min = 1;}
+						else if (Number(this.min) > 1 && this.min != null) {
+							this.min = Number(this.min)/100;
+						} else {
+							this.min = Number(this.min);
+						}
+						if (this.max == null) {this.max = 0;}
+						else if (Number(this.max) > 1 && this.max != null) {
+							this.max = Number(this.max)/100;
+						} else {
+							this.max = Number(this.max);
+						}
+					}
 				} else if (this.type == 'anchor' || this.type == 'reference') {
 					this.value = Number(child.textContent);
 				}
@@ -1345,7 +1373,7 @@ function Specification() {
 			var title = DOM.getElementsByTagName('title');
 			if (title.length == 0) {this.title = null;}
 			else {this.title = title[0].textContent;}
-			
+			this.options = parent.commonInterface.options;
 			var scale = DOM.getElementsByTagName('scale');
 			this.scale = [];
 			for (var i=0; i<scale.length; i++) {
@@ -1360,26 +1388,26 @@ function Specification() {
 			this.url = xml.getAttribute('url');
 			this.id = xml.id;
 			this.parent = parent;
-			this.anchor = xml.getAttribute('anchor');
-			if (this.anchor == 'true') {this.anchor = true;}
+			this.type = xml.getAttribute('type');
+			if (this.type == null) {this.type = "normal";}
+			if (this.type == 'anchor') {this.anchor = true;}
 			else {this.anchor = false;}
-			
-			this.reference = xml.getAttribute('reference');
-			if (this.reference == 'true') {this.reference = true;}
+			if (this.type == 'reference') {this.reference = true;}
 			else {this.reference = false;}
 			
-			if (this.anchor == true && this.reference == true) {
-				console.log('ERROR - Cannot have one audioElement be both the reference and anchor!');
-				console.log(this);
-				console.log('Neither reference nor anchor will be enabled on this fragment');
-				this.anchor = false;
-				this.reference = false;
-			}
-			if (this.anchor == true) {
+			this.marker = xml.getAttribute('marker');
+			if (this.marker == null) {this.marker = undefined;}
+			
+			if (this.anchor == true && this.marker == undefined) {
 				this.marker = anchor;
 			}
-			if (this.reference == true) {
+			else if (this.reference == true && this.marker == undefined) {
 				this.marker = reference;
+			}
+			
+			if (this.marker != undefined) {
+				this.marker = Number(this.marker);
+				if (this.marker > 1) {this.marker /= 100;}
 			}
 		};
 		
@@ -1494,13 +1522,30 @@ function Specification() {
 		
 		this.audioElements  =[];
 		var audioElementsDOM = xml.getElementsByTagName('audioElements');
+		this.outsideReference = null;
 		for (var i=0; i<audioElementsDOM.length; i++) {
-			this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+			if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
+				if (this.outsideReference == null) {
+					this.outsideReference = new this.audioElementNode(this,audioElementsDOM[i]);
+				} else {
+					console.log('Error only one audioelement can be of type outsidereference per audioholder');
+					this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+					console.log('Element id '+audioElementsDOM[i].id+' made into normal node');
+				}
+			} else {
+				this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+			}
+		}
+		
+		if (this.randomiseOrder) {
+			this.audioElements = randomiseOrder(this.audioElements);
 		}
 		
 		// Check only one anchor and one reference per audioNode
 		var anchor = [];
 		var reference = [];
+		this.anchorId = null;
+		this.referenceId = null;
 		for (var i=0; i<this.audioElements.length; i++)
 		{
 			if (this.audioElements[i].anchor == true) {anchor.push(i);}
@@ -1515,7 +1560,7 @@ function Specification() {
 				this.audioElements[anchor[i]].anchor = false;
 				this.audioElements[anchor[i]].value = undefined;
 			}
-		}
+		} else {this.anchorId = anchor[0];}
 		if (reference.length > 1) {
 			console.log('Error - cannot have more than one anchor!');
 			console.log('Each anchor node will be a normal mode to continue the test');
@@ -1524,7 +1569,7 @@ function Specification() {
 				this.audioElements[reference[i]].reference = false;
 				this.audioElements[reference[i]].value = undefined;
 			}
-		}
+		} else {this.referenceId = reference[0];}
 		
 		this.commentQuestions = [];
 		var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
@@ -1798,7 +1843,7 @@ function Interface(specificationObject) {
 	
 	this.deleteCommentBoxes = function() {
 		this.commentBoxes = [];
-	}
+	};
 	
 	this.createCommentQuestion = function(element) {
 		var node;
@@ -1887,6 +1932,42 @@ function Interface(specificationObject) {
 			clearInterval(this.interval);
 			this.interval = undefined;
 		};
+	};
+	
+	// Global Checkers
+	// These functions will help enforce the checkers
+	this.checkHiddenAnchor = function()
+	{
+		var audioHolder = testState.currentStateMap[testState.currentIndex];
+		if (audioHolder.anchorId != null)
+		{
+			var audioObject = audioEngineContext.audioObjects[audioHolder.anchorId];
+			if (audioObject.interfaceDOM.getValue() > audioObject.specification.marker)
+			{
+				// Anchor is not set below
+				console.log('Anchor node not below marker value');
+				alert('Please keep listening');
+				return false;
+			}
+		}
+		return true;
+	};
+	
+	this.checkHiddenReference = function()
+	{
+		var audioHolder = testState.currentStateMap[testState.currentIndex];
+		if (audioHolder.referenceId != null)
+		{
+			var audioObject = audioEngineContext.audioObjects[audioHolder.referenceId];
+			if (audioObject.interfaceDOM.getValue() < audioObject.specification.marker)
+			{
+				// Anchor is not set below
+				console.log('Reference node not above marker value');
+				alert('Please keep listening');
+				return false;
+			}
+		}
+		return true;
 	};
 }
 
