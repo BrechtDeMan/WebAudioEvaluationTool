@@ -5,10 +5,13 @@ import xml.etree.ElementTree as ET
 import os
 import csv
 
+# XML results files location (modify as needed):
+folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
+
 # get every XML file in folder
-for file in os.listdir("."): # You have to put this script in folder where output XML files are.
+for file in os.listdir(folder_name): 
     if file.endswith(".xml"):
-        tree = ET.parse(file)
+        tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
 
         # get list of all page names
@@ -19,16 +22,15 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
                 break
 
             # create folder [page_name] if not yet created
-            if not os.path.exists(page_name):
-                os.makedirs(page_name)
+            if not os.path.exists(folder_name + "/" + page_name):
+                os.makedirs(folder_name + "/" + page_name)
 
             # for page [page_name], print comments related to fragment [id]
-            for audioelement in root.findall("*/[@id='"+page_name+"']/audioelement"): #TODO in audioholder.findall(...)
+            for audioelement in audioholder.findall("./audioelement"):
                 if audioelement is not None: # Check it exists
                     audio_id = str(audioelement.get('id'))
                     
-                    
-                    csv_name = page_name+'/'+page_name+'-comments-'+audio_id+'.csv'
+                    csv_name = folder_name +'/' + page_name+'/'+page_name+'-comments-'+audio_id+'.csv'
 
                     # append (!) to file [page_name]/[page_name]-comments-[id].csv
                     with open(csv_name, 'a') as csvfile:
@@ -36,18 +38,15 @@ for file in os.listdir("."): # You have to put this script in folder where outpu
                                             delimiter=',', 
                                             dialect="excel",
                                             quoting=csv.QUOTE_ALL)
-                        commentstr = root.find("*/[@id='"
-                                               + page_name
-                                               + "']/audioelement/[@id='"
-                                               + audio_id
-                                               + "']/comment/response").text
+                        commentstr = audioelement.find("./comment/response").text
+                        
                         if commentstr is None:
-                            writer.writerow([''])
-                        else:
-                        	# anonymous comments:
-                            writer.writerow([commentstr.encode("utf-8")]) 
-                            # comments with (file) name:
-                            #writer.writerow([file[:-4]] + [commentstr.encode("utf-8")]) 
+                           commentstr = '';
+                            
+                        # anonymous comments:
+                        #writer.writerow([commentstr.encode("utf-8")]) 
+                        # comments with (file) name:
+                        writer.writerow([file[:-4]] + [commentstr.encode("utf-8")]) 
 
                         #TODO Replace 'new line' in comment with something else?
                         
