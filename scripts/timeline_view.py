@@ -28,7 +28,7 @@ if not os.path.exists(timeline_folder):
     os.makedirs(timeline_folder)
 
 # get every XML file in folder
-for file in os.listdir(folder_name): # You have to put this script in folder where output XML files are.
+for file in os.listdir(folder_name):
     if file.endswith(".xml"):
         tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
