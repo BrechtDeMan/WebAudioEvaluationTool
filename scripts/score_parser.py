@@ -10,7 +10,7 @@ import csv
 folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
 
 # get every XML file in folder
-for file in os.listdir(folder_name): # You have to put this in folder where output XML files are.
+for file in os.listdir(folder_name):
     if file.endswith(".xml"):
         tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
@@ -57,7 +57,6 @@ for file in os.listdir(folder_name): # You have to put this in folder where outp
                 newfragments = sorted(newfragments) # new fragments in alphabetical order
                 # If not empty, read file and rewrite adding extra columns
                 if newfragments: # if not empty
-                    print '        '+page_name+','+file_name+','+subject_id
                     #print "DEBUG New fragments found: " + str(newfragments)
                     with open('temp.csv', 'w') as writefile:
                         filewriter = csv.writer(writefile, delimiter=',')
@@ -102,5 +101,6 @@ for file in os.listdir(folder_name): # You have to put this in folder where outp
                     ratingrow.append('') # append empty cell
 
             # write row: [subject ID, rating fragment ID 1, ..., rating fragment ID M]
-            filewriter.writerow(ratingrow)
+            if any(ratingrow[1:]): # append to file if row non-empty (except subject name)
+                filewriter.writerow(ratingrow)
 
