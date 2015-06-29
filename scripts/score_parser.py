@@ -4,10 +4,13 @@ import csv
 
 #TODO Remove DEBUG statements
 
+# XML results files location (modify as needed):
+folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
+
 # get every XML file in folder
-for file in os.listdir("."): # You have to put this in folder where output XML files are.
+for file in os.listdir(folder_name): # You have to put this in folder where output XML files are.
     if file.endswith(".xml"):
-        tree = ET.parse(file)
+        tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
         #print ["DEBUG Reading " + file + "..."]
 
@@ -22,17 +25,17 @@ for file in os.listdir("."): # You have to put this in folder where output XML f
             if page_name is None: # ignore 'empty' audio_holders
                 break
 
-            file_name = 'ratings/'+page_name+'-ratings.csv' # score file name
+            file_name = folder_name+'/ratings/'+page_name+'-ratings.csv' # score file name
 
             # create folder 'ratings if not yet created
-            if not os.path.exists('ratings'):
-                os.makedirs('ratings')
+            if not os.path.exists(folder_name + '/ratings'):
+                os.makedirs(folder_name + '/ratings')
 
             # header: fragment IDs in 'alphabetical' order
             # go to fragment column, or create new column if it doesn't exist yet
 
             # get array of audio elements and number of audio elements
-            audiolist = root.findall("*/[@id='"+page_name+"']/audioelement")
+            audiolist = audioholder.findall("./audioelement")
             n_fragments = len(audiolist)
 
             # get alphabetical array of fragment IDs from this subject's XML
@@ -85,9 +88,7 @@ for file in os.listdir("."): # You have to put this in folder where output XML f
 
             # get scores related to fragment [id]
             for fragmentname in headerrow[1:]: # iterate over fragments in header (skip first empty column)
-                elementvalue = root.find("*/[@id='"
-                                       + page_name
-                                       + "']/audioelement/[@id='"
+                elementvalue = audioholder.find("./audioelement/[@id='"
                                        + fragmentname
                                        + "']/value")
                 if hasattr(elementvalue, 'text'): # if rating for this fragment exists

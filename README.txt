@@ -58,6 +58,8 @@ See LICENSE.txt. This code is shared under the GNU General Public License v3.0 (
 
 
 FEATURE REQUESTS AND BUG REPORTS
+We continually develop this tool to fix issues and implement features useful to us or our user base. See https://code.soundsoftware.ac.uk/projects/webaudioevaluationtool/issues for a list of feature requests and bug reports, and their status. 
+
 Please contact the authors if you experience any bugs, if you would like additional functionality, if you have questions about using the interface or if you would like to give any feedback (even positive!) about the interface. We look forward to learning how the tool has (not) been useful to you. 
 
 
