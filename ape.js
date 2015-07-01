@@ -33,7 +33,6 @@ function loadInterface() {
 	
 	audioEngineContext.metric.sliderMoved = function()
 	{
-		
 		var id = this.data;
 		this.data = -1;
 		var position = convSliderPosToRate(id);
@@ -495,6 +494,7 @@ function dragEnd(ev) {
 	var time = audioEngineContext.timer.getTestTime();
 	var id = Number(ev.srcElement.getAttribute('trackindex'));
 	audioEngineContext.audioObjects[id].metric.moved(time,convSliderPosToRate(ev.srcElement));
+	console.log('slider '+id+' moved to '+convSliderPosToRate(ev.srcElement)+' ('+time+')');
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
