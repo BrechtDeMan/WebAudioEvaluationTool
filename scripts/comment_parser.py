@@ -13,12 +13,13 @@ for file in os.listdir(folder_name):
     if file.endswith(".xml"):
         tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
-
+        
         # get list of all page names
         for audioholder in root.findall("./audioholder"):   # iterate over pages
             page_name = audioholder.get('id')               # get page name
             
             if page_name is None: # ignore 'empty' audio_holders
+                print "WARNING: " + file + " contains empty audio holder. (comment_parser.py)"
                 break
 
             # create folder [page_name] if not yet created

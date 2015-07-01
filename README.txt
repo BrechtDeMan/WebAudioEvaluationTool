@@ -72,6 +72,9 @@ By default, the scripts can be run from the ‘scripts’ folder, with the resul
 		Extracts comments from the output XML files corresponding with the different subjects found in ‘saves/’. It creates a folder per ‘audioholder’/page it finds, and stores a CSV file with comments for every ‘audioelement’/fragment within these respective ‘audioholders’/pages. In this CSV file, every line corresponds with a subject/output XML file. Depending on the settings, the first column containing the name of the corresponding XML file can be omitted (for anonymisation). 
 		Beware of Excel: sometimes the UTF-8 is not properly imported, leading to problems with special characters in the comments (particularly cumbersome for foreign languages). 
 
+	evaluation_stats.py
+		Shows a few statistics of tests in the ‘saves/‘ folder so far, mainly for checking for errors. Shows the number of files that are there, the audioholder IDs that were tested (and how many of each separate ID), the duration of each page, the duration of each complete test, the average duration per page, and the average duration in function of the page number. 
+
 	score_parser.py
 		Extracts rating values from the XML to CSV - necessary for running visualisation of ratings. Creates the folder ‘saves/ratings/‘ if not yet created, to which it writes a separate file for every ‘audioholder’/page in any of the output XMLs it finds in ‘saves/‘. Within each file, rows represent different subjects (output XML file names) and columns represent different ‘audioelements’/fragments. 
 
