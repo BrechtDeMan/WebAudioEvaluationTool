@@ -24,6 +24,7 @@ for file in os.listdir(folder_name):
             page_name = audioholder.get('id') # get page name
                        
             if page_name is None: # ignore 'empty' audio_holders
+                print "WARNING: " + file + " contains empty audio holder. (score_parser.py)"
                 break
 
             file_name = folder_name+'/ratings/'+page_name+'-ratings.csv' # score file name
