@@ -58,9 +58,26 @@ See LICENSE.txt. This code is shared under the GNU General Public License v3.0 (
 
 
 FEATURE REQUESTS AND BUG REPORTS
+
 We continually develop this tool to fix issues and implement features useful to us or our user base. See https://code.soundsoftware.ac.uk/projects/webaudioevaluationtool/issues for a list of feature requests and bug reports, and their status. 
 
 Please contact the authors if you experience any bugs, if you would like additional functionality, if you have questions about using the interface or if you would like to give any feedback (even positive!) about the interface. We look forward to learning how the tool has (not) been useful to you. 
+
+
+TROUBLESHOOTING
+
+Thanks to feedback from using the interface in experiments by the authors and others, many bugs have been caught and fatal crashes due to the interface (provided it is set up properly by the user) seem to be a thing of the past. 
+However, if things do go wrong or the test needs to be interrupted for whatever reason, all data is not lost. In a normal scenario, the test needs to be completed until the end (the final ‘Submit’), at which point the output XML is stored in ‘saves/‘. If this stage is not reached, a lot of data can be read from the JavaScript Console (see below for how to find it). Specifically:
+	- the randomisation of pages and fragments are logged;
+	- any time a slider is played, its ID and the time stamp (in seconds since the start of the test) are displayed;
+	- any time a slider is dragged and dropped, the location where it is dropped including the time stamp are shown; 
+	- any comments and pre- or post-test questions and their answers are logged as well. 
+
+You can select all this and save into a text file, so that none of this data is lost. 
+
+In Google Chrome, the JavaScript Console can be found in View>Developer>JavaScript Console, or via the keyboard shortcut Cmd + Alt + J (Mac OS X). 
+In Safari, the JavaScript Console can be found in Develop>Show Error Console, or via the keyboard shortcut Cmd + Alt + C (Mac OS X). Note that for the Developer menu to be visible, you have to go to Preferences (Cmd + ,) and enable ‘Show Develop menu in menu bar’ in the ‘Advanced’ tab. 
+In Firefox, go to Tools>Web Developer>Web Console, or hit Cmd + Alt + K. 
 
 
 SCRIPTS
