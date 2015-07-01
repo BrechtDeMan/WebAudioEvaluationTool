@@ -394,11 +394,14 @@ function stateMachine()
 			}
 			this.stateIndex = -1;
 			var that = this;
+			var aH_pId = 0;
 			for (var id=0; id<this.stateMap.length; id++){
 				var name = this.stateMap[id].type;
 				var obj = document.createElement(name);
 				if (name == 'audioHolder') {
 					obj.id = this.stateMap[id].id;
+					obj.setAttribute('presentedid',aH_pId);
+					aH_pId+=1;
 				}
 				this.stateResults.push(obj);
 			}
