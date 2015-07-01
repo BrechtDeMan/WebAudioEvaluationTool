@@ -406,7 +406,7 @@ function stateMachine()
 				this.stateResults.push(obj);
 			}
 		} else {
-			conolse.log('FATAL - StateMap not correctly constructed. EMPTY_STATE_MAP');
+			console.log('FATAL - StateMap not correctly constructed. EMPTY_STATE_MAP');
 		}
 	};
 	this.advanceState = function(){
@@ -1688,8 +1688,8 @@ function Interface(specificationObject) {
 			root.id = this.specification.id;
 			root.setAttribute('type',this.specification.type);
 			root.textContent = this.textArea.value;
-			console.log("Question :"+this.string.textContent);
-			console.log("Response :"+root.textContent);
+			console.log("Question: "+this.string.textContent);
+			console.log("Response: "+root.textContent);
 			return root;
 		};
 	};
