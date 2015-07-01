@@ -40,6 +40,7 @@
 			<check name="fragmentMoved"/>
 			<check name="fragmentComments"/>-->
 			<check name="scalerange" min="25" max="75"/>
+			<option name='playhead'/>
 		</interface>
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>

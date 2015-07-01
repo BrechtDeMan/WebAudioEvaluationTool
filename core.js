@@ -1288,7 +1288,11 @@ function Specification() {
 		this.commonInterface = new function() {
 			this.OptionNode = function(child) {
 				this.type = child.nodeName;
-				if (this.type == 'check') {
+				if (this.type == 'option')
+				{
+					this.name = child.getAttribute('name');
+				}
+				else if (this.type == 'check') {
 					this.check = child.getAttribute('name');
 					if (this.check == 'scalerange') {
 						this.min = child.getAttribute('min');
