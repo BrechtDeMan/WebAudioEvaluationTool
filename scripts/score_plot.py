@@ -11,10 +11,10 @@ import scipy.stats
 # CONFIGURATION
 
 # Which type(s) of plot do you want? 
-enable_boxplot    = False     # show box plot
-enable_confidence = True      # show confidence interval
+enable_boxplot    = True      # show box plot
+enable_confidence = False     # show confidence interval
 confidence        = 0.90      # confidence value (for confidence interval plot)
-enable_individual = True      # show all individual ratings
+enable_individual = False     # show all individual ratings
 show_individual   = []        # show specific individuals
 show_legend       = False     # show names of individuals
 #TODO: Merge, implement this functionality
@@ -56,7 +56,7 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
                                    )
         
         # assert at least 2 subjects (move on to next file if violated)
-        if ratings.shape[1]<2:
+        if ratings.shape[0]<2:
             print "WARNING: Just one subject for " + page_name + ". Moving on to next file."
             break
 
