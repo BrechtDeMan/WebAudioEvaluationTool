@@ -637,6 +637,29 @@ function createProjectSave(destURL) {
 	}
 }
 
+function errorSessionDump(msg){
+	// Create the partial interface XML save
+	// Include error node with message on why the dump occured
+	var xmlDoc = interfaceXMLSave();
+	var err = document.createElement('error');
+	err.textContent = msg;
+	xmlDoc.appendChild(err);
+	var parent = document.createElement("div");
+	parent.appendChild(xmlDoc);
+	var file = [parent.innerHTML];
+	var bb = new Blob(file,{type : 'application/xml'});
+	var dnlk = window.URL.createObjectURL(bb);
+	var a = document.createElement("a");
+	a.hidden = '';
+	a.href = dnlk;
+	a.download = "save.xml";
+	a.textContent = "Save File";
+	
+	popup.showPopup();
+	popup.popupContent.innerHTML = "ERROR : "+msg;
+	popup.popupContent.appendChild(a);
+}
+
 // Only other global function which must be defined in the interface class. Determines how to create the XML document.
 function interfaceXMLSave(){
 	// Create the XML string to be exported with results
@@ -888,6 +911,12 @@ function audioObject(id) {
 				if (audioObj.state == 0 || audioObj.buffer == undefined) {
 					// Genuine error
 					console.log('FATAL - Error loading buffer on '+audioObj.id);
+					if (request.status == 404)
+					{
+						console.log('FATAL - Fragment '+audioObj.id+' 404 error');
+						console.log('URL: '+audioObj.url);
+						errorSessionDump('Fragment '+audioObj.id+' 404 error');
+					}
 				}
 			});
 		};
@@ -1976,4 +2005,3 @@ function Interface(specificationObject) {
 		return true;
 	};
 }
-
