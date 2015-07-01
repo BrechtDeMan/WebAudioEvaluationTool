@@ -1622,6 +1622,7 @@ function Interface(specificationObject) {
 				question.textContent = this.trackString.textContent;
 				var response = document.createElement('response');
 				response.textContent = this.trackCommentBox.value;
+				console.log("Comment frag-"+this.id+": "+response.textContent);
 				root.appendChild(question);
 				root.appendChild(response);
 			}
@@ -1655,6 +1656,8 @@ function Interface(specificationObject) {
 			root.id = this.specification.id;
 			root.setAttribute('type',this.specification.type);
 			root.textContent = this.textArea.value;
+			console.log("Question :"+this.string.textContent);
+			console.log("Response :"+root.textContent);
 			return root;
 		};
 	};
