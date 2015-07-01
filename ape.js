@@ -297,13 +297,27 @@ function loadTest(audioHolderObject)
 	feedbackHolder.innerHTML = null;
 	canvas.innerHTML = null;
 	
-	var playbackHolder = document.createElement('div');
-	playbackHolder.style.width = "100%";
-	playbackHolder.align = 'center';
-	playbackHolder.appendChild(interfaceContext.playhead.object);
-	feedbackHolder.appendChild(playbackHolder);
-	// Setup question title
 	var interfaceObj = audioHolderObject.interfaces;
+	for (var k=0; k<interfaceObj.length; k++) {
+		for (var i=0; i<interfaceObj[k].options.length; i++)
+		{
+			if (interfaceObj[k].options[i].type == 'option' && interfaceObj[k].options[i].name == 'playhead')
+			{
+				var playbackHolder = document.getElementById('playback-holder');
+				if (playbackHolder == null)
+				{
+					playbackHolder = document.createElement('div');
+					playbackHolder.style.width = "100%";
+					playbackHolder.align = 'center';
+					playbackHolder.appendChild(interfaceContext.playhead.object);
+					feedbackHolder.appendChild(playbackHolder);
+				}
+				break;
+			}
+		}
+	}
+	// Setup question title
+	
 	var commentBoxPrefix = "Comment on track";
 	if (interfaceObj.length != 0) {
 		interfaceObj = interfaceObj[0];
