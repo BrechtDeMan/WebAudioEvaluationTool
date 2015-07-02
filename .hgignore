@@ -27,3 +27,7 @@ re:^realismTest\.html$
 saves/*.xml
 saves/timelines
 saves/timelines-old
+saves/*.csv
+saves/*/*.csv
+saves/*/*.png
+saves/*/*.xml
