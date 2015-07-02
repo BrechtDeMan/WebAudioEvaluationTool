@@ -20,7 +20,7 @@ while(path.isfile('saves/'+curFileName)):
 
 print "Next save - " + curFileName
 pseudo_index = curSaveIndex % len(pseudo_files)
-print "Next test - " + pseudo_files[pseudo_index]
+print "Next test in pseudo-random queue - " + pseudo_files[pseudo_index]
 
 def send404(s):
 	s.send_response(404)
