@@ -2,9 +2,15 @@ import BaseHTTPServer
 from os import walk
 from os import path
 from os import listdir
+import inspect
+import os
 import urllib2
 import pickle
 import datetime
+
+# Go to right folder. 
+scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
+os.chdir(scriptdir) # does this work?
 
 PSEUDO_PATH = 'example_eval/'
 pseudo_files = []
