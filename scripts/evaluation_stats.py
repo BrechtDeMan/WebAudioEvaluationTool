@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import os
 
 # XML results files location (modify as needed):
-folder_name = "xml_with_statements"    # Looks in 'saves/' folder from 'scripts/' folder
+folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
 
 # Turn number of seconds (int) to '[minutes] min [seconds] s' (string)
 def seconds2timestr(time_in_seconds):
@@ -79,8 +79,8 @@ for file in files_list: # iterate over all files in files_list
             number_of_pages += 1 # increase total number of pages
             time_per_page_accum += duration # total duration (for average time spent per page)
 
-    # print total duration of this test
-    print "    TOTAL: " + seconds2timestr(total_duration)
+        # print total duration of this test
+        print "    TOTAL: " + seconds2timestr(total_duration)
 
 
 # PRINT EVERYTHING
