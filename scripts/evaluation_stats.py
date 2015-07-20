@@ -4,9 +4,19 @@
 import xml.etree.ElementTree as ET
 import os       # for getting files from directory
 import operator # for sorting data with multiple keys
+import sys      # for accessing command line arguments
 
-# XML results files location (modify as needed):
-folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
+# Command line arguments
+assert len(sys.argv)<3, "evaluation_stats takes at most 1 command line argument\n"+\
+                        "Use: python evaluation_stats.py [results_folder]"
+
+# XML results files location
+if len(sys.argv) == 1:
+    folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
+    print "Use: python evaluation_stats.py [results_folder]"
+    print "Using default path: " + folder_name
+elif len(sys.argv) == 2:
+    folder_name = sys.argv[1]   # First command line argument is folder
 
 # Turn number of seconds (int) to '[minutes] min [seconds] s' (string)
 def seconds2timestr(time_in_seconds):
@@ -126,6 +136,8 @@ print "Number of pages: " + str(number_of_pages)
 print "Number of fragments: " + str(number_of_fragments)
 print "Number of empty comments: " + str(total_empty_comments)
 print "Average time per page: " + seconds2timestr(time_per_page_accum/number_of_pages)
+
+# Pages and number of times tested
 page_count_strings = list(str(x) for x in page_count)
 count_list = page_names + page_count_strings
 count_list[::2] = page_names
