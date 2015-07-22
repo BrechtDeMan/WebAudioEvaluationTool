@@ -212,7 +212,11 @@ function interfacePopup() {
 		}
 		this.popupContent.appendChild(this.buttonProceed);
 		if(this.currentIndex+1 == this.popupOptions.length) {
-			this.buttonProceed.textContent = 'Submit';
+			if (this.responses.nodeName == "PRETEST") {
+				this.buttonProceed.textContent = 'Start';
+			} else {
+				this.buttonProceed.textContent = 'Submit';
+			}
 		} else {
 			this.buttonProceed.textContent = 'Next';
 		}
