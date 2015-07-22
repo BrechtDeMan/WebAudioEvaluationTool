@@ -1948,19 +1948,28 @@ function Interface(specificationObject) {
 			// Update the playhead position, startPlay must be called
 			if (this.timePerPixel > 0) {
 				var time = this.playbackObject.getCurrentPosition();
-				var width = 490;
-				var pix = Math.floor(time/this.timePerPixel);
-				this.scrubberHead.style.left = pix+'px';
-				if (this.maxTime > 60.0) {
-					var secs = time%60;
-					var mins = Math.floor((time-secs)/60);
-					secs = secs.toString();
-					secs = secs.substr(0,2);
-					mins = mins.toString();
-					this.curTimeSpan.textContent = mins+':'+secs;
+				if (time > 0) {
+					var width = 490;
+					var pix = Math.floor(time/this.timePerPixel);
+					this.scrubberHead.style.left = pix+'px';
+					if (this.maxTime > 60.0) {
+						var secs = time%60;
+						var mins = Math.floor((time-secs)/60);
+						secs = secs.toString();
+						secs = secs.substr(0,2);
+						mins = mins.toString();
+						this.curTimeSpan.textContent = mins+':'+secs;
+					} else {
+						time = time.toString();
+						this.curTimeSpan.textContent = time.substr(0,4);
+					}
 				} else {
-					time = time.toString();
-					this.curTimeSpan.textContent = time.substr(0,4);
+					this.scrubberHead.style.left = '0px';
+					if (this.maxTime < 60) {
+						this.curTimeSpan.textContent = '0.00';
+					} else {
+						this.curTimeSpan.textContent = '00:00';
+					}
 				}
 			}
 		};
@@ -1969,12 +1978,21 @@ function Interface(specificationObject) {
 		
 		this.start = function() {
 			if (this.playbackObject != undefined && this.interval == undefined) {
-				this.interval = setInterval(function(){interfaceContext.playhead.update();},100);
+				if (this.maxTime < 60) {
+					this.interval = setInterval(function(){interfaceContext.playhead.update();},10);
+				} else {
+					this.interval = setInterval(function(){interfaceContext.playhead.update();},100);
+				}
 			}
 		};
 		this.stop = function() {
 			clearInterval(this.interval);
 			this.interval = undefined;
+			if (this.maxTime < 60) {
+				this.curTimeSpan.textContent = '0.00';
+			} else {
+				this.curTimeSpan.textContent = '00:00';
+			}
 		};
 	};
 	

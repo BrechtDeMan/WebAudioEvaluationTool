@@ -43,7 +43,7 @@
 			<option name='playhead'/>
 		</interface>
 	</setup>
-	<audioHolder id='test-0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
+	<audioHolder id='test-0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='false' elementComments='true'>
 		<interface>
 			<title>Example Test Question</title>
 			<scale position="0">Min</scale>
@@ -86,7 +86,7 @@
 			<question id="genre" mandatory="true">Please enter the genre.</question>
 		</PostTest>
 	</audioHolder>
-    <audioHolder id='test-1' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
+    <audioHolder id='test-1' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='false' elementComments='true'>
         <interface>
             <title>Example Test Question</title>
             <scale position="0">Min</scale>
