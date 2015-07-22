@@ -1321,6 +1321,9 @@ function Specification() {
 					}
 				} else if (this.type == 'anchor' || this.type == 'reference') {
 					this.value = Number(child.textContent);
+					this.enforce = child.getAttribute('enforce');
+					if (this.enforce == 'true') {this.enforce = true;}
+					else {this.enforce = false;}
 				}
 			};
 			this.options = [];
@@ -1443,10 +1446,14 @@ function Specification() {
 			this.marker = xml.getAttribute('marker');
 			if (this.marker == null) {this.marker = undefined;}
 			
-			if (this.anchor == true && this.marker == undefined) {
+			if (this.anchor == true) {
+				if (this.marker != undefined) {this.enforce = true;}
+				else {this.enforce = enforceAnchor;}
 				this.marker = anchor;
 			}
-			else if (this.reference == true && this.marker == undefined) {
+			else if (this.reference == true) {
+				if (this.marker != undefined) {this.enforce = true;}
+				else {this.enforce = enforceReference;}
 				this.marker = reference;
 			}
 			
@@ -1510,11 +1517,13 @@ function Specification() {
 		else {this.elementComments = false;}
 		
 		var anchor = xml.getElementsByTagName('anchor');
+		var enforceAnchor = false;
 		if (anchor.length == 0) {
 			// Find anchor in commonInterface;
 			for (var i=0; i<parent.commonInterface.options.length; i++) {
 				if(parent.commonInterface.options[i].type == 'anchor') {
 					anchor = parent.commonInterface.options[i].value;
+					enforceAnchor = parent.commonInterface.options[i].enforce;
 					break;
 				}
 			}
@@ -1526,11 +1535,13 @@ function Specification() {
 		}
 		
 		var reference = xml.getElementsByTagName('anchor');
+		var enforceReference = false;
 		if (reference.length == 0) {
 			// Find anchor in commonInterface;
 			for (var i=0; i<parent.commonInterface.options.length; i++) {
 				if(parent.commonInterface.options[i].type == 'reference') {
 					reference = parent.commonInterface.options[i].value;
+					enforceReference = parent.commonInterface.options[i].enforce;
 					break;
 				}
 			}
@@ -2008,7 +2019,7 @@ function Interface(specificationObject) {
 		if (audioHolder.anchorId != null)
 		{
 			var audioObject = audioEngineContext.audioObjects[audioHolder.anchorId];
-			if (audioObject.interfaceDOM.getValue() > audioObject.specification.marker)
+			if (audioObject.interfaceDOM.getValue() > audioObject.specification.marker && audioObject.interfaceDOM.enforce == true)
 			{
 				// Anchor is not set below
 				console.log('Anchor node not below marker value');
@@ -2025,7 +2036,7 @@ function Interface(specificationObject) {
 		if (audioHolder.referenceId != null)
 		{
 			var audioObject = audioEngineContext.audioObjects[audioHolder.referenceId];
-			if (audioObject.interfaceDOM.getValue() < audioObject.specification.marker)
+			if (audioObject.interfaceDOM.getValue() < audioObject.specification.marker && audioObject.interfaceDOM.enforce == true)
 			{
 				// Anchor is not set below
 				console.log('Reference node not above marker value');

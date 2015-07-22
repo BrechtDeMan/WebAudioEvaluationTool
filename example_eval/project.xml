@@ -41,6 +41,7 @@
 			<check name="fragmentComments"/>-->
 			<check name="scalerange" min="25" max="75"/>
 			<option name='playhead'/>
+			<anchor enforce="false">40</anchor>
 		</interface>
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" sampleRate="44100" randomiseOrder='true' repeatCount='0' loop='false' elementComments='true'>
@@ -51,7 +52,6 @@
 			<scale position="50">Middle</scale>
 			<scale position="20">20</scale>
 			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
-			<anchor>40</anchor>
 		</interface>
 		<audioElements url="0.wav" id="0" type="anchor"/>
 		<audioElements url="1.wav" id="1"/>
