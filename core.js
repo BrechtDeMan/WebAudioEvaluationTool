@@ -936,6 +936,11 @@ function audioObject(id) {
 		if (this.specification.type != 'outsidereference') {
 			root.appendChild(this.interfaceDOM.exportXMLDOM(this));
 			root.appendChild(this.commentDOM.exportXMLDOM(this));
+			if(this.specification.type == 'anchor') {
+				root.setAttribute('anchor',true);
+			} else if(this.specification.type == 'reference') {
+				root.setAttribute('reference',true);
+			}
 		}
 		root.appendChild(this.metric.exportXMLDOM());
 		return root;
