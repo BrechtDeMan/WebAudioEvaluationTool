@@ -105,6 +105,13 @@ function interfacePopup() {
 		var blank = document.getElementsByClassName('testHalt')[0];
 		blank.style.zIndex = 2;
 		blank.style.visibility = 'visible';
+		$(window).keypress(function(e){
+			if (e.keyCode == 13 && popup.popup.style.visibility == 'visible')
+			{
+				// Enter key pressed
+				popup.buttonProceed.onclick();
+			}
+		});
 	};
 	
 	this.hidePopup = function(){
