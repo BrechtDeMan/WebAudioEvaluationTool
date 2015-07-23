@@ -807,6 +807,45 @@ function AudioEngine() {
 		return ready;
 	};
 	
+	this.setSynchronousLoop = function() {
+		// Pads the signals so they are all exactly the same length
+		if (this.audioObjectsReady)
+		{
+			var length = 0;
+			var lens = [];
+			var maxId;
+			for (var i=0; i<this.audioObjects.length; i++)
+			{
+				lens.push(this.audioObjects[i].buffer.length);
+				if (length < this.audioObjects[i].buffer.length)
+				{
+					length = this.audioObjects[i].buffer.length;
+					maxId = i;
+				}
+			}
+			// Perform difference
+			for (var i=0; i<lens.length; i++)
+			{
+				lens[i] = length - lens[i];
+			}
+			// Extract the audio and zero-pad
+			for (var i=0; i<lens.length; i++)
+			{
+				var orig = this.audioObjects[i].buffer;
+				var hold = audioContext.createBuffer(orig.numberOfChannels,length,orig.sampleRate);
+				for (var c=0; c<orig.numberOfChannels; c++)
+				{
+					var inData = hold.getChannelData(c);
+					var outData = orig.getChannelData(c);
+					for (var n=0; n<orig.length; n++)
+					{inData[n] = outData[n];}
+				}
+				this.audioObjects[i].buffer = hold;
+				delete orig;
+			}
+		}
+	};
+	
 }
 
 function audioObject(id) {
