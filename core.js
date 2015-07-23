@@ -109,6 +109,12 @@ function interfacePopup() {
 			if (e.keyCode == 13 && popup.popup.style.visibility == 'visible')
 			{
 				// Enter key pressed
+				var textarea = $(popup.popupContent).find('textarea');
+				if (textarea.length != 0)
+				{
+					if (textarea[0] == document.activeElement)
+					{return;}
+				}
 				popup.buttonProceed.onclick();
 			}
 		});
