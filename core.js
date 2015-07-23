@@ -909,6 +909,8 @@ function audioObject(id) {
 			audioContext.decodeAudioData(request.response, function(decodedData) {
 				audioObj.buffer = decodedData;
 				audioObj.state = 1;
+				if (audioObj.specification.type != 'outsidereference')
+					{audioObj.interfaceDOM.enable();}
 			}, function(){
 				// Should only be called if there was an error, but sometimes gets called continuously
 				// Check here if the error is genuine
