@@ -76,3 +76,10 @@ div.comment-box-playing {
 	background-color: #FFDDDD;
 }
 
+div#outside-reference {
+	width:250px;
+	margin-left: 100px;
+	height:20px;
+	margin-bottom:5px;
+	background-color: rgb(100,200,100);
+}
