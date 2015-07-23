@@ -434,14 +434,14 @@ function loadTest(audioHolderObject)
 	}
 	
 	
-	testWaitIndicator();
+	//testWaitIndicator();
 }
 
 function sliderObject(audioObject) {
 	// Create a new slider object;
 	this.parent = audioObject;
 	this.trackSliderObj = document.createElement('div');
-	this.trackSliderObj.className = 'track-slider';
+	this.trackSliderObj.className = 'track-slider track-slider-disabled';
 	this.trackSliderObj.id = 'track-slider-'+audioObject.id;
 
 	this.trackSliderObj.setAttribute('trackIndex',audioObject.id);
@@ -475,6 +475,13 @@ function sliderObject(audioObject) {
             var outsideReference = document.getElementById('outside-reference');
             if (outsideReference != undefined)
             $(outsideReference).removeClass('track-slider-playing');
+		}
+	};
+	
+	this.enable = function() {
+		if (this.parent.state == 1)
+		{
+			$(this.trackSliderObj).removeClass('track-slider-disabled');
 		}
 	};
 	

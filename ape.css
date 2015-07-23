@@ -68,6 +68,10 @@ div.track-slider {
 	background-color: rgb(100,200,100);
 }
 
+div.track-slider-disabled {
+	background-color: rgb(100,100,100);
+}
+
 div.track-slider-playing {
 	background-color: #FF0000;
 }
