@@ -41,6 +41,7 @@
 			<check name="fragmentComments"/>-->
 			<check name="scalerange" min="25" max="75"/>
 			<option name='playhead'/>
+			<option name="page-count"/>
 			<anchor enforce="false">40</anchor>
 		</interface>
 	</setup>
