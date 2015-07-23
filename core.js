@@ -717,6 +717,8 @@ function AudioEngine() {
 			}
 			if (this.audioObjectsReady == true) {
 				this.timer.startTest();
+				if (this.loopPlayback)
+					{this.setSynchronousLoop();}
 				this.status = 1;
 			}
 		}
