@@ -639,6 +639,10 @@ function createProjectSave(destURL) {
 			console.log(xmlhttp.status);
 			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
 				createProjectSave(null);
+			} else {
+				popup.showPopup();
+				popup.popupContent.innerHTML = null;
+				popup.popupContent.textContent = "Thank you for performing this listening test";
 			}
 		};
 		xmlhttp.send(file);
