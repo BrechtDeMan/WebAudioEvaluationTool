@@ -541,6 +541,10 @@ function loadProjectSpecCallback(response) {
 	if (specification.randomiseOrder)
 	{
  		specification.audioHolders = randomiseOrder(specification.audioHolders);
+ 		for (var i=0; i<specification.audioHolders.length; i++)
+ 		{
+ 			specification.audioHolders[i].presentedId = i;
+ 		}
 	}
 	
 	$(specification.audioHolders).each(function(index,elem){
@@ -1460,6 +1464,7 @@ function Specification() {
 	
 	this.audioHolderNode = function(parent,xml) {
 		this.type = 'audioHolder';
+		this.presentedId = parent.audioHolders.length;
 		this.interfaceNode = function(DOM) {
 			var title = DOM.getElementsByTagName('title');
 			if (title.length == 0) {this.title = null;}

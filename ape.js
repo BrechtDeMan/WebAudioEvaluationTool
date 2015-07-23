@@ -312,7 +312,17 @@ function loadTest(audioHolderObject)
 					playbackHolder.appendChild(interfaceContext.playhead.object);
 					feedbackHolder.appendChild(playbackHolder);
 				}
-				break;
+			} else if (interfaceObj[k].options[i].type == 'option' && interfaceObj[k].options[i].name == 'page-count')
+			{
+				var pagecountHolder = document.getElementById('page-count');
+				if (pagecountHolder == null)
+				{
+					pagecountHolder = document.createElement('div');
+					pagecountHolder.id = 'page-count';
+				}
+				pagecountHolder.innerHTML = '<span>Test '+(audioHolderObject.presentedId+1)+' of '+specification.audioHolders.length+'</span>';
+				var inject = document.getElementById('interface-buttons');
+				inject.appendChild(pagecountHolder);
 			}
 		}
 	}
@@ -598,7 +608,7 @@ function resizeWindow(event){
 	// Store the slider marker values
 	var holdValues = [];
 	$(".track-slider").each(function(index,sliderObj){
-		holdValues.push(convSliderPosToRate(index));
+		holdValues.push(convSliderPosToRate(sliderObj));
 	});
 	
 	var width = event.target.innerWidth;
