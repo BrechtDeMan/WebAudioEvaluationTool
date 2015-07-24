@@ -8,17 +8,84 @@ import numpy as np
 import scipy as sp
 import scipy.stats
 
-# CONFIGURATION
+# COMMAND LINE ARGUMENTS
 
-# Which type(s) of plot do you want? 
-enable_boxplot    = True      # show box plot
+#TODO: Merge, implement this functionality
+#TODO: Control by CLI arguments (plot types, save and/or show, ...) 
+
+assert len(sys.argv)<4, "score_plot takes at most 2 command line arguments\n"+\
+                        "Use: python score_plot.py [ratings_folder_location]."+\
+                        "Type 'python score_plot.py -h' for more options"
+
+# initialise plot types (false by default) and options
+enable_boxplot    = False     # show box plot
 enable_confidence = False     # show confidence interval
 confidence        = 0.90      # confidence value (for confidence interval plot)
 enable_individual = False     # show all individual ratings
-show_individual   = []        # show specific individuals
+show_individual   = []        # show specific individuals (empty: show all individuals found)
 show_legend       = False     # show names of individuals
-#TODO: Merge, implement this functionality
-#TODO: Control by CLI arguments (plot types, save and/or show, ...) 
+
+# DEFAULT: Looks in 'saves/ratings/' folder from 'scripts/' folder
+rating_folder = "../saves/ratings/" 
+
+# XML results files location
+if len(sys.argv) == 1: # no extra arguments
+    enable_boxplot    = True # show box plot
+    print "Use: python score_plot.py [rating folder] [plot_type] [-l/-legend]"
+    print "Type 'python score_plot.py -h' for help."
+    print "Using default path: " + rating_folder + " with boxplot."
+else:
+    for arg in sys.argv: # go over all arguments
+        if arg == '-h':
+            # show help
+            #TODO: replace with contents of helpfile score_plot.info (or similar)
+            print "Use: python score_plot.py [rating_folder] [plot_type] [-l] [confidence]"
+            print "   rating_folder:"
+            print "            folder where output of 'score_parser' can be found, and"
+            print "            where plots will be stored."
+            print "            By default, '../saves/ratings/' is used."
+            print ""
+            print "PLOT TYPES"
+            print " Can be used in combination."
+            print "    box | boxplot | -b"
+            print "            Enables the boxplot" 
+            print "    conf | confidence | -c"
+            print "            Enables the confidence interval plot" 
+            print "    ind | individual | -i"
+            print "            Enables plot of individual ratings" 
+            print ""
+            print "PLOT OPTIONS"
+            print "    legend | -l"
+            print "            For individual plot: show legend with individual file names"
+            print "    "
+            assert False, ""# stop immediately after showing help #TODO cleaner way
+            
+        # PLOT TYPES
+        elif arg == 'box' or arg == 'boxplot' or arg == '-b':
+            enable_boxplot    = True     # show box plot
+        elif arg == 'conf' or arg == 'confidence' or arg == '-c':
+            enable_confidence = True     # show confidence interval
+            #TODO add confidence value input
+        elif arg == 'ind' or arg == 'individual' or arg == '-i':
+            enable_individual = True     # show all individual ratings
+            
+        # PLOT OPTIONS
+        elif arg == 'leg' or arg == 'legend' or arg == '-l':
+            if not enable_individual: 
+                print "WARNING: The 'legend' option is only relevant to plots of individual ratings"
+            show_legend = True     # show all individual ratings
+            
+         # FOLDER NAME
+         else: 
+            # assume it's the folder name
+            rating_folder = arg
+            #TODO try it exists, otherwise show exception
+
+# at least one plot type should be selected: box plot by default
+if not enable_boxplot and not enable_confidence and not enable_individual:
+    enable_boxplot = True
+
+# CONFIGURATION
 
 # Enter folder where rating CSV files are (generated with score_parser.py or same format).
 rating_folder = '../saves/ratings/' # folder with rating csv files

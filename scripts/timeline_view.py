@@ -1,13 +1,24 @@
 #!/usr/bin/python
 
 import xml.etree.ElementTree as ET
-import os
-import matplotlib.pyplot as plt
+import os # list files in directory
+import sys # command line arguments
+import matplotlib.pyplot as plt # plots
+
+# COMMAND LINE ARGUMENTS
+
+assert len(sys.argv)<3, "timeline_view takes at most 1 command line argument\n"+\
+                        "Use: python timeline_view.py [timeline_folder_location]"
+
+# XML results files location
+if len(sys.argv) == 1:
+    folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
+    print "Use: python timeline_view.py [timeline_folder_location]"
+    print "Using default path: " + folder_name
+elif len(sys.argv) == 2:
+    folder_name = sys.argv[1]   # First command line argument is folder
 
 # CONFIGURATION 
-
-# XML results files location (modify as needed):
-folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
 
 # Folder where to store timelines
 timeline_folder = folder_name + '/timelines/'    # Stores in 'saves/timelines/'
