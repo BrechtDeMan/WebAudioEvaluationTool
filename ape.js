@@ -3,12 +3,6 @@
  *  Create the APE interface
  */
 
-// preTest - In preTest state
-// testRun-ID - In test running, test Id number at the end 'testRun-2'
-// testRunPost-ID - Post test of test ID
-// testRunPre-ID - Pre-test of test ID
-// postTest - End of test, final submission!
-
 
 // Once this is loaded and parsed, begin execution
 loadInterface();

@@ -613,6 +613,17 @@ function loadProjectSpecCallback(response) {
 		css.href = 'ape.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
+	} else if (specification.interfaceType == "MUSHRA")
+	{
+		interfaceJS.setAttribute("src","mushra.js");
+		
+		// MUSHRA comes with a css file
+		var css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.type = 'text/css';
+		css.href = 'mushra.css';
+		
+		document.getElementsByTagName("head")[0].appendChild(css);
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
 	
