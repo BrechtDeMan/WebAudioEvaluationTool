@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="/save" randomiseOrder='true' collectMetrics='true'>
+	<setup interface="MUSHRA" projectReturn="/save" randomiseOrder='true' collectMetrics='true'>
 		<PreTest>
 			<question id="Location" mandatory="true" boxsize="large">Please enter your location.</question>
 			<checkbox id="experience">
