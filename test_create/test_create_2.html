@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>test_create_2</title>
+		<meta name="description" content="">
+		<meta name="author" content="Nicholas">
+
+		<meta name="viewport" content="width=device-width; initial-scale=1.0">
+		
+		<script type="text/javascript">
+			window.onload = function() {
+				var dropBody = document.getElementById('dragFile');
+				dropBody.addEventListener('dragover', handleDragOver, false);
+				dropBody.addEventListener('dragenter',handleDragEnter,false);
+				dropBody.addEventListener('dragleave',handleDragLeave,false);
+				dropBody.addEventListener('drop', handleDrop,false);
+			};
+			
+			function handleDragOver(e) {
+				e.stopPropagation();
+				e.preventDefault();
+			}
+			function handleDragEnter(e) {
+				e.stopPropagation();
+				e.preventDefault();
+				this.style.backgroundColor = '#AAFFAA';
+			}
+			function handleDragLeave(e) {
+				e.stopPropagation();
+				e.preventDefault();
+				this.style.backgroundColor = "#FFFFFF";
+			}
+			function handleDrop(e) {
+				e.stopPropagation();
+				e.preventDefault();
+				
+				var file = e.dataTransfer.files[0];
+				
+				// Uses HTML5 FileAPI - https://w3c.github.io/FileAPI/#filereader-interface
+				var reader = new FileReader();
+				reader.onload = function() {
+					var parse = new DOMParser();
+					var xml = parse.parseFromString(reader.result,'text/xml');
+					importXML(xml);
+				};
+				reader.readAsText(file);
+				
+			}
+			
+			function removeNode(event) {
+				event.srcElement.parentElement.parentElement.removeChild(event.srcElement.parentElement);
+			}
+			
+			function removeNodeButton()
+			{
+				var button = document.createElement('button');
+				button.textContent = 'Remove';
+				button.onclick = function(event){removeNode(event);};
+				return button;
+			}
+			
+			function attributePair(type,text,name,mandatory)
+			{
+				var node = document.createElement('div');
+				node.setAttribute('name','attribute');
+				var span = document.createElement('span');
+				span.textContent = text;
+				var input = document.createElement('input');
+				input.type = type;
+				input.setAttribute('attrib-name',name);
+				input.setAttribute('mandatory',mandatory);
+				node.appendChild(span);
+				node.appendChild(input);
+				return node;
+			}
+			
+			function buttonClickedValidate()
+			{
+				var allInputs = document.getElementsByTagName('input');
+				for (var i=0; i<allInputs.length; i++)
+				{goodNode(allInputs[i]);}
+				var errList = document.getElementById('errorMessage');
+				errList.innerHTML = "";
+				validate(document.getElementById('topLevelBody'));
+				var submit = document.getElementById('createXML');
+				if (errList.innerHTML == "")
+				{submit.disabled = false;}
+				else {submit.disabled = true;}
+			}
+			
+			function validate(node)
+			{
+				var name = node.getAttribute('name');
+				if (name != 'attribute' && name != 'element') {
+					var child = node.children;
+					for (var i=0; i<node.childElementCount; i++)
+					{
+						if (child[i].nodeName == "DIV")
+						{
+							validate(child[i]);
+						}
+					}
+				} else if (name == 'attribute')
+				{
+					var child = node.children;
+					for (var i=0; i<node.childElementCount; i++)
+					{
+						if (child[i].nodeName == "INPUT")
+						{
+							var mandatory = child[i].getAttribute('mandatory');
+							if (mandatory == 'true') {mandatory = true;}
+							else {mandatory = false;}
+							if (child[i].type =='text' || child[i].type =='number')
+							{
+								if (child[i].value.length == 0)
+								{
+									if (mandatory == true) {errorNode(child[i]);}
+									else {warningNode(child[i]);}
+								} else {goodNode(child[i]);}
+							}
+						}
+					}
+				} else if (name == 'element')
+				{
+					var child = node.children;
+					for (var i=0; i<node.childElementCount; i++)
+					{
+						if (child[i].nodeName == "INPUT")
+						{
+							if (child[i].value.length == 0){warningNode(child[i]);}
+							else {goodNode(child[i]);}
+						}
+					}
+				}
+			}
+			
+			function buttonClickedSubmit()
+			{
+				var xml = document.createElement('BrowserEvalProjectDocument');
+				var dom = document.getElementById('topLevelBody');
+				xml = extractXML(xml,dom);
+				var drop = document.getElementById('errorMessage');
+				createProjectSave(xml,drop);
+			}
+			
+			function createProjectSave(xmlDoc, injectPoint) {
+				var parent = document.createElement("div");
+				parent.appendChild(xmlDoc);
+				var file = [parent.innerHTML];
+				var bb = new Blob(file,{type : 'application/xml'});
+				var dnlk = window.URL.createObjectURL(bb);
+				var a = document.createElement("a");
+				a.hidden = '';
+				a.href = dnlk;
+				a.download = "save.xml";
+				a.textContent = "Save File";
+				injectPoint.appendChild(a);
+			}
+			
+			function extractXML(xml,node)
+			{
+				if(node.getAttribute('class')=='attrib')
+				{
+					var children = node.children;
+					for (var i=0; i<children.length; i++)
+					{
+						if (children[i].getAttribute('name')=='attribute')
+						{
+							var input = children[i].children[1];
+							if (input.type == 'checkbox')
+							{
+								xml.setAttribute(input.getAttribute('attrib-name'),input.checked);
+							} else {
+								xml.setAttribute(input.getAttribute('attrib-name'),input.value);
+							}
+						} else if (children[i].getAttribute('name') == 'element')
+						{
+							var input = children[i].children[1];
+							xml.textContent = input.value;
+						}
+					}
+					return xml;
+				} else if (node.getAttribute('node-name') != undefined)
+				{
+					var xmlDom = document.createElement(node.getAttribute('node-name'));
+					xml.appendChild(xmlDom);
+					var children = node.children;
+					for (var i=0; i<children.length; i++)
+					{
+						if (children[i].nodeName == "DIV")
+						{
+							xmlDom = extractXML(xmlDom,children[i]);
+						}
+					}
+				} else {
+					var children = node.children;
+					for (var i=0; i<children.length; i++)
+					{
+						if (children[i].nodeName == "DIV")
+						{
+							xml = extractXML(xml,children[i]);
+						}
+					}
+				}
+				return xml;
+			}
+			
+			function goodNode(node)
+			{node.style.backgroundColor="#FFFFFF";}
+			
+			function warningNode(node)
+			{node.style.backgroundColor="#FFFF88";}
+			
+			function errorNode(node)
+			{
+				var errLog = document.getElementById('errorMessage');
+				var div = document.createElement('div');
+				var span = document.createElement('span');
+				span.textContent = 'Invalid Data: ';
+				var list = [node.getAttribute('attrib-name')];
+				var pNode = node;
+				while (pNode.id != 'topLevelBody')
+				{
+					if (pNode.getAttribute('node-name') != undefined)
+					{list.push(pNode.getAttribute('node-name'));}
+					pNode = pNode.parentElement;
+				}
+				for (var i=list.length-1; i>=0; i--)
+				{
+					span.textContent = span.textContent +' ->'+ list[i];
+				}
+				div.appendChild(span);
+				errLog.appendChild(div);
+				errLog.style.visibility = 'visible';
+				node.style.backgroundColor="#FF0000";
+			}
+			
+			function importXML(xml)
+			{
+				xml = xml.children[0];
+				var setup = xml.getElementsByTagName('setup')[0];
+				var DOM = document.getElementById('setup');
+				// Insert any setup node attributes
+				setAttributes(DOM,setup);
+				
+				for (var i=0; i<setup.childElementCount; i++)
+				{
+					var node = DOM.getElementsByClassName(setup.children[i].nodeName);
+					if (node.length != 0)
+					{
+						node = node[0];
+						setAttributes(node,setup.children[i]);
+						buildNode(node,setup.children[i]);
+					}
+				}
+				
+				var holders = xml.getElementsByTagName('audioHolder');
+				for (var i=0; i<holders.length; i++)
+				{
+					var node = addAudioHolder();
+					document.getElementById('topLevelBody').appendChild(node);
+					setAttributes(node,holders[i]);
+					buildNode(node,holders[i]);
+				}
+			}
+			
+			function setAttributes(node,xml)
+			{
+				var attribs = node.getElementsByClassName('attrib');
+				if (attribs.length != 0){
+					attribs = attribs[0];
+					for (var i=0; i < attribs.children.length; i++)
+					{
+						if(attribs.children[i].getAttribute('name')=='attribute'){
+							var input = attribs.children[i].children[1];
+							var value = xml.attributes.getNamedItem(input.getAttribute('attrib-name'));
+							if (value != undefined) {value = value.value;}
+							if (input.type == 'checkbox')
+							{input.checked = value;}
+							else
+							{input.value = value;}
+						} else if(attribs.children[i].getAttribute('name')=='element'){
+							var input = attribs.children[i].children[1];
+							input.value = xml.textContent;
+						}
+					}
+				}
+			}
+			
+			function buildNode(parent,xml)
+			{
+				for (var i=0; i<xml.childElementCount; i++)
+				{
+					var child = xml.children[i];
+					var name = child.nodeName;
+					var node = null;
+					if (name == 'statement'){node = addPPStatement();}
+					else if (name == 'question' || name == 'number'){node = addPPQuestion();}
+					else if (name == 'checkbox'){node = addPPCheckbox();}
+					else if (name == 'radio'){node = addPPRadio();}
+					else if (name == 'metricEnable'){node = addMetricEnable();}
+					else if (name == 'check'){node = addInterfaceCheck();}
+					else if (name == 'option'){node = addInterfaceOption();}
+					else if (name == 'scale'){node = addScaleMarker();}
+					else if (name == 'audioHolder'){node = addAudioHolder();}
+					else if (name == 'audioElements'){node = addAudioElement();}
+					else if (name == 'commentQuestion'){node = addExtraComment();}
+					else if (name == 'interface'){node = parent.getElementsByClassName('interface')[0];}
+					else if (name == 'preTest' || name == 'PreTest')
+					{
+						node = parent.getElementsByClassName('preTest')[0];
+					}
+					else if (name == 'postTest' || name == 'PostTest')
+					{
+						node = parent.getElementsByClassName('postTest')[0];
+					}
+					else if (name == 'title' || name == 'commentBoxPrefix')
+					{
+						node = parent.getElementsByClassName(name)[0];
+					}
+					if (node != null) {
+						if (name == 'radio' || name == 'checkbox')
+						{
+							buildRadio(node,xml.children[i]);
+							parent.appendChild(node);
+						} else
+						{
+							setAttributes(node,child);
+							parent.appendChild(node);
+							buildNode(node,child);
+						}
+					} else {
+						var node = createHead(name,name,'h3');
+						
+						var attrib = document.createElement('div');
+						attrib.className = 'attrib';
+						for (var j=0; j<child.attributes.length; j++)
+						{
+							attrib.appendChild(attributePair('text',child.attributes[j].name,child.attributes[j].name,false));
+						}
+						
+						node.appendChild(attrib);
+						parent.appendChild(node);
+						setAttributes(node,child);
+						/*
+						buildNode(node,child);
+						*/
+					}
+				}
+			}
+			
+			function buildRadio(node,xml)
+			{
+				setAttributes(node,xml);
+				setAttributes(node.getElementsByClassName('statement')[0],xml.getElementsByTagName('statement')[0]);
+				var options = xml.getElementsByTagName('option');
+				var addOptionButton = node.getElementsByTagName('button')[2];
+				for (var i=0; i<options.length; i++)
+				{
+					addOptionButton.click();
+					setAttributes(node.getElementsByClassName('option')[i],options[i]);
+				}
+			}
+			
+			function createHead(name,title,size)
+			{
+				var node = document.createElement('div');
+				node.setAttribute('class','head '+name);
+				node.setAttribute('node-name',name);
+				if (size == undefined)
+				{var node_T = document.createElement('h3');}
+				else{var node_T = document.createElement(size);}
+				node_T.textContent = title;
+				node.appendChild(node_T);
+				node.appendChild(removeNodeButton());
+				return node;
+			}
+			
+			function addPretestNode()
+			{
+				var node = createHead('preTest', 'Pre Test','h3');
+				var addStatement = document.createElement('button');
+				addStatement.textContent = 'Add Statement';
+				addStatement.onclick = function(){event.srcElement.parentElement.appendChild(addPPStatement());};
+				node.appendChild(addStatement);
+				var addQuestion = document.createElement('button');
+				addQuestion.textContent = 'Add Question';
+				addQuestion.onclick = function(){event.srcElement.parentElement.appendChild(addPPQuestion());};
+				node.appendChild(addQuestion);
+				var addCheckbox = document.createElement('button');
+				addCheckbox.textContent = 'Add Checkbox';
+				addCheckbox.onclick = function(){event.srcElement.parentElement.appendChild(addPPCheckbox());};
+				node.appendChild(addCheckbox);
+				var addRadio = document.createElement('button');
+				addRadio.textContent = 'Add Checkbox';
+				addRadio.onclick = function(){event.srcElement.parentElement.appendChild(addPPRadio());};
+				node.appendChild(addRadio);
+				return node;
+			};
+			
+			function addPosttestNode()
+			{
+				var node = createHead('postTest', 'Post Test','h3');
+				var addStatement = document.createElement('button');
+				addStatement.textContent = 'Add Statement';
+				addStatement.onclick = function(){event.srcElement.parentElement.appendChild(addPPStatement());};
+				node.appendChild(addStatement);
+				var addQuestion = document.createElement('button');
+				addQuestion.textContent = 'Add Question';
+				addQuestion.onclick = function(){event.srcElement.parentElement.appendChild(addPPQuestion());};
+				node.appendChild(addQuestion);
+				var addCheckbox = document.createElement('button');
+				addCheckbox.textContent = 'Add Checkbox';
+				addCheckbox.onclick = function(){event.srcElement.parentElement.appendChild(addPPCheckbox());};
+				node.appendChild(addCheckbox);
+				var addRadio = document.createElement('button');
+				addRadio.textContent = 'Add Checkbox';
+				addRadio.onclick = function(){event.srcElement.parentElement.appendChild(addPPRadio());};
+				node.appendChild(addRadio);
+				return node;
+			};
+		
+			function addPPStatement()
+			{
+				var node = createHead('statement', 'Statement','h4');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				var element = document.createElement('div');
+				element.setAttribute('name','element');
+				var span = document.createElement('span');
+				span.textContent = "Enter statement: ";
+				element.appendChild(span);
+				var input = document.createElement('input');
+				input.type = "text";
+				input.style.width = "500px";
+				element.appendChild(input);
+				attrib.appendChild(element);
+				node.appendChild(attrib);
+				return node;
+			};
+			function addPPQuestion()
+			{
+				var node = createHead('question', 'Question','h4');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				attrib.appendChild(attributePair('text','ID: ','id',true));
+				attrib.appendChild(attributePair('checkbox','Mandatory: ','mandatory',false));
+				attrib.appendChild(attributePair('text','Box size: ','boxsize',false));
+				var element = document.createElement('div');
+				element.setAttribute('name','element');
+				var span = document.createElement('span');
+				span.textContent = "Enter Question: ";
+				element.appendChild(span);
+				var input = document.createElement('input');
+				input.type = "text";
+				input.style.width = "500px";
+				element.appendChild(input);
+				attrib.appendChild(element);
+				node.appendChild(attrib);
+				return node;
+			};
+			function addPPCheckbox()
+			{
+				var node = createHead('checkbox', 'Checkbox','h4');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				attrib.appendChild(attributePair('text','ID: ','id',true));
+				attrib.appendChild(attributePair('checkbox','Mandatory: ','mandatory',false));
+				node.appendChild(attrib);
+				node.appendChild(addPPStatement());
+				var addOption = document.createElement('button');
+				addOption.textContent = 'Add Checkbox';
+				addOption.onclick = function() {
+					var node = createHead('option', 'Option','h4');
+					var attrib = document.createElement('div');
+					attrib.className = "attrib";
+					attrib.appendChild(attributePair('text','ID: ','id',true));
+					var element = document.createElement('div');
+					element.setAttribute('name','element');
+					var span = document.createElement('span');
+					span.textContent = "Enter Text: ";
+					var input = document.createElement('input');
+					input.type = 'text';
+					element.appendChild(span);
+					element.appendChild(input);
+					attrib.appendChild(element);
+					node.appendChild(attrib);
+					event.srcElement.parentElement.appendChild(node);
+				};
+				node.appendChild(addOption);
+				return node;
+			};
+			
+			function addPPRadio()
+			{
+				var node = createHead('radio', 'Radio','h4');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				attrib.appendChild(attributePair('text','ID: ','id',true));
+				attrib.appendChild(attributePair('checkbox','Mandatory: ','mandatory',false));
+				node.appendChild(attrib);
+				node.appendChild(addPPStatement());
+				var addOption = document.createElement('button');
+				addOption.textContent = 'Add Radio';
+				addOption.onclick = function() {
+					var node = createHead('option', 'Option','h4');
+					var attrib = document.createElement('div');
+					attrib.className = "attrib";
+					attrib.appendChild(attributePair('text','Name: ','name',true));
+					var element = document.createElement('div');
+					element.setAttribute('name','element');
+					var span = document.createElement('span');
+					span.textContent = "Enter Text: ";
+					var input = document.createElement('input');
+					input.type = 'text';
+					element.appendChild(span);
+					element.appendChild(input);
+					attrib.appendChild(element);
+					node.appendChild(attrib);
+					event.srcElement.parentElement.appendChild(node);
+				};
+				node.appendChild(addOption);
+				return node;
+			};
+			
+			function addMetricEnable()
+			{
+				var node = createHead('metricEnable', '','h4');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				var element = document.createElement('div');
+				element.setAttribute('name','element');
+				var span = document.createElement('span');
+				span.textContent = "Enter Metric Name: ";
+				element.appendChild(span);
+				var input = document.createElement('input');
+				input.type = "text";
+				input.style.width = "500px";
+				element.appendChild(input);
+				attrib.appendChild(element);
+				node.appendChild(attrib);
+				return node;
+			};
+			
+			function addInterfaceCheck()
+			{
+				var node = createHead('check', 'Check','h4');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				attrib.appendChild(attributePair('text','Name','name',true));
+				node.appendChild(attrib);
+				return node;
+			}
+			function addInterfaceOption()
+			{
+				var node = createHead('option', 'Option','h4');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				attrib.appendChild(attributePair('text','Name','name',true));
+				node.appendChild(attrib);
+				return node;
+			}
+			
+			
+			function addAudioHolder()
+			{
+				var node = createHead('audioHolder','Audio Holder / Test Page','h2');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				node.appendChild(attrib);
+				
+				attrib.appendChild(attributePair('text','ID: ','id',true));
+				attrib.appendChild(attributePair('url','Host URL: ','hostURL',false));
+				attrib.appendChild(attributePair('number','Sample Rate: ','sampleRate',false));
+				attrib.appendChild(attributePair('checkbox','Randomise Fragment Order: ','randomiseOrder',false));
+				attrib.appendChild(attributePair('number','Repeat Count: ','repeatCount',false));
+				attrib.appendChild(attributePair('checkbox','Loop Fragments: ','loop',false));
+				attrib.appendChild(attributePair('checkbox','Fragment Comment Boxes: ','enableComments',false));
+				
+				node.appendChild(addPretestNode());
+				
+				node.appendChild(addPosttestNode());
+				
+				var interfaceNode = createHead('interface','Interface','h3');
+				var addOption = document.createElement('button');
+				addOption.textContent = 'Add Option';
+				addOption.onclick = function(){event.srcElement.parentElement.appendChild(addInterfaceOption());};
+				interfaceNode.appendChild(addOption);
+				var scale = document.createElement('button');
+				scale.textContent = 'Add scale';
+				scale.onclick = function(){event.srcElement.parentElement.appendChild(addScaleMarker());};
+				interfaceNode.appendChild(scale);
+				
+				var PageTitle = createHead('title','Page Title','h4');
+				var attrib = document.createElement('div');
+				attrib.className='attrib';
+				var element = document.createElement('div');
+				element.setAttribute('name','element');
+				var span = document.createElement('span');
+				span.textContent = 'Page Title: ';
+				element.appendChild(span);
+				var input = document.createElement('input');
+				input.type = 'text';
+				input.style.width = "500px";
+				element.appendChild(input);
+				attrib.appendChild(element);
+				PageTitle.appendChild(attrib);
+				interfaceNode.appendChild(PageTitle);
+				
+				var commentBoxPrefix = createHead('commentBoxPrefix','Comment Box Prefix','h4');
+				var attrib = document.createElement('div');
+				attrib.className='attrib';
+				var element = document.createElement('div');
+				element.setAttribute('name','element');
+				var span = document.createElement('span');
+				span.textContent = 'Prefix: ';
+				element.appendChild(span);
+				var input = document.createElement('input');
+				input.type = 'text';
+				input.style.width = "500px";
+				element.appendChild(input);
+				attrib.appendChild(element);
+				commentBoxPrefix.appendChild(attrib);
+				interfaceNode.appendChild(commentBoxPrefix);
+				
+				node.appendChild(interfaceNode);
+				
+				var addElement = document.createElement('button');
+				addElement.textContent = 'Add Audio Element';
+				addElement.onclick = function(){event.srcElement.parentElement.appendChild(addAudioElement());};
+				node.appendChild(addElement);
+				
+				var addCQ = document.createElement('button');
+				addCQ.textContent = 'Add Comment Box';
+				addCQ.onclick = function(){event.srcElement.parentElement.appendChild(addExtraComment());};
+				node.appendChild(addCQ);
+				
+				return node;
+			};
+			
+			function addScaleMarker(){
+				var node = createHead('scale','Scale','h4');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				node.appendChild(attrib);
+				attrib.appendChild(attributePair('number','Position','position',true));
+				var element = document.createElement('div');
+				element.setAttribute('name','element');
+				var span = document.createElement('span');
+				span.textContent = 'Marker Text (Optional): ';
+				element.appendChild(span);
+				var input = document.createElement('input');
+				input.type = 'text';
+				element.appendChild(input);
+				attrib.appendChild(element);
+				return node;
+			};
+			
+			function addAudioElement()
+			{
+				var node = createHead('audioElements','Audio Element');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				node.appendChild(attrib);
+				
+				attrib.appendChild(attributePair('text','ID: ','id',true));
+				attrib.appendChild(attributePair('text','URL: ','url',true));
+				attrib.appendChild(attributePair('text','Type: ','type',false));
+				
+				return node;
+			};
+			
+			function addExtraComment()
+			{
+				var node = createHead('CommentQuestion','Comment');
+				var attrib = document.createElement('div');
+				attrib.className = "attrib";
+				node.appendChild(attrib);
+				attrib.appendChild(attributePair('text','ID: ','id',true));
+				
+				var element = document.createElement('div');
+				element.setAttribute('name','element');
+				var span = document.createElement('span');
+				span.textContent = 'Question: ';
+				element.appendChild(span);
+				var input = document.createElement('input');
+				input.type = 'text';
+				input.style.width = "500px";
+				element.appendChild(input);
+				attrib.appendChild(element);
+				return node;
+			}
+		</script>
+
+		<style>
+			h4 {margin: 0px;}
+			div {
+				padding: 2px;
+				margin-top: 2px;
+				margin-bottom: 2px;
+			}
+			div.head{
+				margin-left: 10px;
+				border: black;
+				border-width: 2px;
+				border-style: solid;
+			}
+			div.attrib{
+				margin-left:25px;
+				border: black;
+				border-width: 2px;
+				border-style: dashed;
+				margin-bottom: 10px;
+				display: table;
+				background-color: rgb(200,255,255);
+			}
+			div.attrib div {
+				width: auto;
+				position: relative;
+				display: table-cell;
+			}
+			div#dragFile{
+				height:100px;
+				border-width: 2px;
+				border-style: dashed;
+				margin-bottom: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h1>Create Test Setup XML</h1>
+		<div id="dragFile">
+			<span>Drag and Drop an XML specification file here to auto-load.</span>
+		</div>
+		<button id="validateXML" onclick="buttonClickedValidate();">Validate</button>
+		<button id="createXML" onclick="buttonClickedSubmit();" disabled>Submit</button>
+		<div id="errorMessage" visibility="hidden"></div>
+		<div id="topLevelBody" align="left">
+			<div id='setup' class="head setup" node-name='setup'>
+				<h2>Setup Node</h2>
+				<div class="attrib">
+					<div name="attribute">
+						<span>Interface: </span>
+						<input type="text" attrib-name='interface' mandatory='true'/>
+					</div>
+					<div name="attribute">
+						<span>Project Return: </span>
+						<input type="url" attrib-name='projectReturn'/>
+					</div>
+					<div name="attribute">
+						<span>Randomise Page Order: </span>
+						<input type="checkbox" attrib-name='randomiseOrder'/>
+					</div>
+					<div name="attribute">
+						<span>Collect Metrics: </span>
+						<input type="checkbox" attrib-name='collectMetrics'/>
+					</div>
+				</div>
+				<div class="head PreTest" node-name="preTest">
+					<h3>Pre Test</h3>
+					<button onclick="event.srcElement.parentElement.appendChild(addPPStatement());">Add Statement</button>
+					<button onclick="event.srcElement.parentElement.appendChild(addPPQuestion());">Add Question</button>
+					<button onclick="event.srcElement.parentElement.appendChild(addPPCheckbox());">Add Checkbox</button>
+					<button onclick="event.srcElement.parentElement.appendChild(addPPRadio());">Add Radio</button>
+				</div>
+				<div class="head PostTest" node-name="postTest">
+					<h3>Post Test</h3>
+					<button onclick="event.srcElement.parentElement.appendChild(addPPStatement());">Add Statement</button>
+					<button onclick="event.srcElement.parentElement.appendChild(addPPQuestion());">Add Question</button>
+					<button onclick="event.srcElement.parentElement.appendChild(addPPCheckbox());">Add Checkbox</button>
+					<button onclick="event.srcElement.parentElement.appendChild(addPPRadio());">Add Radio</button>
+				</div>
+				<div class="head Metric" node-name="metrics">
+					<h3>Metrics</h3>
+					<button onclick="event.srcElement.parentElement.appendChild(addMetricEnable());">Add Metric Enable</button>
+				</div>
+				<div class="head interface" node-name="interface">
+					<h3>Interface</h3>
+					<button onclick="event.srcElement.parentElement.appendChild(addInterfaceCheck());">Add Check</button>
+					<button onclick="event.srcElement.parentElement.appendChild(addInterfaceOption());">Add Option</button>
+				</div>
+			</div>
+			<button onclick="event.srcElement.parentElement.appendChild(addAudioHolder());">Add Audio Holder</button>
+		</div>
+	</body>
+</html>
