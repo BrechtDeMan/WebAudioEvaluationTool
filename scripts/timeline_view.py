@@ -31,6 +31,9 @@ plt.rc('font', **font)
 # Colormap for to cycle through
 colormap = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
 
+# x-axis shows time per audioholder, not total test time
+show_audioholder_time = True
+
 
 # CODE
 
@@ -44,6 +47,8 @@ for file in os.listdir(folder_name):
         tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
         subject_id = file[:-4] # drop '.xml'
+        
+        time_offset = 0 # test starts at zero
         
         # ONE TIMELINE PER PAGE - make new plot per page
 
@@ -78,25 +83,30 @@ for file in os.listdir(folder_name):
                     listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
                     for event in listen_events:
                         # get testtime: start and stop
-                        start_time = event.find('testtime').get('start')
-                        stop_time  = event.find('testtime').get('stop')
+                        start_time = float(event.find('testtime').get('start'))
+                        stop_time  = float(event.find('testtime').get('stop'))
                         # event lines:
-                        plt.plot([start_time, start_time], # x-values
+                        plt.plot([start_time-time_offset, start_time-time_offset], # x-values
                             [0, N_audioelements+1], # y-values
                             color='k'
                             )
-                        plt.plot([stop_time, stop_time], # x-values
+                        plt.plot([stop_time-time_offset, stop_time-time_offset], # x-values
                             [0, N_audioelements+1], # y-values
                             color='k'
                             )
                         # plot time: 
-                        plt.plot([start_time, stop_time], # x-values
+                        plt.plot([start_time-time_offset, stop_time-time_offset], # x-values
                             [N_audioelements-increment, N_audioelements-increment], # y-values
                             color=colormap[increment%len(colormap)],
                             linewidth=6
                             )
                         
                 increment+=1
+                
+            # subtract total audioholder length from subsequent audioholder event times
+            audioholder_time = audioholder.find("./metric/metricresult/[@id='testTime']")
+            if audioholder_time is not None and show_audioholder_time: 
+                time_offset = float(audioholder_time.text)
                                            
             #TODO: if 'nonsensical' or unknown: dashed line until next event
             #TODO: Vertical lines for fragment looping point

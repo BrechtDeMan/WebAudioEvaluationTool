@@ -72,9 +72,16 @@ else:
         # PLOT OPTIONS
         elif arg == 'leg' or arg == 'legend' or arg == '-l':
             if not enable_individual: 
-                print "WARNING: The 'legend' option is only relevant to plots of individual ratings"
+                print "WARNING: The 'legend' option is only relevant to plots of "+\
+                      "individual ratings"
             show_legend = True     # show all individual ratings
-            
+        elif arg.isnumeric():
+            if not enable_confidence: 
+                print "WARNING: The numeric confidence value is only relevant when "+\
+                      "confidence plot is enabled"
+            if float(arg)>0 and float(arg)<1:
+                confidence = float(arg)
+        
          # FOLDER NAME
          else: 
             # assume it's the folder name
