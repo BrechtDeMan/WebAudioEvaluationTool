@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import os # list files in directory
 import sys # command line arguments
 import matplotlib.pyplot as plt # plots
+import matplotlib.patches as patches # rectangles
 
 # COMMAND LINE ARGUMENTS
 
@@ -17,7 +18,7 @@ if len(sys.argv) == 1:
     print "Using default path: " + folder_name
 elif len(sys.argv) == 2:
     folder_name = sys.argv[1]   # First command line argument is folder
-    
+
 # check if folder_name exists
 if not os.path.exists(folder_name):
     #the file is not there
@@ -41,8 +42,15 @@ plt.rc('font', **font)
 # Colormap for to cycle through
 colormap = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
 
-# x-axis shows time per audioholder, not total test time
+# if enabled, x-axis shows time per audioholder, not total test time
 show_audioholder_time = True
+
+# bar height (<1 to avoid overlapping)
+bar_height = 0.6
+
+# figure size
+fig_width = 25
+fig_height = 5
 
 
 # CODE
@@ -82,6 +90,16 @@ for file in os.listdir(folder_name):
             increment = 0 # increased for every new audioelement
             audioelements_names = [] # store names of audioelements
             
+            # set plot parameters
+            plt.title('Timeline ' + file + ": "+page_name)
+            plt.xlabel('Time [seconds]')
+            plt.ylabel('Fragment')
+            plt.ylim(0, N_audioelements+1)
+            
+            # get axes handle
+            fig = plt.figure(figsize=(fig_width, fig_height))
+            ax  = fig.add_subplot(111) #, aspect='equal'
+            
             # for page [page_name], print comments related to fragment [id]
             for tuple in data:
             	audioelement = tuple[1]
@@ -96,22 +114,25 @@ for file in os.listdir(folder_name):
                         start_time = float(event.find('testtime').get('start'))
                         stop_time  = float(event.find('testtime').get('stop'))
                         # event lines:
-                        plt.plot([start_time-time_offset, start_time-time_offset], # x-values
+                        ax.plot([start_time-time_offset, start_time-time_offset], # x-values
                             [0, N_audioelements+1], # y-values
                             color='k'
                             )
-                        plt.plot([stop_time-time_offset, stop_time-time_offset], # x-values
+                        ax.plot([stop_time-time_offset, stop_time-time_offset], # x-values
                             [0, N_audioelements+1], # y-values
                             color='k'
                             )
                         # plot time: 
-                        plt.plot([start_time-time_offset, stop_time-time_offset], # x-values
-                            [N_audioelements-increment, N_audioelements-increment], # y-values
-                            color=colormap[increment%len(colormap)],
-                            linewidth=6
+                        ax.add_patch(
+                            patches.Rectangle(
+                                (start_time-time_offset, N_audioelements-increment-bar_height/2), # (x, y)
+                                stop_time - start_time, # width
+                                bar_height, # height
+                                color=colormap[increment%len(colormap)] # colour
                             )
+                        )
                         
-                increment+=1
+                increment+=1 # to next audioelement
                 
             # subtract total audioholder length from subsequent audioholder event times
             audioholder_time = audioholder.find("./metric/metricresult/[@id='testTime']")
@@ -121,11 +142,6 @@ for file in os.listdir(folder_name):
             #TODO: if 'nonsensical' or unknown: dashed line until next event
             #TODO: Vertical lines for fragment looping point
             
-            plt.title('Timeline ' + file) #TODO add song too
-            plt.xlabel('Time [seconds]')
-            plt.ylabel('Fragment')
-            plt.ylim(0, N_audioelements+1)
-            
             #y-ticks: fragment IDs, top to bottom
             plt.yticks(range(N_audioelements, 0, -1), audioelements_names) # show fragment names
 
@@ -133,5 +149,5 @@ for file in os.listdir(folder_name):
             #plt.show() # uncomment to show plot; comment when just saving
             #exit()
             
-            plt.savefig(timeline_folder+subject_id+"-"+page_name+".png")
+            plt.savefig(timeline_folder+subject_id+"-"+page_name+".pdf", bbox_inches='tight')
             plt.close()
