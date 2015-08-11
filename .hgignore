@@ -32,3 +32,4 @@ saves/*/*.csv
 saves/*/*.png
 saves/*/*.xml
 saves/ratings/*.pdf
+saves/timelines_movement/*.pdf

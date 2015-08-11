@@ -9,12 +9,12 @@ import matplotlib.patches as patches # rectangles
 # COMMAND LINE ARGUMENTS
 
 assert len(sys.argv)<3, "timeline_view takes at most 1 command line argument\n"+\
-                        "Use: python timeline_view.py [timeline_folder_location]"
+                        "Use: python timeline_view.py [XML_files_location]"
 
 # XML results files location
 if len(sys.argv) == 1:
     folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
-    print "Use: python timeline_view.py [timeline_folder_location]"
+    print "Use: python timeline_view.py [XML_files_location]"
     print "Using default path: " + folder_name
 elif len(sys.argv) == 2:
     folder_name = sys.argv[1]   # First command line argument is folder
@@ -90,12 +90,6 @@ for file in os.listdir(folder_name):
             increment = 0 # increased for every new audioelement
             audioelements_names = [] # store names of audioelements
             
-            # set plot parameters
-            plt.title('Timeline ' + file + ": "+page_name)
-            plt.xlabel('Time [seconds]')
-            plt.ylabel('Fragment')
-            plt.ylim(0, N_audioelements+1)
-            
             # get axes handle
             fig = plt.figure(figsize=(fig_width, fig_height))
             ax  = fig.add_subplot(111) #, aspect='equal'
@@ -138,9 +132,12 @@ for file in os.listdir(folder_name):
             audioholder_time = audioholder.find("./metric/metricresult/[@id='testTime']")
             if audioholder_time is not None and show_audioholder_time: 
                 time_offset = float(audioholder_time.text)
-                                           
-            #TODO: if 'nonsensical' or unknown: dashed line until next event
-            #TODO: Vertical lines for fragment looping point
+            
+            # set plot parameters
+            plt.title('Timeline ' + file + ": "+page_name)
+            plt.xlabel('Time [seconds]')
+            plt.ylabel('Fragment')
+            plt.ylim(0, N_audioelements+1)
             
             #y-ticks: fragment IDs, top to bottom
             plt.yticks(range(N_audioelements, 0, -1), audioelements_names) # show fragment names
@@ -151,3 +148,7 @@ for file in os.listdir(folder_name):
             
             plt.savefig(timeline_folder+subject_id+"-"+page_name+".pdf", bbox_inches='tight')
             plt.close()
+            
+            #TODO: if 'nonsensical' or unknown: dashed line until next event
+            #TODO: Vertical lines for fragment looping point
+            
