@@ -20,6 +20,18 @@ if len(sys.argv) == 1:
 elif len(sys.argv) == 2:
     folder_name = sys.argv[1]   # First command line argument is folder
 
+# check if folder_name exists
+if not os.path.exists(folder_name):
+    #the file is not there
+    print "Folder '"+folder_name+"' does not exist."
+    sys.exit() # terminate script execution
+elif not os.access(os.path.dirname(folder_name), os.W_OK):
+    #the file does exist but write privileges are not given
+    print "No write privileges in folder '"+folder_name+"'."
+
+    
+# CODE
+
 # get every XML file in folder
 for file in os.listdir(folder_name):
     if file.endswith(".xml"):

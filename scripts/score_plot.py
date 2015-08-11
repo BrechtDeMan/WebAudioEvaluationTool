@@ -55,9 +55,10 @@ else:
             print "            Enables plot of individual ratings" 
             print ""
             print "PLOT OPTIONS"
-            print "    legend | -l"
+            print "    leg | legend | -l"
             print "            For individual plot: show legend with individual file names"
-            print "    "
+            print "    numeric value between 0 and 1, e.g. 0.95"
+            print "            For confidence interval plot: confidence value"
             assert False, ""# stop immediately after showing help #TODO cleaner way
             
         # PLOT TYPES
@@ -81,6 +82,8 @@ else:
                       "confidence plot is enabled"
             if float(arg)>0 and float(arg)<1:
                 confidence = float(arg)
+            else: 
+                print "WARNING: The confidence value needs to be between 0 and 1"
         
          # FOLDER NAME
          else: 
@@ -92,10 +95,17 @@ else:
 if not enable_boxplot and not enable_confidence and not enable_individual:
     enable_boxplot = True
 
-# CONFIGURATION
+# check if folder_name exists
+if not os.path.exists(rating_folder):
+    #the file is not there
+    print "Folder '"+rating_folder+"' does not exist."
+    sys.exit() # terminate script execution
+elif not os.access(os.path.dirname(rating_folder), os.W_OK):
+    #the file does exist but write rating_folder are not given
+    print "No write privileges in folder '"+rating_folder+"'."
 
-# Enter folder where rating CSV files are (generated with score_parser.py or same format).
-rating_folder = '../saves/ratings/' # folder with rating csv files
+
+# CONFIGURATION
 
 # Font settings
 font = {'weight' : 'bold',
