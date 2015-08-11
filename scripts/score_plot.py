@@ -85,11 +85,10 @@ else:
             else: 
                 print "WARNING: The confidence value needs to be between 0 and 1"
         
-         # FOLDER NAME
-         else: 
-            # assume it's the folder name
-            rating_folder = arg
-            #TODO try it exists, otherwise show exception
+        # FOLDER NAME
+        else: 
+             # assume it's the folder name
+             rating_folder = arg
 
 # at least one plot type should be selected: box plot by default
 if not enable_boxplot and not enable_confidence and not enable_individual:
@@ -230,5 +229,5 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
         plot_type = ("-box" if enable_boxplot else "") + \
                     ("-conf" if enable_confidence else "") + \
                     ("-ind" if enable_individual else "")
-        plt.savefig(rating_folder+page_name+plot_type+".png")
+        plt.savefig(rating_folder+page_name+plot_type+".pdf", bbox_inches='tight')
         plt.close()
