@@ -105,21 +105,21 @@ for file in os.listdir(folder_name):
                     listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
                     for event in listen_events:
                         # get testtime: start and stop
-                        start_time = float(event.find('testtime').get('start'))
-                        stop_time  = float(event.find('testtime').get('stop'))
+                        start_time = float(event.find('testtime').get('start'))-time_offset
+                        stop_time  = float(event.find('testtime').get('stop'))-time_offset
                         # event lines:
-                        ax.plot([start_time-time_offset, start_time-time_offset], # x-values
+                        ax.plot([start_time, start_time], # x-values
                             [0, N_audioelements+1], # y-values
                             color='k'
                             )
-                        ax.plot([stop_time-time_offset, stop_time-time_offset], # x-values
+                        ax.plot([stop_time, stop_time], # x-values
                             [0, N_audioelements+1], # y-values
                             color='k'
                             )
                         # plot time: 
                         ax.add_patch(
                             patches.Rectangle(
-                                (start_time-time_offset, N_audioelements-increment-bar_height/2), # (x, y)
+                                (start_time, N_audioelements-increment-bar_height/2), # (x, y)
                                 stop_time - start_time, # width
                                 bar_height, # height
                                 color=colormap[increment%len(colormap)] # colour
