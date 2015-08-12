@@ -113,10 +113,19 @@ for file in os.listdir(folder_name):
                         print "Skipping "+page_name+" from "+subject_id+": does not have initial positions specified."
                         break
                     
-                    # for this audioelement, loop over all move events
+                    # get move events, initial and eventual position
                     initial_position = float(initial_position_temp.text)
                     move_events = audioelement.findall("./metric/metricresult/[@name='elementTrackerFull']/timepos")
                     final_position = float(audioelement.find("./value").text)
+                    
+                    # get listen events
+                    start_times_global = []
+                    stop_times_global  = []
+                    listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
+                    for event in listen_events:
+                        # get testtime: start and stop
+                        start_times_global.append(float(event.find('testtime').get('start'))-time_offset)
+                        stop_times_global.append(float(event.find('testtime').get('stop'))-time_offset)
                     
                     # display fragment name at start
                     plt.text(0,initial_position+0.02,audio_id,color=colormap[increment%len(colormap)]) #,rotation=45
@@ -125,20 +134,71 @@ for file in os.listdir(folder_name):
                     previous_position = initial_position
                     previous_time = 0
                     
+                    # assume not playing at start
+                    currently_playing = False # keep track of whether fragment is playing during move event
+                    
                     # draw all segments except final one
                     for event in move_events: 
+                        # get time and final position of move event
                         new_time = float(event.find("./time").text)-time_offset
                         new_position = float(event.find("./position").text)
-                        # horizontal line from previous to current time
-                        plt.plot([previous_time, new_time], # x-values
+                        
+                        # get play/stop events since last move until current move event
+                        stop_times = []
+                        start_times = []
+                        # is there a play and/or stop event between previous_time and new_time?
+                        for time in start_times_global:
+                            if time>previous_time and time<new_time:
+                                start_times.append(time)
+                        for time in stop_times_global:
+                            if time>previous_time and time<new_time:
+                                stop_times.append(time)
+                        # if no play/stop events between move events, find out whether playing
+                        
+                        segment_start = previous_time # first segment starts at previous move event
+                        
+                        # draw segments (horizontal line)
+                        while len(start_times)+len(stop_times)>0: # while still play/stop events left
+                            if len(stop_times)<1: # upcoming event is 'play'
+                                # draw non-playing segment from segment_start to 'play'
+                                currently_playing = False
+                                segment_stop = start_times.pop(0) # remove and return first item
+                            elif len(start_times)<1: # upcoming event is 'stop'
+                                # draw playing segment (red) from segment_start to 'stop'
+                                currently_playing = True
+                                segment_stop = stop_times.pop(0) # remove and return first item
+                            elif start_times[0]<stop_times[0]: # upcoming event is 'play'
+                                # draw non-playing segment from segment_start to 'play'
+                                currently_playing = False
+                                segment_stop = start_times.pop(0) # remove and return first item
+                            else: # stop_times[0]<start_times[0]: upcoming event is 'stop'
+                                # draw playing segment (red) from segment_start to 'stop'
+                                currently_playing = True
+                                segment_stop = stop_times.pop(0) # remove and return first item
+                                
+                            # draw segment
+                            plt.plot([segment_start, segment_stop], # x-values
+                                [previous_position, previous_position], # y-values
+                                color='r' if currently_playing else colormap[increment%len(colormap)],
+                                linewidth=3
+                            )
+                            segment_start = segment_stop # move on to next segment
+                            currently_playing = not currently_playing # toggle to draw final segment correctly
+                        
+                        # draw final segment (horizontal line) from last 'segment_start' to current move event time
+                        plt.plot([segment_start, new_time], # x-values
                             [previous_position, previous_position], # y-values
-                            color=colormap[increment%len(colormap)],
+                            # color depends on playing during move event or not:
+                            color='r' if currently_playing else colormap[increment%len(colormap)], 
                             linewidth=3
                         )
+                        
                         # vertical line from previous to current position
+                        #TODO red if currently playing, orig color if not
                         plt.plot([new_time, new_time], # x-values
                             [previous_position, new_position], # y-values
-                            color=colormap[increment%len(colormap)],
+                            # color depends on playing during move event or not:
+                            color='r' if currently_playing else colormap[increment%len(colormap)], 
                             linewidth=3
                         )
                         
@@ -157,14 +217,6 @@ for file in os.listdir(folder_name):
                     # display fragment name at end
                     plt.text(audioholder_time-time_offset,previous_position,\
                              audio_id,color=colormap[increment%len(colormap)]) #,rotation=45
-                    
-                    # for this audioelement, loop over all listen events
-#                     listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
-#                     for event in listen_events:
-#                         # get testtime: start and stop
-#                         start_time = float(event.find('testtime').get('start'))
-#                         stop_time  = float(event.find('testtime').get('stop'))
-                        
                         
                 increment+=1 # to next audioelement
             
@@ -187,7 +239,7 @@ for file in os.listdir(folder_name):
             for tag in scale_tags:
                 label_positions.append(float(tag.get('position'))/100) # on a scale from 0 to 100
                 label_text.append(tag.text)
-            if len(label_positions) > 0:
+            if len(label_positions) > 0: # if any labels available
                 plt.yticks(label_positions, label_text) # show rating axis labels
             # set label Y-axis
             if scale_title is not None: 
