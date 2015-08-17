@@ -35,6 +35,7 @@ PACKAGE CONTENTS
 
 
 QUICK START
+
 Using the example project: 
 1. Make sure your system sample rate corresponds with the sample rate of the audio files, if the input XML file enforces the given sample rate. 
 2. Run pythonServer.py (make sure you have Python installed). 
@@ -44,6 +45,7 @@ Using the example project:
 
 
 LEGACY
+
 The APE interface and most of the functionality of the interface is inspired by the APE toolbox for MATLAB [1]. See https://code.soundsoftware.ac.uk/projects/ape for the source code and corresponding paper. 
 
 
@@ -81,10 +83,15 @@ In Safari, the JavaScript Console can be found in Develop>Show Error Console, or
 In Firefox, go to Tools>Web Developer>Web Console, or hit Cmd + Alt + K. 
 
 
+REMOTE TESTS
+
+As the test is browser-based, it can be run remotely from a web server without modification. To allow for remote storage of the output XML files (as opposed to saving them locally on the subject’s machine, which is the default if no ‘save’ path is specified or found), a PHP script on the server needs to accept the output XML files. An example of such script will be included in a future version. 
+
+
 SCRIPTS
 
-The tool comes with a few handy Python scripts for easy extraction of ratings or comments, and visualisation of ratings and timelines. See below for a quick guide on how to use them. All scripts written for Python 2.7. Visualisation requires the free matplotlib toolbox (http://matplotlib.org), numpy and scipy. 
-By default, the scripts can be run from the ‘scripts’ folder, with the result files in the ‘saves’ folder (the default location where result XMLs are stored). 
+The tool comes with a few handy Python (2.7) scripts for easy extraction of ratings or comments, and visualisation of ratings and timelines. See below for a quick guide on how to use them. All scripts written for Python 2.7. Visualisation requires the free matplotlib toolbox (http://matplotlib.org), numpy and scipy. 
+By default, the scripts can be run from the ‘scripts’ folder, with the result files in the ‘saves’ folder (the default location where result XMLs are stored). Each script takes the XML file folder as an argument, along with other arguments in some cases. 
 
 	comment_parser.py
 		Extracts comments from the output XML files corresponding with the different subjects found in ‘saves/’. It creates a folder per ‘audioholder’/page it finds, and stores a CSV file with comments for every ‘audioelement’/fragment within these respective ‘audioholders’/pages. In this CSV file, every line corresponds with a subject/output XML file. Depending on the settings, the first column containing the name of the corresponding XML file can be omitted (for anonymisation). 
@@ -101,6 +108,9 @@ By default, the scripts can be run from the ‘scripts’ folder, with the resul
 		Depending on the settings, it displays and/or saves (in ‘saves/ratings/’) a boxplot, confidence interval plot, scatter plot, or a combination of the aforementioned. 
 		Requires the free matplotlib library. 
 		At this point, more than one subjects are needed for this script to work. 
+
+	timeline_view_movement.py
+		Creates a timeline for every subject, for every ‘audioholder’/page, corresponding with any of the output XML files found in ‘/saves’. It shows the marker movements of the different fragments, along with when each fragment was played (red regions). Automatically takes fragment names, rating axis title, rating axis labels, and audioholder name from the XML file (if available). 
 
 	timeline_view.py
 		Creates a timeline for every subject, for every ‘audioholder’/page, corresponding with any of the output XML files found in ‘/saves’. It shows when and for how long the subject listened to each of the fragments. 

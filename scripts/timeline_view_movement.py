@@ -69,6 +69,7 @@ for file in os.listdir(folder_name):
         # get list of all page names
         for audioholder in root.findall("./audioholder"):   # iterate over pages
             page_name = audioholder.get('id')               # get page name
+            plot_empty = True                               # check if any data is plotted
             
             if page_name is None: # ignore 'empty' audio_holders
                 print "Skipping empty audioholder name from "+subject_id+"."
@@ -139,6 +140,9 @@ for file in os.listdir(folder_name):
                     
                     # draw all segments except final one
                     for event in move_events: 
+                        # mark this plot as not empty
+                        plot_empty = False
+                    
                         # get time and final position of move event
                         new_time = float(event.find("./time").text)-time_offset
                         new_position = float(event.find("./position").text)
@@ -223,31 +227,31 @@ for file in os.listdir(folder_name):
             last_audioholder_duration = audioholder_time-time_offset
             time_offset = audioholder_time
             
-
-            # set plot parameters
-            plt.title('Timeline ' + file + ": "+page_name)
-            plt.xlabel('Time [seconds]')
-            plt.xlim(0, last_audioholder_duration)
-            plt.ylabel('Rating') # default
-            plt.ylim(0, 1) # rating between 0 and 1
+            if not plot_empty: # if plot is not empty, show or store
+                # set plot parameters
+                plt.title('Timeline ' + file + ": "+page_name)
+                plt.xlabel('Time [seconds]')
+                plt.xlim(0, last_audioholder_duration)
+                plt.ylabel('Rating') # default
+                plt.ylim(0, 1) # rating between 0 and 1
             
-            #y-ticks: labels on rating axis
-            label_positions = []
-            label_text = []
-            scale_tags = root.findall("./BrowserEvalProjectDocument/audioHolder/interface/scale")
-            scale_title = root.find("./BrowserEvalProjectDocument/audioHolder/interface/title")
-            for tag in scale_tags:
-                label_positions.append(float(tag.get('position'))/100) # on a scale from 0 to 100
-                label_text.append(tag.text)
-            if len(label_positions) > 0: # if any labels available
-                plt.yticks(label_positions, label_text) # show rating axis labels
-            # set label Y-axis
-            if scale_title is not None: 
-                plt.ylabel(scale_title.text)
+                #y-ticks: labels on rating axis
+                label_positions = []
+                label_text = []
+                scale_tags = root.findall("./BrowserEvalProjectDocument/audioHolder/interface/scale")
+                scale_title = root.find("./BrowserEvalProjectDocument/audioHolder/interface/title")
+                for tag in scale_tags:
+                    label_positions.append(float(tag.get('position'))/100) # on a scale from 0 to 100
+                    label_text.append(tag.text)
+                if len(label_positions) > 0: # if any labels available
+                    plt.yticks(label_positions, label_text) # show rating axis labels
+                # set label Y-axis
+                if scale_title is not None: 
+                    plt.ylabel(scale_title.text)
             
-            #plt.show() # uncomment to show plot; comment when just saving
-            #exit()
+                #plt.show() # uncomment to show plot; comment when just saving
+                #exit()
             
-            plt.savefig(timeline_folder+subject_id+"-"+page_name+".pdf", bbox_inches='tight')
-            plt.close()
+                plt.savefig(timeline_folder+subject_id+"-"+page_name+".pdf", bbox_inches='tight')
+                plt.close()
             

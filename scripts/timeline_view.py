@@ -73,6 +73,7 @@ for file in os.listdir(folder_name):
         # get list of all page names
         for audioholder in root.findall("./audioholder"):   # iterate over pages
             page_name = audioholder.get('id')               # get page name
+            plot_empty = True                               # check if any data is plotted
             
             if page_name is None: # ignore 'empty' audio_holders
                 break
@@ -96,7 +97,7 @@ for file in os.listdir(folder_name):
             
             # for page [page_name], print comments related to fragment [id]
             for tuple in data:
-            	audioelement = tuple[1]
+                audioelement = tuple[1]
                 if audioelement is not None: # Check it exists
                     audio_id = str(audioelement.get('id'))
                     audioelements_names.append(audio_id)
@@ -104,6 +105,9 @@ for file in os.listdir(folder_name):
                     # for this audioelement, loop over all listen events
                     listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
                     for event in listen_events:
+                        # mark this plot as not empty
+                        plot_empty = False
+                    
                         # get testtime: start and stop
                         start_time = float(event.find('testtime').get('start'))-time_offset
                         stop_time  = float(event.find('testtime').get('stop'))-time_offset
@@ -133,21 +137,22 @@ for file in os.listdir(folder_name):
             if audioholder_time is not None and show_audioholder_time: 
                 time_offset = float(audioholder_time.text)
             
-            # set plot parameters
-            plt.title('Timeline ' + file + ": "+page_name)
-            plt.xlabel('Time [seconds]')
-            plt.ylabel('Fragment')
-            plt.ylim(0, N_audioelements+1)
+            if not plot_empty:
+                # set plot parameters
+                plt.title('Timeline ' + file + ": "+page_name)
+                plt.xlabel('Time [seconds]')
+                plt.ylabel('Fragment')
+                plt.ylim(0, N_audioelements+1)
             
-            #y-ticks: fragment IDs, top to bottom
-            plt.yticks(range(N_audioelements, 0, -1), audioelements_names) # show fragment names
+                #y-ticks: fragment IDs, top to bottom
+                plt.yticks(range(N_audioelements, 0, -1), audioelements_names) # show fragment names
 
 
-            #plt.show() # uncomment to show plot; comment when just saving
-            #exit()
+                #plt.show() # uncomment to show plot; comment when just saving
+                #exit()
             
-            plt.savefig(timeline_folder+subject_id+"-"+page_name+".pdf", bbox_inches='tight')
-            plt.close()
+                plt.savefig(timeline_folder+subject_id+"-"+page_name+".pdf", bbox_inches='tight')
+                plt.close()
             
             #TODO: if 'nonsensical' or unknown: dashed line until next event
             #TODO: Vertical lines for fragment looping point
