@@ -214,7 +214,7 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
         plt.title(page_name)
         plt.xlabel('Fragment')
         plt.xlim(0, len(headerrow)+1) # only show relevant region, leave space left & right)
-        plt.xticks(range(1, len(headerrow)+1), headerrow) # show fragment names
+        plt.xticks(range(1, len(headerrow)+1), headerrow, rotation=90) # show fragment names
         plt.ylabel('Rating')
         plt.ylim(0,1)
         
