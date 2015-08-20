@@ -4,7 +4,7 @@
 import xml.etree.ElementTree as ET
 import os
 import csv
-
+import sys
 
 # COMMAND LINE ARGUMENTS
 
@@ -31,6 +31,9 @@ elif not os.access(os.path.dirname(folder_name), os.W_OK):
 
 # CODE
 
+# remember which files have been opened this time
+file_history = []
+
 # get every XML file in folder
 for file in os.listdir(folder_name): 
     if file.endswith(".xml"):
@@ -56,23 +59,28 @@ for file in os.listdir(folder_name):
                     
                     csv_name = folder_name +'/' + page_name+'/'+page_name+'-comments-'+audio_id+'.csv'
 
-                    # append (!) to file [page_name]/[page_name]-comments-[id].csv
-                    with open(csv_name, 'a') as csvfile:
-                        writer = csv.writer(csvfile, 
-                                            delimiter=',', 
-                                            dialect="excel",
-                                            quoting=csv.QUOTE_ALL)
-                        commentstr = audioelement.find("./comment/response").text
+                    # If file hasn't been opened yet this time, empty
+                    if csv_name not in file_history:
+                        csvfile = open(csv_name, 'w')
+                        file_history.append(csv_name) # remember this file has been written to this time around
+                    else: 
+                        # append (!) to file [page_name]/[page_name]-comments-[id].csv
+                        csvfile = open(csv_name, 'a')
+                    writer = csv.writer(csvfile, 
+                                        delimiter=',', 
+                                        dialect="excel",
+                                        quoting=csv.QUOTE_ALL)
+                    commentstr = audioelement.find("./comment/response").text
                         
-                        if commentstr is None:
-                           commentstr = '';
-                            
-                        # anonymous comments:
-                        #writer.writerow([commentstr.encode("utf-8")]) 
-                        # comments with (file) name:
-                        writer.writerow([file[:-4]] + [commentstr.encode("utf-8")]) 
+                    if commentstr is None:
+                       commentstr = ''
+                        
+                    # anonymous comments:
+                    #writer.writerow([commentstr.encode("utf-8")]) 
+                    # comments with (file) name:
+                    writer.writerow([file[:-4]] + [commentstr.encode("utf-8")]) 
 
-                        #TODO Replace 'new line' in comment with something else?
+                    #TODO Replace 'new line' in comment with something else?
                         
 # PRO TIP: Change from csv to txt by running this in bash: 
 # $ cd folder_where_csvs_are/

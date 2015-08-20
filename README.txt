@@ -91,7 +91,8 @@ As the test is browser-based, it can be run remotely from a web server without m
 SCRIPTS
 
 The tool comes with a few handy Python (2.7) scripts for easy extraction of ratings or comments, and visualisation of ratings and timelines. See below for a quick guide on how to use them. All scripts written for Python 2.7. Visualisation requires the free matplotlib toolbox (http://matplotlib.org), numpy and scipy. 
-By default, the scripts can be run from the ‘scripts’ folder, with the result files in the ‘saves’ folder (the default location where result XMLs are stored). Each script takes the XML file folder as an argument, along with other arguments in some cases. 
+By default, the scripts can be run from the ‘scripts’ folder, with the result files in the ‘saves’ folder (the default location where result XMLs are stored). Each script takes the XML file folder as an argument, along with other arguments in some cases.
+Note: to avoid all kinds of problems, please avoid using spaces in file and folder names (this may work on some systems, but others don’t like it). 
 
 	comment_parser.py
 		Extracts comments from the output XML files corresponding with the different subjects found in ‘saves/’. It creates a folder per ‘audioholder’/page it finds, and stores a CSV file with comments for every ‘audioelement’/fragment within these respective ‘audioholders’/pages. In this CSV file, every line corresponds with a subject/output XML file. Depending on the settings, the first column containing the name of the corresponding XML file can be omitted (for anonymisation). 
@@ -99,6 +100,9 @@ By default, the scripts can be run from the ‘scripts’ folder, with the resul
 
 	evaluation_stats.py
 		Shows a few statistics of tests in the ‘saves/‘ folder so far, mainly for checking for errors. Shows the number of files that are there, the audioholder IDs that were tested (and how many of each separate ID), the duration of each page, the duration of each complete test, the average duration per page, and the average duration in function of the page number. 
+
+	generate_report.py
+		Similar to ‘evaluation_stats.py’, but generates a PDF report based on the output files in the ‘saves/‘ folder - or any folder specified as command line argument. Uses pdflatex to write a LaTeX document, then convert to a PDF. 
 
 	score_parser.py
 		Extracts rating values from the XML to CSV - necessary for running visualisation of ratings. Creates the folder ‘saves/ratings/‘ if not yet created, to which it writes a separate file for every ‘audioholder’/page in any of the output XMLs it finds in ‘saves/‘. Within each file, rows represent different subjects (output XML file names) and columns represent different ‘audioelements’/fragments. 
