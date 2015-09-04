@@ -29,9 +29,6 @@ elif len(sys.argv) == 3:
            "Use: python generate_report.py [results_folder] [no_render | -nr]"
     # Second command line argument is [no_render | -nr]
     render_figures = False
-    
-    
-#TODO add 'skip regenerating figures'
 
 # Turn number of seconds (int) to '[minutes] min [seconds] s' (string)
 def seconds2timestr(time_in_seconds):
@@ -151,8 +148,8 @@ for file in files_list: # iterate over all files in files_list
             
             number_of_comments = 0 # for this page
             number_of_missing_comments = 0 # for this page
-            not_played = 0 # for this page
-            not_moved = 0 # for this page
+            not_played = [] # for this page
+            not_moved = [] # for this page
             
             # 'testTime' keeps total duration: subtract time so far for duration of this audioholder
             duration = float(audioholder.find("./metric/metricresult[@id='testTime']").text) - total_duration
@@ -174,28 +171,33 @@ for file in files_list: # iterate over all files in files_list
                 else: 
                     number_of_missing_comments += 1
                 if was_played is not None and was_played.text == 'false': 
-                    not_played += 1
+                    not_played.append(audioelement.get('id'))
                 if was_moved is not None and was_moved.text == 'false': 
-                    not_moved += 1
+                    not_moved.append(audioelement.get('id'))
             
             # update global counters
             total_empty_comments += number_of_missing_comments
-            total_not_played += not_played
-            total_not_moved += not_moved
+            total_not_played += len(not_played)
+            total_not_moved += len(not_moved)
             
             # PRINT alerts when elements not played or markers not moved
             # number of audio elements not played
-            if not_played > 1:
-                body += '\\emph{\\textbf{ATTENTION: '+str(not_played)+' fragments were not listened to in '+page_name+'!}} \\\\ \n'
-            if not_played == 1: 
-                body += '\\emph{\\textbf{ATTENTION: one fragment was not listened to in '+page_name+'!}} \\\\ \n '
+            if len(not_played) > 1:
+                body += '\\emph{\\textbf{ATTENTION: '+str(len(not_played))+\
+                        ' fragments were not listened to in '+page_name+'! }}'+\
+                        ', '.join(not_played)+'\\\\ \n'
+            if len(not_played) == 1: 
+                body += '\\emph{\\textbf{ATTENTION: one fragment was not listened to in '+page_name+'! }}'+\
+                        not_played[0]+'\\\\ \n'
             
             # number of audio element markers not moved
-            if not_moved > 1:
-                body += '\\emph{\\textbf{ATTENTION: '+str(not_moved)+' markers were not moved in '+page_name+'!}} \\\\ \n'
-            if not_moved == 1: 
-                body += '\\emph{\\textbf{ATTENTION: one marker was not moved in '+page_name+'!}} \\\\ \n'
-            #TODO which one not moved/listened to? 
+            if len(not_moved) > 1:
+                body += '\\emph{\\textbf{ATTENTION: '+str(len(not_moved))+\
+                        ' markers were not moved in '+page_name+'! }}'+\
+                        ', '.join(not_moved)+'\\\\ \n'
+            if len(not_moved) == 1: 
+                body += '\\emph{\\textbf{ATTENTION: one marker was not moved in '+page_name+'! }}'+\
+                        not_moved[0]+'\\\\ \n'
             
             # PRINT song-specific statistic
             individual_table += page_name+'&'+\
