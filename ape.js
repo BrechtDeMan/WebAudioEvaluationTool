@@ -507,10 +507,8 @@ function dragEnd(ev) {
 	var w = slider.style.width;
 	w = Number(w.substr(0,w.length-2));
 	var x = ev.x;
-	if (x < 0)
-	{
-		x += -1.0*ev.view.screenLeft;
-	}
+	x += Math.abs(ev.view.screenLeft);
+	x = x % ev.view.outerWidth;
 	if (x >= marginSize && x < w+marginSize) {
 		this.style.left = (x)+'px';
 	} else {
@@ -526,7 +524,7 @@ function dragEnd(ev) {
 	console.log('slider '+id+' moved to '+convSliderPosToRate(ev.srcElement)+' ('+time+')');
 }
 
-function buttonSubmitClick() // TODO: Only when all songs have been played!
+function buttonSubmitClick()
 {
 	var checks = testState.currentStateMap[testState.currentIndex].interfaces[0].options;
 	var canContinue = true;
