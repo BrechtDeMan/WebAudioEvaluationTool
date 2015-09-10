@@ -83,7 +83,7 @@ function loadInterface() {
 		var strNums = [];
 		for (var i=0; i<audioObjs.length; i++)
 		{
-			if (audioObjs[i].metric.wasMoved == false) {
+			if (audioObjs[i].metric.wasMoved == false && audioObjs[i].specification.type != 'outsidereference') {
 				state = false;
 				strNums.push(i);
 			}
