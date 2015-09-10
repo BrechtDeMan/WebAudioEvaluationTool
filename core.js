@@ -549,16 +549,6 @@ function loadProjectSpecCallback(response) {
 	specification.decode();
 	
 	testState.stateMap.push(specification.preTest);
-	 
-	// New check if we need to randomise the test order
-	if (specification.randomiseOrder)
-	{
- 		specification.audioHolders = randomiseOrder(specification.audioHolders);
- 		for (var i=0; i<specification.audioHolders.length; i++)
- 		{
- 			specification.audioHolders[i].presentedId = i;
- 		}
-	}
 	
 	$(specification.audioHolders).each(function(index,elem){
 		testState.stateMap.push(elem);
@@ -1332,6 +1322,7 @@ function Specification() {
 	this.projectReturn;
 	this.randomiseOrder;
 	this.collectMetrics;
+	this.testPages;
 	this.preTest;
 	this.postTest;
 	this.metrics =[];
@@ -1344,12 +1335,20 @@ function Specification() {
 		var setupNode = projectXML.getElementsByTagName('setup')[0];
 		this.interfaceType = setupNode.getAttribute('interface');
 		this.projectReturn = setupNode.getAttribute('projectReturn');
+		this.testPages = setupNode.getAttribute('testPages');
 		if (setupNode.getAttribute('randomiseOrder') == "true") {
 			this.randomiseOrder = true;
 		} else {this.randomiseOrder = false;}
 		if (setupNode.getAttribute('collectMetrics') == "true") {
 			this.collectMetrics = true;
 		} else {this.collectMetrics = false;}
+		if (isNaN(Number(this.testPages)) || this.testPages == undefined)
+		{
+			this.testPages = null;
+		} else {
+			this.testPages = Number(this.testPages);
+			if (this.testPages == 0) {this.testPages = null;}
+		}
 		var metricCollection = setupNode.getElementsByTagName('Metric');
 		
 		this.preTest = new this.prepostNode('pretest',setupNode.getElementsByTagName('PreTest'));
@@ -1416,6 +1415,30 @@ function Specification() {
 			this.audioHolders.push(new this.audioHolderNode(this,audioHolders[i]));
 		}
 		
+		// New check if we need to randomise the test order
+		if (this.randomiseOrder)
+		{
+	 		this.audioHolders = randomiseOrder(this.audioHolders);
+	 		for (var i=0; i<this.audioHolders.length; i++)
+	 		{
+	 			this.audioHolders[i].presentedId = i;
+	 		}
+		}
+		
+		if (this.testPages != null || this.testPages != undefined)
+		{
+			if (this.testPages > audioHolders.length)
+			{
+				console.log('Warning: You have specified '+audioHolders.length+' tests but requested '+this.testPages+' be completed!');
+				this.testPages = audioHolders.length;
+			}
+			var aH = this.audioHolders;
+			this.audioHolders = [];
+			for (var i=0; i<this.testPages; i++)
+			{
+				this.audioHolders.push(aH[i]);
+			}
+		}
 	};
 	
 	this.prepostNode = function(type,Collection) {
