@@ -239,6 +239,8 @@ function loadInterface() {
 	canvas.align = "left";
 	canvas.addEventListener('dragover',function(event){
 		event.preventDefault();
+		event.dataTransfer.effectAllowed = 'none';
+		event.dataTransfer.dropEffect = 'copy';
 		return false;
 	},false);
 	var sliderMargin = document.createAttribute('marginsize');
@@ -452,19 +454,29 @@ function sliderObject(audioObject) {
 	this.trackSliderObj.innerHTML = '<span>'+audioObject.id+'</span>';
 	this.trackSliderObj.draggable = true;
 	this.trackSliderObj.ondragend = dragEnd;
+	
+	this.trackSliderObj.ondragstart = function(event){
+		event.dataTransfer.setData('Text',null);
+	};
+	
+	this.trackSliderObj.ondrop = function(event)
+	{
+		if(event.stopPropagation) {event.stopPropagation();}
+		return false;
+	};
 
 	// Onclick, switch playback to that track
-	this.trackSliderObj.onclick = function() {
+	this.trackSliderObj.onclick = function(event) {
 		// Start the test on first click, that way timings are more accurate.
 		audioEngineContext.play();
 		if (audioEngineContext.audioObjectsReady) {
 			// Cannot continue to issue play command until audioObjects reported as ready!
 			// Get the track ID from the object ID
 			var element;
-			if (event.srcElement.nodeName == "SPAN") {
-				element = event.srcElement.parentNode;
+			if (event.currentTarget.nodeName == "SPAN") {
+				element = event.currentTarget.parentNode;
 			} else {
-				element = event.srcElement;
+				element = event.currentTarget;
 			}
 			var id = Number(element.attributes['trackIndex'].value);
 			//audioEngineContext.metric.sliderPlayed(id);
@@ -506,9 +518,11 @@ function dragEnd(ev) {
 	var marginSize = Number(slider.attributes['marginsize'].value);
 	var w = slider.style.width;
 	w = Number(w.substr(0,w.length-2));
-	var x = ev.x;
-	x += Math.abs(ev.view.screenLeft);
-	x = x % ev.view.outerWidth;
+	var x = ev.screenX;
+	
+	x += Math.abs(window.screenX);
+	x = x % window.outerWidth;
+	
 	if (x >= marginSize && x < w+marginSize) {
 		this.style.left = (x)+'px';
 	} else {
@@ -519,9 +533,9 @@ function dragEnd(ev) {
 		}
 	}
 	var time = audioEngineContext.timer.getTestTime();
-	var id = Number(ev.srcElement.getAttribute('trackindex'));
-	audioEngineContext.audioObjects[id].metric.moved(time,convSliderPosToRate(ev.srcElement));
-	console.log('slider '+id+' moved to '+convSliderPosToRate(ev.srcElement)+' ('+time+')');
+	var id = Number(ev.currentTarget.getAttribute('trackindex'));
+	audioEngineContext.audioObjects[id].metric.moved(time,convSliderPosToRate(ev.currentTarget));
+	console.log('slider '+id+' moved to '+convSliderPosToRate(ev.currentTarget)+' ('+time+')');
 }
 
 function buttonSubmitClick()
