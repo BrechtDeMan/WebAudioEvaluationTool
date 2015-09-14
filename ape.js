@@ -467,31 +467,27 @@ function sliderObject(audioObject) {
 
 	// Onclick, switch playback to that track
 	this.trackSliderObj.onclick = function(event) {
-		// Start the test on first click, that way timings are more accurate.
-		audioEngineContext.play();
-		if (audioEngineContext.audioObjectsReady) {
-			// Cannot continue to issue play command until audioObjects reported as ready!
-			// Get the track ID from the object ID
-			var element;
-			if (event.currentTarget.nodeName == "SPAN") {
-				element = event.currentTarget.parentNode;
-			} else {
-				element = event.currentTarget;
-			}
-			var id = Number(element.attributes['trackIndex'].value);
-			//audioEngineContext.metric.sliderPlayed(id);
-			audioEngineContext.play(id);
-            // Currently playing track red, rest green
-            
-            //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
-            $('.track-slider').removeClass('track-slider-playing');
-            $(element).addClass('track-slider-playing');
-            $('.comment-div').removeClass('comment-box-playing');
-            $('#comment-div-'+id).addClass('comment-box-playing');
-            var outsideReference = document.getElementById('outside-reference');
-            if (outsideReference != undefined)
-            $(outsideReference).removeClass('track-slider-playing');
+		// Cannot continue to issue play command until audioObjects reported as ready!
+		// Get the track ID from the object ID
+		var element;
+		if (event.currentTarget.nodeName == "SPAN") {
+			element = event.currentTarget.parentNode;
+		} else {
+			element = event.currentTarget;
 		}
+		var id = Number(element.attributes['trackIndex'].value);
+		//audioEngineContext.metric.sliderPlayed(id);
+		audioEngineContext.play(id);
+        // Currently playing track red, rest green
+        
+        //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
+        $('.track-slider').removeClass('track-slider-playing');
+        $(element).addClass('track-slider-playing');
+        $('.comment-div').removeClass('comment-box-playing');
+        $('#comment-div-'+id).addClass('comment-box-playing');
+        var outsideReference = document.getElementById('outside-reference');
+        if (outsideReference != undefined)
+        $(outsideReference).removeClass('track-slider-playing');
 	};
 	
 	this.enable = function() {
