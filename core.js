@@ -618,7 +618,7 @@ function loadProjectSpecCallback(response) {
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
 	
 	// Define window callbacks for interface
-	window.onresize = function(event){resizeWindow(event);};
+	window.onresize = function(event){interfaceContext.resizeWindow(event);};
 }
 
 function createProjectSave(destURL) {
@@ -1282,37 +1282,6 @@ function returnDateNode()
 	
 }
 
-function testWaitIndicator() {
-	if (audioEngineContext.checkAllReady() == false) {
-		var hold = document.createElement("div");
-		hold.id = "testWaitIndicator";
-		hold.className = "indicator-box";
-		hold.style.zIndex = 3;
-		var span = document.createElement("span");
-		span.textContent = "Please wait! Elements still loading";
-		hold.appendChild(span);
-		var blank = document.createElement('div');
-		blank.className = 'testHalt';
-		blank.id = "testHaltBlank";
-		var body = document.getElementsByTagName('body')[0];
-		body.appendChild(hold);
-		body.appendChild(blank);
-		testWaitTimerIntervalHolder = setInterval(function(){
-			var ready = audioEngineContext.checkAllReady();
-			if (ready) {
-				var elem = document.getElementById('testWaitIndicator');
-				var blank = document.getElementById('testHaltBlank');
-				var body = document.getElementsByTagName('body')[0];
-				body.removeChild(elem);
-				body.removeChild(blank);
-				clearInterval(testWaitTimerIntervalHolder);
-			}
-		},500,false);
-	}
-}
-
-var testWaitTimerIntervalHolder = null;
-
 function Specification() {
 	// Handles the decoding of the project specification XML into a simple JavaScript Object.
 	
@@ -1744,6 +1713,23 @@ function Interface(specificationObject) {
 	this.interfaceObjects = [];
 	this.interfaceObject = function(){};
 	
+	this.resizeWindow = function(event)
+	{
+		for(var i=0; i<this.commentBoxes.length; i++)
+		{this.commentBoxes[i].resize();}
+		for(var i=0; i<this.commentQuestions.length; i++)
+		{this.commentQuestions[i].resize();}
+		try
+		{
+			resizeWindow(event);
+		}
+		catch(err)
+		{
+			console.log("Warning - Interface does not have Resize option");
+			console.log(err);
+		}
+	};
+	
 	this.commentBoxes = [];
 	this.elementCommentBox = function(audioObject) {
 		var element = audioObject.specification;
@@ -1754,16 +1740,6 @@ function Interface(specificationObject) {
 		this.trackComment = document.createElement('div');
 		this.trackComment.className = 'comment-div';
 		this.trackComment.id = 'comment-div-'+audioObject.id;
-		var boxwidth = (window.innerWidth-100)/2;
-		if (boxwidth >= 624)
-		{
-			boxwidth = 624;
-		}
-		else if (boxwidth < 400)
-		{
-			boxwidth = 400;
-		}
-		this.trackComment.style.width = boxwidth+"px";
 		// Create a string next to each comment asking for a comment
 		this.trackString = document.createElement('span');
 		this.trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.id;
@@ -1773,7 +1749,6 @@ function Interface(specificationObject) {
 		this.trackCommentBox.cols = '100';
 		this.trackCommentBox.name = 'trackComment'+audioObject.id;
 		this.trackCommentBox.className = 'trackComment';
-		this.trackCommentBox.style.width = boxwidth-6+"px";
 		var br = document.createElement('br');
 		// Add to the holder.
 		this.trackComment.appendChild(this.trackString);
@@ -1793,6 +1768,21 @@ function Interface(specificationObject) {
 			}
 			return root;
 		};
+		this.resize = function()
+		{
+			var boxwidth = (window.innerWidth-100)/2;
+			if (boxwidth >= 600)
+			{
+				boxwidth = 600;
+			}
+			else if (boxwidth < 400)
+			{
+				boxwidth = 400;
+			}
+			this.trackComment.style.width = boxwidth+"px";
+			this.trackCommentBox.style.width = boxwidth-6+"px";
+		};
+		this.resize();
 	};
 	
 	this.commentQuestions = [];
@@ -1802,16 +1792,6 @@ function Interface(specificationObject) {
 		// Create document objects to hold the comment boxes
 		this.holder = document.createElement('div');
 		this.holder.className = 'comment-div';
-		var boxwidth = (window.innerWidth-100)/2;
-		if (boxwidth >= 624)
-		{
-			boxwidth = 624;
-		}
-		else if (boxwidth < 400)
-		{
-			boxwidth = 400;
-		}
-		this.holder.style.width = boxwidth+"px";
 		// Create a string next to each comment asking for a comment
 		this.string = document.createElement('span');
 		this.string.innerHTML = commentQuestion.question;
@@ -1820,7 +1800,6 @@ function Interface(specificationObject) {
 		this.textArea.rows = '4';
 		this.textArea.cols = '100';
 		this.textArea.className = 'trackComment';
-		this.textArea.style.width = boxwidth-6+"px";
 		var br = document.createElement('br');
 		// Add to the holder.
 		this.holder.appendChild(this.string);
@@ -1836,6 +1815,21 @@ function Interface(specificationObject) {
 			console.log("Response: "+root.textContent);
 			return root;
 		};
+		this.resize = function()
+		{
+			var boxwidth = (window.innerWidth-100)/2;
+			if (boxwidth >= 600)
+			{
+				boxwidth = 600;
+			}
+			else if (boxwidth < 400)
+			{
+				boxwidth = 400;
+			}
+			this.holder.style.width = boxwidth+"px";
+			this.textArea.style.width = boxwidth-6+"px";
+		};
+		this.resize();
 	};
 	
 	this.radioBox = function(commentQuestion) {
@@ -1843,16 +1837,6 @@ function Interface(specificationObject) {
 		// Create document objects to hold the comment boxes
 		this.holder = document.createElement('div');
 		this.holder.className = 'comment-div';
-		var boxwidth = (window.innerWidth-100)/2;
-		if (boxwidth >= 624)
-		{
-			boxwidth = 624;
-		}
-		else if (boxwidth < 400)
-		{
-			boxwidth = 400;
-		}
-		this.holder.style.width = boxwidth+"px";
 		// Create a string next to each comment asking for a comment
 		this.string = document.createElement('span');
 		this.string.innerHTML = commentQuestion.statement;
@@ -1870,14 +1854,11 @@ function Interface(specificationObject) {
 		this.span.style.marginTop = '15px';
 		
 		var optCount = commentQuestion.options.length;
-		var spanMargin = Math.floor(((boxwidth-20-(optCount*80))/(optCount))/2)+'px';
 		for (var i=0; i<optCount; i++)
 		{
 			var div = document.createElement('div');
 			div.style.width = '80px';
 			div.style.float = 'left';
-			div.style.marginRight = spanMargin;
-			div.style.marginLeft = spanMargin;
 			var input = document.createElement('input');
 			input.type = 'radio';
 			input.name = commentQuestion.id;
@@ -1890,8 +1871,6 @@ function Interface(specificationObject) {
 			div = document.createElement('div');
 			div.style.width = '80px';
 			div.style.float = 'left';
-			div.style.marginRight = spanMargin;
-			div.style.marginLeft = spanMargin;
 			div.align = 'center';
 			var span = document.createElement('span');
 			span.textContent = commentQuestion.options[i].text;
@@ -1929,6 +1908,39 @@ function Interface(specificationObject) {
 			root.appendChild(response);
 			return root;
 		};
+		this.resize = function()
+		{
+			var boxwidth = (window.innerWidth-100)/2;
+			if (boxwidth >= 600)
+			{
+				boxwidth = 600;
+			}
+			else if (boxwidth < 400)
+			{
+				boxwidth = 400;
+			}
+			this.holder.style.width = boxwidth+"px";
+			var text = this.holder.children[2];
+			var options = this.holder.children[3];
+			var optCount = options.children.length;
+			var spanMargin = Math.floor(((boxwidth-20-(optCount*80))/(optCount))/2)+'px';
+			var options = options.firstChild;
+			var text = text.firstChild;
+			options.style.marginRight = spanMargin;
+			options.style.marginLeft = spanMargin;
+			text.style.marginRight = spanMargin;
+			text.style.marginLeft = spanMargin;
+			while(options.nextSibling != undefined)
+			{
+				options = options.nextSibling;
+				text = text.nextSibling;
+				options.style.marginRight = spanMargin;
+				options.style.marginLeft = spanMargin;
+				text.style.marginRight = spanMargin;
+				text.style.marginLeft = spanMargin;
+			}
+		};
+		this.resize();
 	};
 	
 	this.checkboxBox = function(commentQuestion) {
@@ -1936,16 +1948,6 @@ function Interface(specificationObject) {
 		// Create document objects to hold the comment boxes
 		this.holder = document.createElement('div');
 		this.holder.className = 'comment-div';
-		var boxwidth = (window.innerWidth-100)/2;
-		if (boxwidth >= 624)
-		{
-			boxwidth = 624;
-		}
-		else if (boxwidth < 400)
-		{
-			boxwidth = 400;
-		}
-		this.holder.style.width = boxwidth+"px";
 		// Create a string next to each comment asking for a comment
 		this.string = document.createElement('span');
 		this.string.innerHTML = commentQuestion.statement;
@@ -1963,14 +1965,11 @@ function Interface(specificationObject) {
 		this.span.style.marginTop = '15px';
 		
 		var optCount = commentQuestion.options.length;
-		var spanMargin = Math.floor(((boxwidth-20-(optCount*80))/(optCount))/2)+'px';
 		for (var i=0; i<optCount; i++)
 		{
 			var div = document.createElement('div');
 			div.style.width = '80px';
 			div.style.float = 'left';
-			div.style.marginRight = spanMargin;
-			div.style.marginLeft = spanMargin;
 			var input = document.createElement('input');
 			input.type = 'checkbox';
 			input.name = commentQuestion.id;
@@ -1983,8 +1982,6 @@ function Interface(specificationObject) {
 			div = document.createElement('div');
 			div.style.width = '80px';
 			div.style.float = 'left';
-			div.style.marginRight = spanMargin;
-			div.style.marginLeft = spanMargin;
 			div.align = 'center';
 			var span = document.createElement('span');
 			span.textContent = commentQuestion.options[i].text;
@@ -2013,6 +2010,39 @@ function Interface(specificationObject) {
 			}
 			return root;
 		};
+		this.resize = function()
+		{
+			var boxwidth = (window.innerWidth-100)/2;
+			if (boxwidth >= 600)
+			{
+				boxwidth = 600;
+			}
+			else if (boxwidth < 400)
+			{
+				boxwidth = 400;
+			}
+			this.holder.style.width = boxwidth+"px";
+			var text = this.holder.children[2];
+			var options = this.holder.children[3];
+			var optCount = options.children.length;
+			var spanMargin = Math.floor(((boxwidth-20-(optCount*80))/(optCount))/2)+'px';
+			var options = options.firstChild;
+			var text = text.firstChild;
+			options.style.marginRight = spanMargin;
+			options.style.marginLeft = spanMargin;
+			text.style.marginRight = spanMargin;
+			text.style.marginLeft = spanMargin;
+			while(options.nextSibling != undefined)
+			{
+				options = options.nextSibling;
+				text = text.nextSibling;
+				options.style.marginRight = spanMargin;
+				options.style.marginLeft = spanMargin;
+				text.style.marginRight = spanMargin;
+				text.style.marginLeft = spanMargin;
+			}
+		};
+		this.resize();
 	};
 
 	this.createCommentBox = function(audioObject) {
