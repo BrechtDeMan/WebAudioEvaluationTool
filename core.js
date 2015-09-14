@@ -1754,6 +1754,16 @@ function Interface(specificationObject) {
 		this.trackComment = document.createElement('div');
 		this.trackComment.className = 'comment-div';
 		this.trackComment.id = 'comment-div-'+audioObject.id;
+		var boxwidth = (window.innerWidth-100)/2;
+		if (boxwidth >= 624)
+		{
+			boxwidth = 624;
+		}
+		else if (boxwidth < 400)
+		{
+			boxwidth = 400;
+		}
+		this.trackComment.style.width = boxwidth+"px";
 		// Create a string next to each comment asking for a comment
 		this.trackString = document.createElement('span');
 		this.trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.id;
@@ -1763,6 +1773,7 @@ function Interface(specificationObject) {
 		this.trackCommentBox.cols = '100';
 		this.trackCommentBox.name = 'trackComment'+audioObject.id;
 		this.trackCommentBox.className = 'trackComment';
+		this.trackCommentBox.style.width = boxwidth-6+"px";
 		var br = document.createElement('br');
 		// Add to the holder.
 		this.trackComment.appendChild(this.trackString);
@@ -1791,6 +1802,16 @@ function Interface(specificationObject) {
 		// Create document objects to hold the comment boxes
 		this.holder = document.createElement('div');
 		this.holder.className = 'comment-div';
+		var boxwidth = (window.innerWidth-100)/2;
+		if (boxwidth >= 624)
+		{
+			boxwidth = 624;
+		}
+		else if (boxwidth < 400)
+		{
+			boxwidth = 400;
+		}
+		this.holder.style.width = boxwidth+"px";
 		// Create a string next to each comment asking for a comment
 		this.string = document.createElement('span');
 		this.string.innerHTML = commentQuestion.question;
@@ -1799,6 +1820,7 @@ function Interface(specificationObject) {
 		this.textArea.rows = '4';
 		this.textArea.cols = '100';
 		this.textArea.className = 'trackComment';
+		this.textArea.style.width = boxwidth-6+"px";
 		var br = document.createElement('br');
 		// Add to the holder.
 		this.holder.appendChild(this.string);
@@ -1821,6 +1843,16 @@ function Interface(specificationObject) {
 		// Create document objects to hold the comment boxes
 		this.holder = document.createElement('div');
 		this.holder.className = 'comment-div';
+		var boxwidth = (window.innerWidth-100)/2;
+		if (boxwidth >= 624)
+		{
+			boxwidth = 624;
+		}
+		else if (boxwidth < 400)
+		{
+			boxwidth = 400;
+		}
+		this.holder.style.width = boxwidth+"px";
 		// Create a string next to each comment asking for a comment
 		this.string = document.createElement('span');
 		this.string.innerHTML = commentQuestion.statement;
@@ -1838,12 +1870,11 @@ function Interface(specificationObject) {
 		this.span.style.marginTop = '15px';
 		
 		var optCount = commentQuestion.options.length;
-		var spanMargin = Math.floor(((600-(optCount*100))/(optCount))/2)+'px';
-		console.log(spanMargin);
+		var spanMargin = Math.floor(((boxwidth-20-(optCount*80))/(optCount))/2)+'px';
 		for (var i=0; i<optCount; i++)
 		{
 			var div = document.createElement('div');
-			div.style.width = '100px';
+			div.style.width = '80px';
 			div.style.float = 'left';
 			div.style.marginRight = spanMargin;
 			div.style.marginLeft = spanMargin;
@@ -1857,7 +1888,7 @@ function Interface(specificationObject) {
 			
 			
 			div = document.createElement('div');
-			div.style.width = '100px';
+			div.style.width = '80px';
 			div.style.float = 'left';
 			div.style.marginRight = spanMargin;
 			div.style.marginLeft = spanMargin;
@@ -1905,6 +1936,16 @@ function Interface(specificationObject) {
 		// Create document objects to hold the comment boxes
 		this.holder = document.createElement('div');
 		this.holder.className = 'comment-div';
+		var boxwidth = (window.innerWidth-100)/2;
+		if (boxwidth >= 624)
+		{
+			boxwidth = 624;
+		}
+		else if (boxwidth < 400)
+		{
+			boxwidth = 400;
+		}
+		this.holder.style.width = boxwidth+"px";
 		// Create a string next to each comment asking for a comment
 		this.string = document.createElement('span');
 		this.string.innerHTML = commentQuestion.statement;
@@ -1922,12 +1963,11 @@ function Interface(specificationObject) {
 		this.span.style.marginTop = '15px';
 		
 		var optCount = commentQuestion.options.length;
-		var spanMargin = Math.floor(((600-(optCount*100))/(optCount))/2)+'px';
-		console.log(spanMargin);
+		var spanMargin = Math.floor(((boxwidth-20-(optCount*80))/(optCount))/2)+'px';
 		for (var i=0; i<optCount; i++)
 		{
 			var div = document.createElement('div');
-			div.style.width = '100px';
+			div.style.width = '80px';
 			div.style.float = 'left';
 			div.style.marginRight = spanMargin;
 			div.style.marginLeft = spanMargin;
@@ -1941,7 +1981,7 @@ function Interface(specificationObject) {
 			
 			
 			div = document.createElement('div');
-			div.style.width = '100px';
+			div.style.width = '80px';
 			div.style.float = 'left';
 			div.style.marginRight = spanMargin;
 			div.style.marginLeft = spanMargin;
