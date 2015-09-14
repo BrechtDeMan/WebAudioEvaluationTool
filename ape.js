@@ -424,15 +424,15 @@ function loadTest(audioHolderObject)
 		
 		var audioObject = audioEngineContext.newTrack(audioHolderObject.outsideReference);
 		
-		outsideReferenceHolder.onclick = function()
+		outsideReferenceHolder.onclick = function(event)
 		{
 			audioEngineContext.play(audioEngineContext.audioObjects.length-1);
 			$('.track-slider').removeClass('track-slider-playing');
             $('.comment-div').removeClass('comment-box-playing');
-            if (event.srcElement.nodeName == 'DIV') {
-            	$(event.srcElement).addClass('track-slider-playing');
+            if (event.currentTarget.nodeName == 'DIV') {
+            	$(event.currentTarget).addClass('track-slider-playing');
             } else {
-            	$(event.srcElement.parentElement).addClass('track-slider-playing');
+            	$(event.currentTarget.parentElement).addClass('track-slider-playing');
             }
 		};
 		
