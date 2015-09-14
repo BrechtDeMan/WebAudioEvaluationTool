@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="save.php" randomiseOrder='true' collectMetrics='true' testPages="1">
+	<setup interface="APE" projectReturn="save.php" randomiseOrder='true' collectMetrics='true' testPages="2">
 		<PreTest>
 			<question id="Location" mandatory="true" boxsize="large">Please enter your location.</question>
 			<checkbox id="experience">
