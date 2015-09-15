@@ -8,20 +8,103 @@ import numpy as np
 import scipy as sp
 import scipy.stats
 
-# CONFIGURATION
+# COMMAND LINE ARGUMENTS
 
-# Which type(s) of plot do you want? 
-enable_boxplot    = True      # show box plot
-enable_confidence = False     # show confidence interval
-confidence        = 0.90      # confidence value (for confidence interval plot)
-enable_individual = False     # show all individual ratings
-show_individual   = []        # show specific individuals
-show_legend       = False     # show names of individuals
 #TODO: Merge, implement this functionality
 #TODO: Control by CLI arguments (plot types, save and/or show, ...) 
 
-# Enter folder where rating CSV files are (generated with score_parser.py or same format).
-rating_folder = '../saves/ratings/' # folder with rating csv files
+assert len(sys.argv)<4, "score_plot takes at most 2 command line arguments\n"+\
+                        "Use: python score_plot.py [ratings_folder_location]."+\
+                        "Type 'python score_plot.py -h' for more options"
+
+# initialise plot types (false by default) and options
+enable_boxplot    = False     # show box plot
+enable_confidence = False     # show confidence interval
+confidence        = 0.90      # confidence value (for confidence interval plot)
+enable_individual = False     # show all individual ratings
+show_individual   = []        # show specific individuals (empty: show all individuals found)
+show_legend       = False     # show names of individuals
+
+# DEFAULT: Looks in 'saves/ratings/' folder from 'scripts/' folder
+rating_folder = "../saves/ratings/" 
+
+# XML results files location
+if len(sys.argv) == 1: # no extra arguments
+    enable_boxplot    = True # show box plot
+    print "Use: python score_plot.py [rating folder] [plot_type] [-l/-legend]"
+    print "Type 'python score_plot.py -h' for help."
+    print "Using default path: " + rating_folder + " with boxplot."
+else:
+    for arg in sys.argv: # go over all arguments
+        if arg == '-h':
+            # show help
+            #TODO: replace with contents of helpfile score_plot.info (or similar)
+            print "Use: python score_plot.py [rating_folder] [plot_type] [-l] [confidence]"
+            print "   rating_folder:"
+            print "            folder where output of 'score_parser' can be found, and"
+            print "            where plots will be stored."
+            print "            By default, '../saves/ratings/' is used."
+            print ""
+            print "PLOT TYPES"
+            print " Can be used in combination."
+            print "    box | boxplot | -b"
+            print "            Enables the boxplot" 
+            print "    conf | confidence | -c"
+            print "            Enables the confidence interval plot" 
+            print "    ind | individual | -i"
+            print "            Enables plot of individual ratings" 
+            print ""
+            print "PLOT OPTIONS"
+            print "    leg | legend | -l"
+            print "            For individual plot: show legend with individual file names"
+            print "    numeric value between 0 and 1, e.g. 0.95"
+            print "            For confidence interval plot: confidence value"
+            assert False, ""# stop immediately after showing help #TODO cleaner way
+            
+        # PLOT TYPES
+        elif arg == 'box' or arg == 'boxplot' or arg == '-b':
+            enable_boxplot    = True     # show box plot
+        elif arg == 'conf' or arg == 'confidence' or arg == '-c':
+            enable_confidence = True     # show confidence interval
+            #TODO add confidence value input
+        elif arg == 'ind' or arg == 'individual' or arg == '-i':
+            enable_individual = True     # show all individual ratings
+            
+        # PLOT OPTIONS
+        elif arg == 'leg' or arg == 'legend' or arg == '-l':
+            if not enable_individual: 
+                print "WARNING: The 'legend' option is only relevant to plots of "+\
+                      "individual ratings"
+            show_legend = True     # show all individual ratings
+        elif arg.isnumeric():
+            if not enable_confidence: 
+                print "WARNING: The numeric confidence value is only relevant when "+\
+                      "confidence plot is enabled"
+            if float(arg)>0 and float(arg)<1:
+                confidence = float(arg)
+            else: 
+                print "WARNING: The confidence value needs to be between 0 and 1"
+        
+        # FOLDER NAME
+        else: 
+             # assume it's the folder name
+             rating_folder = arg
+
+# at least one plot type should be selected: box plot by default
+if not enable_boxplot and not enable_confidence and not enable_individual:
+    enable_boxplot = True
+
+# check if folder_name exists
+if not os.path.exists(rating_folder):
+    #the file is not there
+    print "Folder '"+rating_folder+"' does not exist."
+    sys.exit() # terminate script execution
+elif not os.access(os.path.dirname(rating_folder), os.W_OK):
+    #the file does exist but write rating_folder are not given
+    print "No write privileges in folder '"+rating_folder+"'."
+
+
+# CONFIGURATION
 
 # Font settings
 font = {'weight' : 'bold',
@@ -131,7 +214,7 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
         plt.title(page_name)
         plt.xlabel('Fragment')
         plt.xlim(0, len(headerrow)+1) # only show relevant region, leave space left & right)
-        plt.xticks(range(1, len(headerrow)+1), headerrow) # show fragment names
+        plt.xticks(range(1, len(headerrow)+1), headerrow, rotation=90) # show fragment names
         plt.ylabel('Rating')
         plt.ylim(0,1)
         
@@ -146,5 +229,5 @@ for file in os.listdir(rating_folder): # You have to put this in folder where ra
         plot_type = ("-box" if enable_boxplot else "") + \
                     ("-conf" if enable_confidence else "") + \
                     ("-ind" if enable_individual else "")
-        plt.savefig(rating_folder+page_name+plot_type+".png")
+        plt.savefig(rating_folder+page_name+plot_type+".pdf", bbox_inches='tight')
         plt.close()

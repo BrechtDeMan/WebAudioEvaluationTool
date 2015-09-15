@@ -2,19 +2,42 @@
 
 import xml.etree.ElementTree as ET
 import os
+import sys
 import csv
 
-#TODO Remove DEBUG statements
+# COMMAND LINE ARGUMENTS
 
-# XML results files location (modify as needed):
-folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
+assert len(sys.argv)<3, "score_parser takes at most 1 command line argument\n"+\
+                        "Use: python score_parser.py [rating_folder_location]"
+
+# XML results files location
+if len(sys.argv) == 1:
+    folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
+    print "Use: python score_parser.py [rating_folder_location]"
+    print "Using default path: " + folder_name
+elif len(sys.argv) == 2:
+    folder_name = sys.argv[1]   # First command line argument is folder
+
+# check if folder_name exists
+if not os.path.exists(folder_name):
+    #the file is not there
+    print "Folder '"+folder_name+"' does not exist."
+    sys.exit() # terminate script execution
+elif not os.access(os.path.dirname(folder_name), os.W_OK):
+    #the file does exist but write privileges are not given
+    print "No write privileges in folder '"+folder_name+"'."
+
+    
+# CODE
+
+# remember which files have been opened this time
+file_history = []
 
 # get every XML file in folder
 for file in os.listdir(folder_name):
     if file.endswith(".xml"):
         tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
-        #print "DEBUG Reading " + file + "..."
 
         # get subject ID from XML file
         subject_id = file[:-4] # file name (without extension) as subject ID
@@ -29,7 +52,7 @@ for file in os.listdir(folder_name):
 
             file_name = folder_name+'/ratings/'+page_name+'-ratings.csv' # score file name
 
-            # create folder 'ratings if not yet created
+            # create folder 'ratings' if not yet created
             if not os.path.exists(folder_name + '/ratings'):
                 os.makedirs(folder_name + '/ratings')
 
@@ -45,38 +68,38 @@ for file in os.listdir(folder_name):
             for audioelement in audiolist: # iterate over all audioelements
                 fragmentnamelist.append(audioelement.get('id')) # add to list
 
-
             # if file exists, get header and add 'new' fragments
             if os.path.isfile(file_name):
-                #print "DEBUG file " + file_name + " already exists - reading header"
                 with open(file_name, 'r') as readfile:
                     filereader = csv.reader(readfile, delimiter=',')
                     headerrow = filereader.next()
+
+                # If file hasn't been opened yet this time, remove all rows except header
+                if file_name not in file_history:
+                    with open(file_name, 'w') as writefile:
+                        filewriter = csv.writer(writefile, delimiter=',')
+                        headerrow = sorted(headerrow)
+                        filewriter.writerow(headerrow)
+                    file_history.append(file_name)
 
                 # Which of the fragmentes are in fragmentnamelist but not in headerrow?
                 newfragments = list(set(fragmentnamelist)-set(headerrow))
                 newfragments = sorted(newfragments) # new fragments in alphabetical order
                 # If not empty, read file and rewrite adding extra columns
                 if newfragments: # if not empty
-                    #print "DEBUG New fragments found: " + str(newfragments)
                     with open('temp.csv', 'w') as writefile:
                         filewriter = csv.writer(writefile, delimiter=',')
                         filewriter.writerow(headerrow + newfragments) # write new header
-                        #print "        "+str(headerrow + newfragments) # DEBUG
                         with open(file_name, 'r') as readfile:
                             filereader = csv.reader(readfile, delimiter=',')
                             filereader.next() # skip header
                             for row in filereader: # rewrite row plus empty cells for every new fragment name
-                                #print "            Old row: " + str(row) # DEBUG
                                 filewriter.writerow(row + ['']*len(newfragments))
-                                #print "            New row: " + str(row + ['']*len(newfragments)) # DEBUG
                     os.rename('temp.csv', file_name) # replace old file with temp file
                     headerrow = headerrow + newfragments
-                    #print "DEBUG New header row: " + str(headerrow)
 
             # if not, create file and make header
             else:
-                #print ["DEBUG file " + file_name + " doesn't exist yet - making new one"]
                 headerrow = sorted(fragmentnamelist) # sort alphabetically
                 headerrow.insert(0,'')
                 fragmentnamelist = fragmentnamelist[1:] #HACKY FIX inserting in firstrow also affects fragmentnamelist
@@ -104,4 +127,3 @@ for file in os.listdir(folder_name):
             # write row: [subject ID, rating fragment ID 1, ..., rating fragment ID M]
             if any(ratingrow[1:]): # append to file if row non-empty (except subject name)
                 filewriter.writerow(ratingrow)
-
