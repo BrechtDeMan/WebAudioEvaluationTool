@@ -165,7 +165,10 @@ function interfacePopup() {
 		var node = this.popupOptions[this.currentIndex];
 		this.popupResponse.innerHTML = null;
 		if (node.type == 'statement') {
-			this.popupTitle.textContent = node.statement;
+			this.popupTitle.textContent = null;
+			var statement = document.createElement('span');
+			statement.textContent = node.statement;
+			this.popupResponse.appendChild(statement);
 		} else if (node.type == 'question') {
 			this.popupTitle.textContent = node.question;
 			var textArea = document.createElement('textarea');
