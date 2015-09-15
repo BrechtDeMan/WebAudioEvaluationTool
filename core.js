@@ -49,6 +49,8 @@ function interfacePopup() {
 	// Creates an object to manage the popup
 	this.popup = null;
 	this.popupContent = null;
+	this.popupTitle = null;
+	this.popupResponse = null;
 	this.buttonProceed = null;
 	this.buttonPrevious = null;
 	this.popupOptions = null;
@@ -70,23 +72,52 @@ function interfacePopup() {
 		
 		this.popupContent = document.createElement('div');
 		this.popupContent.id = 'popupContent';
-		this.popupContent.style.marginTop = '25px';
+		this.popupContent.style.marginTop = '20px';
 		this.popupContent.align = 'center';
 		this.popup.appendChild(this.popupContent);
 		
+		var titleHolder = document.createElement('div');
+		titleHolder.id = 'popupTitleHolder';
+		titleHolder.style.width = 'inherit';
+		titleHolder.style.height = '25px';
+		titleHolder.style.marginBottom = '5px';
+		
+		this.popupTitle = document.createElement('span');
+		this.popupTitle.id = 'popupTitle';
+		titleHolder.appendChild(this.popupTitle);
+		this.popupContent.appendChild(titleHolder);
+		
+		this.popupResponse = document.createElement('div');
+		this.popupResponse.id = 'popupResponse';
+		this.popupResponse.style.width = 'inherit';
+		this.popupResponse.style.minHeight = '170px';
+		this.popupResponse.style.maxHeight = '320px';
+		this.popupResponse.style.overflow = 'auto';
+		this.popupContent.appendChild(this.popupResponse);
+		
+		var buttonHolder = document.createElement('div');
+		buttonHolder.id='buttonHolder';
+		buttonHolder.width = 'inherit';
+		buttonHolder.style.height= '30px';
+		buttonHolder.align = 'left';
+		this.popupContent.appendChild(buttonHolder);
+		
 		this.buttonProceed = document.createElement('button');
 		this.buttonProceed.className = 'popupButton';
-		this.buttonProceed.style.left = '440px';
-		this.buttonProceed.style.top = '215px';
+		this.buttonProceed.style.left = '390px';
+		this.buttonProceed.style.top = '2px';
 		this.buttonProceed.innerHTML = 'Next';
 		this.buttonProceed.onclick = function(){popup.proceedClicked();};
 		
 		this.buttonPrevious = document.createElement('button');
 		this.buttonPrevious.className = 'popupButton';
 		this.buttonPrevious.style.left = '10px';
-		this.buttonPrevious.style.top = '215px';
+		this.buttonPrevious.style.top = '2px';
 		this.buttonPrevious.innerHTML = 'Back';
 		this.buttonPrevious.onclick = function(){popup.previousClick();};
+		
+		buttonHolder.appendChild(this.buttonPrevious);
+		buttonHolder.appendChild(this.buttonProceed);
 		
 		this.popup.style.zIndex = -1;
 		this.popup.style.visibility = 'hidden';
@@ -126,19 +157,17 @@ function interfacePopup() {
 		var blank = document.getElementsByClassName('testHalt')[0];
 		blank.style.zIndex = -2;
 		blank.style.visibility = 'hidden';
+		this.buttonPrevious.style.visibility = 'inherit';
 	};
 	
 	this.postNode = function() {
 		// This will take the node from the popupOptions and display it
 		var node = this.popupOptions[this.currentIndex];
-		this.popupContent.innerHTML = null;
+		this.popupResponse.innerHTML = null;
 		if (node.type == 'statement') {
-			var span = document.createElement('span');
-			span.textContent = node.statement;
-			this.popupContent.appendChild(span);
+			this.popupTitle.textContent = node.statement;
 		} else if (node.type == 'question') {
-			var span = document.createElement('span');
-			span.textContent = node.question;
+			this.popupTitle.textContent = node.question;
 			var textArea = document.createElement('textarea');
 			switch (node.boxsize) {
 			case 'small':
@@ -158,18 +187,11 @@ function interfacePopup() {
 				textArea.rows = "10";
 				break;
 			}
-			var br = document.createElement('br');
-			this.popupContent.appendChild(span);
-			this.popupContent.appendChild(br);
-			this.popupContent.appendChild(textArea);
-			this.popupContent.childNodes[2].focus();
+			this.popupResponse.appendChild(textArea);
+			textArea.focus();
 		} else if (node.type == 'checkbox') {
-			var span = document.createElement('span');
-			span.textContent = node.statement;
-			this.popupContent.appendChild(span);
-			var optHold = document.createElement('div');
-			optHold.id = 'option-holder';
-			optHold.align = 'left';
+			this.popupTitle.textContent = node.statement;
+			var optHold = this.popupResponse;
 			for (var i=0; i<node.options.length; i++) {
 				var option = node.options[i];
 				var input = document.createElement('input');
@@ -179,22 +201,14 @@ function interfacePopup() {
 				span.textContent = option.text;
 				var hold = document.createElement('div');
 				hold.setAttribute('name','option');
-				hold.style.float = 'left';
 				hold.style.padding = '4px';
 				hold.appendChild(input);
 				hold.appendChild(span);
 				optHold.appendChild(hold);
 			}
-			this.popupContent.appendChild(optHold);
 		} else if (node.type == 'radio') {
-			var span = document.createElement('span');
-			span.textContent = node.statement;
-			this.popupContent.appendChild(span);
-			var optHold = document.createElement('div');
-			optHold.id = 'option-holder';
-			optHold.align = 'none';
-			optHold.style.float = 'left';
-			optHold.style.width = "100%";
+			this.popupTitle.textContent = node.statement;
+			var optHold = this.popupResponse;
 			for (var i=0; i<node.options.length; i++) {
 				var option = node.options[i];
 				var input = document.createElement('input');
@@ -210,20 +224,15 @@ function interfacePopup() {
 				hold.appendChild(span);
 				optHold.appendChild(hold);
 			}
-			this.popupContent.appendChild(optHold);
 		} else if (node.type == 'number') {
-			var span = document.createElement('span');
-			span.textContent = node.statement;
-			this.popupContent.appendChild(span);
-			this.popupContent.appendChild(document.createElement('br'));
+			this.popupTitle.textContent = node.statement;
 			var input = document.createElement('input');
 			input.type = 'textarea';
 			if (node.min != null) {input.min = node.min;}
 			if (node.max != null) {input.max = node.max;}
 			if (node.step != null) {input.step = node.step;}
-			this.popupContent.appendChild(input);
+			this.popupResponse.appendChild(input);
 		}
-		this.popupContent.appendChild(this.buttonProceed);
 		if(this.currentIndex+1 == this.popupOptions.length) {
 			if (this.responses.nodeName == "PRETEST") {
 				this.buttonProceed.textContent = 'Start';
@@ -234,7 +243,9 @@ function interfacePopup() {
 			this.buttonProceed.textContent = 'Next';
 		}
 		if(this.currentIndex > 0)
-			this.popupContent.appendChild(this.buttonPrevious);
+			this.buttonPrevious.style.visibility = 'visible';
+		else
+			this.buttonPrevious.style.visibility = 'hidden';
 	};
 	
 	this.initState = function(node) {
@@ -278,7 +289,7 @@ function interfacePopup() {
 			}
 		} else if (node.type == 'checkbox') {
 			// Must extract checkbox data
-			var optHold = document.getElementById('option-holder');
+			var optHold = this.popupResponse;
 			var hold = document.createElement('checkbox');
 			console.log("Checkbox: "+ node.statement);
 			hold.id = node.id;
@@ -293,7 +304,7 @@ function interfacePopup() {
 			}
 			this.responses.appendChild(hold);
 		} else if (node.type == "radio") {
-			var optHold = document.getElementById('option-holder');
+			var optHold = this.popupResponse;
 			var hold = document.createElement('radio');
 			var responseID = null;
 			var i=0;

@@ -37,7 +37,8 @@ div.comment-div span {
 
 div.popupHolder {
 	width: 500px;
-	height: 250px;
+	min-height: 250px;
+	max-height: 400px;
 	background-color: #fff;
 	border-radius: 10px;
 	box-shadow: 0px 0px 50px #000;
@@ -49,7 +50,7 @@ button.popupButton {
 	 */
 	width: 50px;
 	height: 25px;
-	position: absolute;
+	position: relative;
 	border-radius: 5px;
 	border: #444;
 	border-width: 1px;
