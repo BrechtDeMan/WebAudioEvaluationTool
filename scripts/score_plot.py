@@ -76,7 +76,7 @@ else:
                 print "WARNING: The 'legend' option is only relevant to plots of "+\
                       "individual ratings"
             show_legend = True     # show all individual ratings
-        elif arg.isnumeric():
+        elif arg.isdigit():
             if not enable_confidence: 
                 print "WARNING: The numeric confidence value is only relevant when "+\
                       "confidence plot is enabled"
