@@ -92,7 +92,7 @@ header = r'''\documentclass[11pt, oneside]{article}
           
           '''
           
-footer = r'''\begin{thebibliography}{9}
+footer = '\n\t\t'+r'''\begin{thebibliography}{9}
          \bibitem{WAET} % reference to accompanying publication
         Nicholas Jillings, Brecht De Man, David Moffat and Joshua D. Reiss, 
         ``Web Audio Evaluation Tool: A browser-based listening test environment,'' 
@@ -104,9 +104,9 @@ body = ''
 
 # generate images for later use
 if render_figures:
-    subprocess.call("python timeline_view_movement.py", shell=True)
-    subprocess.call("python score_parser.py", shell=True)
-    subprocess.call("python score_plot.py", shell=True)
+    subprocess.call("python timeline_view_movement.py "+folder_name, shell=True)
+    subprocess.call("python score_parser.py "+folder_name, shell=True)
+    subprocess.call("python score_plot.py "+folder_name, shell=True)
 
 # get every XML file in folder
 files_list = os.listdir(folder_name)
@@ -117,13 +117,13 @@ for file in files_list: # iterate over all files in files_list
         root = tree.getroot()
         
         # PRINT name as section
-        body+= '\section{'+file[:-4].capitalize()+'}\n' # make section header from name without extension
+        body+= '\n\section{'+file[:-4].capitalize()+'}\n' # make section header from name without extension
         
         # reset for new subject
         total_duration = 0
         page_number = 0
         
-        individual_table = '' # table with stats for this individual test file
+        individual_table = '\n' # table with stats for this individual test file
         timeline_plots = '' # plots of timeline (movements and plays)
         
         # DEMO survey stats
@@ -137,7 +137,8 @@ for file in files_list: # iterate over all files in files_list
         this_subjects_age = root.find("./posttest/number/[@id='age']")
         if this_subjects_age is not None:
             age.append(this_subjects_age.text)
-        
+    	#TODO add plot of age
+    	        
         # get list of all page names
         for audioholder in root.findall("./audioholder"):   # iterate over pages
             page_name = audioholder.get('id')               # get page name
@@ -183,27 +184,27 @@ for file in files_list: # iterate over all files in files_list
             # PRINT alerts when elements not played or markers not moved
             # number of audio elements not played
             if len(not_played) > 1:
-                body += '\\emph{\\textbf{ATTENTION: '+str(len(not_played))+\
+                body += '\t\t\\emph{\\textbf{ATTENTION: '+str(len(not_played))+\
                         ' fragments were not listened to in '+page_name+'! }}'+\
                         ', '.join(not_played)+'\\\\ \n'
             if len(not_played) == 1: 
-                body += '\\emph{\\textbf{ATTENTION: one fragment was not listened to in '+page_name+'! }}'+\
+                body += '\t\t\\emph{\\textbf{ATTENTION: one fragment was not listened to in '+page_name+'! }}'+\
                         not_played[0]+'\\\\ \n'
             
             # number of audio element markers not moved
             if len(not_moved) > 1:
-                body += '\\emph{\\textbf{ATTENTION: '+str(len(not_moved))+\
+                body += '\t\t\\emph{\\textbf{ATTENTION: '+str(len(not_moved))+\
                         ' markers were not moved in '+page_name+'! }}'+\
                         ', '.join(not_moved)+'\\\\ \n'
             if len(not_moved) == 1: 
-                body += '\\emph{\\textbf{ATTENTION: one marker was not moved in '+page_name+'! }}'+\
+                body += '\t\t\\emph{\\textbf{ATTENTION: one marker was not moved in '+page_name+'! }}'+\
                         not_moved[0]+'\\\\ \n'
             
             # PRINT song-specific statistic
-            individual_table += page_name+'&'+\
+            individual_table += '\t\t'+page_name+'&'+\
                                 str(number_of_comments) + '/' +\
                                 str(number_of_comments+number_of_missing_comments)+'&'+\
-                                seconds2timestr(duration)+'\\\\'
+                                seconds2timestr(duration)+'\\\\\n'
             
             # get timeline for this audioholder
             img_path = 'timelines_movement/'+file[:-4]+'-'+page_name+'.pdf'
@@ -212,7 +213,7 @@ for file in files_list: # iterate over all files in files_list
             if os.path.isfile(folder_name+'/'+img_path):
                 # SHOW timeline image
                 timeline_plots += '\\includegraphics[width=\\textwidth]{'+\
-                         folder_name+'/'+img_path+'}\n\n'
+                         folder_name+'/'+img_path+'}\n\t\t'
             
             # keep track of duration in function of page index
             if len(duration_order)>page_number:
@@ -261,10 +262,10 @@ for file in files_list: # iterate over all files in files_list
             time_per_page_accum += duration # total duration (for average time spent per page)
 
         # PRINT table with statistics about this test
-        body += r'''\begin{tabular}{|p{3.5cm}|c|p{2.5cm}|}
+        body += '\t\t'+r'''\begin{tabular}{|p{3.5cm}|c|p{2.5cm}|}
                  \hline
                  \textbf{Song name} & \textbf{Comments} & \textbf{Duration} \\ \hline '''+\
-                 individual_table+\
+                 individual_table+'\t\t'+\
                  r'''\hline
                   \textbf{TOTAL} & & \textbf{'''+\
                   seconds2timestr(total_duration)+\
@@ -284,35 +285,34 @@ body = ''
 
 # PRINT summary of everything (at start) 
 #       unnumbered so that number of sections equals number of files
-body += '\section*{Summary}\n\\addcontentsline{toc}{section}{Summary}'
+body += '\section*{Summary}\n\t\t\\addcontentsline{toc}{section}{Summary}\n'
 
 # PRINT table with statistics
-body += '\\begin{tabular}{ll}'
-body += r'Number of XML files: &' + str(number_of_XML_files) + r'\\'
-body += r'Number of pages: &' + str(number_of_pages) + r'\\'
-body += r'Number of fragments: &' + str(number_of_fragments) + r'\\'
+body += '\t\t\\begin{tabular}{ll}\n\t\t\t'
+body += r'Number of XML files: &' + str(number_of_XML_files) + r'\\'+'\n\t\t\t'
+body += r'Number of pages: &' + str(number_of_pages) + r'\\'+'\n\t\t\t'
+body += r'Number of fragments: &' + str(number_of_fragments) + r'\\'+'\n\t\t\t'
 body += r'Number of empty comments: &' + str(total_empty_comments) +\
-      " (" + str(round(100.0*total_empty_comments/number_of_fragments,2)) + r"\%)\\"
+      " (" + str(round(100.0*total_empty_comments/number_of_fragments,2)) + r"\%)\\"+'\n\t\t\t'
 body += r'Number of unplayed fragments: &' + str(total_not_played) +\
-      " (" + str(round(100.0*total_not_played/number_of_fragments,2)) + r"\%)\\"
+      " (" + str(round(100.0*total_not_played/number_of_fragments,2)) + r"\%)\\"+'\n\t\t\t'
 body += r'Number of unmoved markers: &' + str(total_not_moved) +\
-      " (" + str(round(100.0*total_not_moved/number_of_fragments,2)) + r"\%)\\"
-body += r'Average time per page: &' + seconds2timestr(time_per_page_accum/number_of_pages) + r"\\"
+      " (" + str(round(100.0*total_not_moved/number_of_fragments,2)) + r"\%)\\"+'\n\t\t\t'
+body += r'Average time per page: &' + seconds2timestr(time_per_page_accum/number_of_pages) + r"\\"+'\n\t\t'
 body += '\\end{tabular} \\vspace{1.5cm} \\\\ \n'
 
 # Average duration for first, second, ... page
-body += " \\vspace{.5cm} Average duration per page (see also Figure \\ref{fig:avgtimeperpage}): \\\\ \n"
+body += "\t\t\\vspace{.5cm} \n\n\t\tAverage duration per page (see also Figure \\ref{fig:avgtimeperpage}): \\\\ \n\t\t"
 body += r'''\begin{tabular}{lll}
-        \textbf{Page} & \textbf{Duration} & \textbf{\# subjects}\\
-        '''
+                    \textbf{Page} & \textbf{Duration} & \textbf{\# subjects}\\'''
 tpp_averages = [] # store average time per page
 for page_number in range(len(duration_order)): 
-    body += str(page_number+1) + "&" +\
+    body += '\n\t\t\t'+str(page_number+1) + "&" +\
         seconds2timestr(sum(duration_order[page_number])/len(duration_order[page_number])) +\
             "&"+str(len(duration_order[page_number]))+r"\\"
     tpp_averages.append(sum(duration_order[page_number])/len(duration_order[page_number]))
             
-body += '\\end{tabular} \\vspace{1.5cm} \\\\ \n'
+body += '\n\t\t\\end{tabular} \\vspace{1.5cm} \\\\ \n\n\t\t'
 
 # SHOW bar plot of average time per page
 plt.bar(range(1,len(duration_order)+1), np.array(tpp_averages)/60)
@@ -339,10 +339,10 @@ combined_list = [page_names, average_duration_page, fragments_per_page, number_o
 combined_list = sorted(zip(*combined_list), key=operator.itemgetter(1, 2)) # sort
 
 # Show average duration for all songs
-body += r'''\vspace{.5cm} Average duration per audioholder (see also Figure \ref{fig:avgtimeperaudioholder}): \\
-        \begin{tabular}{llll}
-        \textbf{Audioholder} & \textbf{Duration} & \textbf{\# subjects} & \textbf{\# fragments} \\
-        '''
+body += r'''\vspace{.5cm}
+                Average duration per audioholder (see also Figure \ref{fig:avgtimeperaudioholder}): \\
+                \begin{tabular}{llll}
+                        \textbf{Audioholder} & \textbf{Duration} & \textbf{\# subjects} & \textbf{\# fragments} \\'''
 audioholder_names_ordered = []
 average_duration_audioholder_ordered = []
 number_of_subjects = []
@@ -350,11 +350,11 @@ for page_index in range(len(page_names)):
     audioholder_names_ordered.append(combined_list[page_index][0])
     average_duration_audioholder_ordered.append(combined_list[page_index][1])
     number_of_subjects.append(combined_list[page_index][3])
-    body +=  combined_list[page_index][0] + "&" +\
+    body +=  '\n\t\t\t'+combined_list[page_index][0] + "&" +\
              seconds2timestr(combined_list[page_index][1]) + "&" +\
              str(combined_list[page_index][3]) + "&" +\
              str(combined_list[page_index][2]) + r"\\"
-body += '\\end{tabular}\n'
+body += '\n\t\t\\end{tabular}\n'
 
 # SHOW bar plot of average time per page
 plt.bar(range(1,len(audioholder_names_ordered)+1), np.array(average_duration_audioholder_ordered)/60)
@@ -379,7 +379,8 @@ plt.savefig(folder_name+"/subjects_per_audioholder.pdf", bbox_inches='tight')
 plt.close()
 
 # SHOW both figures
-body += r'''\begin{figure}[htbp]
+body += r'''
+         \begin{figure}[htbp]
          \begin{center}
          \includegraphics[width=.65\textwidth]{'''+\
          folder_name+"/time_per_page.pdf"+\
@@ -388,6 +389,7 @@ body += r'''\begin{figure}[htbp]
         \label{fig:avgtimeperpage}
          \end{center}
          \end{figure}
+         
          '''
 body += r'''\begin{figure}[htbp]
          \begin{center}
@@ -398,6 +400,7 @@ body += r'''\begin{figure}[htbp]
         \label{fig:avgtimeperaudioholder}
          \end{center}
          \end{figure}
+         
          '''
 body += r'''\begin{figure}[htbp]
          \begin{center}
@@ -408,6 +411,7 @@ body += r'''\begin{figure}[htbp]
         \label{fig:avgtimeperaudioholder}
          \end{center}
          \end{figure}
+         
          '''
 #TODO add error bars
 #TODO layout of figures
@@ -428,6 +432,7 @@ for audioholder_name in page_names: # get each name
             \label{fig:avgtimeperpage}
              \end{center}
              \end{figure}
+             
              '''
 
 # DEMO pie chart of gender distribution among subjects
@@ -441,6 +446,7 @@ for item in genders:
                                '/'+item.capitalize()+' ('+str(number)+'),\n'
 
 body += r'''
+        % Pie chart of gender distribution
         \def\angle{0}
         \def\radius{3}
         \def\cyclelist{{"orange","blue","red","green"}}
@@ -474,6 +480,7 @@ body += r'''
         \label{default}
         \end{center}
         \end{figure}
+        
         '''
 # problem: some people entered twice? 
 

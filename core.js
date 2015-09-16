@@ -670,7 +670,7 @@ function createProjectSave(destURL) {
 			} else {
 				popup.showPopup();
 				popup.popupContent.innerHTML = null;
-				popup.popupContent.textContent = "Thank you for performing this listening test";
+				popup.popupContent.textContent = "Thank you!";
 			}
 		};
 		xmlhttp.send(file);
