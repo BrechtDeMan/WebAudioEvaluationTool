@@ -1,0 +1,181 @@
+\documentclass{sig-alternate}
+
+
+\begin{document}
+
+% Copyright
+\setcopyright{waclicense}
+
+
+%% DOI
+%\doi{10.475/123_4}
+%
+%% ISBN
+%\isbn{123-4567-24-567/08/06}
+%
+%%Conference
+%\conferenceinfo{PLDI '13}{June 16--19, 2013, Seattle, WA, USA}
+%
+%\acmPrice{\$15.00}
+
+%
+% --- Author Metadata here ---
+\conferenceinfo{Web Audio Conference WAC-2016,}{April 4--6, 2016, Atlanta, USA}
+\CopyrightYear{2016} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
+%\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+% --- End of Author Metadata ---
+
+\title{Latex Template for WAC 2016}
+%\subtitle{[Extended Abstract]
+%\titlenote{A full version of this paper is available as
+%\textit{Author's Guide to Preparing ACM SIG Proceedings Using
+%\LaTeX$2_\epsilon$\ and BibTeX} at
+%\texttt{www.acm.org/eaddress.htm}}}
+%
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+\numberofauthors{4} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor Nicholas Jillings\\
+       \email{n.g.r.jillings@se14.qmul.ac.uk}
+       \alignauthor  % dummy author for nicer spacing
+% 2nd. author
+\alignauthor Brecht De Man\\
+       \email{b.deman@qmul.ac.uk}
+\and  % use '\and' if you need 'another row' of author names
+% 3rd. author
+\alignauthor David Moffat\\
+       \email{d.j.moffat@qmul.ac.uk}
+% 4th. author
+\alignauthor Joshua D. Reiss\\
+\email{joshua.reiss@qmul.ac.uk}
+\and
+       \affaddr{Centre for Digital Music}\\
+       \affaddr{School of Electronic Engineering and Computer Science}\\
+       \affaddr{Queen Mary University of London}\\
+       \affaddr{Mile End Road,}
+       \affaddr{London E1 4NS}\\
+       \affaddr{United Kingdom}\\
+}
+%Centre for Digital Music, School of Electronic Engineering and Computer Science, Queen Mary University of London
+%% 5th. author
+%\alignauthor Sean Fogarty\\
+%       \affaddr{NASA Ames Research Center}\\
+%       \affaddr{Moffett Field}\\
+%       \email{fogartys@amesres.org}
+%% 6th. author
+%\alignauthor Charles Palmer\\
+%       \affaddr{Palmer Research Laboratories}\\
+%       \affaddr{8600 Datapoint Drive}\\
+%       \email{cpalmer@prl.com}
+%}
+% There's nothing stopping you putting the seventh, eighth, etc.
+% author on the opening page (as the 'third row') but we ask,
+% for aesthetic reasons that you place these 'additional authors'
+% in the \additional authors block, viz.
+%\additionalauthors{Additional authors: John Smith (The Th{\o}rv{\"a}ld Group,
+%email: {\texttt{jsmith@affiliation.org}}) and Julius P.~Kumquat
+%(The Kumquat Consortium, email: {\texttt{jpkumquat@consortium.net}}).}
+\date{1 October 2015}
+% Just remember to make sure that the TOTAL number of authors
+% is the number that will appear on the first page PLUS the
+% number that will appear in the \additionalauthors section.
+
+\maketitle
+\begin{abstract}
+Here comes the abstract. 
+\end{abstract}
+
+
+\section{Introduction}
+	Introducing the paper. Referring to \cite{waet}. Talking about what we do in the various sections of this paper. Pointing out that the header of the paper kind of looks like the Bat-sign. 
+	
+\section{Architecture}
+	A slightly technical overview of the system. Talk about XML, JavaScript, Web Audio API, HTML5. 
+	
+\section{Interfaces}
+	We could add more interfaces, such as: 
+	\begin{itemize}
+		\item Hedonic Scale
+		\item Multi attribute ratings
+		\item MUSHRA
+		
+		\item Interval Scale
+		\item Rank Scale
+		
+		\item 2D Plane rating - e.g. Valence vs. Arousal
+		\item Likert scale
+	\end{itemize}
+	
+	There are also the following interfaces, which would require a slightly different `engine' underneath, e.g. loading a different page for every possible pair. 
+	\begin{itemize}
+		\item AB Test
+		\item ABX Test
+		\item JND
+	\end{itemize}
+	
+	A screenshot would be nice. 
+
+\section{Analysis and diagnostics}
+	It would be great to have easy-to-use analysis tools to visualise the collected data and even do science with it. Even better would be to have all this in the browser. Complete perfection would be achieved if and when only limited setup, installation time, and expertise are required for the average non-CS researcher to use this. 
+	
+	Some pictures here please. 
+
+\section{Concluding remarks}
+	Perhaps an `engineering brief' such as this one doesn't really have a lot of conclusion, except `We made this'. 
+	
+	You can check it out at \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}. 
+	
+\section{Future work}
+	Perhaps here, perhaps not. Talking a little bit about what else might happen. Unless we really want to wrap this up. 
+
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{abbrv}
+\bibliography{WAC2016}  % sigproc.bib is the name of the Bibliography in this case
+% You must have a proper ".bib" file
+%  and remember to run:
+% latex bibtex latex latex
+% to resolve all references
+%
+% ACM needs 'a single self-contained file'!
+%
+\end{document}
