@@ -30,11 +30,17 @@ elif len(sys.argv) == 3:
     # Second command line argument is [no_render | -nr]
     render_figures = False
 
+def isNaN(num):
+    return num != num
+
 # Turn number of seconds (int) to '[minutes] min [seconds] s' (string)
 def seconds2timestr(time_in_seconds):
-    time_in_minutes = int(time_in_seconds/60)
-    remaining_seconds = int(time_in_seconds%60)
-    return str(time_in_minutes) + " min " + str(remaining_seconds) + " s"
+    if time_in_seconds is not None and not isNaN(time_in_seconds): 
+        time_in_minutes = int(time_in_seconds/60)
+        remaining_seconds = int(time_in_seconds%60)
+        return str(time_in_minutes) + " min " + str(remaining_seconds) + " s"
+    else:
+        return 'N/A'
 
 # stats initialisation
 number_of_XML_files  = 0
@@ -74,7 +80,7 @@ header = r'''\documentclass[11pt, oneside]{article}
           \usepackage[parfill]{parskip} % empty line instead of indent
           \usepackage{graphicx}    % figures
           \usepackage{hyperref}
-          \usepackage{tikz}		   % pie charts
+          \usepackage{tikz}           % pie charts
           \title{Report}
           \author{'''+\
           user+\
@@ -137,8 +143,8 @@ for file in files_list: # iterate over all files in files_list
         this_subjects_age = root.find("./posttest/number/[@id='age']")
         if this_subjects_age is not None:
             age.append(this_subjects_age.text)
-    	#TODO add plot of age
-    	        
+        #TODO add plot of age
+                
         # get list of all page names
         for audioholder in root.findall("./audioholder"):   # iterate over pages
             page_name = audioholder.get('id')               # get page name
@@ -152,11 +158,15 @@ for file in files_list: # iterate over all files in files_list
             not_played = [] # for this page
             not_moved = [] # for this page
             
-            # 'testTime' keeps total duration: subtract time so far for duration of this audioholder
-            duration = float(audioholder.find("./metric/metricresult[@id='testTime']").text) - total_duration
+            if audioholder.find("./metric/metricresult[@id='testTime']") is not None: # check if time is included
+                # 'testTime' keeps total duration: subtract time so far for duration of this audioholder
+                duration = float(audioholder.find("./metric/metricresult[@id='testTime']").text) - total_duration
             
-            # total duration of test
-            total_duration += duration
+                # total duration of test
+                total_duration += duration
+            else: 
+                duration = float('nan')
+                total_duration = float('nan')
             
             # number of audio elements
             audioelements = audioholder.findall("./audioelement") # get audioelements
@@ -408,7 +418,7 @@ body += r'''\begin{figure}[htbp]
          folder_name+"/subjects_per_audioholder.pdf"+\
         r'''}
         \caption{Number of subjects per audioholder.}
-        \label{fig:avgtimeperaudioholder}
+        \label{fig:subjectsperaudioholder}
          \end{center}
          \end{figure}
          
@@ -429,7 +439,7 @@ for audioholder_name in page_names: # get each name
             \caption{Box plot of ratings for audioholder '''+\
             audioholder_name+' ('+str(subject_count[real_page_names.index(audioholder_name)])+\
             ''' participants).}
-            \label{fig:avgtimeperpage}
+            \label{fig:boxplot'''+audioholder_name.replace(" ", "")+'''}
              \end{center}
              \end{figure}
              
