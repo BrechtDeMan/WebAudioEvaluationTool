@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>WAET: Test Creator</title>
+
+		<meta name="viewport" content="width=device-width; initial-scale=1.0">
+		<script type="text/javascript">
+		
+			var APEInterfaceOptions = [["playhead","page-count"],["Show the playhead/scrubber bar", "Show test page count"]];
+			var APEInterfaceChecks = [["fragmentPlayed","fragmentFullPlayback","fragmentMoved","fragmentComments"],["All Fragments Played","All Fragments Played in entirety","All sliders moved","All fragments have comments"]];
+			var MUSHRAInterfaceOptions = [[],[]];
+			var MUSHRAInterfaceChecks = [["fragmentPlayed","fragmentMoved","fragmentComments"],["All Fragments Played","All sliders moved","All fragments have comments"]];
+			var popupInstance;
+			var specificationNode;
+			var audioContext;
+			window.onload = function()
+			{
+				var AudioContext = window.AudioContext || window.webkitAudioContext;
+				audioContext = new AudioContext;
+				popupInstance = new popup();
+				popupInstance.advanceState();
+				specificationNode = new Specification();
+			};
+			
+			function popup()
+			{
+				var x = window.innerWidth;
+				var y = window.innerHeight;
+				this.popupHolder = document.createElement('div');
+				this.popupHolder.style.visibility = 'hidden';
+				this.popupContent = document.createElement('div');
+				this.popupTitle = document.createElement('div');
+				this.popupBody = document.createElement('div');
+				this.popupFooter = document.createElement('div');
+				this.popupTitleText = document.createElement('span');
+				this.popupTitle.appendChild(this.popupTitleText);
+				
+				this.popupHolder.className = "popup";
+				this.popupHolder.style.left = (x-500)/2 +'px';
+				this.popupHolder.style.top = (y-400)/2 + 'px';
+				this.popupContent.style.padding = "20px";
+				this.popupHolder.appendChild(this.popupContent);
+				
+				this.popupTitle.style.width = "100%";
+				this.popupTitle.style.height = "50px";
+				this.popupTitle.style.fontSize = "xx-large";
+				this.popupContent.appendChild(this.popupTitle);
+				
+				this.popupBody.style.width = "100%";
+				this.popupBody.style.height = "280px";
+				this.popupContent.appendChild(this.popupBody);
+				
+				this.popupFooter.style.width = "100%";
+				this.popupFooter.style.height = "30px";
+				this.popupContent.appendChild(this.popupFooter);
+				var body = document.getElementsByTagName('body')[0];
+				body.appendChild(this.popupHolder);
+				
+				this.pageBlank = document.createElement('div');
+				body.appendChild(this.pageBlank);
+				this.pageBlank.style.width = "100%";
+				this.pageBlank.style.height = "100%";
+				this.pageBlank.style.position = "absolute";
+				this.pageBlank.style.left = "0px";
+				this.pageBlank.style.top = "0px";
+				this.pageBlank.style.backgroundColor = "rgba(0,0,0,0.5)";
+				this.pageBlank.style.visibility = 'hidden';
+				
+				this.state = 0;
+				
+				this.showPopup = function()
+				{
+					this.popupHolder.style.visibility = 'visible';
+					this.popupHolder.style.zIndex = "3";
+					this.pageBlank.style.visibility = 'visible';
+					this.pageBlank.style.zIndex = "2";
+				};
+				
+				this.hidePopup = function()
+				{
+					this.popupHolder.style.visibility = 'hidden';
+					this.popupHolder.style.zIndex = "-1";
+					this.pageBlank.style.visibility = 'hidden';
+					this.pageBlank.style.zIndex = "-2";
+				};
+				
+				this.init = function()
+				{
+					this.popupTitleText.textContent = "Welcome";
+					var text = document.createElement('span');
+					text.textContent = "Thank you for downloading the Web Audio Evaluation Toolbox. This page will help guide you through creating the documents required to run a test. If you have an existing XML file you wish to edit, please drag and drop it into the box below";
+					var dnd = document.createElement('div');
+					dnd.style.width = "100%";
+					dnd.style.height = "50px";
+					dnd.className = "dragndrop";
+					this.popupBody.appendChild(text);
+					this.popupBody.appendChild(dnd);
+					this.showPopup();
+					
+					var button = document.createElement('button');
+					button.className = "popupButton";
+					button.textContent = "New File";
+					button.onclick = function(event) {
+						popupInstance.advanceState();
+					};
+					this.popupFooter.appendChild(button);
+				};
+				
+				this.advanceState = function()
+				{
+					this.popupBody.innerHTML = null;
+					this.popupFooter.innerHTML = null;
+					this.popupTitleText.textContent = null;
+					switch(this.state)
+					{
+					case 0:
+						this.init();
+						break;
+					case 1:
+						this.popupTitleText.textContent = "Test Type";
+						var text = document.createElement("span");
+						text.textContent = "What type of test would you like to use. Currently APE (Audio Perceptual Evaluation) and MUSHRA style interfaces are available";
+						this.popupBody.appendChild(text);
+						var select = document.createElement("select");
+						select.id="interface-select";
+						var opt1 = document.createElement("option");
+						opt1.value = "APE";
+						opt1.textContent = "APE";
+						select.appendChild(opt1);
+						var opt2 = document.createElement("option");
+						opt2.value = "MUSHRA";
+						opt2.textContent = "MUSHRA";
+						select.appendChild(opt2);
+						this.popupBody.appendChild(select);
+						
+						var button = document.createElement('button');
+						button.className = "popupButton";
+						button.textContent = "Submit";
+						button.onclick = function(event) {
+							var select = document.getElementById("interface-select");
+							specificationNode.interfaceType = select.value;
+							specificationNode.collectMetrics = true;
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						break;
+					case 2:
+						this.popupTitleText.textContent = "Test Options";
+						var holder = document.createElement('div');
+						holder.style.margin = "5px";
+						var checkbox = document.createElement('input');
+						checkbox.type = 'checkbox';
+						checkbox.id = "Randomise-Page";
+						var text = document.createElement('span');
+						text.textContent = "Randomise Page Order";
+						holder.appendChild(checkbox);
+						holder.appendChild(text);
+						this.popupBody.appendChild(holder);
+						switch(specificationNode.interfaceType)
+						{
+						case "APE":
+							for (var i=0; i<APEInterfaceOptions[0].length; i++)
+							{
+								holder = document.createElement('div');
+								holder.style.margin = "5px";
+								checkbox = document.createElement('input');
+								checkbox.type = 'checkbox';
+								checkbox.setAttribute("name","option");
+								checkbox.id = APEInterfaceOptions[0][i];
+								text = document.createElement('span');
+								text.textContent = APEInterfaceOptions[1][i];
+								holder.appendChild(checkbox);
+								holder.appendChild(text);
+								this.popupBody.appendChild(holder);
+							}
+							for (var i=0; i<APEInterfaceChecks[0].length; i++)
+							{
+								holder = document.createElement('div');
+								holder.style.margin = "5px";
+								checkbox = document.createElement('input');
+								checkbox.type = 'checkbox';
+								checkbox.setAttribute("name","check");
+								checkbox.id = APEInterfaceChecks[0][i];
+								text = document.createElement('span');
+								text.textContent = APEInterfaceChecks[1][i];
+								holder.appendChild(checkbox);
+								holder.appendChild(text);
+								this.popupBody.appendChild(holder);
+							}
+							break;
+						case "MUSHRA":
+							for (var i=0; i<MUSHRAInterfaceOptions[0].length; i++)
+							{
+								holder = document.createElement('div');
+								holder.style.margin = "5px";
+								checkbox = document.createElement('input');
+								checkbox.type = 'checkbox';
+								checkbox.setAttribute("name","option");
+								checkbox.id = MUSHRAInterfaceOptions[0][i];
+								text = document.createElement('span');
+								text.textContent = MUSHRAInterfaceOptions[1][i];
+								holder.appendChild(checkbox);
+								holder.appendChild(text);
+								this.popupBody.appendChild(holder);
+							}
+							for (var i=0; i<MUSHRAInterfaceChecks[0].length; i++)
+							{
+								holder = document.createElement('div');
+								holder.style.margin = "5px";
+								checkbox = document.createElement('input');
+								checkbox.type = 'checkbox';
+								checkbox.setAttribute("name","check");
+								checkbox.id = MUSHRAInterfaceChecks[0][i];
+								text = document.createElement('span');
+								text.textContent = MUSHRAInterfaceChecks[1][i];
+								holder.appendChild(checkbox);
+								holder.appendChild(text);
+								this.popupBody.appendChild(holder);
+							}
+						}
+						var button = document.createElement('button');
+						button.className = "popupButton";
+						button.textContent = "Submit";
+						button.onclick = function(event) {
+							var optHold = popupInstance.popupBody;
+							var opt = optHold.firstChild;
+							var input = opt.getElementsByTagName('input')[0];
+							specificationNode.randomiseOrder = input.checked;
+							while(opt.nextSibling != null)
+							{
+								opt = opt.nextSibling;
+								input = opt.getElementsByTagName('input')[0];
+								if (input.checked)
+								{
+									specificationNode.commonInterface.options.push(new specificationNode.commonInterface.optionNode(input));
+								}
+								
+							}
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						break;
+					case 3:
+						this.popupTitleText.textContent = "Test Page";
+						var span = document.createElement('span');
+						span.textContent = "Drag and drop your audio files into the box below to add them to a test page";
+						this.popupBody.appendChild(span);
+						var dnd = document.createElement('div');
+						dnd.id = "audio-holder-drop";
+						dnd.style.width = "100%";
+						dnd.style.minHeight = "50px";
+						dnd.style.maxHeight = "220px";
+						dnd.style.overflow = 'auto';
+						dnd.className = "dragndrop";
+						dnd.ondragover = function(e) {
+							if(e.preventDefault) {e.preventDefault();}
+							return false;
+						};
+						dnd.ondragenter = function(e) {
+							if(e.preventDefault) {e.preventDefault();}
+							return false;
+						};
+						dnd.ondrop = function(e) {
+							if(e.preventDefault) {e.preventDefault();}
+							var dt = e.dataTransfer;
+							var body = document.getElementById("audio-holder-drop");
+							var files = dt.files;
+							for (var i = 0, f; f = files[i]; i++)
+							{
+								var dndHeader = document.createElement('div');
+								dndHeader.style.width = "100%";
+								dndHeader.style.height = "20px";
+								dndHeader.style.borderBottom = "#DDD";
+								dndHeader.style.borderBottomWidth = "1px";
+								dndHeader.style.borderBottomStyle = "solid";
+								var dndHInclude = document.createElement('div');
+								dndHInclude.style.width = "30px";
+								dndHInclude.className = "dndheaderelement";
+								var includeCheck = document.createElement('input');
+								includeCheck.type = "checkbox";
+								includeCheck.name = "include-check";
+								includeCheck.checked = true;
+								dndHInclude.appendChild(includeCheck);
+								dndHeader.appendChild(dndHInclude);
+								var dndHTitle = document.createElement('div');
+								dndHTitle.style.width = "180px";
+								dndHTitle.className = "dndheaderelement";
+								var text = document.createElement('span');
+								text.textContent = f.name;
+								dndHTitle.appendChild(text);
+								dndHeader.appendChild(dndHTitle);
+								var dndHID = document.createElement('div');
+								dndHID.style.width = "100px";
+								dndHID.className = "dndheaderelement";
+								var IDInput = document.createElement('input');
+								IDInput.name = "ID";
+								IDInput.value = f.name.split('.')[0];
+								IDInput.style.width = "96px";
+								// TODO: Automatic checking for common ID;
+								dndHID.appendChild(IDInput);
+								dndHeader.appendChild(dndHID);
+								var dndHPlay = document.createElement('div');
+								dndHPlay.style.width = "100px";
+								dndHPlay.className = "dndheaderelement";
+								var audio = document.createElement('audio');
+								dndHPlay.appendChild(audio);
+								dndHeader.appendChild(dndHPlay);
+								dnd.appendChild(dndHeader);
+							}
+						};
+						var dndHeader = document.createElement('div');
+						dndHeader.style.width = "100%";
+						dndHeader.style.height = "15px";
+						dndHeader.style.borderBottom = "#DDD";
+						dndHeader.style.borderBottomWidth = "1px";
+						dndHeader.style.borderBottomStyle = "solid";
+						var dndHInclude = document.createElement('div');
+						dndHInclude.style.width = "30px";
+						dndHInclude.className = "dndheaderelement";
+						var text = document.createElement('span');
+						text.textContent = "Inc.";
+						dndHInclude.appendChild(text);
+						dndHeader.appendChild(dndHInclude);
+						var dndHTitle = document.createElement('div');
+						dndHTitle.style.width = "180px";
+						dndHTitle.className = "dndheaderelement";
+						text = document.createElement('span');
+						text.textContent = "File Name";
+						dndHTitle.appendChild(text);
+						dndHeader.appendChild(dndHTitle);
+						var dndHID = document.createElement('div');
+						dndHID.style.width = "100px";
+						dndHID.className = "dndheaderelement";
+						text = document.createElement('span');
+						text.textContent = "ID";
+						dndHID.appendChild(text);
+						dndHeader.appendChild(dndHID);
+						var dndHPlay = document.createElement('div');
+						dndHPlay.style.width = "100px";
+						dndHPlay.className = "dndheaderelement";
+						text = document.createElement('span');
+						text.textContent = "Sample";
+						dndHPlay.appendChild(text);
+						dndHeader.appendChild(dndHPlay);
+						dnd.appendChild(dndHeader);
+						this.popupBody.appendChild(dnd);
+						var button = document.createElement('button');
+						button.className = "popupButton";
+						button.textContent = "Submit";
+						button.onclick = function(event)
+						{
+							
+						};
+						this.popupFooter.appendChild(button);
+					}
+					this.state++;
+				};
+			};
+			
+			function Specification() {
+				// Handles the decoding of the project specification XML into a simple JavaScript Object.
+				
+				this.interfaceType = null;
+				this.commonInterface = new function()
+				{
+					this.options = [];
+					this.optionNode = function(input)
+					{
+						var name = input.getAttribute('name');
+						this.type = name;
+						if(this.type == "option")
+						{
+							this.name = input.id;
+						} else if (this.type == "check")
+						{
+							this.check = input.id;
+						}
+					};
+				};
+				this.projectReturn = null;
+				this.randomiseOrder = null;
+				this.collectMetrics = null;
+				this.testPages = null;
+				this.preTest = null;
+				this.postTest = null;
+				this.audioHolders = [];
+				
+				this.decode = function() {
+					// projectXML - DOM Parsed document
+					this.projectXML = projectXML.childNodes[0];
+					var setupNode = projectXML.getElementsByTagName('setup')[0];
+					this.interfaceType = setupNode.getAttribute('interface');
+					this.projectReturn = setupNode.getAttribute('projectReturn');
+					this.testPages = setupNode.getAttribute('testPages');
+					if (setupNode.getAttribute('randomiseOrder') == "true") {
+						this.randomiseOrder = true;
+					} else {this.randomiseOrder = false;}
+					if (setupNode.getAttribute('collectMetrics') == "true") {
+						this.collectMetrics = true;
+					} else {this.collectMetrics = false;}
+					if (isNaN(Number(this.testPages)) || this.testPages == undefined)
+					{
+						this.testPages = null;
+					} else {
+						this.testPages = Number(this.testPages);
+						if (this.testPages == 0) {this.testPages = null;}
+					}
+					var metricCollection = setupNode.getElementsByTagName('Metric');
+					
+					this.preTest = new this.prepostNode('pretest',setupNode.getElementsByTagName('PreTest'));
+					this.postTest = new this.prepostNode('posttest',setupNode.getElementsByTagName('PostTest'));
+					
+					if (metricCollection.length > 0) {
+						metricCollection = metricCollection[0].getElementsByTagName('metricEnable');
+						for (var i=0; i<metricCollection.length; i++) {
+							this.metrics.push(new this.metricNode(metricCollection[i].textContent));
+						}
+					}
+					
+					var commonInterfaceNode = setupNode.getElementsByTagName('interface');
+					if (commonInterfaceNode.length > 0) {
+						commonInterfaceNode = commonInterfaceNode[0];
+					} else {
+						commonInterfaceNode = undefined;
+					}
+					
+					this.commonInterface = new function() {
+						this.OptionNode = function(child) {
+							this.type = child.nodeName;
+							if (this.type == 'option')
+							{
+								this.name = child.getAttribute('name');
+							}
+							else if (this.type == 'check') {
+								this.check = child.getAttribute('name');
+								if (this.check == 'scalerange') {
+									this.min = child.getAttribute('min');
+									this.max = child.getAttribute('max');
+									if (this.min == null) {this.min = 1;}
+									else if (Number(this.min) > 1 && this.min != null) {
+										this.min = Number(this.min)/100;
+									} else {
+										this.min = Number(this.min);
+									}
+									if (this.max == null) {this.max = 0;}
+									else if (Number(this.max) > 1 && this.max != null) {
+										this.max = Number(this.max)/100;
+									} else {
+										this.max = Number(this.max);
+									}
+								}
+							} else if (this.type == 'anchor' || this.type == 'reference') {
+								this.value = Number(child.textContent);
+								this.enforce = child.getAttribute('enforce');
+								if (this.enforce == 'true') {this.enforce = true;}
+								else {this.enforce = false;}
+							}
+						};
+						this.options = [];
+						if (commonInterfaceNode != undefined) {
+							var child = commonInterfaceNode.firstElementChild;
+							while (child != undefined) {
+								this.options.push(new this.OptionNode(child));
+								child = child.nextElementSibling;
+							}
+						}
+					};
+					
+					var audioHolders = projectXML.getElementsByTagName('audioHolder');
+					for (var i=0; i<audioHolders.length; i++) {
+						this.audioHolders.push(new this.audioHolderNode(this,audioHolders[i]));
+					}
+					
+					// New check if we need to randomise the test order
+					if (this.randomiseOrder)
+					{
+				 		this.audioHolders = randomiseOrder(this.audioHolders);
+				 		for (var i=0; i<this.audioHolders.length; i++)
+				 		{
+				 			this.audioHolders[i].presentedId = i;
+				 		}
+					}
+					
+					if (this.testPages != null || this.testPages != undefined)
+					{
+						if (this.testPages > audioHolders.length)
+						{
+							console.log('Warning: You have specified '+audioHolders.length+' tests but requested '+this.testPages+' be completed!');
+							this.testPages = audioHolders.length;
+						}
+						var aH = this.audioHolders;
+						this.audioHolders = [];
+						for (var i=0; i<this.testPages; i++)
+						{
+							this.audioHolders.push(aH[i]);
+						}
+					}
+				};
+				
+				this.prepostNode = function(type,Collection) {
+					this.type = type;
+					this.options = [];
+					
+					this.OptionNode = function(child) {
+						
+						this.childOption = function(element) {
+							this.type = 'option';
+							this.id = element.id;
+							this.name = element.getAttribute('name');
+							this.text = element.textContent;
+						};
+						
+						this.type = child.nodeName;
+						if (child.nodeName == "question") {
+							this.id = child.id;
+							this.mandatory;
+							if (child.getAttribute('mandatory') == "true") {this.mandatory = true;}
+							else {this.mandatory = false;}
+							this.question = child.textContent;
+							if (child.getAttribute('boxsize') == null) {
+								this.boxsize = 'normal';
+							} else {
+								this.boxsize = child.getAttribute('boxsize');
+							}
+						} else if (child.nodeName == "statement") {
+							this.statement = child.textContent;
+						} else if (child.nodeName == "checkbox" || child.nodeName == "radio") {
+							var element = child.firstElementChild;
+							this.id = child.id;
+							if (element == null) {
+								console.log('Malformed' +child.nodeName+ 'entry');
+								this.statement = 'Malformed' +child.nodeName+ 'entry';
+								this.type = 'statement';
+							} else {
+								this.options = [];
+								while (element != null) {
+									if (element.nodeName == 'statement' && this.statement == undefined){
+										this.statement = element.textContent;
+									} else if (element.nodeName == 'option') {
+										this.options.push(new this.childOption(element));
+									}
+									element = element.nextElementSibling;
+								}
+							}
+						} else if (child.nodeName == "number") {
+							this.statement = child.textContent;
+							this.id = child.id;
+							this.min = child.getAttribute('min');
+							this.max = child.getAttribute('max');
+							this.step = child.getAttribute('step');
+						}
+					};
+					
+					// On construction:
+					if (Collection.length != 0) {
+						Collection = Collection[0];
+						if (Collection.childElementCount != 0) {
+							var child = Collection.firstElementChild;
+							this.options.push(new this.OptionNode(child));
+							while (child.nextElementSibling != null) {
+								child = child.nextElementSibling;
+								this.options.push(new this.OptionNode(child));
+							}
+						}
+					}
+				};
+				
+				this.metricNode = function(name) {
+					this.enabled = name;
+				};
+				
+				this.audioHolderNode = function(parent,xml) {
+					this.type = 'audioHolder';
+					this.presentedId = parent.audioHolders.length;
+					this.interfaceNode = function(DOM) {
+						var title = DOM.getElementsByTagName('title');
+						if (title.length == 0) {this.title = null;}
+						else {this.title = title[0].textContent;}
+						this.options = parent.commonInterface.options;
+						var scale = DOM.getElementsByTagName('scale');
+						this.scale = [];
+						for (var i=0; i<scale.length; i++) {
+							var arr = [null, null];
+							arr[0] = scale[i].getAttribute('position');
+							arr[1] = scale[i].textContent;
+							this.scale.push(arr);
+						}
+					};
+					
+					this.audioElementNode = function(parent,xml) {
+						this.url = xml.getAttribute('url');
+						this.id = xml.id;
+						this.parent = parent;
+						this.type = xml.getAttribute('type');
+						if (this.type == null) {this.type = "normal";}
+						if (this.type == 'anchor') {this.anchor = true;}
+						else {this.anchor = false;}
+						if (this.type == 'reference') {this.reference = true;}
+						else {this.reference = false;}
+						
+						this.marker = xml.getAttribute('marker');
+						if (this.marker == null) {this.marker = undefined;}
+						
+						if (this.anchor == true) {
+							if (this.marker != undefined) {this.enforce = true;}
+							else {this.enforce = enforceAnchor;}
+							this.marker = anchor;
+						}
+						else if (this.reference == true) {
+							if (this.marker != undefined) {this.enforce = true;}
+							else {this.enforce = enforceReference;}
+							this.marker = reference;
+						}
+						
+						if (this.marker != undefined) {
+							this.marker = Number(this.marker);
+							if (this.marker > 1) {this.marker /= 100;}
+						}
+					};
+					
+					this.commentQuestionNode = function(xml) {
+						this.childOption = function(element) {
+							this.type = 'option';
+							this.name = element.getAttribute('name');
+							this.text = element.textContent;
+						};
+						this.id = xml.id;
+						if (xml.getAttribute('mandatory') == 'true') {this.mandatory = true;}
+						else {this.mandatory = false;}
+						this.type = xml.getAttribute('type');
+						if (this.type == undefined) {this.type = 'text';}
+						switch (this.type) {
+						case 'text':
+							this.question = xml.textContent;
+							break;
+						case 'radio':
+							var child = xml.firstElementChild;
+							this.options = [];
+							while (child != undefined) {
+								if (child.nodeName == 'statement' && this.statement == undefined) {
+									this.statement = child.textContent;
+								} else if (child.nodeName == 'option') {
+									this.options.push(new this.childOption(child));
+								}
+								child = child.nextElementSibling;
+							}
+							break;
+						case 'checkbox':
+							var child = xml.firstElementChild;
+							this.options = [];
+							while (child != undefined) {
+								if (child.nodeName == 'statement' && this.statement == undefined) {
+									this.statement = child.textContent;
+								} else if (child.nodeName == 'option') {
+									this.options.push(new this.childOption(child));
+								}
+								child = child.nextElementSibling;
+							}
+							break;
+						}
+					};
+					
+					this.id = xml.id;
+					this.hostURL = xml.getAttribute('hostURL');
+					this.sampleRate = xml.getAttribute('sampleRate');
+					if (xml.getAttribute('randomiseOrder') == "true") {this.randomiseOrder = true;}
+					else {this.randomiseOrder = false;}
+					this.repeatCount = xml.getAttribute('repeatCount');
+					if (xml.getAttribute('loop') == 'true') {this.loop = true;}
+					else {this.loop == false;}
+					if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
+					else {this.elementComments = false;}
+					
+					var anchor = xml.getElementsByTagName('anchor');
+					var enforceAnchor = false;
+					if (anchor.length == 0) {
+						// Find anchor in commonInterface;
+						for (var i=0; i<parent.commonInterface.options.length; i++) {
+							if(parent.commonInterface.options[i].type == 'anchor') {
+								anchor = parent.commonInterface.options[i].value;
+								enforceAnchor = parent.commonInterface.options[i].enforce;
+								break;
+							}
+						}
+						if (typeof(anchor) == "object") {
+							anchor = null;
+						}
+					} else {
+						anchor = anchor[0].textContent;
+					}
+					
+					var reference = xml.getElementsByTagName('anchor');
+					var enforceReference = false;
+					if (reference.length == 0) {
+						// Find anchor in commonInterface;
+						for (var i=0; i<parent.commonInterface.options.length; i++) {
+							if(parent.commonInterface.options[i].type == 'reference') {
+								reference = parent.commonInterface.options[i].value;
+								enforceReference = parent.commonInterface.options[i].enforce;
+								break;
+							}
+						}
+						if (typeof(reference) == "object") {
+							reference = null;
+						}
+					} else {
+						reference = reference[0].textContent;
+					}
+					
+					if (typeof(anchor) == 'number') {
+						if (anchor > 1 && anchor < 100) {anchor /= 100.0;}
+					}
+					
+					if (typeof(reference) == 'number') {
+						if (reference > 1 && reference < 100) {reference /= 100.0;}
+					}
+					
+					this.preTest = new parent.prepostNode('pretest',xml.getElementsByTagName('PreTest'));
+					this.postTest = new parent.prepostNode('posttest',xml.getElementsByTagName('PostTest'));
+					
+					this.interfaces = [];
+					var interfaceDOM = xml.getElementsByTagName('interface');
+					for (var i=0; i<interfaceDOM.length; i++) {
+						this.interfaces.push(new this.interfaceNode(interfaceDOM[i]));
+					}
+					
+					this.commentBoxPrefix = xml.getElementsByTagName('commentBoxPrefix');
+					if (this.commentBoxPrefix.length != 0) {
+						this.commentBoxPrefix = this.commentBoxPrefix[0].textContent;
+					} else {
+						this.commentBoxPrefix = "Comment on track";
+					}
+					
+					this.audioElements  =[];
+					var audioElementsDOM = xml.getElementsByTagName('audioElements');
+					this.outsideReference = null;
+					for (var i=0; i<audioElementsDOM.length; i++) {
+						if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
+							if (this.outsideReference == null) {
+								this.outsideReference = new this.audioElementNode(this,audioElementsDOM[i]);
+							} else {
+								console.log('Error only one audioelement can be of type outsidereference per audioholder');
+								this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+								console.log('Element id '+audioElementsDOM[i].id+' made into normal node');
+							}
+						} else {
+							this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
+						}
+					}
+					
+					if (this.randomiseOrder) {
+						this.audioElements = randomiseOrder(this.audioElements);
+					}
+					
+					// Check only one anchor and one reference per audioNode
+					var anchor = [];
+					var reference = [];
+					this.anchorId = null;
+					this.referenceId = null;
+					for (var i=0; i<this.audioElements.length; i++)
+					{
+						if (this.audioElements[i].anchor == true) {anchor.push(i);}
+						if (this.audioElements[i].reference == true) {reference.push(i);}
+					}
+					
+					if (anchor.length > 1) {
+						console.log('Error - cannot have more than one anchor!');
+						console.log('Each anchor node will be a normal mode to continue the test');
+						for (var i=0; i<anchor.length; i++)
+						{
+							this.audioElements[anchor[i]].anchor = false;
+							this.audioElements[anchor[i]].value = undefined;
+						}
+					} else {this.anchorId = anchor[0];}
+					if (reference.length > 1) {
+						console.log('Error - cannot have more than one anchor!');
+						console.log('Each anchor node will be a normal mode to continue the test');
+						for (var i=0; i<reference.length; i++)
+						{
+							this.audioElements[reference[i]].reference = false;
+							this.audioElements[reference[i]].value = undefined;
+						}
+					} else {this.referenceId = reference[0];}
+					
+					this.commentQuestions = [];
+					var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
+					for (var i=0; i<commentQuestionsDOM.length; i++) {
+						this.commentQuestions.push(new this.commentQuestionNode(commentQuestionsDOM[i]));
+					}
+				};
+			}
+		</script>
+		<style>
+			div.popup {
+				width: 500px;
+				position: absolute;
+				height: 400px;
+				background-color: #fff;
+				border-radius: 10px;
+				box-shadow: 0px 0px 50px #000;
+				z-index: 2;
+			}
+			
+			button.popupButton {
+				/* Button for popup window
+				 */
+				min-width: 50px;
+				height: 25px;
+				position: relative;
+				border-radius: 5px;
+				border: #444;
+				border-width: 1px;
+				border-style: solid;
+				background-color: #fff;
+			}
+			
+			div.dragndrop {
+				margin-top: 10px;
+				border:#000000;
+				border-style: dashed;
+				border-width: 2px;
+			}
+			div.dndheaderelement {
+				float: left;
+				height: 100%;
+				border-right: #DDDDDD;
+				border-right-width: 1px;
+				border-right-style: solid;
+			}
+			div.dndheaderelement span{
+				padding-left: 5px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="content"></div>
+	</body>
+</html>
