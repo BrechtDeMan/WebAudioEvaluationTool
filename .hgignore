@@ -34,3 +34,6 @@ saves/*/*.xml
 saves/ratings/*.pdf
 saves/timelines_movement/*.pdf
 saves
+re:^docs/WAC2016/\._WAC2016\.bib$
+re:^docs/WAC2016/\._WAC2016\.pdf$
+re:^docs/WAC2016/\._WAC2016\.tex$

@@ -134,13 +134,47 @@ Here comes the abstract.
 	\begin{itemize}
 		\item Hedonic Scale
 		\item Multi attribute ratings
-		\item MUSHRA
+		\item MUSHRA (ITU-R BS. 1534)
 		
 		\item Interval Scale
 		\item Rank Scale
 		
 		\item 2D Plane rating - e.g. Valence vs. Arousal
 		\item Likert scale
+		
+		\item {\bf All the following are the interfaces available in HULTI-GEN~\cite{gribben2015toward} }
+		\item ABC/HR (ITU-R BS. 1116)
+		\begin{itemize}
+			\item Continuous Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)
+		\end{itemize}
+		\item -50 to 50 Bipolar with Ref
+		\begin{itemize}
+			\item Scale -50 to 50 on Mushra with default values as 0 in middle and a comparison ``Reference'' to compare to 0 value
+		\end{itemize}
+		\item Absolute Category Rating (ACR) Scale
+		\begin{itemize}
+			\item 5 point Scale - Bad, Poor, Fair, Good, Excellent (Default fair?)
+		\end{itemize}
+		\item Degredation Category Rating (DCR) Scale
+		\begin{itemize}
+			\item 5 point Scale - Inaudible, Audible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?) - {\it Basically just quantised ABC/HR?}
+		\end{itemize}
+		\item Comparison Category Rating (CCR) Scale
+		\begin{itemize}
+			\item 7 point scale: Much Better, Better, Slightly Better, About the same, slightly worse, worse, much worse - Default about the same with reference to compare to
+		\end{itemize}
+		\item 9 Point Hedonic Category Rating Scale
+		\begin{itemize}
+			\item 9 point scale: Like Extremely, Like Very Much, Like Moderate, Like Slightly, Neither Like nor Dislike, dislike Extremely, dislike Very Much, dislike Moderate, dislike Slightly  - Default Neither Like nor Dislike with reference to compare to
+		\end{itemize}
+		\item ITU-R 5 Point Continuous Impairment Scale
+		\begin{itemize}
+			\item 5 point Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)- {\it Basically just quantised ABC/HR, or Different named DCR}
+		\end{itemize}
+		\item Pairwise Comparison (Better/Worse)
+		\begin{itemize}
+			\item 2 point Scale - Better or Worse - (not sure how to default this - they default everything to better, which is an interesting choice)
+		\end{itemize}
 	\end{itemize}
 	
 	There are also the following interfaces, which would require a slightly different `engine' underneath, e.g. loading a different page for every possible pair. 
