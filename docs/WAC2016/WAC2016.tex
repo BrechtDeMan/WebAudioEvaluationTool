@@ -56,7 +56,7 @@
 % without further effort on your part as the last section in
 % the body of your article BEFORE References or any Appendices.
 
-\numberofauthors{4} %  in this sample file, there are a *total*
+\numberofauthors{5} %  in this sample file, there are a *total*
 % of EIGHT authors. SIX appear on the 'first-page' (for formatting
 % reasons) and the remaining two appear in the \additionalauthors section.
 %
@@ -132,18 +132,16 @@ Here comes the abstract.
 \section{Interfaces}
 	We could add more interfaces, such as: 
 	\begin{itemize}
-		\item Hedonic Scale
 		\item Multi attribute ratings
-		\item MUSHRA (ITU-R BS. 1534)
+		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
+		\item Interval Scale~\cite{zacharov1999round}
+		\item Rank Scale~\cite{pascoe1983evaluation}
 		
-		\item Interval Scale
-		\item Rank Scale
-		
-		\item 2D Plane rating - e.g. Valence vs. Arousal
-		\item Likert scale
+		\item 2D Plane rating - e.g. Valence vs. Arousal~\cite{carroll1969individual}
+		\item Likert scale~\cite{likert1932technique}
 		
 		\item {\bf All the following are the interfaces available in HULTI-GEN~\cite{gribben2015toward} }
-		\item ABC/HR (ITU-R BS. 1116)
+		\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116}
 		\begin{itemize}
 			\item Continuous Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)
 		\end{itemize}
@@ -151,27 +149,27 @@ Here comes the abstract.
 		\begin{itemize}
 			\item Scale -50 to 50 on Mushra with default values as 0 in middle and a comparison ``Reference'' to compare to 0 value
 		\end{itemize}
-		\item Absolute Category Rating (ACR) Scale
+		\item Absolute Category Rating (ACR) Scale~\cite{rec1996p}
 		\begin{itemize}
 			\item 5 point Scale - Bad, Poor, Fair, Good, Excellent (Default fair?)
 		\end{itemize}
-		\item Degredation Category Rating (DCR) Scale
+		\item Degredation Category Rating (DCR) Scale~\cite{rec1996p}
 		\begin{itemize}
 			\item 5 point Scale - Inaudible, Audible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?) - {\it Basically just quantised ABC/HR?}
 		\end{itemize}
-		\item Comparison Category Rating (CCR) Scale
+		\item Comparison Category Rating (CCR) Scale~\cite{rec1996p}
 		\begin{itemize}
 			\item 7 point scale: Much Better, Better, Slightly Better, About the same, slightly worse, worse, much worse - Default about the same with reference to compare to
 		\end{itemize}
-		\item 9 Point Hedonic Category Rating Scale
+		\item 9 Point Hedonic Category Rating Scale~\cite{peryam1952advanced}
 		\begin{itemize}
 			\item 9 point scale: Like Extremely, Like Very Much, Like Moderate, Like Slightly, Neither Like nor Dislike, dislike Extremely, dislike Very Much, dislike Moderate, dislike Slightly  - Default Neither Like nor Dislike with reference to compare to
 		\end{itemize}
-		\item ITU-R 5 Point Continuous Impairment Scale
+		\item ITU-R 5 Point Continuous Impairment Scale~\cite{rec1997bs}
 		\begin{itemize}
 			\item 5 point Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)- {\it Basically just quantised ABC/HR, or Different named DCR}
 		\end{itemize}
-		\item Pairwise Comparison (Better/Worse)
+		\item Pairwise Comparison (Better/Worse)~\cite{david1963method}
 		\begin{itemize}
 			\item 2 point Scale - Better or Worse - (not sure how to default this - they default everything to better, which is an interesting choice)
 		\end{itemize}
@@ -179,8 +177,8 @@ Here comes the abstract.
 	
 	There are also the following interfaces, which would require a slightly different `engine' underneath, e.g. loading a different page for every possible pair. 
 	\begin{itemize}
-		\item AB Test
-		\item ABX Test
+		\item AB Test~\cite{lipshitz1981great}
+		\item ABX Test~\cite{clark1982high}
 		\item JND
 	\end{itemize}
 	
