@@ -25,7 +25,7 @@
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
 % --- End of Author Metadata ---
 
-\title{Latex Template for WAC 2016}
+\title{Web Audio Evaluation Tool something something}
 %\subtitle{[Extended Abstract]
 %\titlenote{A full version of this paper is available as
 %\textit{Author's Guide to Preparing ACM SIG Proceedings Using
@@ -186,6 +186,21 @@ Here comes the abstract.
 
 \section{Analysis and diagnostics}
 	It would be great to have easy-to-use analysis tools to visualise the collected data and even do science with it. Even better would be to have all this in the browser. Complete perfection would be achieved if and when only limited setup, installation time, and expertise are required for the average non-CS researcher to use this. 
+	
+	The following could be nice: 
+	
+	\begin{itemize}
+		\item Web page showing all audioholder IDs, file names, subject IDs, audio element IDs, ... in the collected XMLs so far (\texttt{saves/*.xml})
+		\item Check/uncheck each of the above for analysis (e.g. zoom in on a certain song, or exclude a subset of subjects)
+		\item Click a mix to hear it (follow path in XML setup file, which is also embedded in the XML result file)
+		\item Box plot, confidence plot, scatter plot of values (for a given audioholder)
+		\item Timeline for a specific subject (see Python scripts), perhaps re-playing the experiment in X times realtime. (If actual realtime, you could replay the audio...)
+		\item Distribution plots of any radio button and number questions (drop-down menu with `pretest', `posttest', ...; then drop-down menu with question `IDs' like `gender', `age', ...; make pie chart/histogram of these values over selected range of XMLs)
+		\item All `comments' on a specific audioelement
+		\item A `download' button for a nice CSV of various things (values, survey responses, comments) people might want to use for analysis, e.g. when XML scares them
+	\end{itemize}
+
+	A subset of the above would already be nice for this paper. 
 	
 	Some pictures here please. 
 
