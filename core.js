@@ -1299,14 +1299,14 @@ function returnDateNode()
 function Specification() {
 	// Handles the decoding of the project specification XML into a simple JavaScript Object.
 	
-	this.interfaceType;
-	this.commonInterface;
-	this.projectReturn;
-	this.randomiseOrder;
-	this.collectMetrics;
-	this.testPages;
-	this.preTest;
-	this.postTest;
+	this.interfaceType = null;
+	this.commonInterface = null;
+	this.projectReturn = null;
+	this.randomiseOrder = null;
+	this.collectMetrics = null;
+	this.testPages = null;
+	this.preTest = null;
+	this.postTest = null;
 	this.metrics =[];
 	
 	this.audioHolders = [];
