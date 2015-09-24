@@ -128,6 +128,29 @@ Here comes the abstract.
 	
 \section{Architecture}
 	A slightly technical overview of the system. Talk about XML, JavaScript, Web Audio API, HTML5. 
+	Describe and/or visualise audioholder-audioelement-... structure.
+	
+	Streaming audio? 
+	
+	
+\section{Remote tests}
+	The following features allow easy and effective remote testing: 
+	\begin{itemize}
+		\item PHP script to collect result XML files
+		\item Randomly pick specified number of audioholders
+		\item Functionality to participate multiple times
+			\begin{itemize}
+				\item Possible to log in with unique ID (no password)
+				\item Pick `new user' (need new, unique ID) or `already participated' (need already available ID)
+				\item Store XML on server with IDs plus which audioholders have already been listened to
+				\item Don't show `post-test' survey after first time
+				\item Pick `new' audioholders if available
+				\item Copy survey information first time to new XMLs
+			\end{itemize}
+		\item Intermediate saves
+		\item Collect IP address information (privacy issues?) --> geo-related API? 
+	\end{itemize}
+
 	
 \section{Interfaces}
 	We could add more interfaces, such as: 
@@ -198,6 +221,7 @@ Here comes the abstract.
 		\item Distribution plots of any radio button and number questions (drop-down menu with `pretest', `posttest', ...; then drop-down menu with question `IDs' like `gender', `age', ...; make pie chart/histogram of these values over selected range of XMLs)
 		\item All `comments' on a specific audioelement
 		\item A `download' button for a nice CSV of various things (values, survey responses, comments) people might want to use for analysis, e.g. when XML scares them
+		\item Validation of setup XMLs (easily spot `errors', like duplicate IDs or URLs, missing/dangling tags, ...)
 	\end{itemize}
 
 	A subset of the above would already be nice for this paper. 
