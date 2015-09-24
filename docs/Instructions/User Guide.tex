@@ -1,0 +1,75 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+								
+\usepackage{listings}				% Source code
+\usepackage{amssymb}
+\usepackage{cite}
+\usepackage{hyperref}				% Hyperlinks
+
+\graphicspath{{img/}}					% Relative path where the images are stored. 
+
+\title{Web Audio Evaluation Tool \\User Guide}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+These instructions are about use of the Web Audio Evaluation Tool \cite{deman2015c}.
+Version 1.0
+
+\tableofcontents
+
+\section{Installing}
+
+The tool can be downloaded from the SoundSoftware website, available at \url{https://code.soundsoftware.ac.uk/projects/webaudioevaluationtool/repository}. The repository contains all the files required by the tool, along with interfaces to post bug reports or issue any feature requests.
+
+Once downloaded and extracted (either through a Mercurial client or the available zip download) the tool is ready to be operated with. The tool is designed for three modes of use:
+\begin{itemize}
+\item Single Location, One User - A listening test which will be conducted in a single location, one user at a time. Possibly on a machine with no network or internet connectivity
+\item Single Location, Multiple Users - Similar to the above but where the hosting server is located behind a networked firewall which all test machines can access
+\item Multiple Location, Multiple Users - A test operated over the web by multiple end users
+\end{itemize}
+There are other modes of use which we cannot document due to the flexible nature of the test. If your test does not mostly fit into one of these three categories, have a look in the Advanced Test section.
+
+\subsection{Python}
+
+To trial the test before deployment, or if you are performing a test on a non-networked machine, you will need to run our python script to launch a local python web server. This script is designed for Python 2.7. Running the script will open a basic web server, hosting the directory it is contained in. Visit \url{http://localhost:8080/} to launch the test instance once the server is running. To quit the server, either close the terminal window or press Ctrl+C on your keyboard to forcibly shut the server.
+
+If your system already uses port 8080 and you wish to use the server, please read the Advanced Test Creation section.
+
+\section{Designing a Test}
+
+The test specification document is an XML file containing all the information the tool requires to operate your test. No coding in JavaScript or HTML is needed to get this test running.
+
+
+
+\subsection{Using the test create tool}
+We have supplied a test creation tool, available in the repository directory test\_creation. This tool is a self-contained web page, so doubling clicking will launch the page in your system default browser.
+
+The test creation tool can help you build a simple test very quickly. By simply selecting your interface and clicking check-boxes you can build a test in minutes.
+
+Audio is handled by directing the tool to where
+
+The tool examines your XML before exporting to ensure you do not export an invalid XML structure which would crash the test.
+
+\subsection{Setting up the test directory}
+
+\section{Launching and operating}
+
+\section{Advanced Test Creation}
+\subsection{Multi-User}
+\subsection{3rd Party Server}
+
+\section{Errors and Troubleshooting}
+\subsection{Common Errors}
+\subsection{Forcing an Export}
+\subsection{Terminal}
+
+\section{Future Work}
+
+\end{document}
