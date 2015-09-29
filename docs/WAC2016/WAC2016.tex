@@ -1,4 +1,5 @@
 \documentclass{sig-alternate}
+\usepackage{hyperref}
 
 \begin{document}
 
@@ -125,7 +126,19 @@ Here comes the abstract.
 
 
 \section{Introduction}
-	Introducing the paper. Referring to \cite{waet}. Talking about what we do in the various sections of this paper. Pointing out that the header of the paper kind of looks like the Bat-sign. 
+
+	% Listening tests/perceptual audio evaluation: what are they, why are they important
+	% As opposed to limited scope of WAC15 paper: also musical features, realism of sound effects / sound synthesis, performance of source separation and other algorithms... 
+	Perceptual evaluation of audio, in the form of listening tests, is a powerful way to assess anything from audio codec quality over realism of sound synthesis to the performance of source separation, automated music production and 
+	In less technical areas, the framework of a listening test can be used to measure emotional response to music or test cognitive abilities. % maybe some references? If there's space.
+
+	% Why difficult? Challenges? What constitutes a good interface? 
+	Technical, interfaces, user friendliness, reliability 
+
+	Note that the design of an effective listening test further poses many challenges unrelated to interface design, which are beyond the scope of this paper \cite{bech}. 
+
+	% Why in the browser? 
+	Web Audio API has made some essential features like sample manipulation of audio streams possible \cite{schoeffler2015mushra}.
 	
 	Situating the Web Audio Evaluation Tool between other currently available evaluation tools, ...
 	
@@ -135,12 +148,12 @@ Here comes the abstract.
         \begin{center}
         	\begin{tabular}{|*{6}{l|}}
         		\hline
-        		\textbf{Name} 	& \textbf{Ref.} 	& \textbf{Language} 	& \textbf{Interfaces} 			& \textbf{Remote} 			& \textbf{Programming} 	\\
+        		\textbf{Name} 	& \textbf{Ref.} 	& \textbf{Language} 	& \textbf{Interfaces} 			& \textbf{Remote} 			& \textbf{All UI} 	\\
         		\hline
-        		APE 			& \cite{ape}		& MATLAB				& multiple stimulus one axis 	& 							& \checkmark			\\
+        		APE 			& \cite{ape}		& MATLAB				& multiple stimulus one axis 	& 							& 			\\
         		BeaqleJS		& \cite{beaqlejs}	& JavaScript			& 								& not natively supported 	& \\
-        		HULTI-GEN 		& \cite{hultigen}	& MAX 					& 								& 							& \\
-        		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{all of the above}		& \checkmark				& \\
+        		HULTI-GEN 		& \cite{hultigen}	& MAX 					& 								& 							& \checkmark \\
+        		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{all of the above}		& \checkmark				& \checkmark \\
         		\hline
         	\end{tabular}
         \end{center}
@@ -151,25 +164,38 @@ Here comes the abstract.
         ... However, BeaqleJS \cite{beaqlejs} does not make use of the Web Audio API, %requires programming knowledge... 
 
         % 
-        Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces
+        Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
+
+        As recruiting participants can be very time-consuming, and as for some tests a large number of participants is needed, browser-based tests \cite{schoeffler2015mushra}. However, to our knowledge, no tool currently exists that allows the creation of a remotely accessible listening test. % I wonder what you can do with Amazon Mechanical Turk and the likes. 
+
+        [Talking about what we do in the various sections of this paper. Referring to \cite{waet}. ]
 
 	
-\section{Architecture}  % title? 'back end'?
+\section{Architecture}  % title? 'back end'? % NICK
 	A slightly technical overview of the system. Talk about XML, JavaScript, Web Audio API, HTML5. 
 	Describe and/or visualise audioholder-audioelement-... structure. 
 
-	% see also SMC12
+	% see also SMC12 - less detail here
+
+	Which type of files? % WAV, anything else? Perhaps not exhaustive list, but say something along the lines of 'whatever browser supports'
 	
 	Streaming audio? % probably not, unless it's easy
 
-	Compatibility? 
+	Compatibility? % not IE, everything else fine? 
+
+
 	
 	
 \section{Remote tests} % with previous? 
+
+	If the experimenter is willing to trade some degree of control for a higher number of participants, the test can be hosted on a web server so that subjects can take part remotely. This way, a link can be shared widely in the hope of attracting a large amount of subjects, while listening conditions and subject reliability may be less ideal. However, a sound system calibration page and a wide range of metrics logged during the test mitigate these problems. Note also that in some experiments, it may be preferred that the subject has a `real life', familiar listening set-up, for instance when perceived quality differences on everyday sound systems are investigated. 
+	Furthermore, a fully browser-based test, where the collection of the results is automatic, is more efficient and technically reliable even when the test still takes place under lab conditions.
+
 	The following features allow easy and effective remote testing: 
 	\begin{itemize}
 		\item PHP script to collect result XML files
 		\item Randomly pick specified number of audioholders
+		\item Calibration
 		\item Functionality to participate multiple times
 			\begin{itemize}
 				\item Possible to log in with unique ID (no password)
@@ -181,11 +207,17 @@ Here comes the abstract.
 			\end{itemize}
 		\item Intermediate saves
 		\item Collect IP address information (privacy issues?) --> geo-related API? 
+		\item Time measurement - see before or 
 	\end{itemize}
 
 	
 \section{Interfaces} % title? 'Front end'? % Dave
 	`Build your own test'
+
+	Elements present to build any of the following interfaces, and many more: axes, markers, labels, anchors, references, reference signal button, stop button, comment boxes, radio buttons, checkboxes, transport/scrubber bar
+
+	Established tests (see below) included as `presets' in the build-your-own-test page. 
+
 
 	We could add more interfaces, such as: 
 	\begin{itemize}
@@ -243,6 +275,7 @@ Here comes the abstract.
 	A screenshot would be nice. 
 
 \section{Analysis and diagnostics}
+	% don't mention Python scripts
 	It would be great to have easy-to-use analysis tools to visualise the collected data and even do science with it. Even better would be to have all this in the browser. Complete perfection would be achieved if and when only limited setup, installation time, and expertise are required for the average non-CS researcher to use this. 
 	
 	The following could be nice: 
@@ -264,13 +297,21 @@ Here comes the abstract.
 	Some pictures here please. 
 
 \section{Concluding remarks and future work}
-	Perhaps an `engineering brief' such as this one doesn't really have a lot of conclusion, except `We made this'. 
 	
-	You can check it out at \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}. 
+	The code and documentation can be pulled or downloaded from \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}. 
 	
-	Talking a little bit about what else might happen. Unless we really want to wrap this up. 
+	[Talking a little bit about what else might happen. Unless we really want to wrap this up. ]
 
-	Use \cite{schoeffler2015mushra} as a `checklist'.
+	Use \cite{schoeffler2015mushra} as a `checklist', even though it only considers subjective evaluation of audio systems (and focuses on the requirements for a MUSHRA test).
+		% remote
+		% language support (not explicitly stated)
+		% crossfades
+		% choosing speakers/sound device from within browser? 
+		% collect information about software and sound system
+		% buttons, scales, ... UI elements
+		% must be able to load uncompressed PCM
+
+	[What can we not do? `Method of adjustment', as in \cite{schoeffler2015mushra} is another can of worms, because, like, you could adjust lots of things (volume is just one of them, that could be done quite easily). Same for using input signals like the participant's voice. Either leave out, or mention this requires modification of the code we provide.]
 
 %
 % The following two commands are all you need in the
