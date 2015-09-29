@@ -1,6 +1,5 @@
 \documentclass{sig-alternate}
 
-
 \begin{document}
 
 % Copyright
@@ -56,6 +55,7 @@
 % without further effort on your part as the last section in
 % the body of your article BEFORE References or any Appendices.
 
+% FIVE authors instead of four, to leave space between first two authors.
 \numberofauthors{5} %  in this sample file, there are a *total*
 % of EIGHT authors. SIX appear on the 'first-page' (for formatting
 % reasons) and the remaining two appear in the \additionalauthors section.
@@ -74,7 +74,8 @@
 % 1st. author
 \alignauthor Nicholas Jillings\\
        \email{n.g.r.jillings@se14.qmul.ac.uk}
-       \alignauthor  % dummy author for nicer spacing
+ % dummy author for nicer spacing
+ \alignauthor 
 % 2nd. author
 \alignauthor Brecht De Man\\
        \email{b.deman@qmul.ac.uk}
@@ -85,7 +86,7 @@
 % 4th. author
 \alignauthor Joshua D. Reiss\\
 \email{joshua.reiss@qmul.ac.uk}
-\and
+\and % new line for address
        \affaddr{Centre for Digital Music}\\
        \affaddr{School of Electronic Engineering and Computer Science}\\
        \affaddr{Queen Mary University of London}\\
@@ -126,14 +127,45 @@ Here comes the abstract.
 \section{Introduction}
 	Introducing the paper. Referring to \cite{waet}. Talking about what we do in the various sections of this paper. Pointing out that the header of the paper kind of looks like the Bat-sign. 
 	
-\section{Architecture}
+	Situating the Web Audio Evaluation Tool between other currently available evaluation tools, ...
+	
+	% only browser-based? 
+	\begin{table*}[htdp]
+        \caption{Table with existing listening test platforms and their features}
+        \begin{center}
+        	\begin{tabular}{|*{6}{l|}}
+        		\hline
+        		\textbf{Name} 	& \textbf{Ref.} 	& \textbf{Language} 	& \textbf{Interfaces} 			& \textbf{Remote} 			& \textbf{Programming} 	\\
+        		\hline
+        		APE 			& \cite{ape}		& MATLAB				& multiple stimulus one axis 	& 							& \checkmark			\\
+        		BeaqleJS		& \cite{beaqlejs}	& JavaScript			& 								& not natively supported 	& \\
+        		HULTI-GEN 		& \cite{hultigen}	& MAX 					& 								& 							& \\
+        		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{all of the above}		& \checkmark				& \\
+        		\hline
+        	\end{tabular}
+        \end{center}
+        \label{tab:toolboxes}
+        \end{table*}%
+
+        % about BeaqleJS
+        ... However, BeaqleJS \cite{beaqlejs} does not make use of the Web Audio API, %requires programming knowledge... 
+
+        % 
+        Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces
+
+	
+\section{Architecture}  % title? 'back end'?
 	A slightly technical overview of the system. Talk about XML, JavaScript, Web Audio API, HTML5. 
-	Describe and/or visualise audioholder-audioelement-... structure.
+	Describe and/or visualise audioholder-audioelement-... structure. 
+
+	% see also SMC12
 	
-	Streaming audio? 
+	Streaming audio? % probably not, unless it's easy
+
+	Compatibility? 
 	
 	
-\section{Remote tests}
+\section{Remote tests} % with previous? 
 	The following features allow easy and effective remote testing: 
 	\begin{itemize}
 		\item PHP script to collect result XML files
@@ -152,9 +184,12 @@ Here comes the abstract.
 	\end{itemize}
 
 	
-\section{Interfaces}
+\section{Interfaces} % title? 'Front end'? % Dave
+	`Build your own test'
+
 	We could add more interfaces, such as: 
 	\begin{itemize}
+		\item (APE style) \cite{ape}
 		\item Multi attribute ratings
 		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
 		\item Interval Scale~\cite{zacharov1999round}
@@ -163,7 +198,7 @@ Here comes the abstract.
 		\item 2D Plane rating - e.g. Valence vs. Arousal~\cite{carroll1969individual}
 		\item Likert scale~\cite{likert1932technique}
 		
-		\item {\bf All the following are the interfaces available in HULTI-GEN~\cite{gribben2015toward} }
+		\item {\bf All the following are the interfaces available in HULTI-GEN~\cite{hultigen} }
 		\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116}
 		\begin{itemize}
 			\item Continuous Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)
@@ -228,13 +263,14 @@ Here comes the abstract.
 	
 	Some pictures here please. 
 
-\section{Concluding remarks}
+\section{Concluding remarks and future work}
 	Perhaps an `engineering brief' such as this one doesn't really have a lot of conclusion, except `We made this'. 
 	
 	You can check it out at \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}. 
 	
-\section{Future work}
-	Perhaps here, perhaps not. Talking a little bit about what else might happen. Unless we really want to wrap this up. 
+	Talking a little bit about what else might happen. Unless we really want to wrap this up. 
+
+	Use \cite{schoeffler2015mushra} as a `checklist'.
 
 %
 % The following two commands are all you need in the
