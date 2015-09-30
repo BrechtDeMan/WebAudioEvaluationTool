@@ -37,3 +37,9 @@ saves
 re:^docs/WAC2016/\._WAC2016\.bib$
 re:^docs/WAC2016/\._WAC2016\.pdf$
 re:^docs/WAC2016/\._WAC2016\.tex$
+*.out
+*.fdb_latexmk
+*.toc
+subject
+resample
+test-data
