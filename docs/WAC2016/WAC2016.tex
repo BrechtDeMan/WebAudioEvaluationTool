@@ -1,5 +1,6 @@
 \documentclass{sig-alternate}
-\usepackage{hyperref}
+\usepackage{hyperref}	% make links (like references, links to Sections, ...) clickable
+\usepackage{enumitem}	% tighten itemize etc by appending '[noitemsep,nolistsep]'
 
 \begin{document}
 
@@ -132,6 +133,8 @@ Here comes the abstract.
 	Perceptual evaluation of audio, in the form of listening tests, is a powerful way to assess anything from audio codec quality over realism of sound synthesis to the performance of source separation, automated music production and 
 	In less technical areas, the framework of a listening test can be used to measure emotional response to music or test cognitive abilities. % maybe some references? If there's space.
 
+	% check out http://link.springer.com/article/10.1007/s10055-015-0270-8 - only paper that cited WAC15 paper
+
 	% Why difficult? Challenges? What constitutes a good interface? 
 	Technical, interfaces, user friendliness, reliability 
 
@@ -192,12 +195,12 @@ Here comes the abstract.
 	Furthermore, a fully browser-based test, where the collection of the results is automatic, is more efficient and technically reliable even when the test still takes place under lab conditions.
 
 	The following features allow easy and effective remote testing: 
-	\begin{itemize}
+	\begin{itemize}[noitemsep,nolistsep]
 		\item PHP script to collect result XML files
 		\item Randomly pick specified number of audioholders
 		\item Calibration
 		\item Functionality to participate multiple times
-			\begin{itemize}
+			\begin{itemize}[noitemsep,nolistsep]
 				\item Possible to log in with unique ID (no password)
 				\item Pick `new user' (need new, unique ID) or `already participated' (need already available ID)
 				\item Store XML on server with IDs plus which audioholders have already been listened to
@@ -220,7 +223,7 @@ Here comes the abstract.
 
 
 	We could add more interfaces, such as: 
-	\begin{itemize}
+	\begin{itemize}[noitemsep,nolistsep]
 		\item (APE style) \cite{ape}
 		\item Multi attribute ratings
 		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
@@ -266,7 +269,7 @@ Here comes the abstract.
 	\end{itemize}
 	
 	There are also the following interfaces, which would require a slightly different `engine' underneath, e.g. loading a different page for every possible pair. 
-	\begin{itemize}
+	\begin{itemize}[noitemsep,nolistsep]
 		\item AB Test~\cite{lipshitz1981great}
 		\item ABX Test~\cite{clark1982high}
 		\item JND
@@ -280,7 +283,7 @@ Here comes the abstract.
 	
 	The following could be nice: 
 	
-	\begin{itemize}
+	\begin{itemize}[noitemsep,nolistsep]
 		\item Web page showing all audioholder IDs, file names, subject IDs, audio element IDs, ... in the collected XMLs so far (\texttt{saves/*.xml})
 		\item Check/uncheck each of the above for analysis (e.g. zoom in on a certain song, or exclude a subset of subjects)
 		\item Click a mix to hear it (follow path in XML setup file, which is also embedded in the XML result file)
