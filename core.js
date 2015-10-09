@@ -1376,10 +1376,7 @@ function Specification() {
 						}
 					}
 				} else if (this.type == 'anchor' || this.type == 'reference') {
-					this.value = Number(child.textContent);
-					this.enforce = child.getAttribute('enforce');
-					if (this.enforce == 'true') {this.enforce = true;}
-					else {this.enforce = false;}
+					Console.log("WARNING: Anchor and Reference tags in the <interface> node are depricated");
 				}
 			};
 			this.options = [];
@@ -1524,24 +1521,32 @@ function Specification() {
 			if (this.type == 'reference') {this.reference = true;}
 			else {this.reference = false;}
 			
-			this.marker = xml.getAttribute('marker');
-			if (this.marker == null) {this.marker = undefined;}
-			
-			if (this.anchor == true) {
-				if (this.marker != undefined) {this.enforce = true;}
-				else {this.enforce = enforceAnchor;}
-				this.marker = anchor;
+			if (this.anchor == true || this.reference == true)
+			{
+				this.marker = xml.getAttribute('marker');
+				if (this.marker != undefined)
+				{
+					this.marker = Number(this.marker);
+					if (isNaN(this.marker) == false)
+					{
+						if (this.marker > 1)
+						{	this.marker /= 100.0;}
+						if (this.marker >= 0 && this.marker <= 1)
+						{
+							this.enforce = true;
+							return;
+						} else {
+							console.log("ERROR - Marker of audioElement "+this.id+" is not between 0 and 1 (float) or 0 and 100 (integer)!");
+							console.log("ERROR - Marker not enforced!");
+						}
+					} else {
+						console.log("ERROR - Marker of audioElement "+this.id+" is not a number!");
+						console.log("ERROR - Marker not enforced!");
+					}
+				}
 			}
-			else if (this.reference == true) {
-				if (this.marker != undefined) {this.enforce = true;}
-				else {this.enforce = enforceReference;}
-				this.marker = reference;
-			}
-			
-			if (this.marker != undefined) {
-				this.marker = Number(this.marker);
-				if (this.marker > 1) {this.marker /= 100;}
-			}
+			this.marker = false;
+			this.enforce = false;
 		};
 		
 		this.commentQuestionNode = function(xml) {
@@ -1597,50 +1602,6 @@ function Specification() {
 		if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
 		else {this.elementComments = false;}
 		
-		var anchor = xml.getElementsByTagName('anchor');
-		var enforceAnchor = false;
-		if (anchor.length == 0) {
-			// Find anchor in commonInterface;
-			for (var i=0; i<parent.commonInterface.options.length; i++) {
-				if(parent.commonInterface.options[i].type == 'anchor') {
-					anchor = parent.commonInterface.options[i].value;
-					enforceAnchor = parent.commonInterface.options[i].enforce;
-					break;
-				}
-			}
-			if (typeof(anchor) == "object") {
-				anchor = null;
-			}
-		} else {
-			anchor = anchor[0].textContent;
-		}
-		
-		var reference = xml.getElementsByTagName('anchor');
-		var enforceReference = false;
-		if (reference.length == 0) {
-			// Find anchor in commonInterface;
-			for (var i=0; i<parent.commonInterface.options.length; i++) {
-				if(parent.commonInterface.options[i].type == 'reference') {
-					reference = parent.commonInterface.options[i].value;
-					enforceReference = parent.commonInterface.options[i].enforce;
-					break;
-				}
-			}
-			if (typeof(reference) == "object") {
-				reference = null;
-			}
-		} else {
-			reference = reference[0].textContent;
-		}
-		
-		if (typeof(anchor) == 'number') {
-			if (anchor > 1 && anchor < 100) {anchor /= 100.0;}
-		}
-		
-		if (typeof(reference) == 'number') {
-			if (reference > 1 && reference < 100) {reference /= 100.0;}
-		}
-		
 		this.preTest = new parent.prepostNode('pretest',xml.getElementsByTagName('PreTest'));
 		this.postTest = new parent.prepostNode('posttest',xml.getElementsByTagName('PostTest'));
 		
@@ -1677,36 +1638,6 @@ function Specification() {
 		if (this.randomiseOrder) {
 			this.audioElements = randomiseOrder(this.audioElements);
 		}
-		
-		// Check only one anchor and one reference per audioNode
-		var anchor = [];
-		var reference = [];
-		this.anchorId = null;
-		this.referenceId = null;
-		for (var i=0; i<this.audioElements.length; i++)
-		{
-			if (this.audioElements[i].anchor == true) {anchor.push(i);}
-			if (this.audioElements[i].reference == true) {reference.push(i);}
-		}
-		
-		if (anchor.length > 1) {
-			console.log('Error - cannot have more than one anchor!');
-			console.log('Each anchor node will be a normal mode to continue the test');
-			for (var i=0; i<anchor.length; i++)
-			{
-				this.audioElements[anchor[i]].anchor = false;
-				this.audioElements[anchor[i]].value = undefined;
-			}
-		} else {this.anchorId = anchor[0];}
-		if (reference.length > 1) {
-			console.log('Error - cannot have more than one anchor!');
-			console.log('Each anchor node will be a normal mode to continue the test');
-			for (var i=0; i<reference.length; i++)
-			{
-				this.audioElements[reference[i]].reference = false;
-				this.audioElements[reference[i]].value = undefined;
-			}
-		} else {this.referenceId = reference[0];}
 		
 		this.commentQuestions = [];
 		var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
