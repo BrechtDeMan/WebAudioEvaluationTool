@@ -148,24 +148,59 @@ Here comes the abstract.
 	
 	% only browser-based? 
 	\begin{table*}[ht]
-        \caption{Table with existing listening test platforms and their features}
-        \begin{center}
-        	\begin{tabular}{|*{6}{l|}}
-        		\hline
-        		\textbf{Name} 	& \textbf{Ref.} 	& \textbf{Language} 	& \textbf{Interfaces} 			& \textbf{Remote} 			& \textbf{All UI} 	\\
-        		\hline
-        		APE 			& \cite{ape}		& MATLAB				& multiple stimulus one axis 	& 							& 			\\
-        		BeaqleJS		& \cite{beaqlejs}	& JavaScript			& 								& not natively supported 	& \\
-        		HULTI-GEN 		& \cite{hultigen}	& MAX 					& 								& 							& \checkmark \\
-        		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{all of the above}		& \checkmark				& \checkmark \\
-        		\hline
-        	\end{tabular}
-        \end{center}
-        \label{tab:toolboxes}
-        \end{table*}%
+    \caption{Table with existing listening test platforms and their features}
+    \begin{center}
+    	\begin{tabular}{|*{6}{l|}}
+    		\hline
+    		\textbf{Name} 	& \textbf{Ref.} 	& \textbf{Language} 	& \textbf{Interfaces} 			& \textbf{Remote} 			& \textbf{All UI} 	\\
+    		\hline
+    		APE 			& \cite{ape}		& MATLAB				& multi-stimulus, 1 axis per attribute 	& 					& 			 \\
+    		BeaqleJS		& \cite{beaqlejs}	& JavaScript			& ABX, MUSHRA 					& (not natively supported) 	& 			 \\
+    		HULTI-GEN 		& \cite{hultigen}	& MAX 					& 								& 							& \checkmark \\
+    		mushraJS		& \footnote{https://github.com/akaroice/mushraJS} & JavaScript & MUSHRA 			& \checkmark				& 	 \\
+    		MUSHRAM			& \cite{mushram}	& MATLAB				& MUSHRA						& 							& 			 \\
+    		Scale 			& \cite{scale}		& MATLAB				& 								&							&			 \\
+    		WhisPER			& \cite{whisper}	& MATLAB				&								&							& \checkmark \\
+    		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{all of the above}		& \checkmark				& \checkmark \\
+    		\hline
+    	\end{tabular}
+    \end{center}
+    \label{tab:toolboxes}
+    \end{table*}%
+
+    \begin{table*}[ht]
+    \caption{Table with interfaces and which toolboxes support them}
+    \begin{center}
+    	\begin{tabular}{|*{5}{l|}}
+    		\hline
+    		\textbf{Interface} 									& \textbf{HULTI-GEN} 	& \textbf{Scale} 	& \textbf{WhisPER} 	& \textbf{WAET} \\
+    		\hline
+    		MUSHRA (ITU-R BS. 1534)								& \checkmark 			&					&					& \checkmark 	\\
+    		Rank scale 											& \checkmark 			&					&					& \checkmark	\\
+			Likert scale										& \checkmark 			&					& \checkmark		& \checkmark	\\
+			ABC/HR (ITU-R BS. 1116)								& \checkmark 			&					&					& \checkmark	\\
+			-50 to 50 Bipolar with Ref							& \checkmark 			&					& 					& \checkmark	\\
+			Absolute Category Rating (ACR) Scale				& \checkmark 			&					&					& \checkmark	\\
+			Degredation Category Rating (DCR) Scale				& \checkmark 			&					&					& \checkmark	\\
+			Comparison Category Rating (CCR) Scale				& \checkmark 			&					& \checkmark		& \checkmark	\\
+			9 Point Hedonic Category Rating Scale				& \checkmark 			&					& \checkmark		& \checkmark	\\
+			ITU-R 5 Point Continuous Impairment Scale			& \checkmark 			&					&					& \checkmark	\\
+			Pairwise Comparison (Better/Worse)					& \checkmark 			&					&					& \checkmark	\\
+			APE style											& 			 			&					&					& \checkmark	\\
+			Multi attribute ratings								& \checkmark 			&					&					& \checkmark	\\
+			AB Test												& \checkmark 			&					&					& \checkmark	\\
+			ABX Test											& \checkmark 			&					&					& \checkmark	\\
+			``Adaptive psychophysical methods''					& 						&					& \checkmark		&				\\
+			Repertory Grid Technique (RGT)						&						&					& \checkmark		&				\\
+			(Semantic differential)								& 						&					& (\checkmark)		&				\\ % same as a few of the above
+    		\hline
+    	\end{tabular}
+    \end{center}
+    \label{tab:toolboxes}
+    \end{table*}%
 
         % about BeaqleJS
-        ... However, BeaqleJS \cite{beaqlejs} does not make use of the Web Audio API, %requires programming knowledge... 
+        ... However, BeaqleJS \cite{beaqlejs} does not make use of the Web Audio API, %requires programming knowledge?... 
 
         % 
         Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
@@ -258,7 +293,7 @@ Here comes the abstract.
 
 The purpose of this listening test framework is to allow any user the maximum flexibility to design a listening test for their exact application with minimum effort. To this end, a large range of standard listening test interfaces have been implemented. A review of existing listening test frameworks was undertaken and presented in~\Cref{tab:toolboxes}. HULTI-GEN~\cite{hultigen} is a single toolbox that presents the user with a large number of different test interfaces and allows for customisation of each test interface.
 
-To provide users with a flexible system, a large range of `standard' listening test interfaces have been implemented, including:
+To provide users with a flexible system, a large range of `standard' listening test interfaces have been implemented, including: % pretty much the same wording as two sentences earlier
 	\begin{itemize}[noitemsep,nolistsep]
 		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
 		\begin{itemize}
