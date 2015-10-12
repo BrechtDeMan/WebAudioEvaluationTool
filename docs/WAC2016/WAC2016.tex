@@ -26,7 +26,7 @@
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
 % --- End of Author Metadata ---
 
-\title{Web Audio Evaluation Tool something something}
+\title{Web Audio Evaluation Tool: A framework for subjective assessment of audio}
 %\subtitle{[Extended Abstract]
 %\titlenote{A full version of this paper is available as
 %\textit{Author's Guide to Preparing ACM SIG Proceedings Using
@@ -172,6 +172,32 @@ Here comes the abstract.
         As recruiting participants can be very time-consuming, and as for some tests a large number of participants is needed, browser-based tests \cite{schoeffler2015mushra}. However, to our knowledge, no tool currently exists that allows the creation of a remotely accessible listening test. % I wonder what you can do with Amazon Mechanical Turk and the likes. 
 
         [Talking about what we do in the various sections of this paper. Referring to \cite{waet}. ]
+
+        % MEETING 8 OCTOBER
+        \subsection{Meeting 8 October}
+        \begin{itemize}
+        	\item Do we manipulate audio?\\
+	        	\begin{itemize}
+	        		\item Add loudness equalisation? (test\_create.html) Tag with gains. 
+	        		\item Add volume slider? 
+	        		\item Cross-fade (in interface node): default 0, number of seconds
+	        		\item Also: we use the playback buffer to present metrics of which portion is listened to
+	        	\end{itemize}
+	        \item Logging system information: whichever are possible (justify others)
+	        \item Input streams as audioelements
+	       	\item Capture microphone to estimate loudness (especially Macbook)
+	       	\item Test page (in-built oscillators): left-right calibration, ramp up test tone until you hear it; optional compensating EQ (future work implementing own filters) --> Highlight issues! 
+	       	\item Record IP address (PHP function, grab and append to XML file)
+	       	\item Expand anchor/reference options
+	       	\item AB / ABX
+        \end{itemize}
+
+        \subsubsection{Issues}
+        \begin{itemize}
+        	\item Filters not consistent (Nick to test across browsers)
+        	\item Playback audiobuffers need to be destroyed and rebuilt each time
+        	\item Can't get channel data, hardware input/output... 
+        \end{itemize}
 
 	
 \section{Architecture}  % title? 'back end'? % NICK
