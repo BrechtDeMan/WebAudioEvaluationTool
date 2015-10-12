@@ -1,6 +1,7 @@
 \documentclass{sig-alternate}
 \usepackage{hyperref}	% make links (like references, links to Sections, ...) clickable
 \usepackage{enumitem}	% tighten itemize etc by appending '[noitemsep,nolistsep]'
+\usepackage{cleveref}
 
 \begin{document}
 
@@ -146,7 +147,7 @@ Here comes the abstract.
 	Situating the Web Audio Evaluation Tool between other currently available evaluation tools, ...
 	
 	% only browser-based? 
-	\begin{table*}[htdp]
+	\begin{table*}[ht]
         \caption{Table with existing listening test platforms and their features}
         \begin{center}
         	\begin{tabular}{|*{6}{l|}}
@@ -241,67 +242,126 @@ Here comes the abstract.
 
 	
 \section{Interfaces} % title? 'Front end'? % Dave
+
+The purpose of this listening test framework is to allow any user the maximum flexibility to design a listening test for their exact application with minimum effort. To this end, a large range of standard listening test interfaces have been implemented. A review of existing listening test frameworks was undertaken and presented in~\Cref{tab:toolboxes}. HULTI-GEN~\cite{hultigen} is a single toolbox that presents the user with a large number of different test interfaces and allows for customisation of each test interface.
+
+To provide users with a flexible system, a large range of `standard' listening test interfaces have been implemented, including:
+	\begin{itemize}[noitemsep,nolistsep]
+		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
+		\begin{itemize}
+			\item Multiple stimuli are presented and rated on a continuous scale, which includes a reference, hidden reference and hidden anchors.
+		\end{itemize}
+		\item Rank Scale~\cite{pascoe1983evaluation}
+		\begin{itemize}
+			\item Stimuli ranked on single horizontal scale, where they are ordered in preference order.
+		\end{itemize}
+		\item Likert scale~\cite{likert1932technique}
+		\begin{itemize}
+			\item Each stimuli has a five point scale with values: Strongly Agree, Agree, Neutral, Disagree and Strongly Disagree.
+		\end{itemize}
+		\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116} (Mean Opinion Score: MOS)
+		\begin{itemize}
+			\item Each stimulus has a continuous scale (5-1), labeled as Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying.
+		\end{itemize}
+		\item -50 to 50 Bipolar with Ref
+		\begin{itemize}
+			\item Each stimulus has a continuous scale -50 to 50 with default values as 0 in middle and a comparison. There is also a provided reference		\end{itemize}
+		\item Absolute Category Rating (ACR) Scale~\cite{rec1996p}
+		\begin{itemize}
+			\item Each stimuli has a five point scale with values: Bad, Poor, Fair, Good, Excellent
+		\end{itemize}
+		\item Degredation Category Rating (DCR) Scale~\cite{rec1996p}
+		\begin{itemize}
+			\item Each stimuli has a five point scale with values: (5) Inaudible, (4) Audible but not annoying, (3) slightly annoying, (2) annoying, (1) very annoying.
+		\end{itemize}
+		\item Comparison Category Rating (CCR) Scale~\cite{rec1996p}
+		\begin{itemize}
+			\item Each stimuli has a seven point scale with values: Much Better, Better, Slightly Better, About the same, slightly worse, worse, much worse. There is also a provided reference.
+		\end{itemize}
+		\item 9 Point Hedonic Category Rating Scale~\cite{peryam1952advanced}
+		\begin{itemize}
+			\item Each stimuli has a seven point scale with values: Like Extremely, Like Very Much, Like Moderate, Like Slightly, Neither Like nor Dislike, dislike Extremely, dislike Very Much, dislike Moderate, dislike Slightly. There is also a provided reference.
+			\end{itemize}
+		\item ITU-R 5 Point Continuous Impairment Scale~\cite{rec1997bs}
+		\begin{itemize}
+			\item Each stimuli has a five point scale with values: (5) Imperceptible, (4) Perceptible but not annoying, (3) slightly annoying, (2) annoying, (1) very annoying. There is also a provided reference.
+		\end{itemize}
+		\item Pairwise Comparison (Better/Worse)~\cite{david1963method}
+		\begin{itemize}
+			\item A reference is provided and ever stimulus is rated as being either better or worse than the reference.
+		\end{itemize}
+		\item APE style \cite{ape}
+		\begin{itemize}
+			\item Multiple stimuli on a single horizontal slider for inter-sample rating.
+		\end{itemize}
+		\item Multi attribute ratings
+		\begin{itemize}
+			\item Multiple stimuli as points on a 2D plane for inter-sample rating (eg. Valence Arousal)
+		\end{itemize}
+		\item AB Test~\cite{lipshitz1981great}
+		\begin{itemize}
+			\item Two stimuli are presented at a time and the participant has to select a preferred stimulus.
+		\end{itemize}
+		\item ABX Test~\cite{clark1982high}
+		\begin{itemize}
+			\item Two stimuli are presented along with a reference and the participant has to select a preferred stimulus, often the closest to the reference.
+		\end{itemize}
+	\end{itemize}
+	
+	While implementing all of these interfaces, it is possible to include any number of references, anchors, hidden references and hidden anchors into all of these listening test formats.
+	
+%%%%	\begin{itemize}[noitemsep,nolistsep]
+%%%%		\item (APE style) \cite{ape}
+%%%%		\item Multi attribute ratings
+%%%%		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
+%%%%		\item Interval Scale~\cite{zacharov1999round}
+%%%%		\item Rank Scale~\cite{pascoe1983evaluation}
+%%%%		
+%%%%		\item 2D Plane rating - e.g. Valence vs. Arousal~\cite{carroll1969individual}
+%%%%		\item Likert scale~\cite{likert1932technique}
+%%%%		
+%%%%		\item {\bf All the following are the interfaces available in HULTI-GEN~\cite{hultigen} }
+%%%%		\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116}
+%%%%		\begin{itemize}
+%%%%			\item Continuous Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)
+%%%%		\end{itemize}
+%%%%		\item -50 to 50 Bipolar with Ref
+%%%%		\begin{itemize}
+%%%%			\item Scale -50 to 50 on Mushra with default values as 0 in middle and a comparison ``Reference'' to compare to 0 value
+%%%%		\end{itemize}
+%%%%		\item Absolute Category Rating (ACR) Scale~\cite{rec1996p}
+%%%%		\begin{itemize}
+%%%%			\item 5 point Scale - Bad, Poor, Fair, Good, Excellent (Default fair?)
+%%%%		\end{itemize}
+%%%%		\item Degredation Category Rating (DCR) Scale~\cite{rec1996p}
+%%%%		\begin{itemize}
+%%%%			\item 5 point Scale - Inaudible, Audible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?) - {\it Basically just quantised ABC/HR?}
+%%%%		\end{itemize}
+%%%%		\item Comparison Category Rating (CCR) Scale~\cite{rec1996p}
+%%%%		\begin{itemize}
+%%%%			\item 7 point scale: Much Better, Better, Slightly Better, About the same, slightly worse, worse, much worse - Default about the same with reference to compare to
+%%%%		\end{itemize}
+%%%%		\item 9 Point Hedonic Category Rating Scale~\cite{peryam1952advanced}
+%%%%		\begin{itemize}
+%%%%			\item 9 point scale: Like Extremely, Like Very Much, Like Moderate, Like Slightly, Neither Like nor Dislike, dislike Extremely, dislike Very Much, dislike Moderate, dislike Slightly  - Default Neither Like nor Dislike with reference to compare to
+%%%%		\end{itemize}
+%%%%		\item ITU-R 5 Point Continuous Impairment Scale~\cite{rec1997bs}
+%%%%		\begin{itemize}
+%%%%			\item 5 point Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)- {\it Basically just quantised ABC/HR, or Different named DCR}
+%%%%		\end{itemize}
+%%%%		\item Pairwise Comparison (Better/Worse)~\cite{david1963method}
+%%%%		\begin{itemize}
+%%%%			\item 2 point Scale - Better or Worse - (not sure how to default this - they default everything to better, which is an interesting choice)
+%%%%		\end{itemize}
+%%%%	\end{itemize}
+	
+{	\bf A screenshot would be nice. 
+
 	`Build your own test'
 
 	Elements present to build any of the following interfaces, and many more: axes, markers, labels, anchors, references, reference signal button, stop button, comment boxes, radio buttons, checkboxes, transport/scrubber bar
 
-	Established tests (see below) included as `presets' in the build-your-own-test page. 
-
-
-	We could add more interfaces, such as: 
-	\begin{itemize}[noitemsep,nolistsep]
-		\item (APE style) \cite{ape}
-		\item Multi attribute ratings
-		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
-		\item Interval Scale~\cite{zacharov1999round}
-		\item Rank Scale~\cite{pascoe1983evaluation}
-		
-		\item 2D Plane rating - e.g. Valence vs. Arousal~\cite{carroll1969individual}
-		\item Likert scale~\cite{likert1932technique}
-		
-		\item {\bf All the following are the interfaces available in HULTI-GEN~\cite{hultigen} }
-		\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116}
-		\begin{itemize}
-			\item Continuous Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)
-		\end{itemize}
-		\item -50 to 50 Bipolar with Ref
-		\begin{itemize}
-			\item Scale -50 to 50 on Mushra with default values as 0 in middle and a comparison ``Reference'' to compare to 0 value
-		\end{itemize}
-		\item Absolute Category Rating (ACR) Scale~\cite{rec1996p}
-		\begin{itemize}
-			\item 5 point Scale - Bad, Poor, Fair, Good, Excellent (Default fair?)
-		\end{itemize}
-		\item Degredation Category Rating (DCR) Scale~\cite{rec1996p}
-		\begin{itemize}
-			\item 5 point Scale - Inaudible, Audible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?) - {\it Basically just quantised ABC/HR?}
-		\end{itemize}
-		\item Comparison Category Rating (CCR) Scale~\cite{rec1996p}
-		\begin{itemize}
-			\item 7 point scale: Much Better, Better, Slightly Better, About the same, slightly worse, worse, much worse - Default about the same with reference to compare to
-		\end{itemize}
-		\item 9 Point Hedonic Category Rating Scale~\cite{peryam1952advanced}
-		\begin{itemize}
-			\item 9 point scale: Like Extremely, Like Very Much, Like Moderate, Like Slightly, Neither Like nor Dislike, dislike Extremely, dislike Very Much, dislike Moderate, dislike Slightly  - Default Neither Like nor Dislike with reference to compare to
-		\end{itemize}
-		\item ITU-R 5 Point Continuous Impairment Scale~\cite{rec1997bs}
-		\begin{itemize}
-			\item 5 point Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)- {\it Basically just quantised ABC/HR, or Different named DCR}
-		\end{itemize}
-		\item Pairwise Comparison (Better/Worse)~\cite{david1963method}
-		\begin{itemize}
-			\item 2 point Scale - Better or Worse - (not sure how to default this - they default everything to better, which is an interesting choice)
-		\end{itemize}
-	\end{itemize}
-	
-	There are also the following interfaces, which would require a slightly different `engine' underneath, e.g. loading a different page for every possible pair. 
-	\begin{itemize}[noitemsep,nolistsep]
-		\item AB Test~\cite{lipshitz1981great}
-		\item ABX Test~\cite{clark1982high}
-		\item JND
-	\end{itemize}
-	
-	A screenshot would be nice. 
+	Established tests (see below) included as `presets' in the build-your-own-test page. }
 
 \section{Analysis and diagnostics}
 	% don't mention Python scripts
