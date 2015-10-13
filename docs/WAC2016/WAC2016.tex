@@ -358,6 +358,8 @@ To provide users with a flexible system, a large range of `standard' listening t
 	
 	While implementing all of these interfaces, it is possible to include any number of references, anchors, hidden references and hidden anchors into all of these listening test formats.
 	
+	Because of the design choice to separate the core code and interface modules, it is possible for a 3rd party interface to be built with minimal effort. The repository includes documentation on which functions must be called and the specific functions they expect your interface to perform. To this end, there is an 'Interface' object which includes functions for creating the on-page comment boxes (including those with radio or checkbox responses), start and stop buttons with function handles pre-attached and the playhead / transport bars.
+	
 %%%%	\begin{itemize}[noitemsep,nolistsep]
 %%%%		\item (APE style) \cite{ape}
 %%%%		\item Multi attribute ratings
@@ -403,11 +405,9 @@ To provide users with a flexible system, a large range of `standard' listening t
 %%%%		\end{itemize}
 %%%%	\end{itemize}
 	
+	% Build your own test
+	
 {	\bf A screenshot would be nice. 
-
-	`Build your own test'
-
-	Elements present to build any of the following interfaces, and many more: axes, markers, labels, anchors, references, reference signal button, stop button, comment boxes, radio buttons, checkboxes, transport/scrubber bar
 
 	Established tests (see below) included as `presets' in the build-your-own-test page. }
 
