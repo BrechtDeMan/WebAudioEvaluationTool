@@ -29,6 +29,7 @@
 				popupInstance = new popup();
 				popupInstance.advanceState();
 				specificationNode = new Specification();
+				specificationNode.projectReturn = "null";
 			};
 			
 			function popup()
@@ -1490,7 +1491,7 @@
 								this.node = null;
 								this.previousState = 7;
 							};
-							popupInstace.state = 6;
+							popupInstance.state = 6;
 							popupInstance.advanceState();
 						};
 						entry.appendChild(addPost);
@@ -2192,6 +2193,7 @@
 						text.textContent = "Question";
 						input = document.createElement("input");
 						input.name = "question";
+						input.style.width = "400px";
 						input.value = node.question;
 						text.style.margin = "5px";
 						input.style.margin = "5px";
@@ -2207,6 +2209,31 @@
 						input.style.margin = "5px";
 						attributes.appendChild(text);
 						attributes.appendChild(input);
+						text = document.createElement("span");
+						text.textContent = "Reply box size";
+						input = document.createElement("select");
+						input.name = "boxsize";
+						var option = document.createElement("option");
+						option.textContent = "Normal";
+						option.value = "normal";
+						input.appendChild(option);
+						option = document.createElement("option");
+						option.textContent = "Large";
+						option.value = "large";
+						input.appendChild(option);
+						option = document.createElement("option");
+						option.textContent = "Small";
+						option.value = "small";
+						input.appendChild(option);
+						option = document.createElement("option");
+						option.textContent = "Huge";
+						option.value = "huge";
+						input.appendChild(option);
+						text.style.margin = "5px";
+						input.style.margin = "5px";
+						attributes.appendChild(text);
+						attributes.appendChild(input);
+						input.value = node.boxsize;
 						break;
 					}
 					return holder;
