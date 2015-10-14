@@ -1,0 +1,60 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage[margin=2cm]{geometry}            		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+								
+\usepackage{listings}				% Source code
+\usepackage{amssymb}
+\usepackage{cite}
+\usepackage{hyperref}				% Hyperlinks
+
+
+\graphicspath{{img/}}					% Relative path where the images are stored. 
+
+\title{Building your own Interface for\\ Web Audio Evaluation Tool}
+\author{Nicholas Jillings}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This guide will help you to construct your own interface on top of the WAET (Web Audio Evaluation Tool) engine. The WAET engine resides in the core.js file, this contains prototype objects to handle most of the test creation, operation and data collection. The interface simply has to link into this at the correct points.
+
+\subsection{Nodes to familiarise}
+Core.js handles several very important nodes which you should become familiar with. The first is the Audio Engine, initialised and stored in variable 'AudioEngineContext'. This handles the playback of the web audio nodes as well as storing the 'AudioObjects'. The 'AudioObjects' are custom nodes which hold the audio fragments for playback. These nodes also have a link to two interface objects, the comment box if enabled and the interface providing the ranking. On creation of an 'AudioObject' the interface link will be nulled, it is up to the interface to link these correctly.
+
+The specification document will be decoded and parsed into an object called 'specification'. This will hold all of the specifications various nodes. The test pages and any pre/post test objects are processed by a test state which will proceed through the test when called to by the interface. Any checks (such as playback or movement checks) are to be completed by the interface before instructing the test state to proceed. The test state will call the interface on each page load with the page specification node.
+
+\subsection{Modifying Core.js}
+Whilst there is very little code actually needed, you do need to instruct core.js to load your interface file when called for from a specification node. There is a function called 'loadProjectSpecCallback' which handles the decoding of the specification and setting any external items (such as metric collection). At the very end of this function there is an if statement, add to this list with your interface string to link to the source. There is an example in there for both the APE and MUSHRA tests already included. Note: Any updates to core.js in future work will most likely overwrite your changes to this file, so remember to check your interface is still here after any update that interferes with core.js.
+Any further files can be loaded here as well, such as css styling files. jQuery is already included.
+
+\section{Building the Interface}
+Your interface file will get loaded automatically when the 'interface' attribute of the setup node matches the string in the 'loadProjectSpecCallback' function. The following functions must be defined in your interface file.
+\begin{itemize}
+\item \texttt{loadInterface} - Called once when the document is parsed. This creates any necessary bindings, such as to the metric collection classes and any check commands. Here you can also start the structure for your test such as placing in any common nodes (such as the title and empty divs to drop content into later).
+\item \texttt{loadTest(audioHolderObject)} - Called for each page load. The audioHolderObject contains a specification node holding effectively one of the audioHolder nodes.
+\item \texttt{resizeWindow(event)} - Handle for any window resizing. Simply scale your interface accordingly. This function must be here, but can me an empty function call.
+\end{itemize}
+
+\subsection{loadInterface}
+This function is called by the interface once the document has been parsed since some browsers may parse files asynchronously. The best method is simply to put 'loadInterface()' at the top of your interface file, therefore when the JavaScript engine is ready the function is called.
+
+By default the HTML file has an element with id "topLevelBody" where you can build your interface. Make sure you blank the contents of that object. This function is the perfect time to build any fixed items, such as the page title, session titles, interface buttons (Start, Stop, Submit) and any holding and structure elements for later on.
+
+At the end of the function, insert these two function calls: testState.initialise() and testState.advanceState();. This will actually begin the test sequence, including the pre-test options (if any are included in the specification document).
+
+\subsection{loadTest(audioHolderObject)}
+This function is called on each new test page. It is this functions job to clear out the previous test and set up the new page. Use the function audioEngineContext.newTestPage(); to instruct the audio engine to prepare for a new page. "audioEngineContext.audioObjects = [];" will delete any audioObjects, interfaceContext.deleteCommentBoxes(); will delete any comment boxes and interfaceContext.deleteCommentQuestions(); will delete any extra comment boxes specified by commentQuestion nodes.
+
+This function will need to instruct the audio engine to build each fragment. Just passing the constructor each element from the audioHolderObject will build the track, audioEngineContext.newTrack(element) (where element is the audioHolderObject audio element). This will return a reference to the constructed audioObject. Decoding of the audio will happen asynchronously.
+
+You also need to link audioObject.interfaceDOM with your interface object for that audioObject. The interfaceDOM object has a few default methods. Firstly it must start disabled and become enabled once the audioObject has decoded the audio (function call: enable()). Next it must have a function exportXMLDOM(), this will return the xml node for your interface, however the default is for it to return a value node, with textContent equal to the normalised value. You can perform other functions, but our scripts may not work if something different is specified (as it will breach our results specifications). Finally it must also have a method getValue, which returns the normalised value.
+
+It is also the job the interfaceDOM to call any metric collection functions necessary, however some functions may be better placed outside (for example, the APE interface uses drag and drop, therefore the best way was to call the metric functions from the dragEnd function, which is called when the interface object is dropped). Metrics based upon listening are handled by the audioObject. The interfaceDOM object must manage any movement metrics. For a list of valid metrics and their behaviours, look at the project specification document included in the repository/docs location. The same goes for any checks required when pressing the submit button, or any other method to proceed the test state.
+
+\end{document}
