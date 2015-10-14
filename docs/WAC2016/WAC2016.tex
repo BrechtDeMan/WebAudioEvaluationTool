@@ -131,20 +131,17 @@ Here comes the abstract.
 
 	% Listening tests/perceptual audio evaluation: what are they, why are they important
 	% As opposed to limited scope of WAC15 paper: also musical features, realism of sound effects / sound synthesis, performance of source separation and other algorithms... 
-	Perceptual evaluation of audio, in the form of listening tests, is a powerful way to assess anything from audio codec quality over realism of sound synthesis to the performance of source separation, automated music production and 
+	Perceptual evaluation of audio, in the form of listening tests, is a powerful way to assess anything from audio codec quality over realism of sound synthesis to the performance of source separation, automated music production and other auditory evaluations.
 	In less technical areas, the framework of a listening test can be used to measure emotional response to music or test cognitive abilities. % maybe some references? If there's space.
 
 	% check out http://link.springer.com/article/10.1007/s10055-015-0270-8 - only paper that cited WAC15 paper
 
-	% Why difficult? Challenges? What constitutes a good interface? 
-	Technical, interfaces, user friendliness, reliability 
-
-	Note that the design of an effective listening test further poses many challenges unrelated to interface design, which are beyond the scope of this paper \cite{bech}. 
+	% Why difficult? Challenges? What constitutes a good interface?
+	% Technical, interfaces, user friendliness, reliability 
+	There are multiple programs for performing perceptual listening tests, as can be seen in Table \ref{tab:toolboxes}. Some are designed to have only one interface type or only work using proprietary software. The Web Audio Evaluation Toolbox is different as it does not require proprietary software and provides many interface and test types in one, common environment. Note that the design of an effective listening test further poses many challenges unrelated to interface design, which are beyond the scope of this paper \cite{bech}. 
 
 	% Why in the browser? 
-	Web Audio API has made some essential features like sample manipulation of audio streams possible \cite{schoeffler2015mushra}.
-	
-	Situating the Web Audio Evaluation Tool between other currently available evaluation tools, ...
+	Web Audio API has important features for performing perceptual tests including sample level manipulation of audio streams \cite{schoeffler2015mushra}, synchronous playback and flexible playback. Being in the browser also allows leveraging the flexible object oriented JavaScript format and native support for web documents, such as the extensible markup language (XML) which is used for configuration and test results. Using the web also simplifies test deployment to requiring a basic web server with advanced functionality such as test collection and automatic processing using PHP. As recruiting participants can be very time-consuming, and as for some tests a large number of participants is needed, browser-based tests \cite{schoeffler2015mushra}. However, to our knowledge, no tool currently exists that allows the creation of a remotely accessible listening test. BeaqleJS \cite{beaqlejs} also operates in the browser, however BeaqleJS does not make use of the Web Audio API.%requires programming knowledge?... 
 	
 	% only browser-based? 
 	\begin{table*}[ht]
@@ -196,19 +193,14 @@ Here comes the abstract.
     		\hline
     	\end{tabular}
     \end{center}
-    \label{tab:toolboxes}
+    \label{tab:toolbox_interfaces}
     \end{table*}%
 
-        % about BeaqleJS
-        ... However, BeaqleJS \cite{beaqlejs} does not make use of the Web Audio API, %requires programming knowledge?... 
-
         % 
-        Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
-
-        As recruiting participants can be very time-consuming, and as for some tests a large number of participants is needed, browser-based tests \cite{schoeffler2015mushra}. However, to our knowledge, no tool currently exists that allows the creation of a remotely accessible listening test. % I wonder what you can do with Amazon Mechanical Turk and the likes. 
+        %Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
 
         [Talking about what we do in the various sections of this paper. Referring to \cite{waet}. ]
-
+\begin{comment}
         % MEETING 8 OCTOBER
         \subsection{Meeting 8 October}
         \begin{itemize}
@@ -234,7 +226,7 @@ Here comes the abstract.
         	\item Playback audiobuffers need to be destroyed and rebuilt each time
         	\item Can't get channel data, hardware input/output... 
         \end{itemize}
-
+\end{comment}
 	
 \section{Architecture}  % title? 'back end'? % NICK
     WAET utilises the Web Audio API for audio playback and uses a sparse subset of the Web Audio API functionality, however the performance of WAET comes directly from the Web Audio API. Listening tests can convey large amounts of information other than obtaining the perceptual relationship between the audio fragments. WAET specifically can obtain which parts of the audio fragments were listened to and when, at what point in the audio stream did the participant switch to a different fragment and what new rating did they give a fragment. Therefore it is possible to not only evaluate the perceptual research question but also evaluate if the participant performed the test well and therefore if their results are representative or should be discarded as an outlier.
@@ -406,10 +398,11 @@ To provide users with a flexible system, a large range of `standard' listening t
 %%%%	\end{itemize}
 	
 	% Build your own test
-	
+\begin{comment}
 {	\bf A screenshot would be nice. 
 
 	Established tests (see below) included as `presets' in the build-your-own-test page. }
+\end{comment}
 
 \section{Analysis and diagnostics}
 	% don't mention Python scripts
@@ -438,8 +431,8 @@ To provide users with a flexible system, a large range of `standard' listening t
 	The code and documentation can be pulled or downloaded from \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}. 
 	
 	[Talking a little bit about what else might happen. Unless we really want to wrap this up. ]
-
-	Use \cite{schoeffler2015mushra} as a `checklist', even though it only considers subjective evaluation of audio systems (and focuses on the requirements for a MUSHRA test).
+	
+	\cite{schoeffler2015mushra} gives a 'checklist' for subjective evaluation of audio systems. The Web Audio Evaluation Toolbox meets most of its given requirements including remote testing, crossfading between audio streams, collecting browser information, utilising UI elements and working with various audio formats including uncompressed PCM or WAV format.
 		% remote
 		% language support (not explicitly stated)
 		% crossfades
