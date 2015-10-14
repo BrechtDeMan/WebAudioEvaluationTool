@@ -141,10 +141,10 @@ Here comes the abstract.
 
 	% Why difficult? Challenges? What constitutes a good interface?
 	% Technical, interfaces, user friendliness, reliability 
-	Several applications for performing perceptual listening tests currently exist, as can be seen in Table \ref{tab:toolboxes}. The Web Audio Evaluation Toolbox stands out as it does not require proprietary software or a specific platform and provides a wide range of interface and test types in one user friendly environment. Furthermore, it does not require any progamming experience as any test based on the default test types can be configured in the browser as well. Note that the design of an effective listening test further poses many challenges unrelated to interface design, which are beyond the scope of this paper \cite{bech}. 
+	Several applications for performing perceptual listening tests currently exist, a subset shown in Table \ref{tab:toolboxes}. The Web Audio Evaluation Toolbox stands out as it does not require proprietary software or a specific platform. It also provides a wide range of interface and test types in one user friendly environment. Furthermore, it does not require any progamming experience as any test based on the default test types can be configured in the browser as well. Note that the design of an effective listening test further poses many challenges unrelated to interface design, which are beyond the scope of this paper \cite{bech}. 
 
 	% Why in the browser? 
-	Web Audio API has important features for performing perceptual tests including sample level manipulation of audio streams \cite{schoeffler2015mushra}, synchronous playback and flexible playback. Being in the browser also allows leveraging the flexible object oriented JavaScript format and native support for web documents, such as the extensible markup language (XML) which is used for configuration and test result files. Using the web also reduces deployment requirements to a basic web server with advanced functionality such as test collection and automatic processing using PHP. As recruiting participants can be very time-consuming, and as for some tests a large number of participants is needed, browser-based tests \cite{schoeffler2015mushra}. However, to our knowledge, no tool currently exists that allows the creation of a remotely accessible listening test. 
+	Web Audio API has important features for performing perceptual tests including sample level manipulation of audio streams \cite{schoeffler2015mushra} and the ability for synchronous and flexible playback. Being in the browser also allows leveraging the flexible object oriented JavaScript format and native support for web documents, such as the extensible markup language (XML) which is used for configuration and test result files. Using the web also reduces deployment requirements to a basic web server with advanced functionality such as test collection and automatic processing using PHP. As recruiting participants can be very time-consuming, and as for some tests a large number of participants is needed, browser-based tests \cite{schoeffler2015mushra} can resolve these problems by enabling participants in multiple locations to perform the test. However, to our knowledge, no tool currently exists that allows the creation of a remotely accessible listening test. 
 
 	Both BeaqleJS \cite{beaqlejs} and mushraJS\footnote{https://github.com/akaroice/mushraJS} also operate in the browser, however BeaqleJS does not make use of the Web Audio API and therefore lacks arbitrary manipulation of audio stream samples, and neither offer an adequately wide choice of test designs for them to be useful to many researchers. %requires programming knowledge?... 
 	
@@ -163,7 +163,7 @@ Here comes the abstract.
     		MUSHRAM			& \cite{mushram}	& MATLAB				& MUSHRA						& 							& 			 \\
     		Scale 			& \cite{scale}		& MATLAB				& See Table \ref{tab:toolbox_interfaces} &							&			 \\
     		WhisPER			& \cite{whisper}	& MATLAB				& See Table \ref{tab:toolbox_interfaces}								&							& \checkmark \\
-    		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{All of the above}				& \checkmark				& \checkmark \\
+    		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{all of the above, see Table \ref{tab:toolbox_interfaces}}		& \checkmark				& \checkmark \\
     		\hline
     	\end{tabular}
     \end{center}
@@ -192,7 +192,7 @@ Here comes the abstract.
 			ABX Test											& \checkmark 			&					&					& \checkmark	\\
 			Adaptive psychophysical methods						& 						&					& \checkmark		&				\\
 			Repertory Grid Technique (RGT)						&						&					& \checkmark		&				\\
-			Semantic differential								&						& \checkmark		& \checkmark		&				\\
+			(Semantic differential)								& 						&				& (\checkmark)		&				\\ % same as a few of the above
 			n-Alternative Forced choice 						&						& \checkmark		&					&				\\
 
     		\hline
@@ -204,7 +204,8 @@ Here comes the abstract.
         % 
         %Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
 
-        To meet the need for a cross-platform, versatile and easy-to-use listening test tool, we previously developed the Web Audio Evaluation Tool \cite{waet} which at the time of its inception was capable of running a listening test in the browser from an XML configuration file, and storing an XML file as well, with one particular interface. We have now expanded this into a tool with which a wide range of listening test types can easily be constructed and set up remotely, without any need for manually altering code or configuration files, and which allows visualisation of the collected results in the browser. In this paper, we discuss these different aspects and explore which future improvements would be possible. Specifically, in Section \ref{sec:architecture} we cover the general implementation aspects, with a focus on the Web Audio API, followed by a discussion of the requirements for successful remote tests in Section \ref{sec:remote}. Section \ref{sec:interfaces} describes the various interfaces the tool supports, as well as how to keep this manageable. Finally, in Section \ref{sec:analysis} we provide an overview of the analysis capabilities in the browser, before summarising our findings and listing future research directions in Section \ref{sec:conclusion}. 
+        %[Talking about what we do in the various sections of this paper. Referring to \cite{waet}. ]
+    This paper is divided into five sections. The Architecture section aims to introduce the toolbox by expanding on \cite{waet}, how the Web Audio Evaluation Tool uses the Web Audio API and the relationship of the various modules for configuration, operation and collection. The Remote Tests section aims to briefly highlight the performance of the server-side implementations enabling for powerful remote testing for seemless deployment to many locations. The Interfaces section outlines the various interfaces currently supported by the toolbox along with a brief description of each interface. Analysis and Diagnosis shows the online analysis tools available for processing the gathered data before concluding this paper and highlighting out future work.
 
 \begin{comment}
         % MEETING 8 OCTOBER
@@ -235,38 +236,30 @@ Here comes the abstract.
 \end{comment}
 	
 \section{Architecture}  % title? 'back end'? % NICK
-	\label{sec:architecture}
+%A slightly technical overview of the system. Talk about XML, JavaScript, Web Audio API, HTML5. 
 
-    While WAET uses a sparse subset of the Web Audio API functionality, its performance comes directly from using the Web Audio API for audio playback. Listening tests can convey large amounts of information other than obtaining the perceptual relationship between the audio fragments. Specifically, with WAET one can obtain which parts of the audio fragments were listened to and when, at what point in the audio stream the participant switched to a different fragment, and how a fragment's rating was adjusted over time within a session, to name a few. Not only does this allow to evaluate a wealth of perceptual aspects, but it helps detect poor participants whose results are potentially not representative. 
+    While WAET uses a sparse subset of the Web Audio API functionality, its performance comes directly from using the Web Audio API for audio playback. Listening tests can convey large amounts of information other than obtaining the perceptual relationship between the audio fragments. Specifically, with WAET one can obtain which parts of the audio fragments were listened to and when, at what point in the audio stream the participant switched to a different fragment, and how a fragment's rating was adjusted over time within a session, to name a few. Not only does this allow to evaluate a wealth of perceptual aspects, but it helps detect poor participants whose results are potentially not representative.
     
-    One of the key initial design parameters for WAET is to make the tool as open as possible to non-programmers and to this end the tool has been designed in such a way that all of the user modifiable options are included in a single XML document. This document is loaded up automatically by the web page and the JavaScript code parses and loads any extra resources required to create the test.
+    One of the key initial design parameters for WAET is to make the tool as open as possible to non-programmers and to this end the tool has been designed in such a way that all of the user modifiable options are included in a single XML document. This XML document is called the specification document and can be designed either by manually writing the XML (or modifying an existing document or template) or using our included test creator. These are standalone HTML pages which do not require any server or internet connection and help a build your test specification document. The first (test\_create.html) is for simpler tests and operates step-by-step using in-page popups to guide the user. It supports media through drag and drop and clutter free interface. The advanced version is for more advanced tests where raw XML manipulation is not wanted but the same freedom is required (whilst keeping a safety net). Both models support automatic XML verification to ensure the XML file is valid and will highlight areas which are either incorrect and would cause an error, or options which should be removed as they are blank.
     
-    The specification document also contains the URL of the audio fragments for each test page. These fragments are downloaded asynchronously and decoded offline by the Web Audio offline decoder. The resulting buffers are assigned to a custom Audio Objects node which tracks the fragment buffer, the playback bufferSourceNode, the XML information including its unique test ID, the interface object(s) associated with the fragment and any metric or data collection objects. The Audio Object is controlled by an over-arching custom Audio Context node (not to be confused with the Web Audio Context), this parent JS Node allows for session wide control of the Audio Objects including starting and stopping playback of specific nodes.
+    The basic test create utilises some web audio of its own. It utilises the API to perform quick playback checks, but also allow for loudness normalisation techniques inspired from \cite{ape}. These are calculated offline by accessing the raw audio samples exposed from the buffer before being applied to the audio element as a gain attribute. This is used in the test to perform loudness normalisation without needing to edit any audio files. Equally the gain can be modified in either editor using an HTML5 slider or number box.
+    
+    %Describe and/or visualise audioholder-audioelement-... structure. 
+    The specification document also contains the URL of the audio fragments for each test page. These fragments are downloaded asynchronously in the test and decoded offline by the Web Audio offline decoder. The resulting buffers are assigned to a custom Audio Objects node which tracks the fragment buffer, the playback bufferSourceNode, the XML information including its unique test ID, the interface object(s) associated with the fragment and any metric or data collection objects. The Audio Object is controlled by an over-arching custom Audio Context node (not to be confused with the Web Audio Context), this parent JS Node allows for session wide control of the Audio Objects including starting and stopping playback of specific nodes.
     
     The only issue with this model is the bufferNode in the Web Audio API, which is implemented as a `use once' object which, once the buffer has been played, the buffer must be discarded as it cannot be instructed to play the buffer again. Therefore on each start request the buffer object must be created and then linked with the stored bufferSourceNode. This is an odd behaviour for such a simple object which has no alternative except to use the HTML5 audio element, however they do not have the ability to synchronously start on a given time and therefore not suited.
     
-    The media files supported depend on the browser level support for the initial decoding of information and is the same as the browser support for the HTML5 audio element. Therefore the most widely supported media file is the wave (.WAV) format which can be accpeted by every browser supporting the Web Audio API. The next best supported audio only formats are MP3 and AAC (in MP4) which are supported by all major browsers, Firefox relies on OS decoders and therefore its support is predicated by the OS support.
+    In the test the each buffer node is connected to a gain node which will operate at the level determined by the specification document. Therefore it is technically possible to perform a 'Method of Adjustment' test where an interface could directly manipulate these gain nodes. Equally there is an optional 'Master Volume' slider which can be shown on the test GUI. This slider modifies a gain node before the destination node. This slider can also be monitored and therefore its data tracked providing extra validation. Of course this slider is not indicative of the final volume exiting the speakers and therefore its use should only be considered in a lab condition environment to ensure proper behaviour. Finally the gain nodes allow for cross-fading between samples when operating in synchronous playback. Cross-fading can either be fade-out fade-in or a true cross-fade.
+    
+    %Which type of files?  WAV, anything else? Perhaps not exhaustive list, but say something along the lines of 'whatever browser supports'. Compatability?
+    The media files supported depend on the browser level support for the initial decoding of information and is the same as the browser support for the HTML5 audio element. Therefore the most widely supported media file is the wave (.WAV) format which can be accpeted by every browser supporting the Web Audio API. The next best supported audio only formats are MP3 and AAC (in MP4) which are supported by all major browsers, Firefox relies on OS decoders and therefore its support is predicated by the OS support. The toolbox will work in any browser which supports the Web Audio API, which at point of writing are the major desktop browsers except Microsoft's Internet Explorer, however its newer Edge browser should be supported\footnote{\url{https://msdn.microsoft.com/en-us/library/dn985708.aspx}}.
     
     All the collected session data is returned in an XML document structured similarly to the configuration document, where test pages contain the audio elements with their trace collection, results, comments and any other interface-specific data points.
     
-	%A slightly technical overview of the system. Talk about XML, JavaScript, Web Audio API, HTML5. 
-	%Describe and/or visualise audioholder-audioelement-... structure. 
-
-	% see also SMC12 - less detail here
-
-	%Which type of files? % WAV, anything else? Perhaps not exhaustive list, but say something along the lines of 'whatever browser supports'
-	
-	%Streaming audio? % probably not, unless it's easy
-
-	%Compatibility? % not IE, everything else fine? 
-
-
-	
-	
 \section{Remote tests} % with previous? 
 	\label{sec:remote}
 
-	If the experimenter is willing to trade some degree of control for a higher number of participants, the test can be hosted on a web server so that subjects can take part remotely. This way, a link can be shared widely in the hope of attracting a large amount of subjects, while listening conditions and subject reliability may be less ideal. However, a sound system calibration page and a wide range of metrics logged during the test mitigate these problems. Note also that in some experiments, it may be preferred that the subject has a `real life', familiar listening set-up, for instance when perceived quality differences on everyday sound systems are investigated. 
+	If the experimenter is willing to trade some degree of control for a higher number of participants, the test can be hosted on a web server so that participants can take part remotely. This way, a link can be shared widely in the hope of attracting a large amount of subjects, while listening conditions and subject reliability may be less ideal. However, a sound system calibration page and a wide range of metrics logged during the test mitigate these problems. Note also that in some experiments, it may be preferred that the subject has a `real life', familiar listening set-up, for instance when perceived quality differences on everyday sound systems are investigated. 
 	Furthermore, a fully browser-based test, where the collection of the results is automatic, is more efficient and technically reliable even when the test still takes place under lab conditions.
 
 	The following features allow easy and effective remote testing: 
@@ -298,62 +291,62 @@ The purpose of this listening test framework is to allow any user the maximum fl
 To provide users with a flexible system, a large range of `standard' listening test interfaces have been implemented, including: % pretty much the same wording as two sentences earlier
 	\begin{itemize}[noitemsep,nolistsep]
 		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Multiple stimuli are presented and rated on a continuous scale, which includes a reference, hidden reference and hidden anchors.
 		\end{itemize}
 		\item Rank Scale~\cite{pascoe1983evaluation}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Stimuli ranked on single horizontal scale, where they are ordered in preference order.
 		\end{itemize}
 		\item Likert scale~\cite{likert1932technique}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Each stimuli has a five point scale with values: Strongly Agree, Agree, Neutral, Disagree and Strongly Disagree.
 		\end{itemize}
 		\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116} (Mean Opinion Score: MOS)
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Each stimulus has a continuous scale (5-1), labeled as Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying.
 		\end{itemize}
 		\item -50 to 50 Bipolar with Ref
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Each stimulus has a continuous scale -50 to 50 with default values as 0 in middle and a comparison. There is also a provided reference		\end{itemize}
 		\item Absolute Category Rating (ACR) Scale~\cite{rec1996p}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Each stimuli has a five point scale with values: Bad, Poor, Fair, Good, Excellent
 		\end{itemize}
 		\item Degredation Category Rating (DCR) Scale~\cite{rec1996p}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Each stimuli has a five point scale with values: (5) Inaudible, (4) Audible but not annoying, (3) slightly annoying, (2) annoying, (1) very annoying.
 		\end{itemize}
 		\item Comparison Category Rating (CCR) Scale~\cite{rec1996p}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Each stimuli has a seven point scale with values: Much Better, Better, Slightly Better, About the same, slightly worse, worse, much worse. There is also a provided reference.
 		\end{itemize}
 		\item 9 Point Hedonic Category Rating Scale~\cite{peryam1952advanced}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Each stimuli has a seven point scale with values: Like Extremely, Like Very Much, Like Moderate, Like Slightly, Neither Like nor Dislike, dislike Extremely, dislike Very Much, dislike Moderate, dislike Slightly. There is also a provided reference.
 			\end{itemize}
 		\item ITU-R 5 Point Continuous Impairment Scale~\cite{rec1997bs}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Each stimuli has a five point scale with values: (5) Imperceptible, (4) Perceptible but not annoying, (3) slightly annoying, (2) annoying, (1) very annoying. There is also a provided reference.
 		\end{itemize}
 		\item Pairwise Comparison (Better/Worse)~\cite{david1963method}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item A reference is provided and ever stimulus is rated as being either better or worse than the reference.
 		\end{itemize}
 		\item APE style \cite{ape}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Multiple stimuli on a single horizontal slider for inter-sample rating.
 		\end{itemize}
 		\item Multi attribute ratings
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Multiple stimuli as points on a 2D plane for inter-sample rating (eg. Valence Arousal)
 		\end{itemize}
 		\item AB Test~\cite{lipshitz1981great}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Two stimuli are presented at a time and the participant has to select a preferred stimulus.
 		\end{itemize}
 		\item ABX Test~\cite{clark1982high}
-		\begin{itemize}
+		\begin{itemize}[noitemsep,nolistsep]
 			\item Two stimuli are presented along with a reference and the participant has to select a preferred stimulus, often the closest to the reference.
 		\end{itemize}
 	\end{itemize}
@@ -430,17 +423,19 @@ To provide users with a flexible system, a large range of `standard' listening t
 		\item Selection of subjects and/or test samples to zoom in on a subset of the data %Check/uncheck each of the above for analysis (e.g. zoom in on a certain song, or exclude a subset of subjects)
 		\item Embedded audio to hear corresponding test samples % (follow path in XML setup file, which is also embedded in the XML result file)
 		\item Box plot, confidence plot, and scatter plot of rating values
-		\item Timeline for a specific subject %(see Figure \ref{fig:timeline})%, perhaps re-playing the experiment in X times realtime. (If actual realtime, you could replay the audio...)
-		\item Distribution plots of any radio button and number questions in pre- and post-test survey %(drop-down menu with `pretest', `posttest', ...; then drop-down menu with question `IDs' like `gender', `age', ...; make pie chart/histogram of these values over selected range of XMLs)
+		\item Timeline for a specific subject or song %(see Python scripts), perhaps re-playing the experiment in X times realtime. (If actual realtime, you could replay the audio...) ---> A LOT of work, not sure I can guarantee this one
+		\item Distribution plots of any radio button and number questions. Also pie charts and histograms when over a range of participants %(drop-down menu with `pretest', `posttest', ...; then drop-down menu with question `IDs' like `gender', `age', ...; make pie chart/histogram of these values over selected range of XMLs)
 		\item All `comments' on a specific audioelement
-		\item A `download' function for a CSV of ratings, survey responses and comments% various things (values, survey responses, comments) people might want to use for analysis, e.g. when XML scares them
-		%\item Validation of setup XMLs (easily spot `errors', like duplicate IDs or URLs, missing/dangling tags, ...)
+		\item A `download' button for a nice CSV of various things (values, survey responses, comments) %people might want to use for analysis, e.g. when XML scares them
+		%\item Validation of setup XMLs (easily spot `errors', like duplicate IDs or URLs, missing/dangling tags, ...) --> Took this out as a feature as the test_create will already do this as will the test console.
 	\end{itemize}
 
+	%A subset of the above would already be nice for this paper. 
+	[Some pictures here please.]
 \section{Concluding remarks and future work}
 \label{sec:conclusion}
 	
-	The code and documentation can be pulled or downloaded from \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}. 
+	The code and documentation can be pulled or downloaded from our online repository available at \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}.
 	
 	[Talking a little bit about what else might happen. Unless we really want to wrap this up. ]
 	
