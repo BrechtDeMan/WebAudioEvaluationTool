@@ -126,7 +126,9 @@
 
 \maketitle
 \begin{abstract}
-Here comes the abstract. 
+
+Perceptual listening tests are commonplace in audio research and a vital form of evaluation. Many tools exist to run such tests, however many operate one test type and are therefore limited whilst most require proprietary software. Using Web Audio the Web Audio Evaluation Tool (WAET) addresses these concerns by having one toolbox which can be configured to run many differen tests, perform it through a web browser and without needing proprietary software or computer programming knowledge. In this paper the role of the Web Audio API in giving WAET key functionalities are shown. The paper also highlights less common features, available to web based tools, such as easy remote testing environment and in-browser analytics.
+
 \end{abstract}
 
 
@@ -186,7 +188,7 @@ Here comes the abstract.
         %Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
 
         %[Talking about what we do in the various sections of this paper. Referring to \cite{waet}. ]
-    To meet the need for a cross-platform, versatile and easy-to-use listening test tool, we previously developed the Web Audio Evaluation Tool \cite{waet} which at the time of its inception was capable of running a listening test in the browser from an XML configuration file, and storing an XML file as well, with one particular interface. We have now expanded this into a tool with which a wide range of listening test types can easily be constructed and set up remotely, without any need for manually altering code or configuration files, and which allows visualisation of the collected results in the browser. In this paper, we discuss these different aspects and explore which future improvements would be possible. Specifically, in Section \ref{sec:architecture} we cover the general implementation aspects, with a focus on the Web Audio API, followed by a discussion of the requirements for successful remote tests in Section \ref{sec:remote}. Section \ref{sec:interfaces} describes the various interfaces the tool supports, as well as how to keep this manageable. Finally, in Section \ref{sec:analysis} we provide an overview of the analysis capabilities in the browser, before summarising our findings and listing future research directions in Section \ref{sec:conclusion}.
+    To meet the need for a cross-platform, versatile and easy-to-use listening test tool, we previously developed the Web Audio Evaluation Tool \cite{waet} which at the time of its inception was capable of running a listening test in the browser from an XML configuration file, and storing an XML file as well, with one particular interface. We have now expanded this into a tool with which a wide range of listening test types can easily be constructed and set up remotely, without any need for manually altering code or configuration files, and which allows visualisation of the collected results in the browser. In this paper, we discuss these different aspects and explore which future improvements would be possible.
 
     \begin{figure}[tb]
     	\centering
@@ -231,7 +233,14 @@ Here comes the abstract.
     
     One of the key initial design parameters for WAET was to make the tool as open as possible to non-programmers and to this end all of the user modifiable options are included in a single XML document. This document is called the specification document and can be designed either by manually writing the XML (or modifying an existing document or template) or using our included test creator. These are standalone HTML pages which do not require any server or internet connection and help a build the test specification document. The first (test\_create.html) is for simpler tests and operates step-by-step to guide the user. It supports media through drag and drop and a clutter free interface. The advanced version is for more advanced tests where raw XML manipulation is not wanted but the same freedom is required (whilst keeping a safety net). Both models support automatic verification to ensure the XML file is valid and will highlight areas which are either incorrect and would cause an error, or options which should be removed as they are blank.
     
-    The basic test creator utilises the Web Audio API to perform quick playback checks and also allows for loudness normalisation techniques inspired from \cite{ape}. These are calculated offline by accessing the raw audio samples exposed from the buffer before being applied to the audio element as a gain attribute. This is used in the test to perform loudness normalisation without needing to edit any audio files. Equally the gain can be modified in either editor using an HTML5 slider or number box.
+    The basic test creator, Figre \ref{fig:test_create}, utilises the Web Audio API to perform quick playback checks and also allows for loudness normalisation techniques inspired from \cite{ape}. These are calculated offline by accessing the raw audio samples exposed from the buffer before being applied to the audio element as a gain attribute. This is used in the test to perform loudness normalisation without needing to edit any audio files. Equally the gain can be modified in either editor using an HTML5 slider or number box.
+    
+    \begin{figure}[h!]
+	\centering
+	\includegraphics[width=.45\textwidth]{test_create_2.png}
+	\caption{Screen-shot of test creator tool using drag and drop to create specification document}
+	\label{fig:test_create}
+	\end{figure}
     
     %Describe and/or visualise audioholder-audioelement-... structure. 
     The specification document contains the URL of the audio fragments for each test page. These fragments are downloaded asynchronously in the test and decoded offline by the Web Audio offline decoder. The resulting buffers are assigned to a custom Audio Objects node which tracks the fragment buffer, the playback bufferSourceNode, the XML information including its unique test ID, the interface object(s) associated with the fragment and any metric or data collection objects. The Audio Object is controlled by an over-arching custom Audio Context node (not to be confused with the Web Audio Context). This parent JS Node allows for session wide control of the Audio Objects including starting and stopping playback of specific nodes.
@@ -390,6 +399,7 @@ To provide users with a flexible system, a large range of `standard' listening t
 %%%%	\end{itemize}
 	
 	% Build your own test
+
 \begin{comment}
 {	\bf A screenshot would be nice. 
 
@@ -428,8 +438,6 @@ To provide users with a flexible system, a large range of `standard' listening t
 	
 	The code and documentation can be pulled or downloaded from our online repository available at \url{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}.
 	
-	[Talking a little bit about what else might happen. Unless we really want to wrap this up. ]
-	
 	\cite{schoeffler2015mushra} gives a `checklist' for subjective evaluation of audio systems. The Web Audio Evaluation Toolbox meets most of its given requirements including remote testing, crossfading between audio streams, collecting browser information, utilising UI elements and working with various audio formats including uncompressed PCM or WAV format.
 		% remote
 		% language support (not explicitly stated)
@@ -439,13 +447,16 @@ To provide users with a flexible system, a large range of `standard' listening t
 		% buttons, scales, ... UI elements
 		% must be able to load uncompressed PCM
 
+    The use of the Web Audio API is therefore key to WAET to meeting these requirements and others for performing perceptual evaluation tests. Along with the power of the HTML DOM environment giving the ability to interact with all on-page elements creates a powerful and flexible tool capable of performing a multitude of tests out of the box, whilst other tests could easily be built on top of the framework provided.
+    \begin{comment}
 	[What can we not do? `Method of adjustment', as in \cite{schoeffler2015mushra} is another can of worms, because, like, you could adjust lots of things (volume is just one of them, that could be done quite easily). Same for using input signals like the participant's voice. Either leave out, or mention this requires modification of the code we provide.]
+	\end{comment}
 
 %
 % The following two commands are all you need in the
 % initial runs of your .tex file to
 % produce the bibliography for the citations in your paper.
-\bibliographystyle{abbrv}
+\bibliographystyle{ieeetr}
 \bibliography{WAC2016}  % sigproc.bib is the name of the Bibliography in this case
 % You must have a proper ".bib" file
 %  and remember to run:
