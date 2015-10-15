@@ -10,6 +10,8 @@
 % Copyright
 \setcopyright{waclicense}
 
+\newcommand*\rot{\rotatebox{90}}
+
 
 %% DOI
 %\doi{10.475/123_4}
@@ -150,56 +152,36 @@ Here comes the abstract.
 	% only browser-based? 
 	\begin{table*}[ht]
 	 \caption{Table with existing listening test platforms and their features}
+	 \small
 	 \begin{center}
-	    	\begin{tabular}{|*{6}{l|}}
+	    	\begin{tabular}{|*{9}{l|}}
 	    		\hline
-	    		\textbf{Name} 	& \textbf{Ref.} 	& \textbf{Language} 	& \textbf{Interfaces} 			& \textbf{Remote} 			& \textbf{All UI} 	\\
-	    		\hline
-	    		APE 			& \cite{ape}		& MATLAB				& multi-stimulus, 1 axis per attribute 	& 					& 			 \\
-	    		BeaqleJS		& \cite{beaqlejs}	& JavaScript			& ABX, MUSHRA 					& (not natively supported) 	& 			 \\
-	    		HULTI-GEN 		& \cite{hultigen}	& MAX 					& See Table \ref{tab:toolbox_interfaces}& 							& \checkmark \\
-	    		mushraJS		& 					& JavaScript 			& MUSHRA 						& \checkmark				& 	 \\
-	    		MUSHRAM			& \cite{mushram}	& MATLAB				& MUSHRA						& 							& 			 \\
-	    		Scale 			& \cite{scale}		& MATLAB				& See Table \ref{tab:toolbox_interfaces} &							&			 \\
-	    		WhisPER			& \cite{whisper}	& MATLAB				& See Table \ref{tab:toolbox_interfaces}								&							& \checkmark \\
-	    		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{All of the above}				& \checkmark				& \checkmark \\
-	    		\hline
+	    		\textbf{Toolbox}    & \rot{\textbf{APE}}   & \rot{\textbf{BeaqleJS}}    &\rot{\textbf{HULTI-GEN}} & \rot{\textbf{mushraJS}}    & \rot{\textbf{MUSHRAM}}    & \rot{\textbf{Scale}}    & \rot{\textbf{WhisPER}}    & \rot{\textbf{WAET}} \\ \hline
+	    		 \textbf{Reference}    & \cite{ape}    & \cite{beaqlejs}    & \cite{hultigen}    &    & \cite{mushram} & \cite{scale}    & \cite{whisper}    & \cite{waet} \\ \hline
+	    		 \textbf{Language} & MATLAB    & JS    & MAX    & JS    & MATLAB    &    MATLAB    & MATLAB    & JS \\ \hline
+	    		 \textbf{Remote} &    & (not native)    &     & \checkmark    &    &    &    & \checkmark \\ \hline \hline
+	    		 MUSHRA (ITU-R BS. 1534) & & \checkmark & \checkmark & \checkmark & \checkmark & & & \checkmark \\ \hline
+	    		 APE & \checkmark & & & & & & & \checkmark \\ \hline
+	    		 Rank Scale & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Likert Scale & & & \checkmark & & & & \checkmark & \checkmark \\ \hline
+	    		 ABC/HR (ITU-R BS. 1116)   & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 -50 to 50 Bipolar with ref. & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Absolute Category Rating Scale & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Degredation Category Rating Scale & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Comparison Category Rating Scale & & & \checkmark & & & & \checkmark & \checkmark \\ \hline
+	    		 9 Point Hedonic Category Rating Scale & & & \checkmark & & & & \checkmark & \checkmark \\ \hline
+	    		 ITU-R 5 Continuous Impairment Scale & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Pairwise / AB Test & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Multi-attribute ratings & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 ABX Test & & \checkmark & \checkmark & & & & & \checkmark \\ \hline
+	    		 Adaptive psychophysical methods & & & & & & & \checkmark & \\ \hline 
+	    		 Repertory Grid Technique & & & & & & & \checkmark & \\ \hline
+	    		 Semantic Differential  & & & & & & \checkmark & \checkmark & \\ \hline
+	    		 n-Alternative Forced Choice & & & & & & \checkmark & & \\ \hline
 	    	\end{tabular}
 	 \end{center}
 	 \label{tab:toolboxes}
-	 \end{table*}%
-	
-	 \begin{table*}[ht]
-	 \caption{Table with interfaces and which toolboxes support them}
-	 \begin{center}
-	    	\begin{tabular}{|*{5}{l|}}
-	    		\hline
-	    		\textbf{Interface} 									& \textbf{HULTI-GEN} 	& \textbf{Scale} 	& \textbf{WhisPER} 	& \textbf{WAET} \\
-	    		\hline
-	    		MUSHRA (ITU-R BS. 1534)								& \checkmark 			&					&					& \checkmark 	\\
-	    		Rank scale 											& \checkmark 			&					&					& \checkmark	\\
-				Likert scale										& \checkmark 			&					& \checkmark		& \checkmark	\\
-				ABC/HR (ITU-R BS. 1116)								& \checkmark 			&					&					& \checkmark	\\
-				-50 to 50 Bipolar with Ref							& \checkmark 			&					& 					& \checkmark	\\
-				Absolute Category Rating (ACR) Scale				& \checkmark 			&					&					& \checkmark	\\
-				Degredation Category Rating (DCR) Scale				& \checkmark 			&					&					& \checkmark	\\
-				Comparison Category Rating (CCR) Scale				& \checkmark 			&					& \checkmark		& \checkmark	\\
-				9 Point Hedonic Category Rating Scale				& \checkmark 			&					& \checkmark		& \checkmark	\\
-				ITU-R 5 Point Continuous Impairment Scale			& \checkmark 			&					&					& \checkmark	\\
-				Pairwise Comparison / AB test						& \checkmark 			&					&					& \checkmark	\\
-				Multi-attribute ratings								& \checkmark 			&					&					& \checkmark	\\
-				ABX Test											& \checkmark 			&					&					& \checkmark	\\
-				Adaptive psychophysical methods						& 						&					& \checkmark		&				\\
-				Repertory Grid Technique (RGT)						&						&					& \checkmark		&				\\
-				Semantic differential								&						& \checkmark		& \checkmark		&				\\
-				n-Alternative Forced choice 						&						& \checkmark		&					&				\\
-	
-	    		\hline
-	    	\end{tabular}
-	 \end{center}
-	 \label{tab:toolbox_interfaces}
-	 \end{table*}%
-
+	 \end{table*}
         % 
         %Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
 
