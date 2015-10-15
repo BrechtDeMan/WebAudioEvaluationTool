@@ -206,6 +206,13 @@ Here comes the abstract.
         %[Talking about what we do in the various sections of this paper. Referring to \cite{waet}. ]
     To meet the need for a cross-platform, versatile and easy-to-use listening test tool, we previously developed the Web Audio Evaluation Tool \cite{waet} which at the time of its inception was capable of running a listening test in the browser from an XML configuration file, and storing an XML file as well, with one particular interface. We have now expanded this into a tool with which a wide range of listening test types can easily be constructed and set up remotely, without any need for manually altering code or configuration files, and which allows visualisation of the collected results in the browser. In this paper, we discuss these different aspects and explore which future improvements would be possible. Specifically, in Section \ref{sec:architecture} we cover the general implementation aspects, with a focus on the Web Audio API, followed by a discussion of the requirements for successful remote tests in Section \ref{sec:remote}. Section \ref{sec:interfaces} describes the various interfaces the tool supports, as well as how to keep this manageable. Finally, in Section \ref{sec:analysis} we provide an overview of the analysis capabilities in the browser, before summarising our findings and listing future research directions in Section \ref{sec:conclusion}.
 
+    \begin{figure}[tb]
+    	\centering
+    	\includegraphics[width=.5\textwidth]{interface.png}
+    	\caption{A simple example of a multi-stimulus, single attribute, single rating scale test with a reference and comment fields.}
+    	\label{fig:interface}
+    \end{figure}
+
 \begin{comment}
         % MEETING 8 OCTOBER
         \subsection{Meeting 8 October}
@@ -411,18 +418,19 @@ To provide users with a flexible system, a large range of `standard' listening t
 \label{sec:analysis}
 	% don't mention Python scripts
 	There are several benefits to providing basic analysis tools in the browser: they allow diagnosing problems, with the interface or with the test subject; they may be sufficient for many researchers' purposes; and test subjects may enjoy seeing an overview of their own results and/or results thus far at the end of their tests. 
-	% \begin{figure*}[bhf]
-	% 	\centering
-	% 	\includegraphics[width=.7\textwidth]{timeline.pdf}
-	% 	\caption{This timeline of a single subject's listening test shows playback of fragments (red segments) and marker movements on the rating axis in function of time. }
-	% 	\label{fig:timeline}
-	% \end{figure*}
+	\begin{figure}[bhf]
+		\centering
+		\includegraphics[width=.5\textwidth]{boxplot.png}
+		%\caption{This timeline of a single subject's listening test shows playback of fragments (red segments) and marker movements on the rating axis in function of time. }
+		\caption{Box and whisker plot showing the aggregated numerical ratings of six stimuli by a group of subjects.}
+		\label{fig:timeline}
+	\end{figure}
 	For this reason, we include a proof-of-concept web page with:
 	\begin{itemize}[noitemsep,nolistsep]
 		\item All audioholder IDs, file names, subject IDs, audio element IDs, ... in the collected XMLs so far (\texttt{saves/*.xml})
 		\item Selection of subjects and/or test samples to zoom in on a subset of the data %Check/uncheck each of the above for analysis (e.g. zoom in on a certain song, or exclude a subset of subjects)
 		\item Embedded audio to hear corresponding test samples % (follow path in XML setup file, which is also embedded in the XML result file)
-		\item Box plot, confidence plot, and scatter plot of rating values
+		\item Scatter plot, confidence plot and box plot of rating values (see Figure )
 		\item Timeline for a specific subject %(see Figure \ref{fig:timeline})%, perhaps re-playing the experiment in X times realtime. (If actual realtime, you could replay the audio...)
 		\item Distribution plots of any radio button and number questions in pre- and post-test survey %(drop-down menu with `pretest', `posttest', ...; then drop-down menu with question `IDs' like `gender', `age', ...; make pie chart/histogram of these values over selected range of XMLs)
 		\item All `comments' on a specific audioelement
