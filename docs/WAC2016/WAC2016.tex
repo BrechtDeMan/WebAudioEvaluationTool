@@ -150,56 +150,56 @@ Here comes the abstract.
 	
 	% only browser-based? 
 	\begin{table*}[ht]
-    \caption{Table with existing listening test platforms and their features}
-    \begin{center}
-    	\begin{tabular}{|*{6}{l|}}
-    		\hline
-    		\textbf{Name} 	& \textbf{Ref.} 	& \textbf{Language} 	& \textbf{Interfaces} 			& \textbf{Remote} 			& \textbf{All UI} 	\\
-    		\hline
-    		APE 			& \cite{ape}		& MATLAB				& multi-stimulus, 1 axis per attribute 	& 					& 			 \\
-    		BeaqleJS		& \cite{beaqlejs}	& JavaScript			& ABX, MUSHRA 					& (not natively supported) 	& 			 \\
-    		HULTI-GEN 		& \cite{hultigen}	& MAX 					& See Table \ref{tab:toolbox_interfaces}& 							& \checkmark \\
-    		mushraJS		& 					& JavaScript 			& MUSHRA 						& \checkmark				& 	 \\
-    		MUSHRAM			& \cite{mushram}	& MATLAB				& MUSHRA						& 							& 			 \\
-    		Scale 			& \cite{scale}		& MATLAB				& See Table \ref{tab:toolbox_interfaces} &							&			 \\
-    		WhisPER			& \cite{whisper}	& MATLAB				& See Table \ref{tab:toolbox_interfaces}								&							& \checkmark \\
-    		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{all of the above, see Table \ref{tab:toolbox_interfaces}}		& \checkmark				& \checkmark \\
-    		\hline
-    	\end{tabular}
-    \end{center}
-    \label{tab:toolboxes}
-    \end{table*}%
-
-    \begin{table*}[ht]
-    \caption{Table with interfaces and which toolboxes support them}
-    \begin{center}
-    	\begin{tabular}{|*{5}{l|}}
-    		\hline
-    		\textbf{Interface} 									& \textbf{HULTI-GEN} 	& \textbf{Scale} 	& \textbf{WhisPER} 	& \textbf{WAET} \\
-    		\hline
-    		MUSHRA (ITU-R BS. 1534)								& \checkmark 			&					&					& \checkmark 	\\
-    		Rank scale 											& \checkmark 			&					&					& \checkmark	\\
-			Likert scale										& \checkmark 			&					& \checkmark		& \checkmark	\\
-			ABC/HR (ITU-R BS. 1116)								& \checkmark 			&					&					& \checkmark	\\
-			-50 to 50 Bipolar with Ref							& \checkmark 			&					& 					& \checkmark	\\
-			Absolute Category Rating (ACR) Scale				& \checkmark 			&					&					& \checkmark	\\
-			Degredation Category Rating (DCR) Scale				& \checkmark 			&					&					& \checkmark	\\
-			Comparison Category Rating (CCR) Scale				& \checkmark 			&					& \checkmark		& \checkmark	\\
-			9 Point Hedonic Category Rating Scale				& \checkmark 			&					& \checkmark		& \checkmark	\\
-			ITU-R 5 Point Continuous Impairment Scale			& \checkmark 			&					&					& \checkmark	\\
-			Pairwise Comparison / AB test						& \checkmark 			&					&					& \checkmark	\\
-			Multi-attribute ratings								& \checkmark 			&					&					& \checkmark	\\
-			ABX Test											& \checkmark 			&					&					& \checkmark	\\
-			Adaptive psychophysical methods						& 						&					& \checkmark		&				\\
-			Repertory Grid Technique (RGT)						&						&					& \checkmark		&				\\
-			(Semantic differential)								& 						&				& (\checkmark)		&				\\ % same as a few of the above
-			n-Alternative Forced choice 						&						& \checkmark		&					&				\\
-
-    		\hline
-    	\end{tabular}
-    \end{center}
-    \label{tab:toolbox_interfaces}
-    \end{table*}%
+	 \caption{Table with existing listening test platforms and their features}
+	 \begin{center}
+	    	\begin{tabular}{|*{6}{l|}}
+	    		\hline
+	    		\textbf{Name} 	& \textbf{Ref.} 	& \textbf{Language} 	& \textbf{Interfaces} 			& \textbf{Remote} 			& \textbf{All UI} 	\\
+	    		\hline
+	    		APE 			& \cite{ape}		& MATLAB				& multi-stimulus, 1 axis per attribute 	& 					& 			 \\
+	    		BeaqleJS		& \cite{beaqlejs}	& JavaScript			& ABX, MUSHRA 					& (not natively supported) 	& 			 \\
+	    		HULTI-GEN 		& \cite{hultigen}	& MAX 					& See Table \ref{tab:toolbox_interfaces}& 							& \checkmark \\
+	    		mushraJS		& 					& JavaScript 			& MUSHRA 						& \checkmark				& 	 \\
+	    		MUSHRAM			& \cite{mushram}	& MATLAB				& MUSHRA						& 							& 			 \\
+	    		Scale 			& \cite{scale}		& MATLAB				& See Table \ref{tab:toolbox_interfaces} &							&			 \\
+	    		WhisPER			& \cite{whisper}	& MATLAB				& See Table \ref{tab:toolbox_interfaces}								&							& \checkmark \\
+	    		\textbf{WAET}	& \cite{waet}		& JavaScript			& \textbf{All of the above}				& \checkmark				& \checkmark \\
+	    		\hline
+	    	\end{tabular}
+	 \end{center}
+	 \label{tab:toolboxes}
+	 \end{table*}%
+	
+	 \begin{table*}[ht]
+	 \caption{Table with interfaces and which toolboxes support them}
+	 \begin{center}
+	    	\begin{tabular}{|*{5}{l|}}
+	    		\hline
+	    		\textbf{Interface} 									& \textbf{HULTI-GEN} 	& \textbf{Scale} 	& \textbf{WhisPER} 	& \textbf{WAET} \\
+	    		\hline
+	    		MUSHRA (ITU-R BS. 1534)								& \checkmark 			&					&					& \checkmark 	\\
+	    		Rank scale 											& \checkmark 			&					&					& \checkmark	\\
+				Likert scale										& \checkmark 			&					& \checkmark		& \checkmark	\\
+				ABC/HR (ITU-R BS. 1116)								& \checkmark 			&					&					& \checkmark	\\
+				-50 to 50 Bipolar with Ref							& \checkmark 			&					& 					& \checkmark	\\
+				Absolute Category Rating (ACR) Scale				& \checkmark 			&					&					& \checkmark	\\
+				Degredation Category Rating (DCR) Scale				& \checkmark 			&					&					& \checkmark	\\
+				Comparison Category Rating (CCR) Scale				& \checkmark 			&					& \checkmark		& \checkmark	\\
+				9 Point Hedonic Category Rating Scale				& \checkmark 			&					& \checkmark		& \checkmark	\\
+				ITU-R 5 Point Continuous Impairment Scale			& \checkmark 			&					&					& \checkmark	\\
+				Pairwise Comparison / AB test						& \checkmark 			&					&					& \checkmark	\\
+				Multi-attribute ratings								& \checkmark 			&					&					& \checkmark	\\
+				ABX Test											& \checkmark 			&					&					& \checkmark	\\
+				Adaptive psychophysical methods						& 						&					& \checkmark		&				\\
+				Repertory Grid Technique (RGT)						&						&					& \checkmark		&				\\
+				Semantic differential								&						& \checkmark		& \checkmark		&				\\
+				n-Alternative Forced choice 						&						& \checkmark		&					&				\\
+	
+	    		\hline
+	    	\end{tabular}
+	 \end{center}
+	 \label{tab:toolbox_interfaces}
+	 \end{table*}%
 
         % 
         %Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
@@ -236,6 +236,7 @@ Here comes the abstract.
 \end{comment}
 	
 \section{Architecture}  % title? 'back end'? % NICK
+\label{sec:architecture}
 %A slightly technical overview of the system. Talk about XML, JavaScript, Web Audio API, HTML5. 
 
     While WAET uses a sparse subset of the Web Audio API functionality, its performance comes directly from using the Web Audio API for audio playback. Listening tests can convey large amounts of information other than obtaining the perceptual relationship between the audio fragments. Specifically, with WAET one can obtain which parts of the audio fragments were listened to and when, at what point in the audio stream the participant switched to a different fragment, and how a fragment's rating was adjusted over time within a session, to name a few. Not only does this allow to evaluate a wealth of perceptual aspects, but it helps detect poor participants whose results are potentially not representative.
@@ -423,12 +424,13 @@ To provide users with a flexible system, a large range of `standard' listening t
 		\item Selection of subjects and/or test samples to zoom in on a subset of the data %Check/uncheck each of the above for analysis (e.g. zoom in on a certain song, or exclude a subset of subjects)
 		\item Embedded audio to hear corresponding test samples % (follow path in XML setup file, which is also embedded in the XML result file)
 		\item Box plot, confidence plot, and scatter plot of rating values
-		\item Timeline for a specific subject or song %(see Python scripts), perhaps re-playing the experiment in X times realtime. (If actual realtime, you could replay the audio...) ---> A LOT of work, not sure I can guarantee this one
-		\item Distribution plots of any radio button and number questions. Also pie charts and histograms when over a range of participants %(drop-down menu with `pretest', `posttest', ...; then drop-down menu with question `IDs' like `gender', `age', ...; make pie chart/histogram of these values over selected range of XMLs)
+		\item Timeline for a specific subject %(see Figure \ref{fig:timeline})%, perhaps re-playing the experiment in X times realtime. (If actual realtime, you could replay the audio...)
+		\item Distribution plots of any radio button and number questions in pre- and post-test survey %(drop-down menu with `pretest', `posttest', ...; then drop-down menu with question `IDs' like `gender', `age', ...; make pie chart/histogram of these values over selected range of XMLs)
 		\item All `comments' on a specific audioelement
-		\item A `download' button for a nice CSV of various things (values, survey responses, comments) %people might want to use for analysis, e.g. when XML scares them
-		%\item Validation of setup XMLs (easily spot `errors', like duplicate IDs or URLs, missing/dangling tags, ...) --> Took this out as a feature as the test_create will already do this as will the test console.
+		\item A `download' function for a CSV of ratings, survey responses and comments% various things (values, survey responses, comments) people might want to use for analysis, e.g. when XML scares them
+		%\item Validation of setup XMLs (easily spot `errors', like duplicate IDs or URLs, missing/dangling tags, ...)
 	\end{itemize}
+
 
 	%A subset of the above would already be nice for this paper. 
 	[Some pictures here please.]
