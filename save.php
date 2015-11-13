@@ -1,5 +1,5 @@
 <?php
-	head('Access-Control-Allow-Origin: *');
+	header('Access-Control-Allow-Origin: *');
 	$postText = file_get_contents('php://input');
 	$datetime = date('ymdHis');
 	$xmlfile = "save".$datetime.".xml";
