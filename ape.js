@@ -588,7 +588,7 @@ function buttonSubmitClick()
 	    {
 	        if (audioEngineContext.timer.testStarted == false)
 	        {
-	            alert('You have not started the test! Please press start to begin the test!');
+	            alert('You have not started the test! Please click a fragment to begin the test!');
 	            return;
 	        }
 	    }
