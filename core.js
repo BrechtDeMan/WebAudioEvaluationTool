@@ -674,9 +674,22 @@ function createProjectSave(destURL) {
 			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
 				createProjectSave(null);
 			} else {
-				popup.showPopup();
-				popup.popupContent.innerHTML = null;
-				popup.popupContent.textContent = "Thank you!";
+				if (xmlhttp.responseXML == null)
+				{
+					return createProjectSave(null);
+				}
+				var response = xmlhttp.responseXML.childNodes[0];
+				if (response.getAttribute('state') == "OK")
+				{
+					var file = response.getElementsByTagName('file')[0];
+					console.log('Save OK: Filename '+file.textContent+','+file.getAttribute('bytes')+'B');
+					popup.showPopup();
+					popup.popupContent.innerHTML = null;
+					popup.popupContent.textContent = "Thank you!";
+				} else {
+					var message = response.getElementsByTagName('message')[0];
+					errorSessionDump(message.textContent);
+				}
 			}
 		};
 		xmlhttp.send(file);
