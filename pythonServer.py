@@ -70,7 +70,7 @@ def saveFile(self):
 	self.send_response(200)
 	self.send_header("Content-type", "text/xml")
 	self.end_headers()
-	self.wfile.write('<response><state>OK</state><file>saves/'+curFileName+'</file></response>')
+	self.wfile.write('<response state="OK"><message>OK</message><file>"saves/'+curFileName+'"</file></response>')
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_HEAD(s):

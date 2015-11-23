@@ -190,6 +190,12 @@ function interfacePopup() {
 				textArea.rows = "10";
 				break;
 			}
+			document.onkeydown=function(){
+				if(window.event.keyCode=='13'){ // when you hit enter
+					window.event.preventDefault(); // don't make newline
+					popup.proceedClicked(); // go to the next window (or start the test or submit)
+				}
+			}
 			this.popupResponse.appendChild(textArea);
 			textArea.focus();
 		} else if (node.type == 'checkbox') {
@@ -668,9 +674,22 @@ function createProjectSave(destURL) {
 			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
 				createProjectSave(null);
 			} else {
-				popup.showPopup();
-				popup.popupContent.innerHTML = null;
-				popup.popupContent.textContent = "Thank you for performing this listening test";
+				if (xmlhttp.responseXML == null)
+				{
+					return createProjectSave(null);
+				}
+				var response = xmlhttp.responseXML.childNodes[0];
+				if (response.getAttribute('state') == "OK")
+				{
+					var file = response.getElementsByTagName('file')[0];
+					console.log('Save OK: Filename '+file.textContent+','+file.getAttribute('bytes')+'B');
+					popup.showPopup();
+					popup.popupContent.innerHTML = null;
+					popup.popupContent.textContent = "Thank you!";
+				} else {
+					var message = response.getElementsByTagName('message')[0];
+					errorSessionDump(message.textContent);
+				}
 			}
 		};
 		xmlhttp.send(file);
