@@ -56,6 +56,15 @@ div.track-slider {
 	background-color: rgb(100,200,100);
 }
 
+div#outside-reference {
+	width:120px;
+	padding-left: 55px;
+	margin-left: 100px;
+	height:20px;
+	margin-bottom:5px;
+	background-color: rgb(100,200,100);
+}
+
 div.track-slider-disabled {
 	background-color: rgb(100,100,100);
 }
@@ -66,12 +75,4 @@ div.track-slider-playing {
 
 div.comment-box-playing {
 	background-color: #FFDDDD;
-}
-
-div#outside-reference {
-	width:250px;
-	margin-left: 100px;
-	height:20px;
-	margin-bottom:5px;
-	background-color: rgb(100,200,100);
 }
