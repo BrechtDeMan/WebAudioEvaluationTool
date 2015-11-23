@@ -514,9 +514,9 @@ function dragEnd(ev) {
 	var marginSize = Number(slider.attributes['marginsize'].value);
 	var w = slider.style.width;
 	w = Number(w.substr(0,w.length-2));
-	var x = ev.screenX;
+	var x = ev.clientX;
 	
-	x += Math.abs(window.screenX);
+	//x += Math.abs(window.screenX);
 	x = x % window.outerWidth;
 	
 	if (x >= marginSize && x < w+marginSize) {
