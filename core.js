@@ -727,6 +727,7 @@ function interfaceXMLSave(){
 	projectDocument.setAttribute('file-name',url);
 	xmlDoc.appendChild(projectDocument);
 	xmlDoc.appendChild(returnDateNode());
+	xmlDoc.appendChild(interfaceContext.returnNavigator());
 	for (var i=0; i<testState.stateResults.length; i++)
 	{
 		xmlDoc.appendChild(testState.stateResults[i]);
@@ -1693,6 +1694,21 @@ function Interface(specificationObject) {
 			console.log("Warning - Interface does not have Resize option");
 			console.log(err);
 		}
+	};
+	
+	this.returnNavigator = function()
+	{
+		var node = document.createElement("navigator");
+		var platform = document.createElement("platform");
+		platform.textContent = navigator.platform;
+		var vendor = document.createElement("vendor");
+		vendor.textContent = navigator.vendor;
+		var userAgent = document.createElement("uagent");
+		userAgent.textContent = navigator.userAgent;
+		node.appendChild(platform);
+		node.appendChild(vendor);
+		node.appendChild(userAgent);
+		return node;
 	};
 	
 	this.commentBoxes = [];
