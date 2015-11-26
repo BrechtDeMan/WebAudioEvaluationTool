@@ -1821,6 +1821,19 @@
 				this.preTest = new this.prepostNode("pretest");
 				this.postTest = new this.prepostNode("posttest");
 			}
+			
+			function createDeleteNodeButton(node)
+			{
+				var button = document.createElement("button");
+				button.textContent = "Delete";
+				button.onclick = function(event)
+				{
+					var node = event.target.parentElement;
+					node.parentElement.removeChild(node);	
+				}
+				return button;
+			}
+			
 			function SpecficationToHTML()
 			{
 				// Take information from Specification Node and format it into an HTML layout
@@ -1990,6 +2003,7 @@
 					var node = PPSurveyToHTML(specificationNode.preTest.options[j]);
 					node.className = "SecondLevel";
 					node.id = preTest.id+"-"+j;
+					node.appendChild(createDeleteNodeButton());
 					preTest.appendChild(node);
 				}
 				setupNode.appendChild(preTest);
@@ -2009,6 +2023,7 @@
 					var node = PPSurveyToHTML(specificationNode.postTest.options[j]);
 					node.className = "SecondLevel";
 					node.id = postTest.id+"-"+j;
+					node.appendChild(createDeleteNodeButton());
 					postTest.appendChild(node);
 				}
 				
@@ -2024,6 +2039,7 @@
 					aHTML.name = "audioHolder";
 					aHTML.id = "audioHolder-"+aH.id;
 					aHTML.className = "topLevel";
+					aHTML.appendChild(createDeleteNodeButton());
 					destination.appendChild(aHTML);
 					var title = document.createElement("h2");
 					title.textContent = "Audio Holder "+aH.id;
@@ -2099,6 +2115,7 @@
 						var node = PPSurveyToHTML(aH.preTest.options[j]);
 						node.className = "SecondLevel";
 						node.id = preTest.id+"-"+j;
+						node.appendChild(createDeleteNodeButton());
 						preTest.appendChild(node);
 					}
 					
@@ -2119,6 +2136,7 @@
 						var node = PPSurveyToHTML(aH.postTest.options[j]);
 						node.className = "SecondLevel";
 						node.id = postTest.id+"-"+j;
+						node.appendChild(createDeleteNodeButton());
 						postTest.appendChild(node);
 					}
 					
@@ -2154,9 +2172,9 @@
 						input.style.margin = "5px";
 						entry.appendChild(text);
 						entry.appendChild(input);
+						entry.appendChild(createDeleteNodeButton());
 						audioElems.appendChild(entry);
 					}
-					
 					aHTML.appendChild(audioElems);
 				}
 				
