@@ -139,13 +139,6 @@ function interfacePopup() {
 		$(window).keypress(function(e){
 			if (e.keyCode == 13 && popup.popup.style.visibility == 'visible')
 			{
-				// Enter key pressed
-				var textarea = $(popup.popupContent).find('textarea');
-				if (textarea.length != 0)
-				{
-					if (textarea[0] == document.activeElement)
-					{return;}
-				}
 				popup.buttonProceed.onclick();
 			}
 		});
@@ -158,6 +151,7 @@ function interfacePopup() {
 		blank.style.zIndex = -2;
 		blank.style.visibility = 'hidden';
 		this.buttonPrevious.style.visibility = 'inherit';
+		$(window).keypress(function(e){});
 	};
 	
 	this.postNode = function() {
@@ -189,12 +183,6 @@ function interfacePopup() {
 				textArea.cols = "50";
 				textArea.rows = "10";
 				break;
-			}
-			document.onkeydown=function(){
-				if(window.event.keyCode=='13'){ // when you hit enter
-					window.event.preventDefault(); // don't make newline
-					popup.proceedClicked(); // go to the next window (or start the test or submit)
-				}
 			}
 			this.popupResponse.appendChild(textArea);
 			textArea.focus();
