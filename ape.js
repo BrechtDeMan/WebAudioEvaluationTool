@@ -405,8 +405,12 @@ function loadTest(audioHolderObject)
         
 	});
 	
-	$('.track-slider').mousedown(function() {
+	$('.track-slider').mousedown(function(event) {
 		clicking = this.getAttribute('trackIndex');
+	});
+	
+	$('.track-slider').mousemove(function(event) {
+		event.preventDefault();
 	});
 	
 	$('#slider').mousemove(function(event) {
