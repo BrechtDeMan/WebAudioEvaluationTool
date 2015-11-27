@@ -62,15 +62,21 @@ def saveFile(self):
 	postVars = self.rfile.read(varLen)
 	print curFileName
 	file = open('saves/'+curFileName,'w')
-	curSaveIndex += 1;
-	curFileName = 'test-'+str(curSaveIndex)+'.xml'
-	print curFileName
 	file.write(postVars)
 	file.close()
+	try:
+		wbytes = os.path.getsize('saves/'+curFileName)
+	except OSError:
+		self.send_response(200)
+		self.send_header("Content-type", "text/xml")
+		self.end_headers()
+		self.wfile.write('<response state="error"><message>Could not open file</message></response>')
 	self.send_response(200)
 	self.send_header("Content-type", "text/xml")
 	self.end_headers()
-	self.wfile.write('<response state="OK"><message>OK</message><file>"saves/'+curFileName+'"</file></response>')
+	self.wfile.write('<response state="OK"><message>OK</message><file bytes="'+str(wbytes)+'">"saves/'+curFileName+'"</file></response>')
+	curSaveIndex += 1
+	curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_HEAD(s):
@@ -98,7 +104,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 	def do_POST(request):
 		if(request.client_address[0] == "127.0.0.1"):
-			if (request.path == "/save"):
+			if (request.path == "/save" or request.path == "/save.php"):
 				saveFile(request)
 		else:
 			send404(request)
