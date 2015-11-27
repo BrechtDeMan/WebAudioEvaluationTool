@@ -7,6 +7,8 @@
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
+var clicking = -1;
+
 function loadInterface() {
 	
 	// Get the dimensions of the screen available to the page
@@ -368,9 +370,6 @@ function loadTest(audioHolderObject)
 
 	audioEngineContext.loopPlayback = loopPlayback;
 	// Create AudioEngine bindings for playback
-	audioEngineContext.selectedTrack = function(id) {
-		console.log('Deprecated');
-	};
 	
 	currentTestHolder = document.createElement('audioHolder');
 	currentTestHolder.id = audioHolderObject.id;
@@ -405,6 +404,33 @@ function loadTest(audioHolderObject)
 		audioObject.metric.initialised(convSliderPosToRate(audioObject.interfaceDOM.trackSliderObj));
         
 	});
+	
+	$('.track-slider').mousedown(function() {
+		clicking = this.getAttribute('trackIndex');
+	});
+	
+	$('#slider').mousemove(function(event) {
+		event.preventDefault();
+		if (clicking == -1)
+		{
+			return;
+		}
+		$("#track-slider-"+clicking).css("left",event.clientX + "px");
+	});
+	
+	$(document).mouseup(function(event){
+		if (clicking >= 0)
+		{
+			var l = $("#track-slider-"+clicking).css("left");
+			var time = audioEngineContext.timer.getTestTime();
+			var rate = convSliderPosToRate(document.getElementById("track-slider-"+clicking));
+			audioEngineContext.audioObjects[clicking].metric.moved(time,rate);
+			console.log("slider "+clicking+" moved to "+rate+' ('+time+')');
+		}
+		clicking = -1;
+	});
+	
+	
 	if (commentShow) {
 		interfaceContext.showCommentBoxes(feedbackHolder,true);
 	}
@@ -452,18 +478,6 @@ function sliderObject(audioObject) {
 
 	this.trackSliderObj.setAttribute('trackIndex',audioObject.id);
 	this.trackSliderObj.innerHTML = '<span>'+audioObject.id+'</span>';
-	this.trackSliderObj.draggable = true;
-	this.trackSliderObj.ondragend = dragEnd;
-	
-	this.trackSliderObj.ondragstart = function(event){
-		event.dataTransfer.setData('Text',null);
-	};
-	
-	this.trackSliderObj.ondrop = function(event)
-	{
-		if(event.stopPropagation) {event.stopPropagation();}
-		return false;
-	};
 
 	// Onclick, switch playback to that track
 	this.trackSliderObj.onclick = function(event) {
@@ -506,36 +520,6 @@ function sliderObject(audioObject) {
 	this.getValue = function() {
 		return convSliderPosToRate(this.trackSliderObj);
 	};
-}
-
-function dragEnd(ev) {
-	// Function call when a div has been dropped
-	var slider = document.getElementById('slider');
-	var marginSize = Number(slider.attributes['marginsize'].value);
-	var w = slider.style.width;
-	w = Number(w.substr(0,w.length-2));
-	var x
-	if (navigator.platform.substr(0,3) == "Win")
-	{
-		x = ev.screenX;
-		x -= Math.abs(window.screenX);
-		x = x % window.outerWidth;
-	} else
-	x = ev.clientX;
-	
-	if (x >= marginSize && x < w+marginSize) {
-		this.style.left = (x)+'px';
-	} else {
-		if (x<marginSize) {
-			this.style.left = marginSize+'px';
-		} else {
-			this.style.left = (w+marginSize) + 'px';
-		}
-	}
-	var time = audioEngineContext.timer.getTestTime();
-	var id = Number(ev.currentTarget.getAttribute('trackindex'));
-	audioEngineContext.audioObjects[id].metric.moved(time,convSliderPosToRate(ev.currentTarget));
-	console.log('slider '+id+' moved to '+convSliderPosToRate(ev.currentTarget)+' ('+time+')');
 }
 
 function buttonSubmitClick()
