@@ -176,6 +176,37 @@ function loadInterface() {
 		}
 	};
 	
+	Interface.prototype.objectSelected = null;
+	Interface.prototype.objectMoved = false;
+	Interface.prototype.selectObject = function(object)
+	{
+		if (this.objectSelected == null)
+		{
+			this.objectSelected = object;
+			this.objectMoved = false;
+		}
+	};
+	Interface.prototype.moveObject = function()
+	{
+		if (this.objectMoved == false)
+		{
+			this.objectMoved = true;
+		}
+	};
+	Interface.prototype.releaseObject = function()
+	{
+		this.objectSelected = null;
+		this.objectMoved = false;
+	};
+	Interface.prototype.getSelectedObject = function()
+	{
+		return this.objectSelected;
+	};
+	Interface.prototype.hasSelectedObjectMoved = function()
+	{
+		return this.objectMoved;
+	};
+	
 	// Bindings for audioObjects
 	
 	// Create the top div for the Title element
@@ -406,7 +437,7 @@ function loadTest(audioHolderObject)
 	});
 	
 	$('.track-slider').mousedown(function(event) {
-		clicking = this.getAttribute('trackIndex');
+		interfaceContext.selectObject($(this)[0]);
 	});
 	
 	$('.track-slider').mousemove(function(event) {
@@ -415,23 +446,40 @@ function loadTest(audioHolderObject)
 	
 	$('#slider').mousemove(function(event) {
 		event.preventDefault();
-		if (clicking == -1)
-		{
-			return;
-		}
-		$("#track-slider-"+clicking).css("left",event.clientX + "px");
+		var obj = interfaceContext.getSelectedObject();
+		if (obj == null) {return;}
+		$(obj).css("left",event.clientX + "px");
+		interfaceContext.moveObject();
 	});
-	
+
 	$(document).mouseup(function(event){
-		if (clicking >= 0)
+		event.preventDefault();
+		var obj = interfaceContext.getSelectedObject();
+		if (obj == null) {return;}
+		if (interfaceContext.hasSelectedObjectMoved() == true)
 		{
-			var l = $("#track-slider-"+clicking).css("left");
+			var l = $(obj).css("left");
+			var id = obj.getAttribute('trackIndex');
 			var time = audioEngineContext.timer.getTestTime();
-			var rate = convSliderPosToRate(document.getElementById("track-slider-"+clicking));
-			audioEngineContext.audioObjects[clicking].metric.moved(time,rate);
-			console.log("slider "+clicking+" moved to "+rate+' ('+time+')');
+			var rate = convSliderPosToRate(obj);
+			audioEngineContext.audioObjects[id].metric.moved(time,rate);
+			console.log("slider "+id+" moved to "+rate+' ('+time+')');
+		} else {
+			var id = Number(obj.attributes['trackIndex'].value);
+			//audioEngineContext.metric.sliderPlayed(id);
+			audioEngineContext.play(id);
+	        // Currently playing track red, rest green
+	        
+	        //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
+	        $('.track-slider').removeClass('track-slider-playing');
+	        $(obj).addClass('track-slider-playing');
+	        $('.comment-div').removeClass('comment-box-playing');
+	        $('#comment-div-'+id).addClass('comment-box-playing');
+	        var outsideReference = document.getElementById('outside-reference');
+	        if (outsideReference != undefined)
+	        $(outsideReference).removeClass('track-slider-playing');
 		}
-		clicking = -1;
+		interfaceContext.releaseObject();
 	});
 	
 	
@@ -484,29 +532,6 @@ function sliderObject(audioObject) {
 	this.trackSliderObj.innerHTML = '<span>'+audioObject.id+'</span>';
 
 	// Onclick, switch playback to that track
-	this.trackSliderObj.onclick = function(event) {
-		// Cannot continue to issue play command until audioObjects reported as ready!
-		// Get the track ID from the object ID
-		var element;
-		if (event.currentTarget.nodeName == "SPAN") {
-			element = event.currentTarget.parentNode;
-		} else {
-			element = event.currentTarget;
-		}
-		var id = Number(element.attributes['trackIndex'].value);
-		//audioEngineContext.metric.sliderPlayed(id);
-		audioEngineContext.play(id);
-        // Currently playing track red, rest green
-        
-        //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
-        $('.track-slider').removeClass('track-slider-playing');
-        $(element).addClass('track-slider-playing');
-        $('.comment-div').removeClass('comment-box-playing');
-        $('#comment-div-'+id).addClass('comment-box-playing');
-        var outsideReference = document.getElementById('outside-reference');
-        if (outsideReference != undefined)
-        $(outsideReference).removeClass('track-slider-playing');
-	};
 	
 	this.enable = function() {
 		if (this.parent.state == 1)
