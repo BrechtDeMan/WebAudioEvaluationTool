@@ -968,7 +968,7 @@ function audioObject(id) {
 		if (this.bufferNode != undefined) {
 			if (this.bufferNode.loop == true) {
 				if (audioEngineContext.status  == 1) {
-					return time%this.buffer.duration;
+					return (time-this.metric.listenStart)%this.buffer.duration;
 				} else {
 					return 0;
 				}
