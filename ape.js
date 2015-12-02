@@ -571,9 +571,8 @@ function buttonSubmitClick()
 				break;
 			case  'fragmentFullPlayback':
 				// Check all fragments have been played to their full length
-				var checkState = interfaceContext.checkAllPlayed();
+				var checkState = interfaceContext.checkFragmentsFullyPlayed();
 				if (checkState == false) {canContinue = false;}
-				console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
 				break;
 			case 'fragmentMoved':
 				// Check all fragment sliders have been moved.

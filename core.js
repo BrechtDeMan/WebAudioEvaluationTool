@@ -2186,4 +2186,57 @@ function Interface(specificationObject) {
 		}
 		return true;
 	};
+	
+	this.checkFragmentsFullyPlayed = function ()
+	{
+		// Checks the entire file has been played back
+		// NOTE ! This will return true IF playback is Looped!!!
+		if (audioEngineContext.loopPlayback)
+		{
+			console.log("WARNING - Looped source: Cannot check fragments are fully played");
+			return true;
+		}
+		var check_pass = true;
+		var error_obj = [];
+		for (var i = 0; i<audioEngineContext.audioObjects.length; i++)
+		{
+			var object = audioEngineContext.audioObjects[i];
+			var time = object.buffer.duration;
+			var metric = object.metric;
+			var passed = false;
+			for (var j=0; j<metric.listenTracker.length; j++)
+			{
+				var bt = metric.listenTracker[j].getElementsByTagName('buffertime');
+				var start_time = Number(bt[0].getAttribute('start'));
+				var stop_time = Number(bt[0].getAttribute('stop'));
+				var delta = stop_time - start_time;
+				if (delta >= time)
+				{
+					passed = true;
+					break;
+				}
+			}
+			if (passed == false)
+			{
+				check_pass = false;
+				console.log("Continue listening to track-"+i);
+				error_obj.push(i);
+			}
+		}
+		if (check_pass == false)
+		{
+			var str_start = "You have not listened to fragments ";
+			for (var i=0; i<error_obj.length; i++)
+			{
+				str_start += error_obj[i];
+				if (i != error_obj.length-1)
+				{
+					str_start += ', ';
+				}
+			}
+			str_start += ". Please keep listening";
+			console.log("[ALERT]: "+str_start);
+			alert(str_start);
+		}
+	};
 }
