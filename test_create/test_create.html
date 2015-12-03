@@ -1704,6 +1704,141 @@
 					}
 				};
 				
+				this.encode = function()
+				{
+					var root = document.createElement("BrowserEvalProjectDocument");
+					// First get all the <setup> tag compiled
+					var setupNode = document.createElement("setup");
+					setupNode.setAttribute('interface',this.interfaceType);
+					setupNode.setAttribute('projectReturn',this.projectReturn);
+					setupNode.setAttribute('randomiseOrder',this.randomiseOrder);
+					setupNode.setAttribute('collectMetrics',this.collectMetrics);
+					setupNode.setAttribute('testPages',this.testPages);
+					
+					var setupPreTest = document.createElement("PreTest");
+					for (var i=0; i<this.preTest.options.length; i++)
+					{
+						setupPreTest.appendChild(this.preTest.options.exportXML());
+					}
+					
+					var setupPostTest = document.createElement("PostTest");
+					for (var i=0; i<this.preTest.options.length; i++)
+					{
+						setupPostTest.appendChild(this.postTest.options.exportXML());
+					}
+					
+					setupNode.appendChild(setupPreTest);
+					setupNode.appendChild(setupPostTest);
+					
+					// <Metric> tag
+					var Metric = document.createElement("Metric");
+					for (var i=0; i<this.metrics.length; i++)
+					{
+						var metricEnable = document.createElement("metricEnable");
+						metricEnable.textContent = this.metrics[i].enabled;
+						Metric.appendChild(metricEnable);
+					}
+					setupNode.appendChild(Metric);
+					
+					// <interface> tag
+					var CommonInterface = document.createElement("interface");
+					for (var i=0; i<this.commonInterface.options.length; i++)
+					{
+						var CIObj = this.commonInterface.options[i];
+						var CINode = document.createElement(CIObj.type);
+						if (CIObj.type == "check") {CINode.setAttribute("name",CIObj.check);}
+						else {CINode.setAttribute("name",CIObj.name);}
+						CommonInterface.appendChild(CINode);
+					}
+					setupNode.appendChild(CommonInterface);
+					
+					root.appendChild(setupNode);
+					// Time for the <audioHolder> tags
+					for (var ahIndex = 0; ahIndex < this.audioHolders.length; ahIndex++)
+					{
+						var AHObj = this.audioHolders[ahIndex];
+						var AHNode = document.createElement("audioHolder");
+						AHNode.id = AHObj.id;
+						AHNode.setAttribute("hostURL",AHObj.hostURL);
+						AHNode.setAttribute("sampleRate",AHObj.samplerate);
+						AHNode.setAttribute("randomiseOrder",AHObj.randomiseOrder);
+						AHNode.setAttribute("repeatCount",AHObj.repeatCount);
+						AHNode.setAttribute("loop",AHObj.loop);
+						AHNode.setAttribute("elementComments",AHObj.elementComments);
+						
+						// Create <interface> tag
+						for (var i=0; i<AHObj.interfaces.length; i++)
+						{
+							var AHObjInterface = AHObj.interfaces[i];
+							var AHinterface = document.createElement("interface");
+							if (AHObjInterface.title != undefined)
+							{
+								var title = document.createElement("title");
+								title.textContent = AHObjInterface.title;
+								AHinterface.appendChild(title);
+							}
+							for (var j=0; j<AHObjInterface.options.length; j++)
+							{
+								var CIObj = AHObjInterface.options[j];
+								var CINode = document.createElement(CIObj.type);
+								if (CIObj.type == "check") {CINode.setAttribute("name",CIObj.check);}
+								else {CINode.setAttribute("name",CIObj.name);}
+								AHinterface.appendChild(CINode);
+							}
+							if (AHObjInterface.scale != undefined)
+							{
+								for (var j=0; j<AHObjInterface.scale.length; j++)
+								{
+									var CIObj = AHObjInterface.scale[j];
+									var CINode = document.createElement("scale");
+									CINode.setAttribute("position",CIObj[0]);
+									CINode.textContent = CIObj[1];
+									AHinterface.appendChild(CINode);
+								}
+							}
+							AHNode.appendChild(AHinterface);
+						}
+						
+						// Create <audioElements>
+						for (var aeIndex = 0; aeIndex < AHObj.audioElements.length; aeIndex++)
+						{
+							var AEObj = AHObj.audioElements[aeIndex];
+							var AENode = document.createElement("audioElements");
+							AENode.id = AEObj.id;
+							AENode.setAttribute("url",AEObj.url);
+							AENode.setAttribute("type",AEObj.type);
+							if (AEObj.marker != undefined && AEObj.enforce)
+							{
+								AENode.setAttribute("marker",AEObj.marker*100);
+							}
+							AHNode.appendChild(AENode);
+						}
+						
+						// Create <CommentQuestion>
+						for (var i=0; i<AHObj.commentQuestions.length; i++)
+						{
+							AHNode.appendChild(AHObj.commentQuestions[i].exportXML());
+						}
+						
+						// Create <PreTest>
+						var AHPreTest = document.createElement("PreTest");
+						for (var i=0; i<AHObj.preTest.options.length; i++)
+						{
+							AHPreTest.appendChild(AHObj.preTest.options.exportXML());
+						}
+						
+						var AHPostTest = document.createElement("PostTest");
+						for (var i=0; i<AHObj.preTest.options.length; i++)
+						{
+							AHPostTest.appendChild(AHObj.postTest.options.exportXML());
+						}
+						AHNode.appendChild(AHPreTest);
+						AHNode.appendChild(AHPostTest);
+						root.appendChild(AHNode);
+					}
+					return root;
+				};
+				
 				this.prepostNode = function(type) {
 					this.type = type;
 					this.options = [];
@@ -1728,6 +1863,58 @@
 						this.max = undefined;
 						this.step = undefined;
 						
+						this.exportXML = function()
+						{
+							var node = document.createElement(this.type);
+							switch(this.type)
+							{
+							case "statement":
+								node.textContent = this.statement;
+								break;
+							case "question":
+								node.id = this.id;
+								node.setAttribute("mandatory",this.mandatory);
+								node.setAttribute("boxsize",this.boxsize);
+								node.textContent = this.question;
+								break;
+							case "number":
+								node.id = this.id;
+								node.setAttribute("mandatory",this.mandatory);
+								node.setAttribute("min"), this.min;
+								node.setAttribute("max"), this.max;
+								node.setAttribute("step"), this.step;
+								break;
+							case "checkbox":
+								node.id = this.id;
+								var statement = document.createElement("statement");
+								statement.textContent = this.statement;
+								node.appendChild(statement);
+								for (var i=0; i<this.options.length; i++)
+								{
+									var option = this.option[i];
+									var optionNode = document.createElement("option");
+									optionNode.id = option.id;
+									optionNode.textContent = option.text;
+									node.appendChild(option);
+								}
+								break;
+							case "radio":
+								node.id = this.id;
+								var statement = document.createElement("statement");
+								statement.textContent = this.statement;
+								node.appendChild(statement);
+								for (var i=0; i<this.options.length; i++)
+								{
+									var option = this.option[i];
+									var optionNode = document.createElement("option");
+									optionNode.setAttribute("name") = option.name;
+									optionNode.textContent = option.text;
+									node.appendChild(option);
+								}
+								break;
+							}
+							return node;
+						};
 					};
 				};
 				
@@ -1776,6 +1963,31 @@
 					};
 					
 					this.commentQuestionNode = function(xml) {
+						this.exportXML = function()
+						{
+							var CQNode = document.createElement("CommentQuestion");
+							CQNode.id = this.id;
+							CQNode.setAttribute("type",this.type);
+							switch(this.type)
+							{
+							case "text":
+								CQNode.textContent = this.question;
+								break;
+							case "radio" || "checkbox":
+								var statement = document.createElement("statement");
+								statement.textContent = this.statement;
+								CQNode.appendChild(statement);
+								for (var i=0; i<this.options.length; i++)
+								{
+									var optionNode = document.createElement("option");
+									optionNode.setAttribute("name",this.options[i].name);
+									optionNode.textContent = this.options[i].text;
+									CQNode.appendChild(optionNode);
+								}
+								break;
+							}
+							return CQNode;
+						};
 						this.childOption = function(element) {
 							this.type = 'option';
 							this.name = element.getAttribute('name');
@@ -2393,6 +2605,28 @@
 					}
 					return holder;
 				}
+			}
+			function exportToXML()
+			{
+				var xmlDoc = specificationNode.encode();
+				var parent = document.createElement("div");
+				parent.appendChild(xmlDoc);
+				var file = [parent.innerHTML];
+				var bb = new Blob(file,{type : 'application/xml'});
+				var dnlk = window.URL.createObjectURL(bb);
+				var a = document.createElement("a");
+				a.hidden = '';
+				a.href = dnlk;
+				a.download = "save.xml";
+				a.textContent = "Save File";
+				
+				popupInstance.showPopup();
+				popupInstance.popupBody.innerHTML = null;
+				var body = document.createElement("span");
+				body.textContent = "Right click and save the file using the link below. Place this file in your WAET directory as 'project.xml' in the example_eval/ directory. Place your media files in the location specified by the Host URL entries. If you wish to review this XML or edit it, refresh this tool and drag your XML document into the page on the welcome screen.";
+				popupInstance.popupBody.appendChild(body);
+				popupInstance.popupBody.appendChild(a);
+				popupInstance.popupTitle.innerHTML = "<span>Thank You</span>";
 			}
 		</script>
 		<style>
