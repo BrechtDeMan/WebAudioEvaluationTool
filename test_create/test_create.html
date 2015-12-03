@@ -1830,7 +1830,7 @@
 				{
 					var node = event.target.parentElement;
 					node.parentElement.removeChild(node);	
-				}
+				};
 				return button;
 			}
 			
@@ -1861,6 +1861,10 @@
 				option.textContent = "MUSHRA";
 				select.appendChild(option);
 				select.value = specificationNode.interfaceType;
+				select.onchange = function(event)
+				{
+					specificationNode.interfaceType = event.currentTarget.value;
+				};
 				var span = document.createElement("span");
 				span.textContent = "Interface Type";
 				div.appendChild(span);
@@ -1873,6 +1877,9 @@
 				input.value = specificationNode.projectReturn;
 				input.id = "projectReturn";
 				input.style.margin = "5px";
+				input.onchange = function(event) {
+					specificationNode.projectReturn = event.currentTarget.value;
+				};
 				div.appendChild(span);
 				div.appendChild(input);
 				// Randomise Order
@@ -1882,7 +1889,10 @@
 				input.id = "randomiseOrder";
 				input.style.margin = "5px";
 				input.type = "checkbox";
-				input.value = specificationNode.projectReturn;
+				input.checked = specificationNode.randomiseOrder;
+				input.onchange = function(event) {
+					specificationNode.randomiseOrder = event.currentTarget.checked;
+				};
 				div.appendChild(span);
 				div.appendChild(input);
 				setupNode.appendChild(div);
@@ -1916,6 +1926,7 @@
 					var input = document.createElement("input");
 					input.type = "checkbox";
 					input.id = interfaceOptions[0][i];
+					input.setAttribute("name", "option");
 					div.appendChild(input);
 					div.appendChild(span);
 					commonInterface.appendChild(div);
@@ -1927,6 +1938,21 @@
 							break;
 						}
 					}
+					input.onchange = function(event) {
+						var id = event.currentTarget.id;
+						if (event.currentTarget.checked) {
+							specificationNode.commonInterface.options.push(new specificationNode.commonInterface.optionNode(event.currentTarget));
+						} else {
+							for (var j=0; j<specificationNode.commonInterface.options.length; j++)
+							{
+								if (specificationNode.commonInterface.options[j].name == event.currentTarget.id)
+								{
+									specificationNode.commonInterface.options.splice(j,1);
+									break;
+								}
+							}
+						}
+					};
 				}
 				for (var i=0; i<interfaceChecks[0].length; i++)
 				{
@@ -1935,6 +1961,7 @@
 					var input = document.createElement("input");
 					input.type = "checkbox";
 					input.id = interfaceChecks[0][i];
+					input.setAttribute("name", "check");
 					div.appendChild(input);
 					div.appendChild(span);
 					commonInterface.appendChild(div);
@@ -1946,6 +1973,21 @@
 							break;
 						}
 					}
+					input.onchange = function(event) {
+						var id = event.currentTarget.id;
+						if (event.currentTarget.checked) {
+							specificationNode.commonInterface.options.push(new specificationNode.commonInterface.optionNode(event.currentTarget));
+						} else {
+							for (var j=0; j<specificationNode.commonInterface.options.length; j++)
+							{
+								if (specificationNode.commonInterface.options[j].name == event.currentTarget.id)
+								{
+									specificationNode.commonInterface.options.splice(j,1);
+									break;
+								}
+							}
+						}
+					};
 				}
 				setupNode.appendChild(commonInterface);
 				// Now the Metric Node
@@ -1985,6 +2027,21 @@
 							input.checked = true;
 						}
 					}
+					input.onchange = function(event)
+					{
+						if (event.currentTarget.checked) {
+							specificationNode.metrics.push(new specificationNode.metricNode(event.currentTarget.id));
+						} else {
+							for (var j=0; j<specificationNode.metrics.length; j++)
+							{
+								if (specificationNode.metrics[j].enabled == event.currentTarget.id)
+								{
+									specificationNode.metrics.splice(j,1);
+									break;
+								}
+							}
+						}
+					};
 				}
 				
 				setupNode.appendChild(metrics);
@@ -2003,7 +2060,15 @@
 					var node = PPSurveyToHTML(specificationNode.preTest.options[j]);
 					node.className = "SecondLevel";
 					node.id = preTest.id+"-"+j;
-					node.appendChild(createDeleteNodeButton());
+					var del_button = document.createElement("button");
+					del_button.textContent = "Delete";
+					del_button.onclick = function(event) {
+						var node = event.currentTarget.parentElement;
+						var id = node.id.split("-")[1];
+						specificationNode.preTest.options.splice(id,1);
+						node.parentElement.removeChild(node);	
+					};
+					node.appendChild(del_button);
 					preTest.appendChild(node);
 				}
 				setupNode.appendChild(preTest);
@@ -2023,7 +2088,15 @@
 					var node = PPSurveyToHTML(specificationNode.postTest.options[j]);
 					node.className = "SecondLevel";
 					node.id = postTest.id+"-"+j;
-					node.appendChild(createDeleteNodeButton());
+					var del_button = document.createElement("button");
+					del_button.textContent = "Delete";
+					del_button.onclick = function(event) {
+						var node = event.currentTarget.parentElement;
+						var id = node.id.split("-")[1];
+						specificationNode.postTest.options.splice(id,1);
+						node.parentElement.removeChild(node);	
+					};
+					node.appendChild(del_button);
 					postTest.appendChild(node);
 				}
 				
@@ -2037,7 +2110,7 @@
 					var aH = specificationNode.audioHolders[i];
 					var aHTML = document.createElement("div");
 					aHTML.name = "audioHolder";
-					aHTML.id = "audioHolder-"+aH.id;
+					aHTML.id = "audioHolder-"+i;
 					aHTML.className = "topLevel";
 					aHTML.appendChild(createDeleteNodeButton());
 					destination.appendChild(aHTML);
@@ -2054,7 +2127,12 @@
 					input.value = aH.id;
 					input.onchange = function()
 					{
-						event.currentTarget.parentElement.parentElement.childNodes[0].textContent = "Audio Holder "+event.currentTarget.value;
+						var IDSplit = event.currentTarget.id.split('-');
+						var aholderID = IDSplit[0]+"-"+IDSplit[1];
+						var aholder = document.getElementById(aholderID);
+						title = aholder.getElementsByTagName("h2")[0];
+						title.textContent = "Audio Holder "+event.currentTarget.value;
+						specificationNode.audioHolders[IDSplit[1]].id = event.currentTarget.value;
 					};
 					text.style.margin = "5px";
 					input.style.margin = "5px";
@@ -2065,6 +2143,11 @@
 					input = document.createElement("input");
 					input.id = aHTML.id+"-hostURL";
 					input.value = aH.hostURL;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						specificationNode.audioHolders[IDSplit[1]].hostURL = event.currentTarget.value;
+					};
 					text.style.margin = "5px";
 					input.style.margin = "5px";
 					attributes.appendChild(text);
@@ -2075,6 +2158,11 @@
 					input.id = aHTML.id+"-loop";
 					input.type = "checkbox";
 					input.checked = aH.loop;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						specificationNode.audioHolders[IDSplit[1]].loop = event.currentTarget.checked;
+					};
 					text.style.margin = "5px";
 					input.style.margin = "5px";
 					attributes.appendChild(text);
@@ -2085,6 +2173,11 @@
 					input.id = aHTML.id+"-randomiseOrder";
 					input.type = "checkbox";
 					input.checked = aH.randomiseOrder;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						specificationNode.audioHolders[IDSplit[1]].randomiseOrder = event.currentTarget.checked;
+					};
 					text.style.margin = "5px";
 					input.style.margin = "5px";
 					attributes.appendChild(text);
@@ -2095,6 +2188,11 @@
 					input.id = aHTML.id+"-elementComments";
 					input.type = "checkbox";
 					input.checked = aH.elementComments;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						specificationNode.audioHolders[IDSplit[1]].elementComments = event.currentTarget.checked;
+					};
 					text.style.margin = "5px";
 					input.style.margin = "5px";
 					attributes.appendChild(text);
@@ -2115,7 +2213,17 @@
 						var node = PPSurveyToHTML(aH.preTest.options[j]);
 						node.className = "SecondLevel";
 						node.id = preTest.id+"-"+j;
-						node.appendChild(createDeleteNodeButton());
+						var button_delete = document.createElement("button");
+						button_delete.textContent = "Delete";
+						button_delete.onclick = function(event)
+						{
+							var node = event.currentTarget.parentElement;
+							var IDSplit = node.id.split("-");
+							var preTest = specificationNode.audioHolders[IDSplit[1]].preTest;
+							preTest.options.splice(IDSplit[3],1);
+							node.parentElement.removeChild(node);
+						};
+						node.appendChild(button_delete);
 						preTest.appendChild(node);
 					}
 					
@@ -2136,7 +2244,17 @@
 						var node = PPSurveyToHTML(aH.postTest.options[j]);
 						node.className = "SecondLevel";
 						node.id = postTest.id+"-"+j;
-						node.appendChild(createDeleteNodeButton());
+						var button_delete = document.createElement("button");
+						button_delete.textContent = "Delete";
+						button_delete.onclick = function(event)
+						{
+							var node = event.currentTarget.parentElement;
+							var IDSplit = node.id.split("-");
+							var postTest = specificationNode.audioHolders[IDSplit[1]].postTest;
+							postTest.options.splice(IDSplit[3],1);
+							node.parentElement.removeChild(node);
+						};
+						node.appendChild(button_delete);
 						postTest.appendChild(node);
 					}
 					
@@ -2159,6 +2277,11 @@
 						var input = document.createElement("input");
 						input.id = entry.id+"-id";
 						input.value = aH.audioElements[i].id;
+						input.onchange = function() {
+							var IDSplit = event.currentTarget.id.split("-");
+							var ahNode = specificationNode.audioHolders[IDSplit[1]];
+							ahNode.audioElements[IDSplit[3]].id = event.currentTarget.value;
+						};
 						text.style.margin = "5px";
 						input.style.margin = "5px";
 						entry.appendChild(text);
@@ -2168,11 +2291,25 @@
 						input = document.createElement("input");
 						input.id = entry.id+"-URL";
 						input.value = aH.audioElements[i].url;
+						input.onchange = function() {
+							var IDSplit = event.currentTarget.id.split("-");
+							var ahNode = specificationNode.audioHolders[IDSplit[1]];
+							ahNode.audioElements[IDSplit[3]].url = event.currentTarget.value;
+						};
 						text.style.margin = "5px";
 						input.style.margin = "5px";
 						entry.appendChild(text);
 						entry.appendChild(input);
-						entry.appendChild(createDeleteNodeButton());
+						var button_delete = document.createElement("button");
+						button_delete.textContent = "Delete";
+						button_delete.onclick = function() {
+							var node = event.currentTarget.parentElement;
+							var IDSplit = node.id.split("-");
+							var ahNode = specificationNode.audioHolders[IDSplit[1]];
+							ahNode.audioElements.splice(IDSplit[3],1);
+							node.parentElement.removeChild(node);
+						};
+						entry.appendChild(button_delete);
 						audioElems.appendChild(entry);
 					}
 					aHTML.appendChild(audioElems);
@@ -2318,6 +2455,9 @@
 	</head>
 
 	<body>
+		<div id="export">
+			<button id="exportToXML" onclick="specificationNode.exportToXML();">Export XML</button>
+		</div>
 		<div id="content"></div>
 	</body>
 </html>
