@@ -1706,32 +1706,32 @@
 				
 				this.encode = function()
 				{
-					var root = document.createElement("BrowserEvalProjectDocument");
+					var root = document.implementation.createDocument(null,"BrowserEvalProjectDocument");
 					// First get all the <setup> tag compiled
-					var setupNode = document.createElement("setup");
+					var setupNode = root.createElement("setup");
 					setupNode.setAttribute('interface',this.interfaceType);
 					setupNode.setAttribute('projectReturn',this.projectReturn);
 					setupNode.setAttribute('randomiseOrder',this.randomiseOrder);
 					setupNode.setAttribute('collectMetrics',this.collectMetrics);
 					setupNode.setAttribute('testPages',this.testPages);
 					
-					var setupPreTest = document.createElement("PreTest");
+					var setupPreTest = root.createElement("PreTest");
 					for (var i=0; i<this.preTest.options.length; i++)
 					{
-						setupPreTest.appendChild(this.preTest.options.exportXML());
+						setupPreTest.appendChild(this.preTest.options.exportXML(root));
 					}
 					
-					var setupPostTest = document.createElement("PostTest");
+					var setupPostTest = root.createElement("PostTest");
 					for (var i=0; i<this.preTest.options.length; i++)
 					{
-						setupPostTest.appendChild(this.postTest.options.exportXML());
+						setupPostTest.appendChild(this.postTest.options.exportXML(root));
 					}
 					
 					setupNode.appendChild(setupPreTest);
 					setupNode.appendChild(setupPostTest);
 					
 					// <Metric> tag
-					var Metric = document.createElement("Metric");
+					var Metric = root.createElement("Metric");
 					for (var i=0; i<this.metrics.length; i++)
 					{
 						var metricEnable = document.createElement("metricEnable");
@@ -1741,7 +1741,7 @@
 					setupNode.appendChild(Metric);
 					
 					// <interface> tag
-					var CommonInterface = document.createElement("interface");
+					var CommonInterface = root.createElement("interface");
 					for (var i=0; i<this.commonInterface.options.length; i++)
 					{
 						var CIObj = this.commonInterface.options[i];
@@ -1752,12 +1752,12 @@
 					}
 					setupNode.appendChild(CommonInterface);
 					
-					root.appendChild(setupNode);
+					root.getElementsByTagName("BrowserEvalProjectDocument")[0].appendChild(setupNode);
 					// Time for the <audioHolder> tags
 					for (var ahIndex = 0; ahIndex < this.audioHolders.length; ahIndex++)
 					{
 						var AHObj = this.audioHolders[ahIndex];
-						var AHNode = document.createElement("audioHolder");
+						var AHNode = root.createElement("audioHolder");
 						AHNode.id = AHObj.id;
 						AHNode.setAttribute("hostURL",AHObj.hostURL);
 						AHNode.setAttribute("sampleRate",AHObj.samplerate);
@@ -1770,17 +1770,17 @@
 						for (var i=0; i<AHObj.interfaces.length; i++)
 						{
 							var AHObjInterface = AHObj.interfaces[i];
-							var AHinterface = document.createElement("interface");
+							var AHinterface = root.createElement("interface");
 							if (AHObjInterface.title != undefined)
 							{
-								var title = document.createElement("title");
+								var title = root.createElement("title");
 								title.textContent = AHObjInterface.title;
 								AHinterface.appendChild(title);
 							}
 							for (var j=0; j<AHObjInterface.options.length; j++)
 							{
 								var CIObj = AHObjInterface.options[j];
-								var CINode = document.createElement(CIObj.type);
+								var CINode = root.createElement(CIObj.type);
 								if (CIObj.type == "check") {CINode.setAttribute("name",CIObj.check);}
 								else {CINode.setAttribute("name",CIObj.name);}
 								AHinterface.appendChild(CINode);
@@ -1790,7 +1790,7 @@
 								for (var j=0; j<AHObjInterface.scale.length; j++)
 								{
 									var CIObj = AHObjInterface.scale[j];
-									var CINode = document.createElement("scale");
+									var CINode = root.createElement("scale");
 									CINode.setAttribute("position",CIObj[0]);
 									CINode.textContent = CIObj[1];
 									AHinterface.appendChild(CINode);
@@ -1803,7 +1803,7 @@
 						for (var aeIndex = 0; aeIndex < AHObj.audioElements.length; aeIndex++)
 						{
 							var AEObj = AHObj.audioElements[aeIndex];
-							var AENode = document.createElement("audioElements");
+							var AENode = root.createElement("audioElements");
 							AENode.id = AEObj.id;
 							AENode.setAttribute("url",AEObj.url);
 							AENode.setAttribute("type",AEObj.type);
@@ -1817,24 +1817,24 @@
 						// Create <CommentQuestion>
 						for (var i=0; i<AHObj.commentQuestions.length; i++)
 						{
-							AHNode.appendChild(AHObj.commentQuestions[i].exportXML());
+							AHNode.appendChild(AHObj.commentQuestions[i].exportXML(root));
 						}
 						
 						// Create <PreTest>
 						var AHPreTest = document.createElement("PreTest");
 						for (var i=0; i<AHObj.preTest.options.length; i++)
 						{
-							AHPreTest.appendChild(AHObj.preTest.options.exportXML());
+							AHPreTest.appendChild(AHObj.preTest.options.exportXML(root));
 						}
 						
 						var AHPostTest = document.createElement("PostTest");
 						for (var i=0; i<AHObj.preTest.options.length; i++)
 						{
-							AHPostTest.appendChild(AHObj.postTest.options.exportXML());
+							AHPostTest.appendChild(AHObj.postTest.options.exportXML(root));
 						}
 						AHNode.appendChild(AHPreTest);
 						AHNode.appendChild(AHPostTest);
-						root.appendChild(AHNode);
+						root.getElementsByTagName("BrowserEvalProjectDocument")[0].appendChild(AHNode);
 					}
 					return root;
 				};
@@ -1863,9 +1863,9 @@
 						this.max = undefined;
 						this.step = undefined;
 						
-						this.exportXML = function()
+						this.exportXML = function(root)
 						{
-							var node = document.createElement(this.type);
+							var node = root.createElement(this.type);
 							switch(this.type)
 							{
 							case "statement":
@@ -1963,9 +1963,9 @@
 					};
 					
 					this.commentQuestionNode = function(xml) {
-						this.exportXML = function()
+						this.exportXML = function(root)
 						{
-							var CQNode = document.createElement("CommentQuestion");
+							var CQNode = root.createElement("CommentQuestion");
 							CQNode.id = this.id;
 							CQNode.setAttribute("type",this.type);
 							switch(this.type)
@@ -2609,9 +2609,10 @@
 			function exportToXML()
 			{
 				var xmlDoc = specificationNode.encode();
+				var oSerializer = new XMLSerializer();
+				xmlDoc = oSerializer.serializeToString(xmlDoc);
 				var parent = document.createElement("div");
-				parent.appendChild(xmlDoc);
-				var file = [parent.innerHTML];
+				var file = [xmlDoc];
 				var bb = new Blob(file,{type : 'application/xml'});
 				var dnlk = window.URL.createObjectURL(bb);
 				var a = document.createElement("a");
@@ -2690,7 +2691,7 @@
 
 	<body>
 		<div id="export">
-			<button id="exportToXML" onclick="specificationNode.exportToXML();">Export XML</button>
+			<button id="exportToXML" onclick="exportToXML();">Export XML</button>
 		</div>
 		<div id="content"></div>
 	</body>
