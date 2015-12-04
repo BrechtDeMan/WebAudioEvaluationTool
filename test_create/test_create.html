@@ -1898,6 +1898,7 @@
 								node.setAttribute("min", this.min);
 								node.setAttribute("max", this.max);
 								node.setAttribute("step", this.step);
+								node.textContent = this.statement;
 								break;
 							case "checkbox":
 								node.id = this.id;
@@ -2211,7 +2212,19 @@
 							case "text":
 								CQNode.textContent = this.question;
 								break;
-							case "radio" || "checkbox":
+							case "radio":
+								var statement = root.createElement("statement");
+								statement.textContent = this.statement;
+								CQNode.appendChild(statement);
+								for (var i=0; i<this.options.length; i++)
+								{
+									var optionNode = root.createElement("option");
+									optionNode.setAttribute("name",this.options[i].name);
+									optionNode.textContent = this.options[i].text;
+									CQNode.appendChild(optionNode);
+								}
+								break;
+							case "checkbox":
 								var statement = root.createElement("statement");
 								statement.textContent = this.statement;
 								CQNode.appendChild(statement);
