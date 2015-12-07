@@ -32,9 +32,6 @@ window.onload = function() {
 	// Create test state
 	testState = new stateMachine();
 	
-	// Create the audio engine object
-	audioEngineContext = new AudioEngine();
-	
 	// Create the popup interface object
 	popup = new interfacePopup();
 	
@@ -44,6 +41,167 @@ window.onload = function() {
 	// Create the interface object
 	interfaceContext = new Interface(specification);
 };
+
+function loadProjectSpec(url) {
+	// Load the project document from the given URL, decode the XML and instruct audioEngine to get audio data
+	// If url is null, request client to upload project XML document
+	var r = new XMLHttpRequest();
+	r.open('GET',url,true);
+	r.onload = function() {
+		loadProjectSpecCallback(r.response);
+	};
+	r.send();
+};
+
+function loadProjectSpecCallback(response) {
+	// Function called after asynchronous download of XML project specification
+	//var decode = $.parseXML(response);
+	//projectXML = $(decode);
+	
+	var parse = new DOMParser();
+	projectXML = parse.parseFromString(response,'text/xml');
+	
+	// Build the specification
+	specification.decode(projectXML);
+	
+	// Create the audio engine object
+	audioEngineContext = new AudioEngine(specification);
+	
+	testState.stateMap.push(specification.preTest);
+	
+	$(specification.audioHolders).each(function(index,elem){
+		testState.stateMap.push(elem);
+	});
+	 
+	 testState.stateMap.push(specification.postTest);
+	
+	
+	
+	// Detect the interface to use and load the relevant javascripts.
+	var interfaceJS = document.createElement('script');
+	interfaceJS.setAttribute("type","text/javascript");
+	if (specification.interfaceType == 'APE') {
+		interfaceJS.setAttribute("src","ape.js");
+		
+		// APE comes with a css file
+		var css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.type = 'text/css';
+		css.href = 'ape.css';
+		
+		document.getElementsByTagName("head")[0].appendChild(css);
+	} else if (specification.interfaceType == "MUSHRA")
+	{
+		interfaceJS.setAttribute("src","mushra.js");
+		
+		// MUSHRA comes with a css file
+		var css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.type = 'text/css';
+		css.href = 'mushra.css';
+		
+		document.getElementsByTagName("head")[0].appendChild(css);
+	}
+	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
+	
+	// Define window callbacks for interface
+	window.onresize = function(event){interfaceContext.resizeWindow(event);};
+}
+
+function createProjectSave(destURL) {
+	// Save the data from interface into XML and send to destURL
+	// If destURL is null then download XML in client
+	// Now time to render file locally
+	var xmlDoc = interfaceXMLSave();
+	var parent = document.createElement("div");
+	parent.appendChild(xmlDoc);
+	var file = [parent.innerHTML];
+	if (destURL == "null" || destURL == undefined) {
+		var bb = new Blob(file,{type : 'application/xml'});
+		var dnlk = window.URL.createObjectURL(bb);
+		var a = document.createElement("a");
+		a.hidden = '';
+		a.href = dnlk;
+		a.download = "save.xml";
+		a.textContent = "Save File";
+		
+		popup.showPopup();
+		popup.popupContent.innerHTML = null;
+		popup.popupContent.appendChild(a);
+	} else {
+		var xmlhttp = new XMLHttpRequest;
+		xmlhttp.open("POST",destURL,true);
+		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
+		xmlhttp.onerror = function(){
+			console.log('Error saving file to server! Presenting download locally');
+			createProjectSave(null);
+		};
+		xmlhttp.onreadystatechange  = function() {
+			console.log(xmlhttp.status);
+			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
+				createProjectSave(null);
+			} else {
+				if (xmlhttp.responseXML == null)
+				{
+					return createProjectSave(null);
+				}
+				var response = xmlhttp.responseXML.childNodes[0];
+				if (response.getAttribute('state') == "OK")
+				{
+					var file = response.getElementsByTagName('file')[0];
+					console.log('Save OK: Filename '+file.textContent+','+file.getAttribute('bytes')+'B');
+					popup.showPopup();
+					popup.popupContent.innerHTML = null;
+					popup.popupContent.textContent = "Thank you!";
+				} else {
+					var message = response.getElementsByTagName('message')[0];
+					errorSessionDump(message.textContent);
+				}
+			}
+		};
+		xmlhttp.send(file);
+	}
+}
+
+function errorSessionDump(msg){
+	// Create the partial interface XML save
+	// Include error node with message on why the dump occured
+	var xmlDoc = interfaceXMLSave();
+	var err = document.createElement('error');
+	err.textContent = msg;
+	xmlDoc.appendChild(err);
+	var parent = document.createElement("div");
+	parent.appendChild(xmlDoc);
+	var file = [parent.innerHTML];
+	var bb = new Blob(file,{type : 'application/xml'});
+	var dnlk = window.URL.createObjectURL(bb);
+	var a = document.createElement("a");
+	a.hidden = '';
+	a.href = dnlk;
+	a.download = "save.xml";
+	a.textContent = "Save File";
+	
+	popup.showPopup();
+	popup.popupContent.innerHTML = "ERROR : "+msg;
+	popup.popupContent.appendChild(a);
+}
+
+// Only other global function which must be defined in the interface class. Determines how to create the XML document.
+function interfaceXMLSave(){
+	// Create the XML string to be exported with results
+	var xmlDoc = document.createElement("BrowserEvaluationResult");
+	var projectDocument = specification.projectXML;
+	projectDocument.setAttribute('file-name',url);
+	xmlDoc.appendChild(projectDocument);
+	xmlDoc.appendChild(returnDateNode());
+	xmlDoc.appendChild(interfaceContext.returnNavigator());
+	for (var i=0; i<testState.stateResults.length; i++)
+	{
+		xmlDoc.appendChild(testState.stateResults[i]);
+	}
+	
+	return xmlDoc;
+}
 
 function interfacePopup() {
 	// Creates an object to manage the popup
@@ -518,216 +676,7 @@ function stateMachine()
 	this.previousState = function(){};
 }
 
-function testEnded(testId)
-{
-	pageXMLSave(testId);
-	if (testXMLSetups.length-1 > testId)
-	{
-		// Yes we have another test to perform
-		testId = (Number(testId)+1);
-		currentState = 'testRun-'+testId;
-		loadTest(testId);
-	} else {
-		console.log('Testing Completed!');
-		currentState = 'postTest';
-		// Check for any post tests
-		var xmlSetup = projectXML.find('setup');
-		var postTest = xmlSetup.find('PostTest')[0];
-		popup.initState(postTest);
-	}
-}
-
-function loadProjectSpec(url) {
-	// Load the project document from the given URL, decode the XML and instruct audioEngine to get audio data
-	// If url is null, request client to upload project XML document
-	var r = new XMLHttpRequest();
-	r.open('GET',url,true);
-	r.onload = function() {
-		loadProjectSpecCallback(r.response);
-	};
-	r.send();
-};
-
-function loadProjectSpecCallback(response) {
-	// Function called after asynchronous download of XML project specification
-	//var decode = $.parseXML(response);
-	//projectXML = $(decode);
-	
-	var parse = new DOMParser();
-	projectXML = parse.parseFromString(response,'text/xml');
-	
-	// Build the specification
-	specification.decode(projectXML);
-	
-	testState.stateMap.push(specification.preTest);
-	
-	$(specification.audioHolders).each(function(index,elem){
-		testState.stateMap.push(elem);
-	});
-	 
-	 testState.stateMap.push(specification.postTest);
-	 
-	// Obtain the metrics enabled
-	$(specification.metrics).each(function(index,node){
-		var enabled = node.textContent;
-		switch(node.enabled)
-		{
-		case 'testTimer':
-			sessionMetrics.prototype.enableTestTimer = true;
-			break;
-		case 'elementTimer':
-			sessionMetrics.prototype.enableElementTimer = true;
-			break;
-		case 'elementTracker':
-			sessionMetrics.prototype.enableElementTracker = true;
-			break;
-		case 'elementListenTracker':
-			sessionMetrics.prototype.enableElementListenTracker = true;
-			break;
-		case 'elementInitialPosition':
-			sessionMetrics.prototype.enableElementInitialPosition = true;
-			break;
-		case 'elementFlagListenedTo':
-			sessionMetrics.prototype.enableFlagListenedTo = true;
-			break;
-		case 'elementFlagMoved':
-			sessionMetrics.prototype.enableFlagMoved = true;
-			break;
-		case 'elementFlagComments':
-			sessionMetrics.prototype.enableFlagComments = true;
-			break;
-		}
-	});
-	
-	
-	
-	// Detect the interface to use and load the relevant javascripts.
-	var interfaceJS = document.createElement('script');
-	interfaceJS.setAttribute("type","text/javascript");
-	if (specification.interfaceType == 'APE') {
-		interfaceJS.setAttribute("src","ape.js");
-		
-		// APE comes with a css file
-		var css = document.createElement('link');
-		css.rel = 'stylesheet';
-		css.type = 'text/css';
-		css.href = 'ape.css';
-		
-		document.getElementsByTagName("head")[0].appendChild(css);
-	} else if (specification.interfaceType == "MUSHRA")
-	{
-		interfaceJS.setAttribute("src","mushra.js");
-		
-		// MUSHRA comes with a css file
-		var css = document.createElement('link');
-		css.rel = 'stylesheet';
-		css.type = 'text/css';
-		css.href = 'mushra.css';
-		
-		document.getElementsByTagName("head")[0].appendChild(css);
-	}
-	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
-	
-	// Define window callbacks for interface
-	window.onresize = function(event){interfaceContext.resizeWindow(event);};
-}
-
-function createProjectSave(destURL) {
-	// Save the data from interface into XML and send to destURL
-	// If destURL is null then download XML in client
-	// Now time to render file locally
-	var xmlDoc = interfaceXMLSave();
-	var parent = document.createElement("div");
-	parent.appendChild(xmlDoc);
-	var file = [parent.innerHTML];
-	if (destURL == "null" || destURL == undefined) {
-		var bb = new Blob(file,{type : 'application/xml'});
-		var dnlk = window.URL.createObjectURL(bb);
-		var a = document.createElement("a");
-		a.hidden = '';
-		a.href = dnlk;
-		a.download = "save.xml";
-		a.textContent = "Save File";
-		
-		popup.showPopup();
-		popup.popupContent.innerHTML = null;
-		popup.popupContent.appendChild(a);
-	} else {
-		var xmlhttp = new XMLHttpRequest;
-		xmlhttp.open("POST",destURL,true);
-		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
-		xmlhttp.onerror = function(){
-			console.log('Error saving file to server! Presenting download locally');
-			createProjectSave(null);
-		};
-		xmlhttp.onreadystatechange  = function() {
-			console.log(xmlhttp.status);
-			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
-				createProjectSave(null);
-			} else {
-				if (xmlhttp.responseXML == null)
-				{
-					return createProjectSave(null);
-				}
-				var response = xmlhttp.responseXML.childNodes[0];
-				if (response.getAttribute('state') == "OK")
-				{
-					var file = response.getElementsByTagName('file')[0];
-					console.log('Save OK: Filename '+file.textContent+','+file.getAttribute('bytes')+'B');
-					popup.showPopup();
-					popup.popupContent.innerHTML = null;
-					popup.popupContent.textContent = "Thank you!";
-				} else {
-					var message = response.getElementsByTagName('message')[0];
-					errorSessionDump(message.textContent);
-				}
-			}
-		};
-		xmlhttp.send(file);
-	}
-}
-
-function errorSessionDump(msg){
-	// Create the partial interface XML save
-	// Include error node with message on why the dump occured
-	var xmlDoc = interfaceXMLSave();
-	var err = document.createElement('error');
-	err.textContent = msg;
-	xmlDoc.appendChild(err);
-	var parent = document.createElement("div");
-	parent.appendChild(xmlDoc);
-	var file = [parent.innerHTML];
-	var bb = new Blob(file,{type : 'application/xml'});
-	var dnlk = window.URL.createObjectURL(bb);
-	var a = document.createElement("a");
-	a.hidden = '';
-	a.href = dnlk;
-	a.download = "save.xml";
-	a.textContent = "Save File";
-	
-	popup.showPopup();
-	popup.popupContent.innerHTML = "ERROR : "+msg;
-	popup.popupContent.appendChild(a);
-}
-
-// Only other global function which must be defined in the interface class. Determines how to create the XML document.
-function interfaceXMLSave(){
-	// Create the XML string to be exported with results
-	var xmlDoc = document.createElement("BrowserEvaluationResult");
-	var projectDocument = specification.projectXML;
-	projectDocument.setAttribute('file-name',url);
-	xmlDoc.appendChild(projectDocument);
-	xmlDoc.appendChild(returnDateNode());
-	xmlDoc.appendChild(interfaceContext.returnNavigator());
-	for (var i=0; i<testState.stateResults.length; i++)
-	{
-		xmlDoc.appendChild(testState.stateResults[i]);
-	}
-	
-	return xmlDoc;
-}
-
-function AudioEngine() {
+function AudioEngine(specification) {
 	
 	// Create two output paths, the main outputGain and fooGain.
 	// Output gain is default to 1 and any items for playback route here
@@ -747,7 +696,7 @@ function AudioEngine() {
 	// Create the timer Object
 	this.timer = new timer();
 	// Create session metrics
-	this.metric = new sessionMetrics(this);
+	this.metric = new sessionMetrics(this,specification);
 	
 	this.loopPlayback = false;
 	
@@ -1084,7 +1033,7 @@ function timer()
 	};
 }
 
-function sessionMetrics(engine)
+function sessionMetrics(engine,specification)
 {
 	/* Used by audioEngine to link to audioObjects to minimise the timer call timers;
 	 */
@@ -1095,6 +1044,46 @@ function sessionMetrics(engine)
 		this.lastClicked = -1;
 		this.data = -1;
 	};
+	
+	this.enableElementInitialPosition = false;
+	this.enableElementListenTracker = false;
+	this.enableElementTimer = false;
+	this.enableElementTracker = false;
+	this.enableFlagListenedTo = false;
+	this.enableFlagMoved = false;
+	this.enableTestTimer = false;
+	// Obtain the metrics enabled
+	for (var i=0; i<specification.metrics.length; i++)
+	{
+		var node = specification.metrics[i];
+		switch(node.enabled)
+		{
+		case 'testTimer':
+			this.enableTestTimer = true;
+			break;
+		case 'elementTimer':
+			this.enableElementTimer = true;
+			break;
+		case 'elementTracker':
+			this.enableElementTracker = true;
+			break;
+		case 'elementListenTracker':
+			this.enableElementListenTracker = true;
+			break;
+		case 'elementInitialPosition':
+			this.enableElementInitialPosition = true;
+			break;
+		case 'elementFlagListenedTo':
+			this.enableFlagListenedTo = true;
+			break;
+		case 'elementFlagMoved':
+			this.enableFlagMoved = true;
+			break;
+		case 'elementFlagComments':
+			this.enableFlagComments = true;
+			break;
+		}
+	}
 	this.initialiseTest = function(){};
 }
 
@@ -1304,7 +1293,7 @@ function returnDateNode()
 	
 	hold.appendChild(date);
 	hold.appendChild(time);
-	return hold
+	return hold;
 	
 }
 
