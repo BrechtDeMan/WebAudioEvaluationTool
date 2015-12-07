@@ -2015,17 +2015,16 @@
 						var audioElementsDOM = xml.getElementsByTagName('audioElements');
 						for (var i=0; i<audioElementsDOM.length; i++) {
 							var node = new this.audioElementNode();
+							node.decode(this,audioElementsDOM[i]);
 							if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
 								if (this.outsideReference == null) {
-									this.outsideReference = node.decode(this,audioElementsDOM[i]);
+									this.outsideReference = node;
 								} else {
 									console.log('Error only one audioelement can be of type outsidereference per audioholder');
-									node.decode(this,audioElementsDOM[i]);
 									this.audioElements.push(node);
 									console.log('Element id '+audioElementsDOM[i].id+' made into normal node');
 								}
 							} else {
-								node.decode(this,audioElementsDOM[i]);
 								this.audioElements.push(node);
 							}
 						}
