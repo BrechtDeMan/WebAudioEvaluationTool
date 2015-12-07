@@ -315,10 +315,7 @@ function loadInterface() {
 
 function loadTest(audioHolderObject)
 {
-	
-	// Reset audioEngineContext.Metric globals for new test
-	audioEngineContext.newTestPage();
-	
+
 	var id = audioHolderObject.id;
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
@@ -385,31 +382,14 @@ function loadTest(audioHolderObject)
 			commentBoxPrefix = interfaceObj.commentBoxPrefix;
 		}
 	}
-
-	/// CHECK FOR SAMPLE RATE COMPATIBILITY
-	if (audioHolderObject.sampleRate != undefined) {
-		if (Number(audioHolderObject.sampleRate) != audioContext.sampleRate) {
-			var errStr = 'Sample rates do not match! Requested '+Number(audioHolderObject.sampleRate)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
-			alert(errStr);
-			return;
-		}
-	}
 	
 	var commentShow = audioHolderObject.elementComments;
 	
 	var loopPlayback = audioHolderObject.loop;
 
-	audioEngineContext.loopPlayback = loopPlayback;
-	// Create AudioEngine bindings for playback
-	
 	currentTestHolder = document.createElement('audioHolder');
 	currentTestHolder.id = audioHolderObject.id;
 	currentTestHolder.repeatCount = audioHolderObject.repeatCount;
-	
-	// Delete any previous audioObjects associated with the audioEngine
-	audioEngineContext.audioObjects = [];
-	interfaceContext.deleteCommentBoxes();
-	interfaceContext.deleteCommentQuestions();
 	
 	// Find all the audioElements from the audioHolder
 	$(audioHolderObject.audioElements).each(function(index,element){

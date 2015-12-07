@@ -458,7 +458,7 @@ function stateMachine()
 				this.currentStateMap = this.stateMap[this.stateIndex];
 				if (this.currentStateMap.type == "audioHolder") {
 					console.log('Loading test page');
-					loadTest(this.currentStateMap);
+					interfaceContext.newPage(this.currentStateMap);
 					this.initialiseInnerState(this.currentStateMap);
 				} else if (this.currentStateMap.type == "pretest" || this.currentStateMap.type == "posttest") {
 					if (this.currentStateMap.options.length >= 1) {
@@ -1999,6 +1999,26 @@ function Interface(specificationObject) {
 	// This handles the bindings between the interface and the audioEngineContext;
 	this.specification = specificationObject;
 	this.insertPoint = document.getElementById("topLevelBody");
+	
+	this.newPage = function(audioHolderObject)
+	{
+		audioEngineContext.newTestPage();
+		/// CHECK FOR SAMPLE RATE COMPATIBILITY
+		if (audioHolderObject.sampleRate != undefined) {
+			if (Number(audioHolderObject.sampleRate) != audioContext.sampleRate) {
+				var errStr = 'Sample rates do not match! Requested '+Number(audioHolderObject.sampleRate)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
+				alert(errStr);
+				return;
+			}
+		}
+		
+		audioEngineContext.loopPlayback = audioHolderObject.loop;
+		// Delete any previous audioObjects associated with the audioEngine
+		audioEngineContext.audioObjects = [];
+		interfaceContext.deleteCommentBoxes();
+		interfaceContext.deleteCommentQuestions();
+		loadTest(audioHolderObject);
+	};
 	
 	// Bounded by interface!!
 	// Interface object MUST have an exportXMLDOM method which returns the various DOM levels
