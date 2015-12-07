@@ -40,6 +40,8 @@ window.onload = function() {
 	
 	// Create the interface object
 	interfaceContext = new Interface(specification);
+	// Define window callbacks for interface
+	window.onresize = function(event){interfaceContext.resizeWindow(event);};
 };
 
 function loadProjectSpec(url) {
@@ -63,19 +65,6 @@ function loadProjectSpecCallback(response) {
 	
 	// Build the specification
 	specification.decode(projectXML);
-	
-	// Create the audio engine object
-	audioEngineContext = new AudioEngine(specification);
-	
-	testState.stateMap.push(specification.preTest);
-	
-	$(specification.audioHolders).each(function(index,elem){
-		testState.stateMap.push(elem);
-	});
-	 
-	 testState.stateMap.push(specification.postTest);
-	
-	
 	
 	// Detect the interface to use and load the relevant javascripts.
 	var interfaceJS = document.createElement('script');
@@ -104,8 +93,33 @@ function loadProjectSpecCallback(response) {
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
 	
-	// Define window callbacks for interface
-	window.onresize = function(event){interfaceContext.resizeWindow(event);};
+	// Create the audio engine object
+	audioEngineContext = new AudioEngine(specification);
+	
+	testState.stateMap.push(specification.preTest);
+	
+	$(specification.audioHolders).each(function(index,elem){
+		testState.stateMap.push(elem);
+		$(elem.audioElements).each(function(i,audioElem){
+			var URL = audioElem.parent.hostURL + audioElem.url;
+			var buffer = null;
+			for (var i=0; i<audioEngineContext.buffers.length; i++)
+			{
+				if (URL == audioEngineContext.buffers[i].url)
+				{
+					buffer = audioEngineContext.buffers[i];
+					break;
+				}
+			}
+			if (buffer == null)
+			{
+				buffer = new audioEngineContext.bufferObj(URL);
+				audioEngineContext.buffers.push(buffer);
+			}
+		});
+	});
+	
+	testState.stateMap.push(specification.postTest);
 }
 
 function createProjectSave(destURL) {
@@ -703,6 +717,48 @@ function AudioEngine(specification) {
 	// Create store for new audioObjects
 	this.audioObjects = [];
 	
+	this.buffers = [];
+	this.bufferObj = function(url)
+	{
+		this.url = url;
+		this.buffer = null;
+		this.xmlRequest = new XMLHttpRequest();
+		this.users = [];
+		this.xmlRequest.open('GET',this.url,true);
+		this.xmlRequest.responseType = 'arraybuffer';
+		
+		var bufferObj = this;
+		
+		// Create callback to decode the data asynchronously
+		this.xmlRequest.onloadend = function() {
+			audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
+				bufferObj.buffer = decodedData;
+				for (var i=0; i<bufferObj.users.length; i++)
+				{
+					bufferObj.users[i].state = 1;
+					if (bufferObj.users[i].interfaceDOM != null)
+					{
+						bufferObj.users[i].interfaceDOM.enable();
+					}
+				}
+			}, function(){
+				// Should only be called if there was an error, but sometimes gets called continuously
+				// Check here if the error is genuine
+				if (bufferObj.buffer == undefined) {
+					// Genuine error
+					console.log('FATAL - Error loading buffer on '+audioObj.id);
+					if (request.status == 404)
+					{
+						console.log('FATAL - Fragment '+audioObj.id+' 404 error');
+						console.log('URL: '+audioObj.url);
+						errorSessionDump('Fragment '+audioObj.id+' 404 error');
+					}
+				}
+			});
+		};
+		this.xmlRequest.send();
+	};
+	
 	this.play = function(id) {
 		// Start the timer and set the audioEngine state to playing (1)
 		if (this.status == 0 && this.loopPlayback) {
@@ -772,9 +828,30 @@ function AudioEngine(specification) {
 		audioObjectId = this.audioObjects.length;
 		this.audioObjects[audioObjectId] = new audioObject(audioObjectId);
 
-		// AudioObject will get track itself.
+		// Check if audioObject buffer is currently stored by full URL
+		var URL = element.parent.hostURL + element.url;
+		var buffer = null;
+		for (var i=0; i<this.buffers.length; i++)
+		{
+			if (URL == this.buffers[i].url)
+			{
+				buffer = this.buffers[i];
+				break;
+			}
+		}
+		if (buffer == null)
+		{
+			console.log("[WARN]: Buffer was not loaded in pre-test!");
+			buffer = new this.bufferObj(URL);
+			this.buffers.push(buffer);
+		}
 		this.audioObjects[audioObjectId].specification = element;
-		this.audioObjects[audioObjectId].constructTrack(element.parent.hostURL + element.url);
+		this.audioObjects[audioObjectId].buffer = buffer;
+		if (buffer.buffer != null)
+		{
+			this.audioObjects[audioObjectId].state = 1;
+		}
+		buffer.users.push(this.audioObjects[audioObjectId]);
 		return this.audioObjects[audioObjectId];
 	};
 	
@@ -782,6 +859,10 @@ function AudioEngine(specification) {
 		this.state = 0;
 		this.audioObjectsReady = false;
 		this.metric.reset();
+		for (var i=0; i < this.buffers.length; i++)
+		{
+			this.buffers[i].users = [];
+		}
 		this.audioObjects = [];
 	};
 	
@@ -885,11 +966,11 @@ function audioObject(id) {
 	};
 	
 	this.play = function(startTime) {
-		if (this.bufferNode == undefined) {
+		if (this.bufferNode == undefined && this.buffer.buffer != undefined) {
 			this.bufferNode = audioContext.createBufferSource();
 			this.bufferNode.owner = this;
 			this.bufferNode.connect(this.outputGain);
-			this.bufferNode.buffer = this.buffer;
+			this.bufferNode.buffer = this.buffer.buffer;
 			this.bufferNode.loop = audioEngineContext.loopPlayback;
 			this.bufferNode.onended = function(event) {
 				// Safari does not like using 'this' to reference the calling object!
@@ -917,7 +998,7 @@ function audioObject(id) {
 		if (this.bufferNode != undefined) {
 			if (this.bufferNode.loop == true) {
 				if (audioEngineContext.status  == 1) {
-					return (time-this.metric.listenStart)%this.buffer.duration;
+					return (time-this.metric.listenStart)%this.buffer.buffer.duration;
 				} else {
 					return 0;
 				}
@@ -2434,7 +2515,7 @@ function Interface(specificationObject) {
 		this.setTimePerPixel = function(audioObject) {
 			//maxTime must be in seconds
 			this.playbackObject = audioObject;
-			this.maxTime = audioObject.buffer.duration;
+			this.maxTime = audioObject.buffer.buffer.duration;
 			var width = 490; //500 - 10, 5 each side of the tracker head
 			this.timePerPixel = this.maxTime/490;
 			if (this.maxTime < 60) {

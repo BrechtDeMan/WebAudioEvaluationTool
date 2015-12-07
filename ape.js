@@ -404,6 +404,10 @@ function loadTest(audioHolderObject)
 		
 		// Create a slider per track
 		audioObject.interfaceDOM = new sliderObject(audioObject);
+		if (audioObject.state == 1)
+		{
+			audioObject.interfaceDOM.enable();
+		}
 		
 		// Distribute it randomnly
 		var w = window.innerWidth - (offset+8)*2;
