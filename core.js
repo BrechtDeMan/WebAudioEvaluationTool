@@ -650,7 +650,26 @@ function stateMachine()
 	this.testPageCompleted = function(store, testXML, testId) {
 		// Function called each time a test page has been completed
 		// Can be used to over-rule default behaviour
-		
+		var metric = document.createElement('metric');
+		if (audioEngineContext.metric.enableTestTimer)
+		{
+			var testTime = document.createElement('metricResult');
+			testTime.id = 'testTime';
+			testTime.textContent = audioEngineContext.timer.testDuration;
+			metric.appendChild(testTime);
+		}
+		testXML.appendChild(metric);
+		var audioObjects = audioEngineContext.audioObjects;
+		for (var i=0; i<audioObjects.length; i++) 
+		{
+			var audioElement = audioEngineContext.audioObjects[i].exportXMLDOM();
+			audioElement.setAttribute('presentedId',i);
+			testXML.appendChild(audioElement);
+		}
+		$(interfaceContext.commentQuestions).each(function(index,element){
+			var node = element.exportXMLDOM();
+			testXML.appendChild(node);
+		});
 		pageXMLSave(store, testXML);
 	};
 	
