@@ -557,7 +557,7 @@ function loadProjectSpecCallback(response) {
 	projectXML = parse.parseFromString(response,'text/xml');
 	
 	// Build the specification
-	specification.decode();
+	specification.decode(projectXML);
 	
 	testState.stateMap.push(specification.preTest);
 	
@@ -1312,18 +1312,30 @@ function Specification() {
 	// Handles the decoding of the project specification XML into a simple JavaScript Object.
 	
 	this.interfaceType = null;
-	this.commonInterface = null;
+	this.commonInterface = new function()
+	{
+		this.options = [];
+		this.optionNode = function(input)
+		{
+			var name = input.getAttribute('name');
+			this.type = name;
+			if(this.type == "option")
+			{
+				this.name = input.id;
+			} else if (this.type == "check")
+			{
+				this.check = input.id;
+			}
+		};
+	};
 	this.projectReturn = null;
 	this.randomiseOrder = null;
 	this.collectMetrics = null;
 	this.testPages = null;
-	this.preTest = null;
-	this.postTest = null;
-	this.metrics =[];
-	
 	this.audioHolders = [];
+	this.metrics = [];
 	
-	this.decode = function() {
+	this.decode = function(projectXML) {
 		// projectXML - DOM Parsed document
 		this.projectXML = projectXML.childNodes[0];
 		var setupNode = projectXML.getElementsByTagName('setup')[0];
@@ -1345,8 +1357,19 @@ function Specification() {
 		}
 		var metricCollection = setupNode.getElementsByTagName('Metric');
 		
-		this.preTest = new this.prepostNode('pretest',setupNode.getElementsByTagName('PreTest'));
-		this.postTest = new this.prepostNode('posttest',setupNode.getElementsByTagName('PostTest'));
+		var setupPreTestNode = setupNode.getElementsByTagName('PreTest');
+		if (setupPreTestNode.length != 0)
+		{
+			setupPreTestNode = setupPreTestNode[0];
+			this.preTest.construct(setupPreTestNode);
+		}
+		
+		var setupPostTestNode = setupNode.getElementsByTagName('PostTest');
+		if (setupPostTestNode.length != 0)
+		{
+			setupPostTestNode = setupPostTestNode[0];
+			this.postTest.construct(setupPostTestNode);
+		}
 		
 		if (metricCollection.length > 0) {
 			metricCollection = metricCollection[0].getElementsByTagName('metricEnable');
@@ -1388,7 +1411,10 @@ function Specification() {
 						}
 					}
 				} else if (this.type == 'anchor' || this.type == 'reference') {
-					Console.log("WARNING: Anchor and Reference tags in the <interface> node are depricated");
+					this.value = Number(child.textContent);
+					this.enforce = child.getAttribute('enforce');
+					if (this.enforce == 'true') {this.enforce = true;}
+					else {this.enforce = false;}
 				}
 			};
 			this.options = [];
@@ -1403,7 +1429,9 @@ function Specification() {
 		
 		var audioHolders = projectXML.getElementsByTagName('audioHolder');
 		for (var i=0; i<audioHolders.length; i++) {
-			this.audioHolders.push(new this.audioHolderNode(this,audioHolders[i]));
+			var node = new this.audioHolderNode(this);
+			node.decode(this,audioHolders[i]);
+			this.audioHolders.push(node);
 		}
 		
 		// New check if we need to randomise the test order
@@ -1432,233 +1460,541 @@ function Specification() {
 		}
 	};
 	
-	this.prepostNode = function(type,Collection) {
+	this.encode = function()
+	{
+		var root = document.implementation.createDocument(null,"BrowserEvalProjectDocument");
+		// First get all the <setup> tag compiled
+		var setupNode = root.createElement("setup");
+		setupNode.setAttribute('interface',this.interfaceType);
+		setupNode.setAttribute('projectReturn',this.projectReturn);
+		setupNode.setAttribute('randomiseOrder',this.randomiseOrder);
+		setupNode.setAttribute('collectMetrics',this.collectMetrics);
+		setupNode.setAttribute('testPages',this.testPages);
+		
+		var setupPreTest = root.createElement("PreTest");
+		for (var i=0; i<this.preTest.options.length; i++)
+		{
+			setupPreTest.appendChild(this.preTest.options[i].exportXML(root));
+		}
+		
+		var setupPostTest = root.createElement("PostTest");
+		for (var i=0; i<this.postTest.options.length; i++)
+		{
+			setupPostTest.appendChild(this.postTest.options[i].exportXML(root));
+		}
+		
+		setupNode.appendChild(setupPreTest);
+		setupNode.appendChild(setupPostTest);
+		
+		// <Metric> tag
+		var Metric = root.createElement("Metric");
+		for (var i=0; i<this.metrics.length; i++)
+		{
+			var metricEnable = root.createElement("metricEnable");
+			metricEnable.textContent = this.metrics[i].enabled;
+			Metric.appendChild(metricEnable);
+		}
+		setupNode.appendChild(Metric);
+		
+		// <interface> tag
+		var CommonInterface = root.createElement("interface");
+		for (var i=0; i<this.commonInterface.options.length; i++)
+		{
+			var CIObj = this.commonInterface.options[i];
+			var CINode = root.createElement(CIObj.type);
+			if (CIObj.type == "check") {CINode.setAttribute("name",CIObj.check);}
+			else {CINode.setAttribute("name",CIObj.name);}
+			CommonInterface.appendChild(CINode);
+		}
+		setupNode.appendChild(CommonInterface);
+		
+		root.getElementsByTagName("BrowserEvalProjectDocument")[0].appendChild(setupNode);
+		// Time for the <audioHolder> tags
+		for (var ahIndex = 0; ahIndex < this.audioHolders.length; ahIndex++)
+		{
+			var node = this.audioHolders[ahIndex].encode(root);
+			root.getElementsByTagName("BrowserEvalProjectDocument")[0].appendChild(node);
+		}
+		return root;
+	};
+	
+	this.prepostNode = function(type) {
 		this.type = type;
 		this.options = [];
 		
-		this.OptionNode = function(child) {
+		this.OptionNode = function() {
 			
-			this.childOption = function(element) {
+			this.childOption = function() {
 				this.type = 'option';
-				this.id = element.id;
-				this.name = element.getAttribute('name');
-				this.text = element.textContent;
+				this.id = null;
+				this.name = undefined;
+				this.text = null;
 			};
 			
-			this.type = child.nodeName;
-			if (child.nodeName == "question") {
-				this.id = child.id;
-				this.mandatory;
-				if (child.getAttribute('mandatory') == "true") {this.mandatory = true;}
-				else {this.mandatory = false;}
-				this.question = child.textContent;
-				if (child.getAttribute('boxsize') == null) {
-					this.boxsize = 'normal';
-				} else {
-					this.boxsize = child.getAttribute('boxsize');
-				}
-			} else if (child.nodeName == "statement") {
-				this.statement = child.textContent;
-			} else if (child.nodeName == "checkbox" || child.nodeName == "radio") {
-				var element = child.firstElementChild;
-				this.id = child.id;
-				if (element == null) {
-					console.log('Malformed' +child.nodeName+ 'entry');
-					this.statement = 'Malformed' +child.nodeName+ 'entry';
-					this.type = 'statement';
-				} else {
-					this.options = [];
-					while (element != null) {
-						if (element.nodeName == 'statement' && this.statement == undefined){
-							this.statement = element.textContent;
-						} else if (element.nodeName == 'option') {
-							this.options.push(new this.childOption(element));
-						}
-						element = element.nextElementSibling;
+			this.type = undefined;
+			this.id = undefined;
+			this.mandatory = undefined;
+			this.question = undefined;
+			this.statement = undefined;
+			this.boxsize = undefined;
+			this.options = [];
+			this.min = undefined;
+			this.max = undefined;
+			this.step = undefined;
+			
+			this.decode = function(child)
+			{
+				this.type = child.nodeName;
+				if (child.nodeName == "question") {
+					this.id = child.id;
+					this.mandatory;
+					if (child.getAttribute('mandatory') == "true") {this.mandatory = true;}
+					else {this.mandatory = false;}
+					this.question = child.textContent;
+					if (child.getAttribute('boxsize') == null) {
+						this.boxsize = 'normal';
+					} else {
+						this.boxsize = child.getAttribute('boxsize');
 					}
+				} else if (child.nodeName == "statement") {
+					this.statement = child.textContent;
+				} else if (child.nodeName == "checkbox" || child.nodeName == "radio") {
+					var element = child.firstElementChild;
+					this.id = child.id;
+					if (element == null) {
+						console.log('Malformed' +child.nodeName+ 'entry');
+						this.statement = 'Malformed' +child.nodeName+ 'entry';
+						this.type = 'statement';
+					} else {
+						this.options = [];
+						while (element != null) {
+							if (element.nodeName == 'statement' && this.statement == undefined){
+								this.statement = element.textContent;
+							} else if (element.nodeName == 'option') {
+								var node = new this.childOption();
+								node.id = element.id;
+								node.name = element.getAttribute('name');
+								node.text = element.textContent;
+								this.options.push(node);
+							}
+							element = element.nextElementSibling;
+						}
+					}
+				} else if (child.nodeName == "number") {
+					this.statement = child.textContent;
+					this.id = child.id;
+					this.min = child.getAttribute('min');
+					this.max = child.getAttribute('max');
+					this.step = child.getAttribute('step');
 				}
-			} else if (child.nodeName == "number") {
-				this.statement = child.textContent;
-				this.id = child.id;
-				this.min = child.getAttribute('min');
-				this.max = child.getAttribute('max');
-				this.step = child.getAttribute('step');
-			}
+			};
+			
+			this.exportXML = function(root)
+			{
+				var node = root.createElement(this.type);
+				switch(this.type)
+				{
+				case "statement":
+					node.textContent = this.statement;
+					break;
+				case "question":
+					node.id = this.id;
+					node.setAttribute("mandatory",this.mandatory);
+					node.setAttribute("boxsize",this.boxsize);
+					node.textContent = this.question;
+					break;
+				case "number":
+					node.id = this.id;
+					node.setAttribute("mandatory",this.mandatory);
+					node.setAttribute("min", this.min);
+					node.setAttribute("max", this.max);
+					node.setAttribute("step", this.step);
+					node.textContent = this.statement;
+					break;
+				case "checkbox":
+					node.id = this.id;
+					var statement = root.createElement("statement");
+					statement.textContent = this.statement;
+					node.appendChild(statement);
+					for (var i=0; i<this.options.length; i++)
+					{
+						var option = this.options[i];
+						var optionNode = root.createElement("option");
+						optionNode.id = option.id;
+						optionNode.textContent = option.text;
+						node.appendChild(optionNode);
+					}
+					break;
+				case "radio":
+					node.id = this.id;
+					var statement = root.createElement("statement");
+					statement.textContent = this.statement;
+					node.appendChild(statement);
+					for (var i=0; i<this.options.length; i++)
+					{
+						var option = this.options[i];
+						var optionNode = root.createElement("option");
+						optionNode.setAttribute("name",option.name);
+						optionNode.textContent = option.text;
+						node.appendChild(optionNode);
+					}
+					break;
+				}
+				return node;
+			};
 		};
-		
-		// On construction:
-		if (Collection.length != 0) {
-			Collection = Collection[0];
+		this.construct = function(Collection)
+		{
 			if (Collection.childElementCount != 0) {
 				var child = Collection.firstElementChild;
-				this.options.push(new this.OptionNode(child));
+				var node = new this.OptionNode();
+				node.decode(child);
+				this.options.push(node);
 				while (child.nextElementSibling != null) {
 					child = child.nextElementSibling;
-					this.options.push(new this.OptionNode(child));
+					node = new this.OptionNode();
+					node.decode(child);
+					this.options.push(node);
 				}
 			}
-		}
+		};
 	};
+	this.preTest = new this.prepostNode("pretest");
+	this.postTest = new this.prepostNode("posttest");
 	
 	this.metricNode = function(name) {
 		this.enabled = name;
 	};
 	
-	this.audioHolderNode = function(parent,xml) {
+	this.audioHolderNode = function(parent) {
 		this.type = 'audioHolder';
-		this.presentedId = parent.audioHolders.length;
-		this.interfaceNode = function(DOM) {
-			var title = DOM.getElementsByTagName('title');
-			if (title.length == 0) {this.title = null;}
-			else {this.title = title[0].textContent;}
-			this.options = parent.commonInterface.options;
-			var scale = DOM.getElementsByTagName('scale');
-			this.scale = [];
-			for (var i=0; i<scale.length; i++) {
-				var arr = [null, null];
-				arr[0] = scale[i].getAttribute('position');
-				arr[1] = scale[i].textContent;
-				this.scale.push(arr);
+		this.presentedId = undefined;
+		this.id = undefined;
+		this.hostURL = undefined;
+		this.sampleRate = undefined;
+		this.randomiseOrder = undefined;
+		this.loop = undefined;
+		this.elementComments = undefined;
+		this.outsideReference = null;
+		this.preTest = new parent.prepostNode("pretest");
+		this.postTest = new parent.prepostNode("pretest");
+		this.interfaces = [];
+		this.commentBoxPrefix = "Comment on track";
+		this.audioElements = [];
+		this.commentQuestions = [];
+		
+		this.decode = function(parent,xml)
+		{
+			this.presentedId = parent.audioHolders.length;
+			this.id = xml.id;
+			this.hostURL = xml.getAttribute('hostURL');
+			this.sampleRate = xml.getAttribute('sampleRate');
+			if (xml.getAttribute('randomiseOrder') == "true") {this.randomiseOrder = true;}
+			else {this.randomiseOrder = false;}
+			this.repeatCount = xml.getAttribute('repeatCount');
+			if (xml.getAttribute('loop') == 'true') {this.loop = true;}
+			else {this.loop == false;}
+			if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
+			else {this.elementComments = false;}
+			
+			var setupPreTestNode = xml.getElementsByTagName('PreTest');
+			if (setupPreTestNode.length != 0)
+			{
+				setupPreTestNode = setupPreTestNode[0];
+				this.preTest.construct(setupPreTestNode);
+			}
+			
+			var setupPostTestNode = xml.getElementsByTagName('PostTest');
+			if (setupPostTestNode.length != 0)
+			{
+				setupPostTestNode = setupPostTestNode[0];
+				this.postTest.construct(setupPostTestNode);
+			}
+			
+			var interfaceDOM = xml.getElementsByTagName('interface');
+			for (var i=0; i<interfaceDOM.length; i++) {
+				var node = new this.interfaceNode();
+				node.decode(interfaceDOM[i]);
+				this.interfaces.push(node);
+			}
+			this.commentBoxPrefix = xml.getElementsByTagName('commentBoxPrefix');
+			if (this.commentBoxPrefix.length != 0) {
+				this.commentBoxPrefix = this.commentBoxPrefix[0].textContent;
+			} else {
+				this.commentBoxPrefix = "Comment on track";
+			}
+			var audioElementsDOM = xml.getElementsByTagName('audioElements');
+			for (var i=0; i<audioElementsDOM.length; i++) {
+				var node = new this.audioElementNode();
+				node.decode(this,audioElementsDOM[i]);
+				if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
+					if (this.outsideReference == null) {
+						this.outsideReference = node;
+					} else {
+						console.log('Error only one audioelement can be of type outsidereference per audioholder');
+						this.audioElements.push(node);
+						console.log('Element id '+audioElementsDOM[i].id+' made into normal node');
+					}
+				} else {
+					this.audioElements.push(node);
+				}
+			}
+			
+			var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
+			for (var i=0; i<commentQuestionsDOM.length; i++) {
+				var node = new this.commentQuestionNode();
+				node.decode(commentQuestionsDOM[i]);
+				this.commentQuestions.push(node);
 			}
 		};
 		
-		this.audioElementNode = function(parent,xml) {
-			this.url = xml.getAttribute('url');
-			this.id = xml.id;
-			this.parent = parent;
-			this.type = xml.getAttribute('type');
-			if (this.type == null) {this.type = "normal";}
-			if (this.type == 'anchor') {this.anchor = true;}
-			else {this.anchor = false;}
-			if (this.type == 'reference') {this.reference = true;}
-			else {this.reference = false;}
+		this.encode = function(root)
+		{
+			var AHNode = root.createElement("audioHolder");
+			AHNode.id = this.id;
+			AHNode.setAttribute("hostURL",this.hostURL);
+			AHNode.setAttribute("sampleRate",this.sampleRate);
+			AHNode.setAttribute("randomiseOrder",this.randomiseOrder);
+			AHNode.setAttribute("repeatCount",this.repeatCount);
+			AHNode.setAttribute("loop",this.loop);
+			AHNode.setAttribute("elementComments",this.elementComments);
 			
-			if (this.anchor == true || this.reference == true)
+			for (var i=0; i<this.interfaces.length; i++)
 			{
-				this.marker = xml.getAttribute('marker');
-				if (this.marker != undefined)
-				{
-					this.marker = Number(this.marker);
-					if (isNaN(this.marker) == false)
-					{
-						if (this.marker > 1)
-						{	this.marker /= 100.0;}
-						if (this.marker >= 0 && this.marker <= 1)
-						{
-							this.enforce = true;
-							return;
-						} else {
-							console.log("ERROR - Marker of audioElement "+this.id+" is not between 0 and 1 (float) or 0 and 100 (integer)!");
-							console.log("ERROR - Marker not enforced!");
-						}
-					} else {
-						console.log("ERROR - Marker of audioElement "+this.id+" is not a number!");
-						console.log("ERROR - Marker not enforced!");
-					}
-				}
+				AHNode.appendChild(this.interfaces[i].encode(root));
 			}
+			
+			for (var i=0; i<this.audioElements.length; i++) {
+				AHNode.appendChild(this.audioElements[i].encode(root));
+			}
+			// Create <CommentQuestion>
+			for (var i=0; i<this.commentQuestions.length; i++)
+			{
+				AHNode.appendChild(this.commentQuestions[i].exportXML(root));
+			}
+			
+			// Create <PreTest>
+			var AHPreTest = root.createElement("PreTest");
+			for (var i=0; i<this.preTest.options.length; i++)
+			{
+				AHPreTest.appendChild(this.preTest.options[i].exportXML(root));
+			}
+			
+			var AHPostTest = root.createElement("PostTest");
+			for (var i=0; i<this.postTest.options.length; i++)
+			{
+				AHPostTest.appendChild(this.postTest.options[i].exportXML(root));
+			}
+			AHNode.appendChild(AHPreTest);
+			AHNode.appendChild(AHPostTest);
+			return AHNode;
+		};
+		
+		this.interfaceNode = function() {
+			this.title = undefined;
+			this.options = [];
+			this.scale = [];
+			this.decode = function(DOM)
+			{
+				var title = DOM.getElementsByTagName('title');
+				if (title.length == 0) {this.title = null;}
+				else {this.title = title[0].textContent;}
+				this.options = parent.commonInterface.options;
+				var scale = DOM.getElementsByTagName('scale');
+				this.scale = [];
+				for (var i=0; i<scale.length; i++) {
+					var arr = [null, null];
+					arr[0] = scale[i].getAttribute('position');
+					arr[1] = scale[i].textContent;
+					this.scale.push(arr);
+				}
+			};
+			this.encode = function(root)
+			{
+				var node = root.createElement("interface");
+				if (this.title != undefined)
+				{
+					var title = root.createElement("title");
+					title.textContent = this.title;
+					node.appendChild(title);
+				}
+				for (var i=0; i<this.options.length; i++)
+				{
+					var optionNode = root.createElement(this.options[i].type);
+					if (this.options[i].type == "option")
+					{
+						optionNode.setAttribute("name",this.options[i].name);
+					} else if (this.options[i].type == "check") {
+						optionNode.setAttribute("check",this.options[i].check);
+					} else if (this.options[i].type == "scalerange") {
+						optionNode.setAttribute("min",this.options[i].min*100);
+						optionNode.setAttribute("max",this.options[i].max*100);
+					}
+					node.appendChild(optionNode);
+				}
+				for (var i=0; i<this.scale.length; i++) {
+					var scale = root.createElement("scale");
+					scale.setAttribute("position",this.scale[i][0]);
+					scale.textContent = this.scale[i][1];
+					node.appendChild(scale);
+				}
+				return node;
+			};
+		};
+		
+		this.audioElementNode = function() {
+			this.url = null;
+			this.id = null;
+			this.parent = null;
+			this.type = "normal";
 			this.marker = false;
 			this.enforce = false;
+			this.decode = function(parent,xml)
+			{
+				this.url = xml.getAttribute('url');
+				this.id = xml.id;
+				this.parent = parent;
+				this.type = xml.getAttribute('type');
+				if (this.type == null) {this.type = "normal";}
+				if (this.type == 'anchor') {this.anchor = true;}
+				else {this.anchor = false;}
+				if (this.type == 'reference') {this.reference = true;}
+				else {this.reference = false;}
+				
+				if (this.anchor == true || this.reference == true)
+				{
+					this.marker = xml.getAttribute('marker');
+					if (this.marker != undefined)
+					{
+						this.marker = Number(this.marker);
+						if (isNaN(this.marker) == false)
+						{
+							if (this.marker > 1)
+							{	this.marker /= 100.0;}
+							if (this.marker >= 0 && this.marker <= 1)
+							{
+								this.enforce = true;
+								return;
+							} else {
+								console.log("ERROR - Marker of audioElement "+this.id+" is not between 0 and 1 (float) or 0 and 100 (integer)!");
+								console.log("ERROR - Marker not enforced!");
+							}
+						} else {
+							console.log("ERROR - Marker of audioElement "+this.id+" is not a number!");
+							console.log("ERROR - Marker not enforced!");
+						}
+					}
+				}
+			};
+			this.encode = function(root)
+			{
+				var AENode = root.createElement("audioElements");
+				AENode.id = this.id;
+				AENode.setAttribute("url",this.url);
+				AENode.setAttribute("type",this.type);
+				if (this.marker != false)
+				{
+					AENode.setAttribute("marker",this.marker*100);
+				}
+				return AENode;
+			};
 		};
 		
 		this.commentQuestionNode = function(xml) {
-			this.childOption = function(element) {
+			this.id = null;
+			this.type = undefined;
+			this.question = undefined;
+			this.options = [];
+			this.statement = undefined;
+			
+			this.childOption = function() {
 				this.type = 'option';
-				this.name = element.getAttribute('name');
-				this.text = element.textContent;
+				this.name = null;
+				this.text = null;
 			};
-			this.id = xml.id;
-			if (xml.getAttribute('mandatory') == 'true') {this.mandatory = true;}
-			else {this.mandatory = false;}
-			this.type = xml.getAttribute('type');
-			if (this.type == undefined) {this.type = 'text';}
-			switch (this.type) {
-			case 'text':
-				this.question = xml.textContent;
-				break;
-			case 'radio':
-				var child = xml.firstElementChild;
-				this.options = [];
-				while (child != undefined) {
-					if (child.nodeName == 'statement' && this.statement == undefined) {
-						this.statement = child.textContent;
-					} else if (child.nodeName == 'option') {
-						this.options.push(new this.childOption(child));
+			this.exportXML = function(root)
+			{
+				var CQNode = root.createElement("CommentQuestion");
+				CQNode.id = this.id;
+				CQNode.setAttribute("type",this.type);
+				switch(this.type)
+				{
+				case "text":
+					CQNode.textContent = this.question;
+					break;
+				case "radio":
+					var statement = root.createElement("statement");
+					statement.textContent = this.statement;
+					CQNode.appendChild(statement);
+					for (var i=0; i<this.options.length; i++)
+					{
+						var optionNode = root.createElement("option");
+						optionNode.setAttribute("name",this.options[i].name);
+						optionNode.textContent = this.options[i].text;
+						CQNode.appendChild(optionNode);
 					}
-					child = child.nextElementSibling;
-				}
-				break;
-			case 'checkbox':
-				var child = xml.firstElementChild;
-				this.options = [];
-				while (child != undefined) {
-					if (child.nodeName == 'statement' && this.statement == undefined) {
-						this.statement = child.textContent;
-					} else if (child.nodeName == 'option') {
-						this.options.push(new this.childOption(child));
+					break;
+				case "checkbox":
+					var statement = root.createElement("statement");
+					statement.textContent = this.statement;
+					CQNode.appendChild(statement);
+					for (var i=0; i<this.options.length; i++)
+					{
+						var optionNode = root.createElement("option");
+						optionNode.setAttribute("name",this.options[i].name);
+						optionNode.textContent = this.options[i].text;
+						CQNode.appendChild(optionNode);
 					}
-					child = child.nextElementSibling;
+					break;
 				}
-				break;
-			}
+				return CQNode;
+			};
+			this.decode = function(xml) {
+				this.id = xml.id;
+				if (xml.getAttribute('mandatory') == 'true') {this.mandatory = true;}
+				else {this.mandatory = false;}
+				this.type = xml.getAttribute('type');
+				if (this.type == undefined) {this.type = 'text';}
+				switch (this.type) {
+				case 'text':
+					this.question = xml.textContent;
+					break;
+				case 'radio':
+					var child = xml.firstElementChild;
+					this.options = [];
+					while (child != undefined) {
+						if (child.nodeName == 'statement' && this.statement == undefined) {
+							this.statement = child.textContent;
+						} else if (child.nodeName == 'option') {
+							var node = new this.childOption();
+							node.name = child.getAttribute('name');
+							node.text = child.textContent;
+							this.options.push(node);
+						}
+						child = child.nextElementSibling;
+					}
+					break;
+				case 'checkbox':
+					var child = xml.firstElementChild;
+					this.options = [];
+					while (child != undefined) {
+						if (child.nodeName == 'statement' && this.statement == undefined) {
+							this.statement = child.textContent;
+						} else if (child.nodeName == 'option') {
+							var node = new this.childOption();
+							node.name = child.getAttribute('name');
+							node.text = child.textContent;
+							this.options.push(node);
+						}
+						child = child.nextElementSibling;
+					}
+					break;
+				}
+			};
 		};
-		
-		this.id = xml.id;
-		this.hostURL = xml.getAttribute('hostURL');
-		this.sampleRate = xml.getAttribute('sampleRate');
-		if (xml.getAttribute('randomiseOrder') == "true") {this.randomiseOrder = true;}
-		else {this.randomiseOrder = false;}
-		this.repeatCount = xml.getAttribute('repeatCount');
-		if (xml.getAttribute('loop') == 'true') {this.loop = true;}
-		else {this.loop == false;}
-		if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
-		else {this.elementComments = false;}
-		
-		this.preTest = new parent.prepostNode('pretest',xml.getElementsByTagName('PreTest'));
-		this.postTest = new parent.prepostNode('posttest',xml.getElementsByTagName('PostTest'));
-		
-		this.interfaces = [];
-		var interfaceDOM = xml.getElementsByTagName('interface');
-		for (var i=0; i<interfaceDOM.length; i++) {
-			this.interfaces.push(new this.interfaceNode(interfaceDOM[i]));
-		}
-		
-		this.commentBoxPrefix = xml.getElementsByTagName('commentBoxPrefix');
-		if (this.commentBoxPrefix.length != 0) {
-			this.commentBoxPrefix = this.commentBoxPrefix[0].textContent;
-		} else {
-			this.commentBoxPrefix = "Comment on track";
-		}
-		
-		this.audioElements  =[];
-		var audioElementsDOM = xml.getElementsByTagName('audioElements');
-		this.outsideReference = null;
-		for (var i=0; i<audioElementsDOM.length; i++) {
-			if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
-				if (this.outsideReference == null) {
-					this.outsideReference = new this.audioElementNode(this,audioElementsDOM[i]);
-				} else {
-					console.log('Error only one audioelement can be of type outsidereference per audioholder');
-					this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
-					console.log('Element id '+audioElementsDOM[i].id+' made into normal node');
-				}
-			} else {
-				this.audioElements.push(new this.audioElementNode(this,audioElementsDOM[i]));
-			}
-		}
-		
-		if (this.randomiseOrder) {
-			this.audioElements = randomiseOrder(this.audioElements);
-		}
-		
-		this.commentQuestions = [];
-		var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
-		for (var i=0; i<commentQuestionsDOM.length; i++) {
-			this.commentQuestions.push(new this.commentQuestionNode(commentQuestionsDOM[i]));
-		}
 	};
 }
-
+			
 function Interface(specificationObject) {
 	// This handles the bindings between the interface and the audioEngineContext;
 	this.specification = specificationObject;
