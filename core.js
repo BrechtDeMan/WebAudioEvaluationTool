@@ -1398,6 +1398,34 @@ function Specification() {
 			}
 		};
 	};
+	
+	this.randomiseOrder = function(input)
+	{
+		// This takes an array of information and randomises the order
+		var N = input.length;
+		
+		var inputSequence = []; // For safety purposes: keep track of randomisation
+		for (var counter = 0; counter < N; ++counter) 
+			inputSequence.push(counter) // Fill array
+		var inputSequenceClone = inputSequence.slice(0);
+		
+		var holdArr = [];
+		var outputSequence = [];
+		for (var n=0; n<N; n++)
+		{
+			// First pick a random number
+			var r = Math.random();
+			// Multiply and floor by the number of elements left
+			r = Math.floor(r*input.length);
+			// Pick out that element and delete from the array
+			holdArr.push(input.splice(r,1)[0]);
+			// Do the same with sequence
+			outputSequence.push(inputSequence.splice(r,1)[0]);
+		}
+		console.log(inputSequenceClone.toString()); // print original array to console
+		console.log(outputSequence.toString()); 	// print randomised array to console
+		return holdArr;
+	};
 	this.projectReturn = null;
 	this.randomiseOrder = null;
 	this.collectMetrics = null;
@@ -1808,6 +1836,11 @@ function Specification() {
 				} else {
 					this.audioElements.push(node);
 				}
+			}
+			
+			if (this.randomiseOrder == true)
+			{
+				this.audioElements = randomiseOrder(this.audioElements);
 			}
 			
 			var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
