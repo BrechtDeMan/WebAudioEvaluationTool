@@ -1,0 +1,88 @@
+/*
+ * Hold any style information for APE interface. Customise if you like to make the interface your own!
+ * 
+ */
+body {
+	/* Set the background colour (note US English spelling) to grey*/
+	background-color: #ddd
+}
+
+div.title {
+	/* Specify any colouring for the title */
+}
+
+div.pageTitle {
+	width: auto;
+	height: 20px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
+
+div.pageTitle span{
+	font-size: 1.5em;
+}
+
+button {
+	/* Specify any button structure or style */
+	min-width: 20px;
+	background-color: #ddd
+}
+
+div.slider {
+	/* Specify any structure for the slider holder interface */
+	background-color: #eee;
+	height: 150px;
+	margin-bottom: 5px;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+}
+
+div.sliderScale {
+	width: 100%;
+	min-height: 30px;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+}
+
+div.sliderScale span {
+	/* Any formatting of text below scale */
+	font-size: 1.2em;
+	min-width: 5px;
+	height: 20px;
+	position: absolute;
+}
+
+div.track-slider {
+	/* Specify any structure for the slider objects */
+	position: absolute;
+	height: inherit;
+	width: 12px;
+	float: left;
+	background-color: rgb(100,200,100);
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+}
+
+div#outside-reference {
+	width:120px;
+	padding-left: 55px;
+	margin-left: 100px;
+	height:20px;
+	margin-bottom:5px;
+	background-color: rgb(100,200,100);
+}
+
+div.track-slider-disabled {
+	background-color: rgb(100,100,100);
+}
+
+div.track-slider-playing {
+	background-color: #FF0000;
+}
+
+div.comment-box-playing {
+	background-color: #FFDDDD;
+}

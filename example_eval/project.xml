@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BrowserEvalProjectDocument>
+	<setup interface="APE" projectReturn="save.php" randomiseOrder='false' collectMetrics='true' testPages="2">
+		<PreTest>
+			<question id="sessionId" mandatory="true">Please enter your name.</question>
+			<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
+		</PreTest>
+		<PostTest>
+			<question id="location" mandatory="true" boxsize="large">Please enter your location. (example mandatory text question)</question>
+			<number id="age" min="0">Please enter your age (example non-mandatory number question)</number>
+			<radio id="rating">
+				<statement>Please rate this interface (example radio button question)</statement>
+				<option name="bad">Bad</option>
+				<option name="poor">Poor</option>
+				<option name="good">Good</option>
+				<option name="great">Great</option>
+			</radio>
+			<statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
+		</PostTest>
+		<Metric>
+			<metricEnable>testTimer</metricEnable>
+			<metricEnable>elementTimer</metricEnable>
+			<metricEnable>elementInitialPosition</metricEnable>
+			<metricEnable>elementTracker</metricEnable>
+			<metricEnable>elementFlagListenedTo</metricEnable>
+			<metricEnable>elementFlagMoved</metricEnable>
+			<metricEnable>elementListenTracker</metricEnable>
+		</Metric>
+		<interface>
+			<check name="fragmentMoved"/>
+			<check name="scalerange" min="25" max="75"/>
+			<option name='playhead'/>
+			<option name="page-count"/>
+		</interface>
+	</setup>
+	<audioHolder id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
+		<interface name="preference">
+			<title>Preference</title>
+			<scale position="0">Min</scale>
+			<scale position="100">Max</scale>
+			<scale position="50">Middle</scale>
+			<scale position="20">20</scale>
+			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+		</interface>
+		<interface name="depth">
+			<title>Depth</title>
+			<scale position="0">Low</scale>
+			<scale position="100">High</scale>
+			<scale position="50">Middle</scale>
+			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+		</interface>
+		<audioElements url="0.wav" id="0" type="anchor"/>
+		<audioElements url="1.wav" id="1"/>
+		<audioElements url="2.wav" id="2"/>
+		<audioElements url="3.wav" id="3"/>
+		<audioElements url="4.wav" id="4"/>
+		<PreTest>
+			<statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%. </statement>
+		</PreTest>
+		<PostTest>
+			<question id="genre" mandatory="true">Please enter the genre.</question>
+		</PostTest>
+	</audioHolder>
+    <audioHolder id='test-1' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='false' elementComments='true'>
+        <interface name="preference">
+            <title>Example Test Question</title>
+            <scale position="0">Min</scale>
+            <scale position="100">Max</scale>
+            <scale position="50">Middle</scale>
+            <scale position="75">75</scale>
+            <scalerange min="25" max="75"/>
+            <commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+        </interface>
+        <audioElements url="0.wav" id="0" type="anchor" marker="20"/>
+        <audioElements url="1.wav" id="1" type="reference" marker="80"/>
+        <audioElements url="2.wav" id="2"/>
+        <audioElements url="3.wav" id="3"/>
+        <audioElements url="4.wav" id="4"/>
+        <audioElements url="5.wav" id="5"/>
+        <audioElements url="6.wav" id="6" type="outsidereference"/>
+        <CommentQuestion id='mixingExperience' type="text">What is your general experience with numbers?</CommentQuestion>
+        <CommentQuestion id="preference" type="radio">
+            <statement>Please enter your overall preference</statement>
+            <option name="worst">Very Bad</option>
+            <option name="bad"></option>
+            <option name="OK">OK</option>
+            <option name="Good"></option>
+            <option name="Great">Great</option>
+        </CommentQuestion>
+        <CommentQuestion id="preference" type="checkbox">
+            <statement>Please describe the overall character</statement>
+            <option name="funky">Funky</option>
+            <option name="mellow">Mellow</option>
+            <option name="laidback">Laid back</option>
+            <option name="heavy">Heavy</option>
+        </CommentQuestion>
+        <PreTest>
+        	<statement>Example of an 'APE' style interface with outside reference 'six', hidden anchor 'zero' (which needs to be below 20%), hidden reference 'one' (which needs to be above 80%), randomisation of marker labels, and a forced scale usage of at least 25%-75%. </statement>
+        </PreTest>
+        <PostTest>
+            <question id="genre" mandatory="true">Please enter the genre.</question>
+        </PostTest>
+    </audioHolder>
+</BrowserEvalProjectDocument>
