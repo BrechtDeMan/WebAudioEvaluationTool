@@ -62,7 +62,7 @@
 		</PostTest>
 	</audioHolder>
     <audioHolder id='test-1' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='false' elementComments='true'>
-        <interface>
+        <interface name="preference">
             <title>Example Test Question</title>
             <scale position="0">Min</scale>
             <scale position="100">Max</scale>
