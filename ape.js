@@ -147,33 +147,34 @@ function loadInterface() {
 		var audioObjs = audioEngineContext.audioObjects;
 		var audioHolder = testState.stateMap[testState.stateIndex];
 		var interfaces = audioHolder.interfaces;
-		
-		var minRanking = audioObjs[0].interfaceDOM.getValue();
-		var maxRanking = minRanking;
-		
-		var minScale;
-		var maxScale;
-		for (var i=0; i<interfaces[0].options.length; i++)
+		for (var i=0; i<interfaces.length; i++)
 		{
-			if (interfaces[0].options[i].check == "scalerange") {
-				minScale = interfaces[0].options[i].min;
-				maxScale = interfaces[0].options[i].max;
+			var minRanking = convSliderPosToRate(audioObjs[0].interfaceDOM.trackSliderObjects[i]);
+			var maxRanking = minRanking;
+			
+			var minScale;
+			var maxScale;
+			for (var j=0; j<interfaces[i].options.length; j++)
+			{
+				if (interfaces[i].options[j].check == "scalerange") {
+					minScale = interfaces[i].options[j].min;
+					maxScale = interfaces[i].options[j].max;
+					break;
+				}
+			}
+			for (var j=1; j<audioObjs.length; j++){
+				if (audioObjs[j].specification.type != 'outsidereference') {
+					var ranking = convSliderPosToRate(audioObjs[j].interfaceDOM.trackSliderObjects[i]);
+					if (ranking < minRanking) { minRanking = ranking;}
+					if (ranking > maxRanking) { maxRanking = ranking;}
+				}
+			}
+			if (minRanking > minScale || maxRanking < maxScale) {
+				alert('Please use the full width of the scale');
+				return false;
 			}
 		}
-		
-		for (var i=1; i<audioObjs.length; i++){
-			if (audioObjs[i].specification.type != 'outsidereference') {
-				var ranking = audioObjs[i].interfaceDOM.getValue();
-				if (ranking < minRanking) { minRanking = ranking;}
-				if (ranking > maxRanking) { maxRanking = ranking;}
-			}
-		}
-		if (minRanking > minScale || maxRanking < maxScale) {
-			alert('Please use the full width of the scale');
-			return false;
-		} else {
-			return true;
-		}
+		return true;
 	};
 	
 	Interface.prototype.objectSelected = null;
@@ -225,13 +226,6 @@ function loadInterface() {
 	// Insert the titleSpan element into the title div element.
 	title.appendChild(titleSpan);
 	
-	var pagetitle = document.createElement('div');
-	pagetitle.className = "pageTitle";
-	pagetitle.align = "center";
-	var titleSpan = document.createElement('span');
-	titleSpan.id = "pageTitle";
-	pagetitle.appendChild(titleSpan);
-	
 	// Create Interface buttons!
 	var interfaceButtons = document.createElement('div');
 	interfaceButtons.id = 'interface-buttons';
@@ -259,38 +253,9 @@ function loadInterface() {
 	interfaceButtons.appendChild(playback);
 	interfaceButtons.appendChild(submit);
 	
-	// Now create the slider and HTML5 canvas boxes
+	var sliderHolder = document.createElement("div");
+	sliderHolder.id = "slider-holder";
 	
-	// Create the div box to center align
-	var sliderBox = document.createElement('div');
-	sliderBox.className = 'sliderCanvasDiv';
-	sliderBox.id = 'sliderCanvasHolder';
-	
-	// Create the slider box to hold the slider elements
-	var canvas = document.createElement('div');
-	canvas.id = 'slider';
-	canvas.align = "left";
-	canvas.addEventListener('dragover',function(event){
-		event.preventDefault();
-		event.dataTransfer.effectAllowed = 'none';
-		event.dataTransfer.dropEffect = 'copy';
-		return false;
-	},false);
-	var sliderMargin = document.createAttribute('marginsize');
-	sliderMargin.nodeValue = 42; // Set default margins to 42px either side
-	// Must have a known EXACT width, as this is used later to determine the ratings
-	var w = (Number(sliderMargin.nodeValue)+8)*2;
-	canvas.style.width = width - w +"px";
-	canvas.style.marginLeft = sliderMargin.nodeValue +'px';
-	canvas.setAttributeNode(sliderMargin);
-	sliderBox.appendChild(canvas);
-	
-	// Create the div to hold any scale objects
-	var scale = document.createElement('div');
-	scale.className = 'sliderScale';
-	scale.id = 'sliderScaleHolder';
-	scale.align = 'left';
-	sliderBox.appendChild(scale);
 	
 	// Global parent for the comment boxes on the page
 	var feedbackHolder = document.createElement('div');
@@ -301,9 +266,8 @@ function loadInterface() {
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
-	testContent.appendChild(pagetitle);
 	testContent.appendChild(interfaceButtons);
-	testContent.appendChild(sliderBox);
+	testContent.appendChild(sliderHolder);
 	testContent.appendChild(feedbackHolder);
 	interfaceContext.insertPoint.appendChild(testContent);
 
@@ -315,16 +279,78 @@ function loadInterface() {
 
 function loadTest(audioHolderObject)
 {
-
+	var width = window.innerWidth;
+	var height = window.innerHeight;
 	var id = audioHolderObject.id;
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
-	var canvas = document.getElementById('slider');
+	var sliderHolder = document.getElementById('slider-holder');
 	feedbackHolder.innerHTML = null;
-	canvas.innerHTML = null;
+	sliderHolder.innerHTML = null;
 	
 	var interfaceObj = audioHolderObject.interfaces;
 	for (var k=0; k<interfaceObj.length; k++) {
+		// Create the div box to center align
+		var sliderBox = document.createElement('div');
+		sliderBox.className = 'sliderCanvasDiv';
+		sliderBox.id = 'sliderCanvasHolder-'+k;
+		
+		var pagetitle = document.createElement('div');
+		pagetitle.className = "pageTitle";
+		pagetitle.align = "center";
+		var titleSpan = document.createElement('span');
+		titleSpan.id = "pageTitle-"+k;
+		if (interfaceObj[k].title != undefined && typeof interfaceObj[k].title == "string")
+		{
+			titleSpan.textContent = interfaceObj[k].title;
+		}
+		pagetitle.appendChild(titleSpan);
+		sliderBox.appendChild(pagetitle);
+		
+		// Create the slider box to hold the slider elements
+		var canvas = document.createElement('div');
+		if (interfaceObj[k].name != undefined)
+			canvas.id = 'slider-'+name;
+		else
+			canvas.id = 'slider-'+k;
+		canvas.className = 'slider';
+		canvas.align = "left";
+		canvas.addEventListener('dragover',function(event){
+			event.preventDefault();
+			event.dataTransfer.effectAllowed = 'none';
+			event.dataTransfer.dropEffect = 'copy';
+			return false;
+		},false);
+		var sliderMargin = document.createAttribute('marginsize');
+		sliderMargin.nodeValue = 42; // Set default margins to 42px either side
+		// Must have a known EXACT width, as this is used later to determine the ratings
+		var w = (Number(sliderMargin.nodeValue)+8)*2;
+		canvas.style.width = width - w +"px";
+		canvas.style.marginLeft = sliderMargin.nodeValue +'px';
+		canvas.setAttributeNode(sliderMargin);
+		sliderBox.appendChild(canvas);
+		
+		// Create the div to hold any scale objects
+		var scale = document.createElement('div');
+		scale.className = 'sliderScale';
+		scale.id = 'sliderScaleHolder';
+		scale.align = 'left';
+		sliderBox.appendChild(scale);
+		sliderHolder.appendChild(sliderBox);
+		var positionScale = canvas.style.width.substr(0,canvas.style.width.length-2);
+		var offset = Number(canvas.attributes['marginsize'].value);
+		$(interfaceObj[k].scale).each(function(index,scaleObj){
+			var value = document.createAttribute('value');
+			var position = Number(scaleObj[0])*0.01;
+			value.nodeValue = position;
+			var pixelPosition = (position*positionScale)+offset;
+			var scaleDOM = document.createElement('span');
+			scaleDOM.textContent = scaleObj[1];
+			scale.appendChild(scaleDOM);
+			scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
+			scaleDOM.setAttributeNode(value);
+		});
+		
 		for (var i=0; i<interfaceObj[k].options.length; i++)
 		{
 			if (interfaceObj[k].options[i].type == 'option' && interfaceObj[k].options[i].name == 'playhead')
@@ -352,36 +378,8 @@ function loadTest(audioHolderObject)
 			}
 		}
 	}
-	// Setup question title
 	
 	var commentBoxPrefix = "Comment on track";
-	if (interfaceObj.length != 0) {
-		interfaceObj = interfaceObj[0];
-		var titleNode = interfaceObj.title;
-		if (titleNode != undefined)
-		{
-			document.getElementById('pageTitle').textContent = titleNode;
-		}
-		var positionScale = canvas.style.width.substr(0,canvas.style.width.length-2);
-		var offset = Number(document.getElementById('slider').attributes['marginsize'].value);
-		var scale = document.getElementById('sliderScaleHolder');
-		scale.innerHTML = null;
-		$(interfaceObj.scale).each(function(index,scaleObj){
-			var value = document.createAttribute('value');
-			var position = Number(scaleObj[0])*0.01;
-			value.nodeValue = position;
-			var pixelPosition = (position*positionScale)+offset;
-			var scaleDOM = document.createElement('span');
-			scaleDOM.textContent = scaleObj[1];
-			scale.appendChild(scaleDOM);
-			scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
-			scaleDOM.setAttributeNode(value);
-		});
-		
-		if (interfaceObj.commentBoxPrefix != undefined) {
-			commentBoxPrefix = interfaceObj.commentBoxPrefix;
-		}
-	}
 	
 	var commentShow = audioHolderObject.elementComments;
 	
@@ -403,20 +401,11 @@ function loadTest(audioHolderObject)
 		var node = interfaceContext.createCommentBox(audioObject);
 		
 		// Create a slider per track
-		audioObject.interfaceDOM = new sliderObject(audioObject);
+		audioObject.interfaceDOM = new sliderObject(audioObject,interfaceObj);
 		if (audioObject.state == 1)
 		{
 			audioObject.interfaceDOM.enable();
 		}
-		
-		// Distribute it randomnly
-		var w = window.innerWidth - (offset+8)*2;
-		w = Math.random()*w;
-		w = Math.floor(w+(offset+8));
-		audioObject.interfaceDOM.trackSliderObj.style.left = w+'px';
-		
-		canvas.appendChild(audioObject.interfaceDOM.trackSliderObj);
-		audioObject.metric.initialised(convSliderPosToRate(audioObject.interfaceDOM.trackSliderObj));
         
 	});
 	
@@ -428,7 +417,7 @@ function loadTest(audioHolderObject)
 		event.preventDefault();
 	});
 	
-	$('#slider').mousemove(function(event) {
+	$('.slider').mousemove(function(event) {
 		event.preventDefault();
 		var obj = interfaceContext.getSelectedObject();
 		if (obj == null) {return;}
@@ -454,9 +443,10 @@ function loadTest(audioHolderObject)
 			audioEngineContext.play(id);
 	        // Currently playing track red, rest green
 	        
-	        //document.getElementById('track-slider-'+index).style.backgroundColor = "#FF0000";
+	        
 	        $('.track-slider').removeClass('track-slider-playing');
-	        $(obj).addClass('track-slider-playing');
+	        var name = ".track-slider-"+obj.getAttribute("trackindex");
+	        $(name).addClass('track-slider-playing');
 	        $('.comment-div').removeClass('comment-box-playing');
 	        $('#comment-div-'+id).addClass('comment-box-playing');
 	        var outsideReference = document.getElementById('outside-reference');
@@ -505,30 +495,55 @@ function loadTest(audioHolderObject)
 	//testWaitIndicator();
 }
 
-function sliderObject(audioObject) {
+function sliderObject(audioObject,interfaceObjects) {
 	// Create a new slider object;
 	this.parent = audioObject;
-	this.trackSliderObj = document.createElement('div');
-	this.trackSliderObj.className = 'track-slider track-slider-disabled';
-	this.trackSliderObj.id = 'track-slider-'+audioObject.id;
-
-	this.trackSliderObj.setAttribute('trackIndex',audioObject.id);
-	this.trackSliderObj.innerHTML = '<span>'+audioObject.id+'</span>';
+	this.trackSliderObjects = [];
+	for (var i=0; i<interfaceObjects.length; i++)
+	{
+		var trackObj = document.createElement('div');
+		trackObj.className = 'track-slider track-slider-disabled track-slider-'+audioObject.id;
+		trackObj.id = 'track-slider-'+i+'-'+audioObject.id;
+		trackObj.setAttribute('trackIndex',audioObject.id);
+		trackObj.innerHTML = '<span>'+audioObject.id+'</span>';
+		if (interfaceObjects[i].name != undefined) {
+			trackObj.setAttribute('interface-name',interfaceObjects[i].name);
+		} else {
+			trackObj.setAttribute('interface-name',i);
+		}
+		this.trackSliderObjects.push(trackObj);
+		var slider = document.getElementById("slider-"+trackObj.getAttribute("interface-name"));
+		var offset = Number(slider.attributes['marginsize'].value);
+		// Distribute it randomnly
+		var w = window.innerWidth - (offset+8)*2;
+		w = Math.random()*w;
+		w = Math.floor(w+(offset+8));
+		trackObj.style.left = w+'px';
+		slider.appendChild(trackObj);
+	}
 
 	// Onclick, switch playback to that track
 	
 	this.enable = function() {
 		if (this.parent.state == 1)
 		{
-			$(this.trackSliderObj).removeClass('track-slider-disabled');
+			$(this.trackSliderObjects).each(function(i,trackObj){
+				$(trackObj).removeClass('track-slider-disabled');
+			});
 		}
 	};
 	
 	this.exportXMLDOM = function(audioObject) {
 		// Called by the audioObject holding this element. Must be present
-		var node = document.createElement('value');
-		node.textContent = convSliderPosToRate(this.trackSliderObj);
-		return node;
+		var obj = [];
+		$(this.trackSliderObjects).each(function(i,trackObj){
+			var node = document.createElement('value');
+			node.setAttribute("name",trackObj.getAttribute("interface-name"));
+			node.textContent = convSliderPosToRate(trackObj);
+			obj.push(node);
+		});
+		
+		return obj;
 	};
 	this.getValue = function() {
 		return convSliderPosToRate(this.trackSliderObj);
@@ -596,12 +611,13 @@ function buttonSubmitClick()
     } 
 }
 
-function convSliderPosToRate(slider)
+function convSliderPosToRate(trackSlider)
 {
-	var w = document.getElementById('slider').style.width;
-	var marginsize = Number(document.getElementById('slider').attributes['marginsize'].value);
+	var slider = trackSlider.parentElement;
+	var w = slider.style.width;
+	var marginsize = Number(slider.attributes['marginsize'].value);
 	var maxPix = w.substr(0,w.length-2);
-	var pix = slider.style.left;
+	var pix = trackSlider.style.left;
 	pix = pix.substr(0,pix.length-2);
 	var rate = (pix-marginsize)/maxPix;
 	return rate;
