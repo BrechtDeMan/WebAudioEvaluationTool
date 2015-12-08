@@ -116,7 +116,7 @@ folder_name = os.path.join(folder_name, '')
 if render_figures:
     subprocess.call("python timeline_view_movement.py '"+folder_name+"'", shell=True)
     subprocess.call("python score_parser.py '"+folder_name+"'", shell=True)
-    subprocess.call("python score_plot.py '"+folder_name+"'", shell=True)
+    subprocess.call("python score_plot.py '"+folder_name+"ratings/'", shell=True)
 
 # get every XML file in folder
 files_list = os.listdir(folder_name)
