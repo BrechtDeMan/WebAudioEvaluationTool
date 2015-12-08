@@ -1070,10 +1070,10 @@ function audioObject(id) {
 		root.id = this.specification.id;
 		root.setAttribute('url',this.url);
 		var file = document.createElement('file');
-		file.setAttribute('sampleRate',this.buffer.sampleRate);
-		file.setAttribute('channels',this.buffer.numberOfChannels);
-		file.setAttribute('sampleCount',this.buffer.length);
-		file.setAttribute('duration',this.buffer.duration);
+		file.setAttribute('sampleRate',this.buffer.buffer.sampleRate);
+		file.setAttribute('channels',this.buffer.buffer.numberOfChannels);
+		file.setAttribute('sampleCount',this.buffer.buffer.length);
+		file.setAttribute('duration',this.buffer.buffer.duration);
 		root.appendChild(file);
 		if (this.specification.type != 'outsidereference') {
 			var interfaceXML = this.interfaceDOM.exportXMLDOM(this);
@@ -1510,7 +1510,6 @@ function Specification() {
 		}
 		
 		this.commonInterface = new function() {
-			this.name = undefined;
 			this.OptionNode = function(child) {
 				this.type = child.nodeName;
 				if (this.type == 'option')
@@ -1544,10 +1543,6 @@ function Specification() {
 			};
 			this.options = [];
 			if (commonInterfaceNode != undefined) {
-				var name = commonInterfaceNode.getAttribute("name");
-				if (name != undefined) {
-					this.name = name;
-				}
 				var child = commonInterfaceNode.firstElementChild;
 				while (child != undefined) {
 					this.options.push(new this.OptionNode(child));
@@ -1928,11 +1923,14 @@ function Specification() {
 			this.title = undefined;
 			this.options = [];
 			this.scale = [];
+			this.name = undefined;
 			this.decode = function(DOM)
 			{
 				var title = DOM.getElementsByTagName('title');
 				if (title.length == 0) {this.title = null;}
 				else {this.title = title[0].textContent;}
+				var name = DOM.getAttribute("name");
+				if (name != undefined) {this.name = name;}
 				this.options = parent.commonInterface.options;
 				var scale = DOM.getElementsByTagName('scale');
 				this.scale = [];

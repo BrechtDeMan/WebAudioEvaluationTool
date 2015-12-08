@@ -7,8 +7,6 @@
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
-var clicking = -1;
-
 function loadInterface() {
 	
 	// Get the dimensions of the screen available to the page
@@ -310,7 +308,7 @@ function loadTest(audioHolderObject)
 		// Create the slider box to hold the slider elements
 		var canvas = document.createElement('div');
 		if (interfaceObj[k].name != undefined)
-			canvas.id = 'slider-'+name;
+			canvas.id = 'slider-'+interfaceObj[k].name;
 		else
 			canvas.id = 'slider-'+k;
 		canvas.className = 'slider';
