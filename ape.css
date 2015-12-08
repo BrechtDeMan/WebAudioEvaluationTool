@@ -33,11 +33,17 @@ div.slider {
 	background-color: #eee;
 	height: 150px;
 	margin-bottom: 5px;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
 }
 
 div.sliderScale {
 	width: 100%;
 	min-height: 30px;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
 }
 
 div.sliderScale span {
@@ -55,6 +61,9 @@ div.track-slider {
 	width: 12px;
 	float: left;
 	background-color: rgb(100,200,100);
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
 }
 
 div#outside-reference {
