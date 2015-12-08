@@ -14,7 +14,8 @@ div.title {
 div.pageTitle {
 	width: auto;
 	height: 20px;
-	margin-top: 20px;
+	margin-top: 5px;
+	margin-bottom: 10px;
 }
 
 div.pageTitle span{
@@ -27,7 +28,7 @@ button {
 	background-color: #ddd
 }
 
-div#slider {
+div.slider {
 	/* Specify any structure for the slider holder interface */
 	background-color: #eee;
 	height: 150px;
