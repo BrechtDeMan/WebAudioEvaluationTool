@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="save.php" randomiseOrder='true' collectMetrics='true' testPages="2">
+	<setup interface="APE" projectReturn="save.php" randomiseOrder='false' collectMetrics='true' testPages="2">
 		<PreTest>
 			<question id="sessionId" mandatory="true">Please enter your name.</question>
 			<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
@@ -34,12 +34,19 @@
 		</interface>
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
-		<interface>
-			<title>Example Test Question</title>
+		<interface name="preference">
+			<title>Preference</title>
 			<scale position="0">Min</scale>
 			<scale position="100">Max</scale>
 			<scale position="50">Middle</scale>
 			<scale position="20">20</scale>
+			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+		</interface>
+		<interface name="depth">
+			<title>Depth</title>
+			<scale position="0">Low</scale>
+			<scale position="100">High</scale>
+			<scale position="50">Middle</scale>
 			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
 		</interface>
 		<audioElements url="0.wav" id="0" type="anchor"/>
