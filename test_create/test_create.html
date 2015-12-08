@@ -1,0 +1,2981 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>WAET: Test Creator</title>
+
+		<meta name="viewport" content="width=device-width; initial-scale=1.0">
+		<script type="text/javascript">
+		
+			var APEInterfaceOptions = [["playhead","page-count"],["Show the playhead/scrubber bar", "Show test page count"]];
+			var APEInterfaceChecks = [["fragmentPlayed","fragmentFullPlayback","fragmentMoved","fragmentComments"],["All Fragments Played","All Fragments Played in entirety","All sliders moved","All fragments have comments"]];
+			var APEInterfaceMetrics = [["testTimer","elementTimer","elementTracker","elementTrackerFull","elementFlagListenedTo","elementFlagMoved","elementFlagComments"],["Test Duration","Total time each fragment was listened to","Return initialised position of marker","Fragment movement tracker with timestamps","Flag if fragment listened to","Flag if fragment moved","Flag if fragment has comments"]];
+			var MUSHRAInterfaceOptions = [[],[]];
+			var MUSHRAInterfaceChecks = [["fragmentPlayed","fragmentMoved","fragmentComments"],["All Fragments Played","All sliders moved","All fragments have comments"]];
+			var MUSHRAInterfaceMetrics = [["testTimer","elementTimer","elementTracker","elementTrackerFull","elementFlagListenedTo","elementFlagMoved","elementFlagComments"],["Test Duration","Total time each fragment was listened to","Return initialised position of marker","Fragment movement tracker with timestamps","Flag if fragment listened to","Flag if fragment moved","Flag if fragment has comments"]];
+			var popupInstance;
+			var specificationNode;
+			var audioContext;
+			var audioObjects = [];
+			window.onload = function()
+			{
+				var AudioContext = window.AudioContext || window.webkitAudioContext;
+				audioContext = new AudioContext;
+				popupInstance = new popup();
+				popupInstance.advanceState();
+				specificationNode = new Specification();
+				specificationNode.projectReturn = "null";
+			};
+			
+			function popup()
+			{
+				var x = window.innerWidth;
+				var y = window.innerHeight;
+				this.popupHolder = document.createElement('div');
+				this.popupHolder.style.visibility = 'hidden';
+				this.popupContent = document.createElement('div');
+				this.popupTitle = document.createElement('div');
+				this.popupBody = document.createElement('div');
+				this.popupFooter = document.createElement('div');
+				this.popupTitleText = document.createElement('span');
+				this.popupTitle.appendChild(this.popupTitleText);
+				
+				this.popupHolder.className = "popup";
+				this.popupHolder.style.left = (x-500)/2 +'px';
+				this.popupHolder.style.top = (y-400)/2 + 'px';
+				this.popupContent.style.padding = "20px";
+				this.popupHolder.appendChild(this.popupContent);
+				
+				this.popupTitle.style.width = "100%";
+				this.popupTitle.style.height = "50px";
+				this.popupTitle.style.fontSize = "xx-large";
+				this.popupContent.appendChild(this.popupTitle);
+				
+				this.popupBody.style.width = "100%";
+				this.popupBody.style.height = "280px";
+				this.popupContent.appendChild(this.popupBody);
+				
+				this.popupFooter.style.width = "100%";
+				this.popupFooter.style.height = "30px";
+				this.popupContent.appendChild(this.popupFooter);
+				var body = document.getElementsByTagName('body')[0];
+				body.appendChild(this.popupHolder);
+				
+				this.pageBlank = document.createElement('div');
+				body.appendChild(this.pageBlank);
+				this.pageBlank.style.width = "100%";
+				this.pageBlank.style.height = "100%";
+				this.pageBlank.style.position = "absolute";
+				this.pageBlank.style.left = "0px";
+				this.pageBlank.style.top = "0px";
+				this.pageBlank.style.backgroundColor = "rgba(0,0,0,0.5)";
+				this.pageBlank.style.visibility = 'hidden';
+				
+				this.state = 0;
+				this.dataTransfer = null;
+				
+				this.showPopup = function()
+				{
+					this.popupHolder.style.visibility = 'visible';
+					this.popupHolder.style.zIndex = "3";
+					this.pageBlank.style.visibility = 'visible';
+					this.pageBlank.style.zIndex = "2";
+				};
+				
+				this.hidePopup = function()
+				{
+					this.popupHolder.style.visibility = 'hidden';
+					this.popupHolder.style.zIndex = "-1";
+					this.pageBlank.style.visibility = 'hidden';
+					this.pageBlank.style.zIndex = "-2";
+				};
+				
+				this.init = function()
+				{
+					this.popupTitleText.textContent = "Welcome";
+					var text = document.createElement('span');
+					text.textContent = "Thank you for downloading the Web Audio Evaluation Toolbox. This page will help guide you through creating the documents required to run a test. If you have an existing XML file you wish to edit, please drag and drop it into the box below";
+					var dnd = document.createElement('div');
+					dnd.style.width = "100%";
+					dnd.style.height = "50px";
+					dnd.className = "dragndrop";
+					dnd.ondragover = function(e) {
+						e.stopPropagation();
+						e.preventDefault();
+					};
+					dnd.ondragenter = function(e) {
+						e.stopPropagation();
+						e.preventDefault();
+						this.style.backgroundColor = '#AAFFAA';
+					};
+					dnd.ondragleave = function(e) {
+						e.stopPropagation();
+						e.preventDefault();
+						this.style.backgroundColor = "#FFFFFF";
+					};
+					dnd.ondrop = function(e) {
+						e.stopPropagation();
+						e.preventDefault();
+						
+						var file = e.dataTransfer.files[0];
+						
+						// Uses HTML5 FileAPI - https://w3c.github.io/FileAPI/#filereader-interface
+						var reader = new FileReader();
+						reader.onload = function() {
+							var parse = new DOMParser();
+							var xml = parse.parseFromString(reader.result,'text/xml');
+							specificationNode.decode(xml);
+							popupInstance.hidePopup();
+							SpecificationToHTML();
+						};
+						reader.readAsText(file);
+						
+					};
+					this.popupBody.appendChild(text);
+					this.popupBody.appendChild(dnd);
+					this.showPopup();
+					
+					var button = document.createElement('button');
+					button.className = "popupButton";
+					button.textContent = "New File";
+					button.onclick = function(event) {
+						popupInstance.advanceState();
+					};
+					this.popupFooter.appendChild(button);
+				};
+				
+				this.advanceState = function()
+				{
+					this.popupBody.innerHTML = null;
+					this.popupFooter.innerHTML = null;
+					this.popupTitleText.textContent = null;
+					switch(this.state)
+					{
+					case 0:
+						this.init();
+						break;
+					case 1:
+						this.popupTitleText.textContent = "Test Type";
+						var text = document.createElement("span");
+						text.textContent = "What type of test would you like to use. Currently APE (Audio Perceptual Evaluation) and MUSHRA style interfaces are available";
+						this.popupBody.appendChild(text);
+						var select = document.createElement("select");
+						select.id="interface-select";
+						var opt1 = document.createElement("option");
+						opt1.value = "APE";
+						opt1.textContent = "APE";
+						select.appendChild(opt1);
+						var opt2 = document.createElement("option");
+						opt2.value = "MUSHRA";
+						opt2.textContent = "MUSHRA";
+						select.appendChild(opt2);
+						this.popupBody.appendChild(select);
+						
+						var button = document.createElement('button');
+						button.className = "popupButton";
+						button.textContent = "Submit";
+						button.onclick = function(event) {
+							var select = document.getElementById("interface-select");
+							specificationNode.interfaceType = select.value;
+							specificationNode.collectMetrics = true;
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						break;
+					case 2:
+						this.popupTitleText.textContent = "Test Options";
+						var holder = document.createElement('div');
+						holder.style.margin = "5px";
+						var checkbox = document.createElement('input');
+						checkbox.type = 'checkbox';
+						checkbox.id = "Randomise-Page";
+						var text = document.createElement('span');
+						text.textContent = "Randomise Page Order";
+						holder.appendChild(checkbox);
+						holder.appendChild(text);
+						this.popupBody.appendChild(holder);
+						switch(specificationNode.interfaceType)
+						{
+						case "APE":
+							for (var i=0; i<APEInterfaceOptions[0].length; i++)
+							{
+								holder = document.createElement('div');
+								holder.style.margin = "5px";
+								checkbox = document.createElement('input');
+								checkbox.type = 'checkbox';
+								checkbox.setAttribute("name","option");
+								checkbox.id = APEInterfaceOptions[0][i];
+								text = document.createElement('span');
+								text.textContent = APEInterfaceOptions[1][i];
+								holder.appendChild(checkbox);
+								holder.appendChild(text);
+								this.popupBody.appendChild(holder);
+							}
+							for (var i=0; i<APEInterfaceChecks[0].length; i++)
+							{
+								holder = document.createElement('div');
+								holder.style.margin = "5px";
+								checkbox = document.createElement('input');
+								checkbox.type = 'checkbox';
+								checkbox.setAttribute("name","check");
+								checkbox.id = APEInterfaceChecks[0][i];
+								text = document.createElement('span');
+								text.textContent = APEInterfaceChecks[1][i];
+								holder.appendChild(checkbox);
+								holder.appendChild(text);
+								this.popupBody.appendChild(holder);
+							}
+							break;
+						case "MUSHRA":
+							for (var i=0; i<MUSHRAInterfaceOptions[0].length; i++)
+							{
+								holder = document.createElement('div');
+								holder.style.margin = "5px";
+								checkbox = document.createElement('input');
+								checkbox.type = 'checkbox';
+								checkbox.setAttribute("name","option");
+								checkbox.id = MUSHRAInterfaceOptions[0][i];
+								text = document.createElement('span');
+								text.textContent = MUSHRAInterfaceOptions[1][i];
+								holder.appendChild(checkbox);
+								holder.appendChild(text);
+								this.popupBody.appendChild(holder);
+							}
+							for (var i=0; i<MUSHRAInterfaceChecks[0].length; i++)
+							{
+								holder = document.createElement('div');
+								holder.style.margin = "5px";
+								checkbox = document.createElement('input');
+								checkbox.type = 'checkbox';
+								checkbox.setAttribute("name","check");
+								checkbox.id = MUSHRAInterfaceChecks[0][i];
+								text = document.createElement('span');
+								text.textContent = MUSHRAInterfaceChecks[1][i];
+								holder.appendChild(checkbox);
+								holder.appendChild(text);
+								this.popupBody.appendChild(holder);
+							}
+						}
+						var button = document.createElement('button');
+						button.className = "popupButton";
+						button.textContent = "Submit";
+						button.onclick = function(event) {
+							var optHold = popupInstance.popupBody;
+							var opt = optHold.firstChild;
+							var input = opt.getElementsByTagName('input')[0];
+							specificationNode.randomiseOrder = input.checked;
+							while(opt.nextSibling != null)
+							{
+								opt = opt.nextSibling;
+								input = opt.getElementsByTagName('input')[0];
+								if (input.checked)
+								{
+									specificationNode.commonInterface.options.push(new specificationNode.commonInterface.optionNode(input));
+								}
+								
+							}
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						break;
+					case 3:
+						audioObjects = [];
+						this.popupTitleText.textContent = "Test Page";
+						var span = document.createElement('span');
+						span.textContent = "Drag and drop your audio files into the box below to add them to a test page";
+						this.popupBody.appendChild(span);
+						var dnd = document.createElement('div');
+						dnd.id = "audio-holder-drop";
+						dnd.style.width = "100%";
+						dnd.style.minHeight = "50px";
+						dnd.style.maxHeight = "220px";
+						dnd.style.overflow = 'auto';
+						dnd.className = "dragndrop";
+						dnd.ondragover = function(e) {
+							if(e.preventDefault) {e.preventDefault();}
+							return false;
+						};
+						dnd.ondragenter = function(e) {
+							if(e.preventDefault) {e.preventDefault();}
+							return false;
+						};
+						dnd.ondrop = function(e) {
+							if(e.preventDefault) {e.preventDefault();}
+							var dt = e.dataTransfer;
+							var body = document.getElementById("audio-holder-drop");
+							var files = dt.files;
+							for (var i = 0, f; f = files[i]; i++)
+							{
+								var ao = new audioObject();
+								ao.constructTrack(f);
+								audioObjects.push(ao);
+								var dndHeader = document.createElement('div');
+								dndHeader.style.width = "100%";
+								dndHeader.style.height = "20px";
+								dndHeader.style.borderBottom = "#DDD";
+								dndHeader.style.borderBottomWidth = "1px";
+								dndHeader.style.borderBottomStyle = "solid";
+								dndHeader.setAttribute('aoID',audioObjects.length-1);
+								var dndHInclude = document.createElement('div');
+								dndHInclude.style.width = "30px";
+								dndHInclude.className = "dndheaderelement";
+								var includeCheck = document.createElement('input');
+								includeCheck.type = "checkbox";
+								includeCheck.name = "include-check";
+								includeCheck.checked = true;
+								includeCheck.onchange = function()
+								{
+									var i = event.currentTarget.parentElement.parentElement.getAttribute('aoID');
+									audioObjects[i].include = event.currentTarget.checked;
+								};
+								dndHInclude.appendChild(includeCheck);
+								dndHeader.appendChild(dndHInclude);
+								var dndHTitle = document.createElement('div');
+								dndHTitle.style.width = "180px";
+								dndHTitle.className = "dndheaderelement";
+								var text = document.createElement('span');
+								text.textContent = f.name;
+								dndHTitle.appendChild(text);
+								dndHeader.appendChild(dndHTitle);
+								var dndHID = document.createElement('div');
+								dndHID.style.width = "100px";
+								dndHID.className = "dndheaderelement";
+								var IDInput = document.createElement('input');
+								IDInput.name = "audio-fragment-ID";
+								IDInput.value = f.name.split('.')[0];
+								IDInput.onchange = function()
+								{
+									var allIDInput = document.getElementsByName("audio-fragment-ID");
+									var isCopy = new Array(allIDInput.length);
+									isCopy.fill(0,0,this.length);
+									if (allIDInput.length > 1)
+									{
+										for (var j=0; j<allIDInput.length; j++)
+										{
+											var textCompare1 = allIDInput[j].value;
+											for (var k=j+1; k<allIDInput.length; k++)
+											{
+												var textCompare2 = allIDInput[k].value;
+												if (textCompare1 == textCompare2)
+												{
+													isCopy[j] = 1;
+													isCopy[k] = 1;
+												}
+											}
+										}
+									}
+									var button = document.getElementById('submit');
+									button.disabled = false;
+									for (var j=0; j<allIDInput.length; j++)
+									{
+										if (isCopy[j] == 1)
+										{
+											allIDInput[j].style.backgroundColor = '#F22';
+											button.disabled = true;
+										}
+										else
+										{
+											allIDInput[j].style.backgroundColor = '#FFF';
+											audioObjects[j].id = allIDInput[j].value;
+										}
+									}
+								};
+								IDInput.style.width = "96px";
+								dndHID.appendChild(IDInput);
+								dndHeader.appendChild(dndHID);
+								var dndHPlay = document.createElement('div');
+								dndHPlay.style.width = "100px";
+								dndHPlay.className = "dndheaderelement";
+								var audio = document.createElement('button');
+								audio.textContent = 'Play';
+								audio.className = "popupButton";
+								audio.style.height = "inherit";
+								audio.onclick = function()
+								{
+									var i = event.currentTarget.parentElement.parentElement.getAttribute('aoID');
+									audioObjects[i].play();
+								};
+								dndHPlay.appendChild(audio);
+								dndHeader.appendChild(dndHPlay);
+								dnd.appendChild(dndHeader);
+								IDInput.onchange();
+							}
+						};
+						var dndHeader = document.createElement('div');
+						dndHeader.style.width = "100%";
+						dndHeader.style.height = "15px";
+						dndHeader.style.borderBottom = "#DDD";
+						dndHeader.style.borderBottomWidth = "1px";
+						dndHeader.style.borderBottomStyle = "solid";
+						var dndHInclude = document.createElement('div');
+						dndHInclude.style.width = "30px";
+						dndHInclude.className = "dndheaderelement";
+						var text = document.createElement('span');
+						text.textContent = "Inc.";
+						dndHInclude.appendChild(text);
+						dndHeader.appendChild(dndHInclude);
+						var dndHTitle = document.createElement('div');
+						dndHTitle.style.width = "180px";
+						dndHTitle.className = "dndheaderelement";
+						text = document.createElement('span');
+						text.textContent = "File Name";
+						dndHTitle.appendChild(text);
+						dndHeader.appendChild(dndHTitle);
+						var dndHID = document.createElement('div');
+						dndHID.style.width = "100px";
+						dndHID.className = "dndheaderelement";
+						text = document.createElement('span');
+						text.textContent = "ID";
+						dndHID.appendChild(text);
+						dndHeader.appendChild(dndHID);
+						var dndHPlay = document.createElement('div');
+						dndHPlay.style.width = "100px";
+						dndHPlay.className = "dndheaderelement";
+						text = document.createElement('span');
+						text.textContent = "Sample";
+						dndHPlay.appendChild(text);
+						dndHeader.appendChild(dndHPlay);
+						dnd.appendChild(dndHeader);
+						this.popupBody.appendChild(dnd);
+						var button = document.createElement('button');
+						button.id = 'submit';
+						button.className = "popupButton";
+						button.textContent = "Submit";
+						button.onclick = function(event)
+						{
+							// Construct the audio-holder nodes;
+							for (var i=0; i<audioObjects.length; i++)
+							{
+								if (!audioObjects[i].include)
+								{
+									audioObjects.pop(audioObjects[i]);
+								}
+							}
+							if (audioObjects.length != 0)
+							{
+								popupInstance.advanceState();
+							}
+						};
+						this.popupFooter.appendChild(button);
+						break;
+					case 4:
+						this.popupTitleText.textContent = "Test Page - Options";
+						var span = document.createElement('span');
+						span.textContent = "Set your test page options here";
+						this.popupBody.appendChild(span);
+						var pair = document.createElement('div');
+						pair.style.margin = '5px';
+						var text = document.createElement('span');
+						text.textContent = "Page ID:";
+						var input = document.createElement('input');
+						input.value = specificationNode.audioHolders.length;
+						input.id = "id";
+						pair.appendChild(text);
+						pair.appendChild(input);
+						this.popupBody.appendChild(pair);
+						pair = document.createElement('div');
+						pair.style.margin = '5px';
+						text = document.createElement('span');
+						text.textContent = "Randomise Fragment Order";
+						input = document.createElement('input');
+						input.type = "checkbox";
+						input.id = "randomiseOrder";
+						pair.appendChild(input);
+						pair.appendChild(text);
+						this.popupBody.appendChild(pair);
+						pair = document.createElement('div');
+						pair.style.margin = '5px';
+						text = document.createElement('span');
+						text.textContent = "Loop Fragment Playback";
+						input = document.createElement('input');
+						input.type = "checkbox";
+						input.id = "loop";
+						pair.appendChild(input);
+						pair.appendChild(text);
+						this.popupBody.appendChild(pair);
+						pair = document.createElement('div');
+						pair.style.margin = '5px';
+						text = document.createElement('span');
+						text.textContent = "Show fragment comment boxes";
+						input = document.createElement('input');
+						input.type = "checkbox";
+						input.id = "elementComments";
+						pair.appendChild(input);
+						pair.appendChild(text);
+						this.popupBody.appendChild(pair);
+						var button = document.createElement('button');
+						button.id = 'submit';
+						button.className = "popupButton";
+						button.textContent = "Next";
+						button.onclick = function(event)
+						{
+							var ah = new specificationNode.audioHolderNode(specificationNode);
+							ah.id = document.getElementById('id').value;
+							ah.presentedId = specificationNode.audioHolders.length;
+							ah.hostURL = ah.id+'/';
+							ah.randomiseOrder = document.getElementById('randomiseOrder').checked;
+							ah.loop = document.getElementById('loop').checked;
+							ah.elementComments = document.getElementById('elementComments').checked;
+							for (var i=0; i<audioObjects.length; i++)
+							{
+								ah.audioElements.push(new ah.audioElementNode(ah,audioObjects[i]));
+							}
+							specificationNode.audioHolders.push(ah);
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						break;
+					case 5:
+						this.dataTransfer = null;
+						this.popupTitleText.textContent = "Test Page - Pre/Post Survey";
+						var span = document.createElement('span');
+						span.textContent = "Add your pre test page options here";
+						this.popupBody.appendChild(span);
+						var preHolder = document.createElement('div');
+						preHolder.id = "preHolder";
+						preHolder.style.width = "460px";
+						preHolder.style.minHeight = "100px";
+						preHolder.style.maxHeight = "220px";
+						preHolder.style.overflow = 'auto';
+						preHolder.style.border = "black";
+						preHolder.style.borderStyle = "solid";
+						preHolder.style.borderWidth = "1px";
+						this.popupBody.appendChild(preHolder);
+						var audioHolder = specificationNode.audioHolders[specificationNode.audioHolders.length-1];
+						var preHeaderHolder = document.createElement('div');
+						preHeaderHolder.style.width = "456px";
+						preHeaderHolder.style.height= "20px";
+						preHeaderHolder.style.margin= "2px";
+						preHeaderHolder.style.borderBottom = "#DDD";
+						preHeaderHolder.style.borderBottomWidth = "1px";
+						preHeaderHolder.style.borderBottomStyle = "solid";
+						var mvH = document.createElement('div');
+						mvH.className = "dndheaderelement";
+						mvH.style.width = "50px";
+						var text = document.createElement('span');
+						text.textContent = "Order";
+						mvH.appendChild(text);
+						preHeaderHolder.appendChild(mvH);
+						var idH = document.createElement('div');
+						idH.className = "dndheaderelement";
+						idH.style.width = "150px";
+						text = document.createElement('span');
+						text.textContent = "ID";
+						idH.appendChild(text);
+						preHeaderHolder.appendChild(idH);
+						var tH = document.createElement('div');
+						tH.className = "dndheaderelement";
+						tH.style.width = "150px";
+						text = document.createElement('span');
+						text.textContent = "Type";
+						tH.appendChild(text);
+						preHeaderHolder.appendChild(tH);
+						var editH = document.createElement('div');
+						editH.className = "dndheaderelement";
+						editH.style.width = "50px";
+						text = document.createElement('span');
+						text.textContent = "Edit";
+						editH.appendChild(text);
+						preHeaderHolder.appendChild(editH);
+						var deleteH = document.createElement('div');
+						deleteH.className = "dndheaderelement";
+						deleteH.style.width = "50px";
+						text = document.createElement('span');
+						text.textContent = "Delete";
+						deleteH.appendChild(text);
+						preHeaderHolder.appendChild(deleteH);
+						preHolder.appendChild(preHeaderHolder);
+						
+						
+						for (var i=0; i<audioHolder.preTest.options.length; i++)
+						{
+							var optionNode = audioHolder.preTest.options[i];
+							var entry = document.createElement('div');
+							entry.style.width = "456px";
+							entry.style.height= "20px";
+							entry.style.margin= "2px";
+							entry.style.borderBottom = "#DDD";
+							entry.style.borderBottomWidth = "1px";
+							entry.style.borderBottomStyle = "solid";
+							entry.setAttribute("node-id",i);
+							var node = audioHolder.preTest.options[i];
+							var mvH = document.createElement('div');
+							mvH.className = "dndheaderelement";
+							mvH.style.width = "50px";
+							var mvup = document.createElement("button");
+							mvup.textContent = "Up";
+							mvup.style.width = "25px";
+							mvup.style.padding = "1px 0px";
+							mvup.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								if (i != 0)
+								{
+									var next = audioHolder.preTest.options[i-1];
+									var cur = audioHolder.preTest.options[i];
+									audioHolder.preTest.options[i-1] = cur;
+									audioHolder.preTest.options[i] = next;
+									popupInstance.state = 5;
+									popupInstance.advanceState();
+								}
+							};
+							mvH.appendChild(mvup);
+							var mvdn = document.createElement("button");
+							mvdn.textContent = "Dn";
+							mvdn.style.width = "25px";
+							mvdn.style.padding = "1px 0px";
+							mvdn.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								if (i != audioHolder.preTest.options.length-1)
+								{
+									var next = audioHolder.preTest.options[i+1];
+									var cur = audioHolder.preTest.options[i];
+									audioHolder.preTest.options[i+1] = cur;
+									audioHolder.preTest.options[i] = next;
+									popupInstance.state = 5;
+									popupInstance.advanceState();
+								}
+							};
+							mvH.appendChild(mvdn);
+							entry.appendChild(mvH);
+							var idH = document.createElement('div');
+							idH.className = "dndheaderelement";
+							idH.style.width = "150px";
+							if (optionNode.type != "statement")
+							{
+								var span = document.createElement('span');
+								span.textContent = optionNode.id;
+								idH.appendChild(span);
+							}
+							entry.appendChild(idH);
+							var typeH = document.createElement('div');
+							typeH.className = "dndheaderelement";
+							typeH.style.width = "150px";
+							var span = document.createElement('span');
+							span.textContent = optionNode.type;
+							typeH.appendChild(span);
+							entry.appendChild(typeH);
+							var editH = document.createElement('div');
+							editH.className = "dndheaderelement";
+							editH.style.width = "50px";
+							var editButton = document.createElement("button");
+							editButton.textContent = "Edit";
+							editButton.style.width = "48px";
+							editButton.style.padding = "1px 0px";
+							editButton.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								popupInstance.dataTransfer = new function() {
+									this.title = "Edit Test Node";
+									this.parent = specificationNode.audioHolders[specificationNode.audioHolders.length-1].preTest;
+									this.node = this.parent.options[i];
+									this.previousState = 5;
+								};
+								popupInstance.advanceState();
+							};
+							editH.appendChild(editButton);
+							entry.appendChild(editH);
+							var deleteH = document.createElement('div');
+							deleteH.className = "dndheaderelement";
+							deleteH.style.width = "50px";
+							var deleteButton = document.createElement("button");
+							deleteButton.textContent = "Del";
+							deleteButton.style.width = "48px";
+							deleteButton.style.padding = "1px 0px";
+							deleteButton.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								var j = i+1;
+								while(j < audioHolder.preTest.options.length)
+								{
+									audioHolder.preTest.options[i] = audioHolder.preTest.options[j];
+									j++;
+									i++;
+								}
+								audioHolder.preTest.options.pop();
+								popupInstance.state = 5;
+								popupInstance.advanceState();
+							};
+							deleteH.appendChild(deleteButton);
+							entry.appendChild(deleteH);
+							preHolder.appendChild(entry);
+						}
+						var entry = document.createElement('div');
+						entry.style.width = "456px";
+						entry.style.height= "20px";
+						entry.style.margin= "2px";
+						entry.style.borderBottom = "#DDD";
+						entry.style.borderBottomWidth = "1px";
+						entry.style.borderBottomStyle = "solid";
+						entry.align = "center";
+						var addPre = document.createElement('button');
+						addPre.className = "popupButton";
+						addPre.textContent = "Add New Entry";
+						addPre.style.height = "20px";
+						addPre.onclick = function()
+						{
+							popupInstance.dataTransfer = new function() {
+								this.title = "New Pre Test Node";
+								this.parent = specificationNode.audioHolders[specificationNode.audioHolders.length-1].preTest;
+								this.node = null;
+								this.previousState = 5;
+							};
+							popupInstance.advanceState();
+						};
+						entry.appendChild(addPre);
+						preHolder.appendChild(entry);
+						
+						var span = document.createElement('span');
+						span.textContent = "Add your post test page options here";
+						this.popupBody.appendChild(span);
+						var postHolder = document.createElement('div');
+						postHolder.id = "preHolder";
+						postHolder.style.width = "100%";
+						postHolder.style.minHeight = "100px";
+						postHolder.style.maxHeight = "220px";
+						postHolder.style.overflow = 'auto';
+						postHolder.style.border = "black";
+						postHolder.style.borderStyle = "solid";
+						postHolder.style.borderWidth = "1px";
+						this.popupBody.appendChild(postHolder);
+						var postHeaderHolder = document.createElement('div');
+						postHeaderHolder.style.width = "456px";
+						postHeaderHolder.style.height= "20px";
+						postHeaderHolder.style.margin= "2px";
+						postHeaderHolder.style.borderBottom = "#DDD";
+						postHeaderHolder.style.borderBottomWidth = "1px";
+						postHeaderHolder.style.borderBottomStyle = "solid";
+						var mvH = document.createElement('div');
+						mvH.className = "dndheaderelement";
+						mvH.style.width = "50px";
+						var text = document.createElement('span');
+						text.textContent = "Order";
+						mvH.appendChild(text);
+						postHeaderHolder.appendChild(mvH);
+						var idH = document.createElement('div');
+						idH.className = "dndheaderelement";
+						idH.style.width = "150px";
+						text = document.createElement('span');
+						text.textContent = "ID";
+						idH.appendChild(text);
+						postHeaderHolder.appendChild(idH);
+						var tH = document.createElement('div');
+						tH.className = "dndheaderelement";
+						tH.style.width = "150px";
+						text = document.createElement('span');
+						text.textContent = "Type";
+						tH.appendChild(text);
+						postHeaderHolder.appendChild(tH);
+						var editH = document.createElement('div');
+						editH.className = "dndheaderelement";
+						editH.style.width = "50px";
+						text = document.createElement('span');
+						text.textContent = "Edit";
+						editH.appendChild(text);
+						postHeaderHolder.appendChild(editH);
+						var deleteH = document.createElement('div');
+						deleteH.className = "dndheaderelement";
+						deleteH.style.width = "50px";
+						text = document.createElement('span');
+						text.textContent = "Delete";
+						deleteH.appendChild(text);
+						postHeaderHolder.appendChild(deleteH);
+						postHolder.appendChild(postHeaderHolder);
+						
+						for (var i=0; i<audioHolder.postTest.options.length; i++)
+						{
+							var optionNode = audioHolder.postTest.options[i];
+							var entry = document.createElement('div');
+							entry.style.width = "456px";
+							entry.style.height= "20px";
+							entry.style.margin= "2px";
+							entry.style.borderBottom = "#DDD";
+							entry.style.borderBottomWidth = "1px";
+							entry.style.borderBottomStyle = "solid";
+							entry.setAttribute("node-id",i);
+							var node = audioHolder.postTest.options[i];
+							var mvH = document.createElement('div');
+							mvH.className = "dndheaderelement";
+							mvH.style.width = "50px";
+							var mvup = document.createElement("button");
+							mvup.textContent = "Up";
+							mvup.style.width = "25px";
+							mvup.style.padding = "1px 0px";
+							mvup.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								if (i != 0)
+								{
+									var next = audioHolder.postTest.options[i-1];
+									var cur = audioHolder.postTest.options[i];
+									audioHolder.postTest.options[i-1] = cur;
+									audioHolder.postTest.options[i] = next;
+									popupInstance.state = 5;
+									popupInstance.advanceState();
+								}
+							};
+							mvH.appendChild(mvup);
+							var mvdn = document.createElement("button");
+							mvdn.textContent = "Dn";
+							mvdn.style.width = "25px";
+							mvdn.style.padding = "1px 0px";
+							mvdn.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								if (i != audioHolder.postTest.options.length-1)
+								{
+									var next = audioHolder.postTest.options[i+1];
+									var cur = audioHolder.postTest.options[i];
+									audioHolder.postTest.options[i+1] = cur;
+									audioHolder.postTest.options[i] = next;
+									popupInstance.state = 5;
+									popupInstance.advanceState();
+								}
+							};
+							mvH.appendChild(mvdn);
+							entry.appendChild(mvH);
+							var idH = document.createElement('div');
+							idH.className = "dndheaderelement";
+							idH.style.width = "150px";
+							if (optionNode.type != "statement")
+							{
+								var span = document.createElement('span');
+								span.textContent = optionNode.id;
+								idH.appendChild(span);
+							}
+							entry.appendChild(idH);
+							var typeH = document.createElement('div');
+							typeH.className = "dndheaderelement";
+							typeH.style.width = "150px";
+							var span = document.createElement('span');
+							span.textContent = optionNode.type;
+							typeH.appendChild(span);
+							entry.appendChild(typeH);
+							var editH = document.createElement('div');
+							editH.className = "dndheaderelement";
+							editH.style.width = "50px";
+							var editButton = document.createElement("button");
+							editButton.textContent = "Edit";
+							editButton.style.width = "48px";
+							editButton.style.padding = "1px 0px";
+							editButton.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								popupInstance.dataTransfer = new function() {
+									this.title = "Edit Test Node";
+									this.parent = specificationNode.audioHolders[specificationNode.audioHolders.length-1].postTest;
+									this.node = this.parent.options[i];
+									this.previousState = 5;
+								};
+								popupInstance.advanceState();
+							};
+							editH.appendChild(editButton);
+							entry.appendChild(editH);
+							var deleteH = document.createElement('div');
+							deleteH.className = "dndheaderelement";
+							deleteH.style.width = "50px";
+							var deleteButton = document.createElement("button");
+							deleteButton.textContent = "Del";
+							deleteButton.style.width = "48px";
+							deleteButton.style.padding = "1px 0px";
+							deleteButton.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								var j = i+1;
+								while(j < audioHolder.postTest.options.length)
+								{
+									audioHolder.postTest.options[i] = audioHolder.postTest.options[j];
+									j++;
+									i++;
+								}
+								audioHolder.postTest.options.pop();
+								popupInstance.state = 5;
+								popupInstance.advanceState();
+							};
+							deleteH.appendChild(deleteButton);
+							entry.appendChild(deleteH);
+							postHolder.appendChild(entry);
+						}
+						
+						var entry = document.createElement('div');
+						entry.style.width = "456px";
+						entry.style.height= "20px";
+						entry.style.margin= "2px";
+						entry.style.borderBottom = "#DDD";
+						entry.style.borderBottomWidth = "1px";
+						entry.style.borderBottomStyle = "solid";
+						entry.align = "center";
+						var addPost = document.createElement('button');
+						addPost.className = "popupButton";
+						addPost.textContent = "Add New Entry";
+						addPost.style.height = "20px";
+						addPost.onclick = function()
+						{
+							popupInstance.dataTransfer = new function() {
+								this.title = "New Pre Test Node";
+								this.parent = specificationNode.audioHolders[specificationNode.audioHolders.length-1].postTest;
+								this.node = null;
+								this.previousState = 5;
+							};
+							popupInstance.advanceState();
+						};
+						entry.appendChild(addPost);
+						postHolder.appendChild(entry);
+						
+						var button = document.createElement('button');
+						button.id = 'submit';
+						button.className = "popupButton";
+						button.textContent = "Finish";
+						button.onclick = function(event)
+						{
+							popupInstance.state = 7;
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						button = document.createElement('button');
+						button.id = 'submit';
+						button.className = "popupButton";
+						button.textContent = "Add Another Page";
+						button.onclick = function(event)
+						{
+							popupInstance.state = 3;
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						break;
+					case 6:
+						this.popupTitleText.textContent = this.dataTransfer.title;
+						var span = document.createElement('span');
+						span.textContent = "Select survey settings here";
+						this.popupBody.appendChild(span);
+						var div = document.createElement('div');
+						span = document.createElement("span");
+						span.textContent = "Survey Type";
+						var select = document.createElement("select");
+						select.id="survey-select";
+						var option = document.createElement('option');
+						option.textContent = "Statement";
+						option.value = "statement";
+						select.appendChild(option);
+						option = document.createElement('option');
+						option.textContent = "Question";
+						option.value = "question";
+						select.appendChild(option);
+						option = document.createElement('option');
+						option.textContent = "Number";
+						option.value = "number";
+						select.appendChild(option);
+						option = document.createElement('option');
+						option.textContent = "Radio";
+						option.value = "radio";
+						select.appendChild(option);
+						option = document.createElement('option');
+						option.textContent = "Checkbox";
+						option.value = "checkbox";
+						select.appendChild(option);
+						this.popupBody.appendChild(select);
+						var options = document.createElement('div');
+						options.id = "survey-options";
+						this.popupBody.appendChild(options);
+						var button = document.createElement('button');
+						button.id = 'submit';
+						button.className = "popupButton";
+						button.textContent = "Add";
+						button.onclick = function(event)
+						{
+							var parent = popupInstance.dataTransfer.parent;
+							if (popupInstance.dataTransfer.node == null)
+							{
+								var node = new parent.OptionNode();
+							} else
+							{
+								var node = popupInstance.dataTransfer.node;
+							}
+							node.type = document.getElementById("survey-select").value;
+							switch(node.type)
+							{
+							case "statement":
+								node.statement = document.getElementById("statement").value;
+								break;
+							case "question":
+								node.question = document.getElementById("question").value;
+								node.id = document.getElementById("ID").value;
+								node.mandatory = document.getElementById("mandatory").checked;
+								node.boxsize = document.getElementById("boxsize").value;
+								break;
+							}
+							if (popupInstance.dataTransfer.node == null)
+							{parent.options.push(node);}
+							popupInstance.state = popupInstance.dataTransfer.previousState;
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						select.onchange = function()
+						{
+							var options = document.getElementById("survey-options");
+							options.innerHTML = null;
+							switch(this.value)
+							{
+							case "statement":
+								var span = document.createElement('span');
+								span.textContent = "Enter Statement";
+								var tA = document.createElement('textarea');
+								tA.id = "statement";
+								tA.style.width = "460px";
+								tA.style.height = "96px";
+								if (popupInstance.dataTransfer.node != null)
+								{tA.value = this.dataTransfer.node.statement;}
+								options.appendChild(span);
+								options.appendChild(tA);
+								break;
+							case "question":
+								var span = document.createElement('span');
+								span.textContent = "Enter Question";
+								var tA = document.createElement('textarea');
+								tA.style.width = "460px";
+								tA.style.height = "54px";
+								tA.id = "question";
+								options.appendChild(span);
+								options.appendChild(tA);
+								var div = document.createElement('div');
+								var input = document.createElement('input');
+								input.id = "ID";
+								span = document.createElement('span');
+								span.textContent = "ID:";
+								div.appendChild(span);
+								div.appendChild(input);
+								options.appendChild(div);
+								div = document.createElement('div');
+								input = document.createElement('input');
+								input.type = "checkbox";
+								input.id = "mandatory";
+								span = document.createElement('span');
+								span.textContent = "Mandatory";
+								div.appendChild(span);
+								div.appendChild(input);
+								options.appendChild(div);
+								div = document.createElement('div');
+								var boxsize = document.createElement("select");
+								boxsize.id = "boxsize";
+								var selOpt = document.createElement("option");
+								selOpt.value = "normal";
+								selOpt.textContent = "Normal";
+								boxsize.appendChild(selOpt);
+								selOpt = document.createElement("option");
+								selOpt.value = "small";
+								selOpt.textContent = "Small";
+								boxsize.appendChild(selOpt);
+								selOpt = document.createElement("option");
+								selOpt.value = "large";
+								selOpt.textContent = "Large";
+								boxsize.appendChild(selOpt);
+								selOpt = document.createElement("option");
+								selOpt.value = "huge";
+								selOpt.textContent = "Huge";
+								boxsize.appendChild(selOpt);
+								span = document.createElement('span');
+								span.textContent = "Response Text Area";
+								div.appendChild(span);
+								div.appendChild(boxsize);
+								options.appendChild(div);
+								if (popupInstance.dataTransfer.node != null)
+								{
+									tA.value = popupInstance.dataTransfer.node.question;
+									document.getElementById("ID").value = popupInstance.dataTransfer.node.id;
+									document.getElementById("mandatory").value = popupInstance.dataTransfer.node.mandatory;
+									document.getElementById("boxsize").value = popupInstance.dataTransfer.node.boxsize;
+								}
+								break;
+							case "number":
+								var span = document.createElement('span');
+								span.textContent = "Enter Question";
+								var tA = document.createElement('textarea');
+								tA.style.width = "460px";
+								tA.style.height = "54px";
+								tA.id = "question";
+								options.appendChild(span);
+								options.appendChild(tA);
+								var div = document.createElement('div');
+								var input = document.createElement('input');
+								input.id = "ID";
+								span = document.createElement('span');
+								span.textContent = "ID:";
+								div.appendChild(span);
+								div.appendChild(input);
+								options.appendChild(div);
+								div = document.createElement('div');
+								input = document.createElement('input');
+								input.type = "checkbox";
+								input.id = "mandatory";
+								span = document.createElement('span');
+								span.textContent = "Mandatory";
+								div.appendChild(span);
+								div.appendChild(input);
+								options.appendChild(div);
+								div = document.createElement('div');
+								break;
+							}
+						};
+						if (this.dataTransfer.node != null)
+						{
+							select.value = this.dataTransfer.node.type;
+						}
+						select.onchange();
+						break;
+					case 7:
+						this.dataTransfer = null;
+						this.popupTitleText.textContent = "Test Session - Pre/Post Survey";
+						var span = document.createElement('span');
+						span.textContent = "Add your pre test session and post test session survey options here";
+						this.popupBody.appendChild(span);
+						var preHolder = document.createElement('div');
+						preHolder.id = "preHolder";
+						preHolder.style.width = "460px";
+						preHolder.style.minHeight = "100px";
+						preHolder.style.maxHeight = "220px";
+						preHolder.style.overflow = 'auto';
+						preHolder.style.border = "black";
+						preHolder.style.borderStyle = "solid";
+						preHolder.style.borderWidth = "1px";
+						this.popupBody.appendChild(preHolder);
+						var preHeaderHolder = document.createElement('div');
+						preHeaderHolder.style.width = "456px";
+						preHeaderHolder.style.height= "20px";
+						preHeaderHolder.style.margin= "2px";
+						preHeaderHolder.style.borderBottom = "#DDD";
+						preHeaderHolder.style.borderBottomWidth = "1px";
+						preHeaderHolder.style.borderBottomStyle = "solid";
+						var mvH = document.createElement('div');
+						mvH.className = "dndheaderelement";
+						mvH.style.width = "50px";
+						var text = document.createElement('span');
+						text.textContent = "Order";
+						mvH.appendChild(text);
+						preHeaderHolder.appendChild(mvH);
+						var idH = document.createElement('div');
+						idH.className = "dndheaderelement";
+						idH.style.width = "150px";
+						text = document.createElement('span');
+						text.textContent = "ID";
+						idH.appendChild(text);
+						preHeaderHolder.appendChild(idH);
+						var tH = document.createElement('div');
+						tH.className = "dndheaderelement";
+						tH.style.width = "150px";
+						text = document.createElement('span');
+						text.textContent = "Type";
+						tH.appendChild(text);
+						preHeaderHolder.appendChild(tH);
+						var editH = document.createElement('div');
+						editH.className = "dndheaderelement";
+						editH.style.width = "50px";
+						text = document.createElement('span');
+						text.textContent = "Edit";
+						editH.appendChild(text);
+						preHeaderHolder.appendChild(editH);
+						var deleteH = document.createElement('div');
+						deleteH.className = "dndheaderelement";
+						deleteH.style.width = "50px";
+						text = document.createElement('span');
+						text.textContent = "Delete";
+						deleteH.appendChild(text);
+						preHeaderHolder.appendChild(deleteH);
+						preHolder.appendChild(preHeaderHolder);
+						
+						
+						for (var i=0; i<specificationNode.preTest.options.length; i++)
+						{
+							var optionNode = specificationNode.preTest.options[i];
+							var entry = document.createElement('div');
+							entry.style.width = "456px";
+							entry.style.height= "20px";
+							entry.style.margin= "2px";
+							entry.style.borderBottom = "#DDD";
+							entry.style.borderBottomWidth = "1px";
+							entry.style.borderBottomStyle = "solid";
+							entry.setAttribute("node-id",i);
+							var node = specificationNode.preTest.options[i];
+							var mvH = document.createElement('div');
+							mvH.className = "dndheaderelement";
+							mvH.style.width = "50px";
+							var mvup = document.createElement("button");
+							mvup.textContent = "Up";
+							mvup.style.width = "25px";
+							mvup.style.padding = "1px 0px";
+							mvup.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								if (i != 0)
+								{
+									var next = specificationNode.preTest.options[i-1];
+									var cur = specificationNode.preTest.options[i];
+									specificationNode.preTest.options[i-1] = cur;
+									specificationNode.preTest.options[i] = next;
+									popupInstance.state = 7;
+									popupInstance.advanceState();
+								}
+							};
+							mvH.appendChild(mvup);
+							var mvdn = document.createElement("button");
+							mvdn.textContent = "Dn";
+							mvdn.style.width = "25px";
+							mvdn.style.padding = "1px 0px";
+							mvdn.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								if (i != specificationNode.preTest.options.length-1)
+								{
+									var next = specificationNode.preTest.options[i+1];
+									var cur = specificationNode.preTest.options[i];
+									specificationNode.preTest.options[i+1] = cur;
+									specificationNode.preTest.options[i] = next;
+									popupInstance.state = 7;
+									popupInstance.advanceState();
+								}
+							};
+							mvH.appendChild(mvdn);
+							entry.appendChild(mvH);
+							var idH = document.createElement('div');
+							idH.className = "dndheaderelement";
+							idH.style.width = "150px";
+							if (optionNode.type != "statement")
+							{
+								var span = document.createElement('span');
+								span.textContent = optionNode.id;
+								idH.appendChild(span);
+							}
+							entry.appendChild(idH);
+							var typeH = document.createElement('div');
+							typeH.className = "dndheaderelement";
+							typeH.style.width = "150px";
+							var span = document.createElement('span');
+							span.textContent = optionNode.type;
+							typeH.appendChild(span);
+							entry.appendChild(typeH);
+							var editH = document.createElement('div');
+							editH.className = "dndheaderelement";
+							editH.style.width = "50px";
+							var editButton = document.createElement("button");
+							editButton.textContent = "Edit";
+							editButton.style.width = "48px";
+							editButton.style.padding = "1px 0px";
+							editButton.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								popupInstance.dataTransfer = new function() {
+									this.title = "Edit Test Node";
+									this.parent = specificationNode.preTest;
+									this.node = this.parent.options[i];
+									this.previousState = 7;
+								};
+								popupInstace.state = 6;
+								popupInstance.advanceState();
+							};
+							editH.appendChild(editButton);
+							entry.appendChild(editH);
+							var deleteH = document.createElement('div');
+							deleteH.className = "dndheaderelement";
+							deleteH.style.width = "50px";
+							var deleteButton = document.createElement("button");
+							deleteButton.textContent = "Del";
+							deleteButton.style.width = "48px";
+							deleteButton.style.padding = "1px 0px";
+							deleteButton.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								var j = i+1;
+								while(j < specificationNode.preTest.options.length)
+								{
+									specificationNode.preTest.options[i] = specificationNode.preTest.options[j];
+									j++;
+									i++;
+								}
+								specificationNode.preTest.options.pop();
+								popupInstance.state = 7;
+								popupInstance.advanceState();
+							};
+							deleteH.appendChild(deleteButton);
+							entry.appendChild(deleteH);
+							preHolder.appendChild(entry);
+						}
+						var entry = document.createElement('div');
+						entry.style.width = "456px";
+						entry.style.height= "20px";
+						entry.style.margin= "2px";
+						entry.style.borderBottom = "#DDD";
+						entry.style.borderBottomWidth = "1px";
+						entry.style.borderBottomStyle = "solid";
+						entry.align = "center";
+						var addPre = document.createElement('button');
+						addPre.className = "popupButton";
+						addPre.textContent = "Add New Entry";
+						addPre.style.height = "20px";
+						addPre.onclick = function()
+						{
+							popupInstance.dataTransfer = new function() {
+								this.title = "New Pre Test Node";
+								this.parent = specificationNode.preTest;
+								this.node = null;
+								this.previousState = 7;
+							};
+							popupInstance.state = 6;
+							popupInstance.advanceState();
+						};
+						entry.appendChild(addPre);
+						preHolder.appendChild(entry);
+						
+						var span = document.createElement('span');
+						span.textContent = "Add your post test page options here";
+						this.popupBody.appendChild(span);
+						var postHolder = document.createElement('div');
+						postHolder.id = "preHolder";
+						postHolder.style.width = "100%";
+						postHolder.style.minHeight = "100px";
+						postHolder.style.maxHeight = "220px";
+						postHolder.style.overflow = 'auto';
+						postHolder.style.border = "black";
+						postHolder.style.borderStyle = "solid";
+						postHolder.style.borderWidth = "1px";
+						this.popupBody.appendChild(postHolder);
+						var postHeaderHolder = document.createElement('div');
+						postHeaderHolder.style.width = "456px";
+						postHeaderHolder.style.height= "20px";
+						postHeaderHolder.style.margin= "2px";
+						postHeaderHolder.style.borderBottom = "#DDD";
+						postHeaderHolder.style.borderBottomWidth = "1px";
+						postHeaderHolder.style.borderBottomStyle = "solid";
+						var mvH = document.createElement('div');
+						mvH.className = "dndheaderelement";
+						mvH.style.width = "50px";
+						var text = document.createElement('span');
+						text.textContent = "Order";
+						mvH.appendChild(text);
+						postHeaderHolder.appendChild(mvH);
+						var idH = document.createElement('div');
+						idH.className = "dndheaderelement";
+						idH.style.width = "150px";
+						text = document.createElement('span');
+						text.textContent = "ID";
+						idH.appendChild(text);
+						postHeaderHolder.appendChild(idH);
+						var tH = document.createElement('div');
+						tH.className = "dndheaderelement";
+						tH.style.width = "150px";
+						text = document.createElement('span');
+						text.textContent = "Type";
+						tH.appendChild(text);
+						postHeaderHolder.appendChild(tH);
+						var editH = document.createElement('div');
+						editH.className = "dndheaderelement";
+						editH.style.width = "50px";
+						text = document.createElement('span');
+						text.textContent = "Edit";
+						editH.appendChild(text);
+						postHeaderHolder.appendChild(editH);
+						var deleteH = document.createElement('div');
+						deleteH.className = "dndheaderelement";
+						deleteH.style.width = "50px";
+						text = document.createElement('span');
+						text.textContent = "Delete";
+						deleteH.appendChild(text);
+						postHeaderHolder.appendChild(deleteH);
+						postHolder.appendChild(postHeaderHolder);
+						
+						for (var i=0; i<specificationNode.postTest.options.length; i++)
+						{
+							var optionNode = specificationNode.postTest.options[i];
+							var entry = document.createElement('div');
+							entry.style.width = "456px";
+							entry.style.height= "20px";
+							entry.style.margin= "2px";
+							entry.style.borderBottom = "#DDD";
+							entry.style.borderBottomWidth = "1px";
+							entry.style.borderBottomStyle = "solid";
+							entry.setAttribute("node-id",i);
+							var node = specificationNode.postTest.options[i];
+							var mvH = document.createElement('div');
+							mvH.className = "dndheaderelement";
+							mvH.style.width = "50px";
+							var mvup = document.createElement("button");
+							mvup.textContent = "Up";
+							mvup.style.width = "25px";
+							mvup.style.padding = "1px 0px";
+							mvup.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								if (i != 0)
+								{
+									var next = specificationNode.postTest.options[i-1];
+									var cur = specificationNode.postTest.options[i];
+									specificationNode.postTest.options[i-1] = cur;
+									specificationNode.postTest.options[i] = next;
+									popupInstance.state = 7;
+									popupInstance.advanceState();
+								}
+							};
+							mvH.appendChild(mvup);
+							var mvdn = document.createElement("button");
+							mvdn.textContent = "Dn";
+							mvdn.style.width = "25px";
+							mvdn.style.padding = "1px 0px";
+							mvdn.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								if (i != specificationNode.postTest.options.length-1)
+								{
+									var next = specificationNode.postTest.options[i+1];
+									var cur = specificationNode.postTest.options[i];
+									specificationNode.postTest.options[i+1] = cur;
+									specificationNode.postTest.options[i] = next;
+									popupInstance.state = 7;
+									popupInstance.advanceState();
+								}
+							};
+							mvH.appendChild(mvdn);
+							entry.appendChild(mvH);
+							var idH = document.createElement('div');
+							idH.className = "dndheaderelement";
+							idH.style.width = "150px";
+							if (optionNode.type != "statement")
+							{
+								var span = document.createElement('span');
+								span.textContent = optionNode.id;
+								idH.appendChild(span);
+							}
+							entry.appendChild(idH);
+							var typeH = document.createElement('div');
+							typeH.className = "dndheaderelement";
+							typeH.style.width = "150px";
+							var span = document.createElement('span');
+							span.textContent = optionNode.type;
+							typeH.appendChild(span);
+							entry.appendChild(typeH);
+							var editH = document.createElement('div');
+							editH.className = "dndheaderelement";
+							editH.style.width = "50px";
+							var editButton = document.createElement("button");
+							editButton.textContent = "Edit";
+							editButton.style.width = "48px";
+							editButton.style.padding = "1px 0px";
+							editButton.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								popupInstance.dataTransfer = new function() {
+									this.title = "Edit Test Node";
+									this.parent = specificationNode.postTest;
+									this.node = this.parent.options[i];
+									this.previousState = 7;
+								};
+								popupInstance.state = 6;
+								popupInstance.advanceState();
+							};
+							editH.appendChild(editButton);
+							entry.appendChild(editH);
+							var deleteH = document.createElement('div');
+							deleteH.className = "dndheaderelement";
+							deleteH.style.width = "50px";
+							var deleteButton = document.createElement("button");
+							deleteButton.textContent = "Del";
+							deleteButton.style.width = "48px";
+							deleteButton.style.padding = "1px 0px";
+							deleteButton.onclick = function()
+							{
+								var i = Number(event.currentTarget.parentElement.parentElement.getAttribute("node-id"));
+								var j = i+1;
+								while(j < specificationNode.postTest.options.length)
+								{
+									specificationNode.postTest.options[i] = specificationNode.postTest.options[j];
+									j++;
+									i++;
+								}
+								audioHolder.postTest.options.pop();
+								popupInstance.state = 7;
+								popupInstance.advanceState();
+							};
+							deleteH.appendChild(deleteButton);
+							entry.appendChild(deleteH);
+							postHolder.appendChild(entry);
+						}
+						
+						var entry = document.createElement('div');
+						entry.style.width = "456px";
+						entry.style.height= "20px";
+						entry.style.margin= "2px";
+						entry.style.borderBottom = "#DDD";
+						entry.style.borderBottomWidth = "1px";
+						entry.style.borderBottomStyle = "solid";
+						entry.align = "center";
+						var addPost = document.createElement('button');
+						addPost.className = "popupButton";
+						addPost.textContent = "Add New Entry";
+						addPost.style.height = "20px";
+						addPost.onclick = function()
+						{
+							popupInstance.dataTransfer = new function() {
+								this.title = "New Pre Test Node";
+								this.parent = specificationNode.postTest;
+								this.node = null;
+								this.previousState = 7;
+							};
+							popupInstance.state = 6;
+							popupInstance.advanceState();
+						};
+						entry.appendChild(addPost);
+						postHolder.appendChild(entry);
+						
+						var button = document.createElement('button');
+						button.id = 'submit';
+						button.className = "popupButton";
+						button.textContent = "Finish";
+						button.onclick = function(event)
+						{
+							popupInstance.state = 8;
+							popupInstance.advanceState();
+						};
+						this.popupFooter.appendChild(button);
+						break;
+					case 8:
+						this.hidePopup();
+						this.state = 0;
+						SpecificationToHTML ();
+					}
+					this.state++;
+				};
+			};
+			
+			function audioObject()
+			{
+				// Used to hold audio information in buffers for quick playback
+				this.bufferObject;
+				this.bufferNode = undefined;
+				this.state = 0;
+				this.gain = audioContext.createGain();
+				this.gain.connect(audioContext.destination);
+				this.include = true;
+				this.id = undefined;
+				this.file = undefined;
+				
+				this.play = function()
+				{
+					if (this.bufferNode != undefined)
+					{
+						this.bufferNode.stop(0);
+						this.bufferNode = undefined;
+					}
+					if(this.state == 1)
+					{
+						this.bufferNode = audioContext.createBufferSource();
+						this.bufferNode.connect(this.gain);
+						this.bufferNode.buffer = this.bufferObject;
+						this.bufferNode.onended = function(event) {
+							// Safari does not like using 'this' to reference the calling object!
+							event.currentTarget = undefined;
+						};
+						this.bufferNode.start(audioContext.currentTime);
+						this.bufferNode.stop(audioContext.currentTime+3);
+					}
+				};
+				
+				this.constructTrack = function(file) {
+					var reader = new FileReader();
+					this.file = file;
+					var audioObj = this;
+					// Create callback to decode the data asynchronously
+					reader.onloadend = function() {
+						audioContext.decodeAudioData(reader.result, function(decodedData) {
+							audioObj.bufferObject = decodedData;
+							audioObj.state = 1;
+						}, function(){});
+					};
+					reader.readAsArrayBuffer(file);
+				};
+			};
+			
+			function Specification() {
+				// Handles the decoding of the project specification XML into a simple JavaScript Object.
+				
+				this.interfaceType = null;
+				this.commonInterface = new function()
+				{
+					this.options = [];
+					this.optionNode = function(input)
+					{
+						var name = input.getAttribute('name');
+						this.type = name;
+						if(this.type == "option")
+						{
+							this.name = input.id;
+						} else if (this.type == "check")
+						{
+							this.check = input.id;
+						}
+					};
+				};
+				
+				this.randomiseOrder = function(input)
+				{
+					// This takes an array of information and randomises the order
+					var N = input.length;
+					
+					var inputSequence = []; // For safety purposes: keep track of randomisation
+					for (var counter = 0; counter < N; ++counter) 
+						inputSequence.push(counter) // Fill array
+					var inputSequenceClone = inputSequence.slice(0);
+					
+					var holdArr = [];
+					var outputSequence = [];
+					for (var n=0; n<N; n++)
+					{
+						// First pick a random number
+						var r = Math.random();
+						// Multiply and floor by the number of elements left
+						r = Math.floor(r*input.length);
+						// Pick out that element and delete from the array
+						holdArr.push(input.splice(r,1)[0]);
+						// Do the same with sequence
+						outputSequence.push(inputSequence.splice(r,1)[0]);
+					}
+					console.log(inputSequenceClone.toString()); // print original array to console
+					console.log(outputSequence.toString()); 	// print randomised array to console
+					return holdArr;
+				};
+				this.projectReturn = null;
+				this.randomiseOrder = null;
+				this.collectMetrics = null;
+				this.testPages = null;
+				this.audioHolders = [];
+				this.metrics = [];
+				
+				this.decode = function(projectXML) {
+					// projectXML - DOM Parsed document
+					this.projectXML = projectXML.childNodes[0];
+					var setupNode = projectXML.getElementsByTagName('setup')[0];
+					this.interfaceType = setupNode.getAttribute('interface');
+					this.projectReturn = setupNode.getAttribute('projectReturn');
+					this.testPages = setupNode.getAttribute('testPages');
+					if (setupNode.getAttribute('randomiseOrder') == "true") {
+						this.randomiseOrder = true;
+					} else {this.randomiseOrder = false;}
+					if (setupNode.getAttribute('collectMetrics') == "true") {
+						this.collectMetrics = true;
+					} else {this.collectMetrics = false;}
+					if (isNaN(Number(this.testPages)) || this.testPages == undefined)
+					{
+						this.testPages = null;
+					} else {
+						this.testPages = Number(this.testPages);
+						if (this.testPages == 0) {this.testPages = null;}
+					}
+					var metricCollection = setupNode.getElementsByTagName('Metric');
+					
+					var setupPreTestNode = setupNode.getElementsByTagName('PreTest');
+					if (setupPreTestNode.length != 0)
+					{
+						setupPreTestNode = setupPreTestNode[0];
+						this.preTest.construct(setupPreTestNode);
+					}
+					
+					var setupPostTestNode = setupNode.getElementsByTagName('PostTest');
+					if (setupPostTestNode.length != 0)
+					{
+						setupPostTestNode = setupPostTestNode[0];
+						this.postTest.construct(setupPostTestNode);
+					}
+					
+					if (metricCollection.length > 0) {
+						metricCollection = metricCollection[0].getElementsByTagName('metricEnable');
+						for (var i=0; i<metricCollection.length; i++) {
+							this.metrics.push(new this.metricNode(metricCollection[i].textContent));
+						}
+					}
+					
+					var commonInterfaceNode = setupNode.getElementsByTagName('interface');
+					if (commonInterfaceNode.length > 0) {
+						commonInterfaceNode = commonInterfaceNode[0];
+					} else {
+						commonInterfaceNode = undefined;
+					}
+					
+					this.commonInterface = new function() {
+						this.OptionNode = function(child) {
+							this.type = child.nodeName;
+							if (this.type == 'option')
+							{
+								this.name = child.getAttribute('name');
+							}
+							else if (this.type == 'check') {
+								this.check = child.getAttribute('name');
+								if (this.check == 'scalerange') {
+									this.min = child.getAttribute('min');
+									this.max = child.getAttribute('max');
+									if (this.min == null) {this.min = 1;}
+									else if (Number(this.min) > 1 && this.min != null) {
+										this.min = Number(this.min)/100;
+									} else {
+										this.min = Number(this.min);
+									}
+									if (this.max == null) {this.max = 0;}
+									else if (Number(this.max) > 1 && this.max != null) {
+										this.max = Number(this.max)/100;
+									} else {
+										this.max = Number(this.max);
+									}
+								}
+							} else if (this.type == 'anchor' || this.type == 'reference') {
+								this.value = Number(child.textContent);
+								this.enforce = child.getAttribute('enforce');
+								if (this.enforce == 'true') {this.enforce = true;}
+								else {this.enforce = false;}
+							}
+						};
+						this.options = [];
+						if (commonInterfaceNode != undefined) {
+							var child = commonInterfaceNode.firstElementChild;
+							while (child != undefined) {
+								this.options.push(new this.OptionNode(child));
+								child = child.nextElementSibling;
+							}
+						}
+					};
+					
+					var audioHolders = projectXML.getElementsByTagName('audioHolder');
+					for (var i=0; i<audioHolders.length; i++) {
+						var node = new this.audioHolderNode(this);
+						node.decode(this,audioHolders[i]);
+						this.audioHolders.push(node);
+					}
+					
+					// New check if we need to randomise the test order
+					if (this.randomiseOrder)
+					{
+				 		this.audioHolders = randomiseOrder(this.audioHolders);
+				 		for (var i=0; i<this.audioHolders.length; i++)
+				 		{
+				 			this.audioHolders[i].presentedId = i;
+				 		}
+					}
+					
+					if (this.testPages != null || this.testPages != undefined)
+					{
+						if (this.testPages > audioHolders.length)
+						{
+							console.log('Warning: You have specified '+audioHolders.length+' tests but requested '+this.testPages+' be completed!');
+							this.testPages = audioHolders.length;
+						}
+						var aH = this.audioHolders;
+						this.audioHolders = [];
+						for (var i=0; i<this.testPages; i++)
+						{
+							this.audioHolders.push(aH[i]);
+						}
+					}
+				};
+				
+				this.encode = function()
+				{
+					var root = document.implementation.createDocument(null,"BrowserEvalProjectDocument");
+					// First get all the <setup> tag compiled
+					var setupNode = root.createElement("setup");
+					setupNode.setAttribute('interface',this.interfaceType);
+					setupNode.setAttribute('projectReturn',this.projectReturn);
+					setupNode.setAttribute('randomiseOrder',this.randomiseOrder);
+					setupNode.setAttribute('collectMetrics',this.collectMetrics);
+					setupNode.setAttribute('testPages',this.testPages);
+					
+					var setupPreTest = root.createElement("PreTest");
+					for (var i=0; i<this.preTest.options.length; i++)
+					{
+						setupPreTest.appendChild(this.preTest.options[i].exportXML(root));
+					}
+					
+					var setupPostTest = root.createElement("PostTest");
+					for (var i=0; i<this.postTest.options.length; i++)
+					{
+						setupPostTest.appendChild(this.postTest.options[i].exportXML(root));
+					}
+					
+					setupNode.appendChild(setupPreTest);
+					setupNode.appendChild(setupPostTest);
+					
+					// <Metric> tag
+					var Metric = root.createElement("Metric");
+					for (var i=0; i<this.metrics.length; i++)
+					{
+						var metricEnable = root.createElement("metricEnable");
+						metricEnable.textContent = this.metrics[i].enabled;
+						Metric.appendChild(metricEnable);
+					}
+					setupNode.appendChild(Metric);
+					
+					// <interface> tag
+					var CommonInterface = root.createElement("interface");
+					for (var i=0; i<this.commonInterface.options.length; i++)
+					{
+						var CIObj = this.commonInterface.options[i];
+						var CINode = root.createElement(CIObj.type);
+						if (CIObj.type == "check") {CINode.setAttribute("name",CIObj.check);}
+						else {CINode.setAttribute("name",CIObj.name);}
+						CommonInterface.appendChild(CINode);
+					}
+					setupNode.appendChild(CommonInterface);
+					
+					root.getElementsByTagName("BrowserEvalProjectDocument")[0].appendChild(setupNode);
+					// Time for the <audioHolder> tags
+					for (var ahIndex = 0; ahIndex < this.audioHolders.length; ahIndex++)
+					{
+						var node = this.audioHolders[ahIndex].encode(root);
+						root.getElementsByTagName("BrowserEvalProjectDocument")[0].appendChild(node);
+					}
+					return root;
+				};
+				
+				this.prepostNode = function(type) {
+					this.type = type;
+					this.options = [];
+					
+					this.OptionNode = function() {
+						
+						this.childOption = function() {
+							this.type = 'option';
+							this.id = null;
+							this.name = undefined;
+							this.text = null;
+						};
+						
+						this.type = undefined;
+						this.id = undefined;
+						this.mandatory = undefined;
+						this.question = undefined;
+						this.statement = undefined;
+						this.boxsize = undefined;
+						this.options = [];
+						this.min = undefined;
+						this.max = undefined;
+						this.step = undefined;
+						
+						this.decode = function(child)
+						{
+							this.type = child.nodeName;
+							if (child.nodeName == "question") {
+								this.id = child.id;
+								this.mandatory;
+								if (child.getAttribute('mandatory') == "true") {this.mandatory = true;}
+								else {this.mandatory = false;}
+								this.question = child.textContent;
+								if (child.getAttribute('boxsize') == null) {
+									this.boxsize = 'normal';
+								} else {
+									this.boxsize = child.getAttribute('boxsize');
+								}
+							} else if (child.nodeName == "statement") {
+								this.statement = child.textContent;
+							} else if (child.nodeName == "checkbox" || child.nodeName == "radio") {
+								var element = child.firstElementChild;
+								this.id = child.id;
+								if (element == null) {
+									console.log('Malformed' +child.nodeName+ 'entry');
+									this.statement = 'Malformed' +child.nodeName+ 'entry';
+									this.type = 'statement';
+								} else {
+									this.options = [];
+									while (element != null) {
+										if (element.nodeName == 'statement' && this.statement == undefined){
+											this.statement = element.textContent;
+										} else if (element.nodeName == 'option') {
+											var node = new this.childOption();
+											node.id = element.id;
+											node.name = element.getAttribute('name');
+											node.text = element.textContent;
+											this.options.push(node);
+										}
+										element = element.nextElementSibling;
+									}
+								}
+							} else if (child.nodeName == "number") {
+								this.statement = child.textContent;
+								this.id = child.id;
+								this.min = child.getAttribute('min');
+								this.max = child.getAttribute('max');
+								this.step = child.getAttribute('step');
+							}
+						};
+						
+						this.exportXML = function(root)
+						{
+							var node = root.createElement(this.type);
+							switch(this.type)
+							{
+							case "statement":
+								node.textContent = this.statement;
+								break;
+							case "question":
+								node.id = this.id;
+								node.setAttribute("mandatory",this.mandatory);
+								node.setAttribute("boxsize",this.boxsize);
+								node.textContent = this.question;
+								break;
+							case "number":
+								node.id = this.id;
+								node.setAttribute("mandatory",this.mandatory);
+								node.setAttribute("min", this.min);
+								node.setAttribute("max", this.max);
+								node.setAttribute("step", this.step);
+								node.textContent = this.statement;
+								break;
+							case "checkbox":
+								node.id = this.id;
+								var statement = root.createElement("statement");
+								statement.textContent = this.statement;
+								node.appendChild(statement);
+								for (var i=0; i<this.options.length; i++)
+								{
+									var option = this.options[i];
+									var optionNode = root.createElement("option");
+									optionNode.id = option.id;
+									optionNode.textContent = option.text;
+									node.appendChild(optionNode);
+								}
+								break;
+							case "radio":
+								node.id = this.id;
+								var statement = root.createElement("statement");
+								statement.textContent = this.statement;
+								node.appendChild(statement);
+								for (var i=0; i<this.options.length; i++)
+								{
+									var option = this.options[i];
+									var optionNode = root.createElement("option");
+									optionNode.setAttribute("name",option.name);
+									optionNode.textContent = option.text;
+									node.appendChild(optionNode);
+								}
+								break;
+							}
+							return node;
+						};
+					};
+					this.construct = function(Collection)
+					{
+						if (Collection.childElementCount != 0) {
+							var child = Collection.firstElementChild;
+							var node = new this.OptionNode();
+							node.decode(child);
+							this.options.push(node);
+							while (child.nextElementSibling != null) {
+								child = child.nextElementSibling;
+								node = new this.OptionNode();
+								node.decode(child);
+								this.options.push(node);
+							}
+						}
+					};
+				};
+				this.preTest = new this.prepostNode("pretest");
+				this.postTest = new this.prepostNode("posttest");
+				
+				this.metricNode = function(name) {
+					this.enabled = name;
+				};
+				
+				this.audioHolderNode = function(parent) {
+					this.type = 'audioHolder';
+					this.presentedId = undefined;
+					this.id = undefined;
+					this.hostURL = undefined;
+					this.sampleRate = undefined;
+					this.randomiseOrder = undefined;
+					this.loop = undefined;
+					this.elementComments = undefined;
+					this.outsideReference = null;
+					this.preTest = new parent.prepostNode("pretest");
+					this.postTest = new parent.prepostNode("pretest");
+					this.interfaces = [];
+					this.commentBoxPrefix = "Comment on track";
+					this.audioElements = [];
+					this.commentQuestions = [];
+					
+					this.decode = function(parent,xml)
+					{
+						this.presentedId = parent.audioHolders.length;
+						this.id = xml.id;
+						this.hostURL = xml.getAttribute('hostURL');
+						this.sampleRate = xml.getAttribute('sampleRate');
+						if (xml.getAttribute('randomiseOrder') == "true") {this.randomiseOrder = true;}
+						else {this.randomiseOrder = false;}
+						this.repeatCount = xml.getAttribute('repeatCount');
+						if (xml.getAttribute('loop') == 'true') {this.loop = true;}
+						else {this.loop == false;}
+						if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
+						else {this.elementComments = false;}
+						
+						var setupPreTestNode = xml.getElementsByTagName('PreTest');
+						if (setupPreTestNode.length != 0)
+						{
+							setupPreTestNode = setupPreTestNode[0];
+							this.preTest.construct(setupPreTestNode);
+						}
+						
+						var setupPostTestNode = xml.getElementsByTagName('PostTest');
+						if (setupPostTestNode.length != 0)
+						{
+							setupPostTestNode = setupPostTestNode[0];
+							this.postTest.construct(setupPostTestNode);
+						}
+						
+						var interfaceDOM = xml.getElementsByTagName('interface');
+						for (var i=0; i<interfaceDOM.length; i++) {
+							var node = new this.interfaceNode();
+							node.decode(interfaceDOM[i]);
+							this.interfaces.push(node);
+						}
+						this.commentBoxPrefix = xml.getElementsByTagName('commentBoxPrefix');
+						if (this.commentBoxPrefix.length != 0) {
+							this.commentBoxPrefix = this.commentBoxPrefix[0].textContent;
+						} else {
+							this.commentBoxPrefix = "Comment on track";
+						}
+						var audioElementsDOM = xml.getElementsByTagName('audioElements');
+						for (var i=0; i<audioElementsDOM.length; i++) {
+							var node = new this.audioElementNode();
+							node.decode(this,audioElementsDOM[i]);
+							if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
+								if (this.outsideReference == null) {
+									this.outsideReference = node;
+								} else {
+									console.log('Error only one audioelement can be of type outsidereference per audioholder');
+									this.audioElements.push(node);
+									console.log('Element id '+audioElementsDOM[i].id+' made into normal node');
+								}
+							} else {
+								this.audioElements.push(node);
+							}
+						}
+						
+						if (this.randomiseOrder == true)
+						{
+							this.audioElements = randomiseOrder(this.audioElements);
+						}
+						
+						var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
+						for (var i=0; i<commentQuestionsDOM.length; i++) {
+							var node = new this.commentQuestionNode();
+							node.decode(commentQuestionsDOM[i]);
+							this.commentQuestions.push(node);
+						}
+					};
+					
+					this.encode = function(root)
+					{
+						var AHNode = root.createElement("audioHolder");
+						AHNode.id = this.id;
+						AHNode.setAttribute("hostURL",this.hostURL);
+						AHNode.setAttribute("sampleRate",this.sampleRate);
+						AHNode.setAttribute("randomiseOrder",this.randomiseOrder);
+						AHNode.setAttribute("repeatCount",this.repeatCount);
+						AHNode.setAttribute("loop",this.loop);
+						AHNode.setAttribute("elementComments",this.elementComments);
+						
+						for (var i=0; i<this.interfaces.length; i++)
+						{
+							AHNode.appendChild(this.interfaces[i].encode(root));
+						}
+						
+						for (var i=0; i<this.audioElements.length; i++) {
+							AHNode.appendChild(this.audioElements[i].encode(root));
+						}
+						// Create <CommentQuestion>
+						for (var i=0; i<this.commentQuestions.length; i++)
+						{
+							AHNode.appendChild(this.commentQuestions[i].exportXML(root));
+						}
+						
+						// Create <PreTest>
+						var AHPreTest = root.createElement("PreTest");
+						for (var i=0; i<this.preTest.options.length; i++)
+						{
+							AHPreTest.appendChild(this.preTest.options[i].exportXML(root));
+						}
+						
+						var AHPostTest = root.createElement("PostTest");
+						for (var i=0; i<this.postTest.options.length; i++)
+						{
+							AHPostTest.appendChild(this.postTest.options[i].exportXML(root));
+						}
+						AHNode.appendChild(AHPreTest);
+						AHNode.appendChild(AHPostTest);
+						return AHNode;
+					};
+					
+					this.interfaceNode = function() {
+						this.title = undefined;
+						this.options = [];
+						this.scale = [];
+						this.decode = function(DOM)
+						{
+							var title = DOM.getElementsByTagName('title');
+							if (title.length == 0) {this.title = null;}
+							else {this.title = title[0].textContent;}
+							this.options = parent.commonInterface.options;
+							var scale = DOM.getElementsByTagName('scale');
+							this.scale = [];
+							for (var i=0; i<scale.length; i++) {
+								var arr = [null, null];
+								arr[0] = scale[i].getAttribute('position');
+								arr[1] = scale[i].textContent;
+								this.scale.push(arr);
+							}
+						};
+						this.encode = function(root)
+						{
+							var node = root.createElement("interface");
+							if (this.title != undefined)
+							{
+								var title = root.createElement("title");
+								title.textContent = this.title;
+								node.appendChild(title);
+							}
+							for (var i=0; i<this.options.length; i++)
+							{
+								var optionNode = root.createElement(this.options[i].type);
+								if (this.options[i].type == "option")
+								{
+									optionNode.setAttribute("name",this.options[i].name);
+								} else if (this.options[i].type == "check") {
+									optionNode.setAttribute("check",this.options[i].check);
+								} else if (this.options[i].type == "scalerange") {
+									optionNode.setAttribute("min",this.options[i].min*100);
+									optionNode.setAttribute("max",this.options[i].max*100);
+								}
+								node.appendChild(optionNode);
+							}
+							for (var i=0; i<this.scale.length; i++) {
+								var scale = root.createElement("scale");
+								scale.setAttribute("position",this.scale[i][0]);
+								scale.textContent = this.scale[i][1];
+								node.appendChild(scale);
+							}
+							return node;
+						};
+					};
+					
+					this.audioElementNode = function() {
+						this.url = null;
+						this.id = null;
+						this.parent = null;
+						this.type = "normal";
+						this.marker = false;
+						this.enforce = false;
+						this.decode = function(parent,xml)
+						{
+							this.url = xml.getAttribute('url');
+							this.id = xml.id;
+							this.parent = parent;
+							this.type = xml.getAttribute('type');
+							if (this.type == null) {this.type = "normal";}
+							if (this.type == 'anchor') {this.anchor = true;}
+							else {this.anchor = false;}
+							if (this.type == 'reference') {this.reference = true;}
+							else {this.reference = false;}
+							
+							if (this.anchor == true || this.reference == true)
+							{
+								this.marker = xml.getAttribute('marker');
+								if (this.marker != undefined)
+								{
+									this.marker = Number(this.marker);
+									if (isNaN(this.marker) == false)
+									{
+										if (this.marker > 1)
+										{	this.marker /= 100.0;}
+										if (this.marker >= 0 && this.marker <= 1)
+										{
+											this.enforce = true;
+											return;
+										} else {
+											console.log("ERROR - Marker of audioElement "+this.id+" is not between 0 and 1 (float) or 0 and 100 (integer)!");
+											console.log("ERROR - Marker not enforced!");
+										}
+									} else {
+										console.log("ERROR - Marker of audioElement "+this.id+" is not a number!");
+										console.log("ERROR - Marker not enforced!");
+									}
+								}
+							}
+						};
+						this.encode = function(root)
+						{
+							var AENode = root.createElement("audioElements");
+							AENode.id = this.id;
+							AENode.setAttribute("url",this.url);
+							AENode.setAttribute("type",this.type);
+							if (this.marker != false)
+							{
+								AENode.setAttribute("marker",this.marker*100);
+							}
+							return AENode;
+						};
+					};
+					
+					this.commentQuestionNode = function(xml) {
+						this.id = null;
+						this.type = undefined;
+						this.question = undefined;
+						this.options = [];
+						this.statement = undefined;
+						
+						this.childOption = function() {
+							this.type = 'option';
+							this.name = null;
+							this.text = null;
+						};
+						this.exportXML = function(root)
+						{
+							var CQNode = root.createElement("CommentQuestion");
+							CQNode.id = this.id;
+							CQNode.setAttribute("type",this.type);
+							switch(this.type)
+							{
+							case "text":
+								CQNode.textContent = this.question;
+								break;
+							case "radio":
+								var statement = root.createElement("statement");
+								statement.textContent = this.statement;
+								CQNode.appendChild(statement);
+								for (var i=0; i<this.options.length; i++)
+								{
+									var optionNode = root.createElement("option");
+									optionNode.setAttribute("name",this.options[i].name);
+									optionNode.textContent = this.options[i].text;
+									CQNode.appendChild(optionNode);
+								}
+								break;
+							case "checkbox":
+								var statement = root.createElement("statement");
+								statement.textContent = this.statement;
+								CQNode.appendChild(statement);
+								for (var i=0; i<this.options.length; i++)
+								{
+									var optionNode = root.createElement("option");
+									optionNode.setAttribute("name",this.options[i].name);
+									optionNode.textContent = this.options[i].text;
+									CQNode.appendChild(optionNode);
+								}
+								break;
+							}
+							return CQNode;
+						};
+						this.decode = function(xml) {
+							this.id = xml.id;
+							if (xml.getAttribute('mandatory') == 'true') {this.mandatory = true;}
+							else {this.mandatory = false;}
+							this.type = xml.getAttribute('type');
+							if (this.type == undefined) {this.type = 'text';}
+							switch (this.type) {
+							case 'text':
+								this.question = xml.textContent;
+								break;
+							case 'radio':
+								var child = xml.firstElementChild;
+								this.options = [];
+								while (child != undefined) {
+									if (child.nodeName == 'statement' && this.statement == undefined) {
+										this.statement = child.textContent;
+									} else if (child.nodeName == 'option') {
+										var node = new this.childOption();
+										node.name = child.getAttribute('name');
+										node.text = child.textContent;
+										this.options.push(node);
+									}
+									child = child.nextElementSibling;
+								}
+								break;
+							case 'checkbox':
+								var child = xml.firstElementChild;
+								this.options = [];
+								while (child != undefined) {
+									if (child.nodeName == 'statement' && this.statement == undefined) {
+										this.statement = child.textContent;
+									} else if (child.nodeName == 'option') {
+										var node = new this.childOption();
+										node.name = child.getAttribute('name');
+										node.text = child.textContent;
+										this.options.push(node);
+									}
+									child = child.nextElementSibling;
+								}
+								break;
+							}
+						};
+					};
+				};
+			}
+		
+			function createDeleteNodeButton(node)
+			{
+				var button = document.createElement("button");
+				button.textContent = "Delete";
+				button.onclick = function(event)
+				{
+					var node = event.target.parentElement;
+					node.parentElement.removeChild(node);	
+				};
+				return button;
+			}
+			
+			function SpecificationToHTML()
+			{
+				// Take information from Specification Node and format it into an HTML layout
+				var destination = document.getElementById("content");
+				// Setup Header Node
+				var setupNode = document.createElement("div");
+				setupNode.className = "topLevel";
+				setupNode.name = "setup";
+				var title = document.createElement("h2");
+				title.textContent = "Setup";
+				setupNode.appendChild(title);
+				// Interface Type
+				var div = document.createElement("div");
+				div.name = "attributes";
+				div.style.margin = "5px";
+				var select = document.createElement("select");
+				select.id = "interfaceSelect";
+				select.style.margin = "5px";
+				var option = document.createElement("option");
+				option.value = "APE";
+				option.textContent = "APE";
+				select.appendChild(option);
+				option = document.createElement("option");
+				option.value = "MUSHRA";
+				option.textContent = "MUSHRA";
+				select.appendChild(option);
+				select.value = specificationNode.interfaceType;
+				select.onchange = function(event)
+				{
+					specificationNode.interfaceType = event.currentTarget.value;
+				};
+				var span = document.createElement("span");
+				span.textContent = "Interface Type";
+				div.appendChild(span);
+				div.appendChild(select);
+				// Project Return Attribute
+				span = document.createElement("span");
+				span.style.margin = "5px";
+				span.textContent = "Project Return";
+				var input = document.createElement("input");
+				input.value = specificationNode.projectReturn;
+				input.id = "projectReturn";
+				input.style.margin = "5px";
+				input.onchange = function(event) {
+					specificationNode.projectReturn = event.currentTarget.value;
+				};
+				div.appendChild(span);
+				div.appendChild(input);
+				// Randomise Order
+				span = document.createElement("span");
+				span.textContent = "Randomise Order";
+				input = document.createElement("input");
+				input.id = "randomiseOrder";
+				input.style.margin = "5px";
+				input.type = "checkbox";
+				input.checked = specificationNode.randomiseOrder;
+				input.onchange = function(event) {
+					specificationNode.randomiseOrder = event.currentTarget.checked;
+				};
+				div.appendChild(span);
+				div.appendChild(input);
+				setupNode.appendChild(div);
+				
+				// Now create the common Interface Node
+				var commonInterface = document.createElement("div");
+				commonInterface.id = "interface";
+				commonInterface.className = "SecondLevel";
+				var title = document.createElement("h3");
+				title.textContent = "Common Interface";
+				commonInterface.appendChild(title);
+				var div = document.createElement("div");
+				div.name = "attributes";
+				var interfaceOptions;
+				var interfaceChecks;
+				switch(select.value)
+				{
+				case "APE":
+					interfaceOptions = APEInterfaceOptions;
+					interfaceChecks = APEInterfaceChecks;
+					break;
+				case "MUSHRA":
+					interfaceOptions = MUSHRAInterfaceOptions;
+					interfaceChecks = MUSHRAInterfaceChecks;
+					break;
+				}
+				for (var i=0; i<interfaceOptions[0].length; i++)
+				{
+					var span = document.createElement("span");
+					span.textContent = interfaceOptions[1][i];
+					var input = document.createElement("input");
+					input.type = "checkbox";
+					input.id = interfaceOptions[0][i];
+					input.setAttribute("name", "option");
+					div.appendChild(input);
+					div.appendChild(span);
+					commonInterface.appendChild(div);
+					for (var j=0; j<specificationNode.commonInterface.options.length; j++)
+					{
+						if (specificationNode.commonInterface.options[j].name == interfaceOptions[0][i])
+						{
+							input.checked = true;
+							break;
+						}
+					}
+					input.onchange = function(event) {
+						var id = event.currentTarget.id;
+						if (event.currentTarget.checked) {
+							specificationNode.commonInterface.options.push(new specificationNode.commonInterface.optionNode(event.currentTarget));
+						} else {
+							for (var j=0; j<specificationNode.commonInterface.options.length; j++)
+							{
+								if (specificationNode.commonInterface.options[j].name == event.currentTarget.id)
+								{
+									specificationNode.commonInterface.options.splice(j,1);
+									break;
+								}
+							}
+						}
+					};
+				}
+				for (var i=0; i<interfaceChecks[0].length; i++)
+				{
+					var span = document.createElement("span");
+					span.textContent = interfaceChecks[1][i];
+					var input = document.createElement("input");
+					input.type = "checkbox";
+					input.id = interfaceChecks[0][i];
+					input.setAttribute("name", "check");
+					div.appendChild(input);
+					div.appendChild(span);
+					commonInterface.appendChild(div);
+					for (var j=0; j<specificationNode.commonInterface.options.length; j++)
+					{
+						if (specificationNode.commonInterface.options[j].check == interfaceChecks[0][i])
+						{
+							input.checked = true;
+							break;
+						}
+					}
+					input.onchange = function(event) {
+						var id = event.currentTarget.id;
+						if (event.currentTarget.checked) {
+							specificationNode.commonInterface.options.push(new specificationNode.commonInterface.optionNode(event.currentTarget));
+						} else {
+							for (var j=0; j<specificationNode.commonInterface.options.length; j++)
+							{
+								if (specificationNode.commonInterface.options[j].name == event.currentTarget.id)
+								{
+									specificationNode.commonInterface.options.splice(j,1);
+									break;
+								}
+							}
+						}
+					};
+				}
+				setupNode.appendChild(commonInterface);
+				// Now the Metric Node
+				var metrics = document.createElement("div");
+				metrics.id = "metrics";
+				metrics.className = "SecondLevel";
+				var title = document.createElement("h3");
+				title.textContent = "Metric Collections";
+				metrics.appendChild(title);
+				var div = document.createElement("div");
+				div.name = "attributes";
+				metrics.appendChild(div);
+				var supportedMetrics;
+				switch(select.value)
+				{
+				case "APE":
+					supportedMetrics = APEInterfaceMetrics;
+					break;
+				case "MUSHRA":
+					supportedMetrics = MUSHRAInterfaceMetrics;
+					break;
+				}
+				
+				for (var i=0; i<supportedMetrics[0].length; i++)
+				{
+					var span = document.createElement("span");
+					span.textContent = supportedMetrics[1][i];
+					var input = document.createElement("input");
+					input.type = "checkbox";
+					input.id = supportedMetrics[0][i];
+					div.appendChild(input);
+					div.appendChild(span);
+					for (var j=0; j<specificationNode.metrics.length; j++)
+					{
+						if (specificationNode.metrics[j].enabled == supportedMetrics[0][i])
+						{
+							input.checked = true;
+						}
+					}
+					input.onchange = function(event)
+					{
+						if (event.currentTarget.checked) {
+							specificationNode.metrics.push(new specificationNode.metricNode(event.currentTarget.id));
+						} else {
+							for (var j=0; j<specificationNode.metrics.length; j++)
+							{
+								if (specificationNode.metrics[j].enabled == event.currentTarget.id)
+								{
+									specificationNode.metrics.splice(j,1);
+									break;
+								}
+							}
+						}
+					};
+				}
+				
+				setupNode.appendChild(metrics);
+				
+				// Test Session Pre Test
+				var preTest = document.createElement("div");
+				preTest.id = "preTest";
+				preTest.className = "SecondLevel";
+				var title = document.createElement("h3");
+				title.textContent = "Pre test Survey";
+				preTest.appendChild(title);
+				var div = document.createElement("div");
+				div.name = "attributes";
+				for (var j=0; j<specificationNode.preTest.options.length; j++)
+				{
+					var node = PPSurveyToHTML(specificationNode.preTest.options[j]);
+					node.className = "SecondLevel";
+					node.id = preTest.id+"-"+j;
+					var del_button = document.createElement("button");
+					del_button.textContent = "Delete";
+					del_button.onclick = function(event) {
+						var node = event.currentTarget.parentElement;
+						var id = node.id.split("-")[1];
+						specificationNode.preTest.options.splice(id,1);
+						node.parentElement.removeChild(node);	
+					};
+					node.appendChild(del_button);
+					preTest.appendChild(node);
+				}
+				setupNode.appendChild(preTest);
+				
+				// Test Session Post Test
+				var postTest = document.createElement("div");
+				postTest.id = "postTest";
+				postTest.className = "SecondLevel";
+				var title = document.createElement("h3");
+				title.textContent = "Post test Survey";
+				postTest.appendChild(title);
+				var div = document.createElement("div");
+				div.name = "attributes";
+				
+				for (var j=0; j<specificationNode.postTest.options.length; j++)
+				{
+					var node = PPSurveyToHTML(specificationNode.postTest.options[j]);
+					node.className = "SecondLevel";
+					node.id = postTest.id+"-"+j;
+					var del_button = document.createElement("button");
+					del_button.textContent = "Delete";
+					del_button.onclick = function(event) {
+						var node = event.currentTarget.parentElement;
+						var id = node.id.split("-")[1];
+						specificationNode.postTest.options.splice(id,1);
+						node.parentElement.removeChild(node);	
+					};
+					node.appendChild(del_button);
+					postTest.appendChild(node);
+				}
+				
+				setupNode.appendChild(postTest);
+				
+				destination.appendChild(setupNode);
+				
+				// Now we step through the AudioHolders
+				for (var i=0; i<specificationNode.audioHolders.length; i++)
+				{
+					var aH = specificationNode.audioHolders[i];
+					var aHTML = document.createElement("div");
+					aHTML.name = "audioHolder";
+					aHTML.id = "audioHolder-"+i;
+					aHTML.className = "topLevel";
+					aHTML.appendChild(createDeleteNodeButton());
+					destination.appendChild(aHTML);
+					var title = document.createElement("h2");
+					title.textContent = "Audio Holder "+aH.id;
+					aHTML.appendChild(title);
+					var attributes = document.createElement("div");
+					attributes.name = "attributes";
+					aHTML.appendChild(attributes);
+					var text = document.createElement("span");
+					text.textContent = "ID: ";
+					var input = document.createElement("input");
+					input.id = aHTML.id+"-id";
+					input.value = aH.id;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						var aholderID = IDSplit[0]+"-"+IDSplit[1];
+						var aholder = document.getElementById(aholderID);
+						title = aholder.getElementsByTagName("h2")[0];
+						title.textContent = "Audio Holder "+event.currentTarget.value;
+						specificationNode.audioHolders[IDSplit[1]].id = event.currentTarget.value;
+					};
+					text.style.margin = "5px";
+					input.style.margin = "5px";
+					attributes.appendChild(text);
+					attributes.appendChild(input);
+					text = document.createElement("span");
+					text.textContent = "Host URL: ";
+					input = document.createElement("input");
+					input.id = aHTML.id+"-hostURL";
+					input.value = aH.hostURL;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						specificationNode.audioHolders[IDSplit[1]].hostURL = event.currentTarget.value;
+					};
+					text.style.margin = "5px";
+					input.style.margin = "5px";
+					attributes.appendChild(text);
+					attributes.appendChild(input);
+					text = document.createElement("span");
+					text.textContent = "Loop Fragments: ";
+					input = document.createElement("input");
+					input.id = aHTML.id+"-loop";
+					input.type = "checkbox";
+					input.checked = aH.loop;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						specificationNode.audioHolders[IDSplit[1]].loop = event.currentTarget.checked;
+					};
+					text.style.margin = "5px";
+					input.style.margin = "5px";
+					attributes.appendChild(text);
+					attributes.appendChild(input);
+					text = document.createElement("span");
+					text.textContent = "Randomise Order: ";
+					input = document.createElement("input");
+					input.id = aHTML.id+"-randomiseOrder";
+					input.type = "checkbox";
+					input.checked = aH.randomiseOrder;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						specificationNode.audioHolders[IDSplit[1]].randomiseOrder = event.currentTarget.checked;
+					};
+					text.style.margin = "5px";
+					input.style.margin = "5px";
+					attributes.appendChild(text);
+					attributes.appendChild(input);
+					text = document.createElement("span");
+					text.textContent = "Show Fragment Comments";
+					input = document.createElement("input");
+					input.id = aHTML.id+"-elementComments";
+					input.type = "checkbox";
+					input.checked = aH.elementComments;
+					input.onchange = function()
+					{
+						var IDSplit = event.currentTarget.id.split('-');
+						specificationNode.audioHolders[IDSplit[1]].elementComments = event.currentTarget.checked;
+					};
+					text.style.margin = "5px";
+					input.style.margin = "5px";
+					attributes.appendChild(text);
+					attributes.appendChild(input);
+					
+					// Test Session Pre Test
+					var preTest = document.createElement("div");
+					preTest.id = aHTML.id+"-pretest";
+					preTest.className = "SecondLevel";
+					var title = document.createElement("h3");
+					title.textContent = "Pre test Survey";
+					preTest.appendChild(title);
+					var div = document.createElement("div");
+					div.name = "attributes";
+					
+					for (var j=0; j<aH.preTest.options.length; j++)
+					{
+						var node = PPSurveyToHTML(aH.preTest.options[j]);
+						node.className = "SecondLevel";
+						node.id = preTest.id+"-"+j;
+						var button_delete = document.createElement("button");
+						button_delete.textContent = "Delete";
+						button_delete.onclick = function(event)
+						{
+							var node = event.currentTarget.parentElement;
+							var IDSplit = node.id.split("-");
+							var preTest = specificationNode.audioHolders[IDSplit[1]].preTest;
+							preTest.options.splice(IDSplit[3],1);
+							node.parentElement.removeChild(node);
+						};
+						node.appendChild(button_delete);
+						preTest.appendChild(node);
+					}
+					
+					aHTML.appendChild(preTest);
+					
+					// Test Session Post Test
+					var postTest = document.createElement("div");
+					postTest.id = aHTML.id+"-postTest";
+					postTest.className = "SecondLevel";
+					var title = document.createElement("h3");
+					title.textContent = "Post test Survey";
+					postTest.appendChild(title);
+					var div = document.createElement("div");
+					div.name = "attributes";
+					
+					for (var j=0; j<aH.postTest.options.length; j++)
+					{
+						var node = PPSurveyToHTML(aH.postTest.options[j]);
+						node.className = "SecondLevel";
+						node.id = postTest.id+"-"+j;
+						var button_delete = document.createElement("button");
+						button_delete.textContent = "Delete";
+						button_delete.onclick = function(event)
+						{
+							var node = event.currentTarget.parentElement;
+							var IDSplit = node.id.split("-");
+							var postTest = specificationNode.audioHolders[IDSplit[1]].postTest;
+							postTest.options.splice(IDSplit[3],1);
+							node.parentElement.removeChild(node);
+						};
+						node.appendChild(button_delete);
+						postTest.appendChild(node);
+					}
+					
+					aHTML.appendChild(postTest);
+					
+					//Audio Elements
+					var audioElems = document.createElement("div");
+					audioElems.id = aHTML.id+"-audioElements";
+					audioElems.className = "SecondLevel";
+					var title = document.createElement("h3");
+					title.textContent = "Audio Elements";
+					audioElems.appendChild(title);
+					for (var i=0; i<aH.audioElements.length; i++)
+					{
+						var entry = document.createElement("div");
+						entry.className = "SecondLevel";
+						entry.id = audioElems.id+"-"+aH.audioElements[i].id;
+						var text = document.createElement("span");
+						text.textContent = "ID:";
+						var input = document.createElement("input");
+						input.id = entry.id+"-id";
+						input.value = aH.audioElements[i].id;
+						input.onchange = function() {
+							var IDSplit = event.currentTarget.id.split("-");
+							var ahNode = specificationNode.audioHolders[IDSplit[1]];
+							ahNode.audioElements[IDSplit[3]].id = event.currentTarget.value;
+						};
+						text.style.margin = "5px";
+						input.style.margin = "5px";
+						entry.appendChild(text);
+						entry.appendChild(input);
+						text = document.createElement("span");
+						text.textContent = "URL:";
+						input = document.createElement("input");
+						input.id = entry.id+"-URL";
+						input.value = aH.audioElements[i].url;
+						input.onchange = function() {
+							var IDSplit = event.currentTarget.id.split("-");
+							var ahNode = specificationNode.audioHolders[IDSplit[1]];
+							ahNode.audioElements[IDSplit[3]].url = event.currentTarget.value;
+						};
+						text.style.margin = "5px";
+						input.style.margin = "5px";
+						entry.appendChild(text);
+						entry.appendChild(input);
+						var button_delete = document.createElement("button");
+						button_delete.textContent = "Delete";
+						button_delete.onclick = function() {
+							var node = event.currentTarget.parentElement;
+							var IDSplit = node.id.split("-");
+							var ahNode = specificationNode.audioHolders[IDSplit[1]];
+							ahNode.audioElements.splice(IDSplit[3],1);
+							node.parentElement.removeChild(node);
+						};
+						entry.appendChild(button_delete);
+						audioElems.appendChild(entry);
+					}
+					aHTML.appendChild(audioElems);
+				}
+				
+				function PPSurveyToHTML(node)
+				{
+					var holder = document.createElement("div");
+					var title = document.createElement("h4");
+					holder.appendChild(title);
+					var attributes = document.createElement("div");
+					holder.appendChild(attributes);
+					switch(node.type)
+					{
+					case "statement":
+						title.textContent = "Statement";
+						var tA = document.createElement("textarea");
+						attributes.style.height = "150px";
+						tA.style.width = "500px";
+						tA.style.height = "100px";
+						tA.value = node.statement;
+						attributes.appendChild(tA);
+						break;
+					case "question":
+						title.textContent = "Question";
+						var text = document.createElement("span");
+						text.textContent = "ID :";
+						var input = document.createElement("input");
+						input.name = "id";
+						input.value = node.id;
+						text.style.margin = "5px";
+						input.style.margin = "5px";
+						attributes.appendChild(text);
+						attributes.appendChild(input);
+						text = document.createElement("span");
+						text.textContent = "Question";
+						input = document.createElement("input");
+						input.name = "question";
+						input.style.width = "400px";
+						input.value = node.question;
+						text.style.margin = "5px";
+						input.style.margin = "5px";
+						attributes.appendChild(text);
+						attributes.appendChild(input);
+						text = document.createElement("span");
+						text.textContent = "Mandatory";
+						input = document.createElement("input");
+						input.name = "mandatory";
+						input.type = "checkbox";
+						input.checked = node.mandatory;
+						text.style.margin = "5px";
+						input.style.margin = "5px";
+						attributes.appendChild(text);
+						attributes.appendChild(input);
+						text = document.createElement("span");
+						text.textContent = "Reply box size";
+						input = document.createElement("select");
+						input.name = "boxsize";
+						var option = document.createElement("option");
+						option.textContent = "Normal";
+						option.value = "normal";
+						input.appendChild(option);
+						option = document.createElement("option");
+						option.textContent = "Large";
+						option.value = "large";
+						input.appendChild(option);
+						option = document.createElement("option");
+						option.textContent = "Small";
+						option.value = "small";
+						input.appendChild(option);
+						option = document.createElement("option");
+						option.textContent = "Huge";
+						option.value = "huge";
+						input.appendChild(option);
+						text.style.margin = "5px";
+						input.style.margin = "5px";
+						attributes.appendChild(text);
+						attributes.appendChild(input);
+						input.value = node.boxsize;
+						break;
+					}
+					return holder;
+				}
+			}
+			function exportToXML()
+			{
+				var xmlDoc = specificationNode.encode();
+				var oSerializer = new XMLSerializer();
+				xmlDoc = oSerializer.serializeToString(xmlDoc);
+				var parent = document.createElement("div");
+				var file = [xmlDoc];
+				var bb = new Blob(file,{type : 'application/xml'});
+				var dnlk = window.URL.createObjectURL(bb);
+				var a = document.createElement("a");
+				a.hidden = '';
+				a.href = dnlk;
+				a.download = "save.xml";
+				a.textContent = "Save File";
+				
+				popupInstance.showPopup();
+				popupInstance.popupBody.innerHTML = null;
+				var body = document.createElement("span");
+				body.textContent = "Right click and save the file using the link below. Place this file in your WAET directory as 'project.xml' in the example_eval/ directory. Place your media files in the location specified by the Host URL entries. If you wish to review this XML or edit it, refresh this tool and drag your XML document into the page on the welcome screen.";
+				popupInstance.popupBody.appendChild(body);
+				popupInstance.popupBody.appendChild(a);
+				popupInstance.popupTitle.innerHTML = "<span>Thank You</span>";
+			}
+		</script>
+		<style>
+			div.popup {
+				width: 500px;
+				position: absolute;
+				height: 400px;
+				background-color: #fff;
+				border-radius: 10px;
+				box-shadow: 0px 0px 50px #000;
+				z-index: 2;
+			}
+			
+			button.popupButton {
+				/* Button for popup window
+				 */
+				min-width: 50px;
+				height: 25px;
+				position: relative;
+				border-radius: 5px;
+				border: #444;
+				border-width: 1px;
+				border-style: solid;
+				background-color: #fff;
+			}
+			
+			div.dragndrop {
+				margin-top: 10px;
+				border:#000000;
+				border-style: dashed;
+				border-width: 2px;
+			}
+			div.dndheaderelement {
+				float: left;
+				height: 100%;
+				border-right: #DDDDDD;
+				border-right-width: 1px;
+				border-right-style: solid;
+			}
+			div.dndheaderelement span{
+				padding-left: 5px;
+			}
+			
+			div.topLevel {
+				border: #000;
+				border-style: solid;
+				border-width: 5px;
+				padding: 10px;
+				margin: 10px;
+			}
+			
+			div.SecondLevel {
+				border: #000;
+				border-style: solid;
+				border-width: 1px;
+				padding: 10px;
+				margin: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="export">
+			<button id="exportToXML" onclick="exportToXML();">Export XML</button>
+		</div>
+		<div id="content"></div>
+	</body>
+</html>
