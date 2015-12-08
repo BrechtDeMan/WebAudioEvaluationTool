@@ -206,6 +206,9 @@ function loadInterface() {
 		return this.objectMoved;
 	};
 	
+	// Bindings for slider interfaces
+	Interface.prototype.interfaceSliders = [];
+	
 	// Bindings for audioObjects
 	
 	// Create the top div for the Title element
@@ -281,6 +284,8 @@ function loadTest(audioHolderObject)
 	var height = window.innerHeight;
 	var id = audioHolderObject.id;
 	
+	interfaceContext.interfaceSliders = [];
+	
 	var feedbackHolder = document.getElementById('feedbackHolder');
 	var sliderHolder = document.getElementById('slider-holder');
 	feedbackHolder.innerHTML = null;
@@ -289,66 +294,7 @@ function loadTest(audioHolderObject)
 	var interfaceObj = audioHolderObject.interfaces;
 	for (var k=0; k<interfaceObj.length; k++) {
 		// Create the div box to center align
-		var sliderBox = document.createElement('div');
-		sliderBox.className = 'sliderCanvasDiv';
-		sliderBox.id = 'sliderCanvasHolder-'+k;
-		
-		var pagetitle = document.createElement('div');
-		pagetitle.className = "pageTitle";
-		pagetitle.align = "center";
-		var titleSpan = document.createElement('span');
-		titleSpan.id = "pageTitle-"+k;
-		if (interfaceObj[k].title != undefined && typeof interfaceObj[k].title == "string")
-		{
-			titleSpan.textContent = interfaceObj[k].title;
-		}
-		pagetitle.appendChild(titleSpan);
-		sliderBox.appendChild(pagetitle);
-		
-		// Create the slider box to hold the slider elements
-		var canvas = document.createElement('div');
-		if (interfaceObj[k].name != undefined)
-			canvas.id = 'slider-'+interfaceObj[k].name;
-		else
-			canvas.id = 'slider-'+k;
-		canvas.className = 'slider';
-		canvas.align = "left";
-		canvas.addEventListener('dragover',function(event){
-			event.preventDefault();
-			event.dataTransfer.effectAllowed = 'none';
-			event.dataTransfer.dropEffect = 'copy';
-			return false;
-		},false);
-		var sliderMargin = document.createAttribute('marginsize');
-		sliderMargin.nodeValue = 42; // Set default margins to 42px either side
-		// Must have a known EXACT width, as this is used later to determine the ratings
-		var w = (Number(sliderMargin.nodeValue)+8)*2;
-		canvas.style.width = width - w +"px";
-		canvas.style.marginLeft = sliderMargin.nodeValue +'px';
-		canvas.setAttributeNode(sliderMargin);
-		sliderBox.appendChild(canvas);
-		
-		// Create the div to hold any scale objects
-		var scale = document.createElement('div');
-		scale.className = 'sliderScale';
-		scale.id = 'sliderScaleHolder';
-		scale.align = 'left';
-		sliderBox.appendChild(scale);
-		sliderHolder.appendChild(sliderBox);
-		var positionScale = canvas.style.width.substr(0,canvas.style.width.length-2);
-		var offset = Number(canvas.attributes['marginsize'].value);
-		$(interfaceObj[k].scale).each(function(index,scaleObj){
-			var value = document.createAttribute('value');
-			var position = Number(scaleObj[0])*0.01;
-			value.nodeValue = position;
-			var pixelPosition = (position*positionScale)+offset;
-			var scaleDOM = document.createElement('span');
-			scaleDOM.textContent = scaleObj[1];
-			scale.appendChild(scaleDOM);
-			scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
-			scaleDOM.setAttributeNode(value);
-		});
-		
+		interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObj[k]));
 		for (var i=0; i<interfaceObj[k].options.length; i++)
 		{
 			if (interfaceObj[k].options[i].type == 'option' && interfaceObj[k].options[i].name == 'playhead')
@@ -493,31 +439,140 @@ function loadTest(audioHolderObject)
 	//testWaitIndicator();
 }
 
-function sliderObject(audioObject,interfaceObjects) {
-	// Create a new slider object;
-	this.parent = audioObject;
-	this.trackSliderObjects = [];
-	for (var i=0; i<interfaceObjects.length; i++)
+function interfaceSliderHolder(interfaceObject)
+{
+	this.sliders = [];
+	this.id = document.getElementsByClassName("sliderCanvasDiv").length;
+	this.name = interfaceObject.name;
+	this.interfaceObject = interfaceObject;
+	this.sliderDOM = document.createElement('div');
+	this.sliderDOM.className = 'sliderCanvasDiv';
+	this.sliderDOM.id = 'sliderCanvasHolder-'+this.id;
+	
+	var pagetitle = document.createElement('div');
+	pagetitle.className = "pageTitle";
+	pagetitle.align = "center";
+	var titleSpan = document.createElement('span');
+	titleSpan.id = "pageTitle-"+this.id;
+	if (interfaceObject.title != undefined && typeof interfaceObject.title == "string")
+	{
+		titleSpan.textContent = interfaceObject.title;
+	}
+	pagetitle.appendChild(titleSpan);
+	this.sliderDOM.appendChild(pagetitle);
+	
+	// Create the slider box to hold the slider elements
+	this.canvas = document.createElement('div');
+	if (this.name != undefined)
+		this.canvas.id = 'slider-'+this.name;
+	else
+		this.canvas.id = 'slider-'+this.id;
+	this.canvas.className = 'slider';
+	this.canvas.align = "left";
+	this.canvas.addEventListener('dragover',function(event){
+		event.preventDefault();
+		event.dataTransfer.effectAllowed = 'none';
+		event.dataTransfer.dropEffect = 'copy';
+		return false;
+	},false);
+	var sliderMargin = document.createAttribute('marginsize');
+	sliderMargin.nodeValue = 42; // Set default margins to 42px either side
+	// Must have a known EXACT width, as this is used later to determine the ratings
+	var w = (Number(sliderMargin.nodeValue)+8)*2;
+	this.canvas.style.width = window.innerWidth - w +"px";
+	this.canvas.style.marginLeft = sliderMargin.nodeValue +'px';
+	this.canvas.setAttributeNode(sliderMargin);
+	this.sliderDOM.appendChild(this.canvas);
+	
+	// Create the div to hold any scale objects
+	this.scale = document.createElement('div');
+	this.scale.className = 'sliderScale';
+	this.scale.id = 'sliderScaleHolder-'+this.id;
+	this.scale.align = 'left';
+	this.sliderDOM.appendChild(this.scale);
+	var positionScale = this.canvas.style.width.substr(0,this.canvas.style.width.length-2);
+	var offset = Number(this.canvas.attributes['marginsize'].value);
+	for (var index=0; index<interfaceObject.scale.length; index++)
+	{
+		var scaleObj = interfaceObject.scale[index];
+		var value = document.createAttribute('value');
+		var position = Number(scaleObj[0])*0.01;
+		value.nodeValue = position;
+		var pixelPosition = (position*positionScale)+offset;
+		var scaleDOM = document.createElement('span');
+		scaleDOM.textContent = scaleObj[1];
+		this.scale.appendChild(scaleDOM);
+		scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
+		scaleDOM.setAttributeNode(value);
+	}
+	
+	var dest = document.getElementById("slider-holder");
+	dest.appendChild(this.sliderDOM);
+	
+	this.createSliderObject = function(audioObject)
 	{
 		var trackObj = document.createElement('div');
 		trackObj.className = 'track-slider track-slider-disabled track-slider-'+audioObject.id;
-		trackObj.id = 'track-slider-'+i+'-'+audioObject.id;
+		trackObj.id = 'track-slider-'+this.id+'-'+audioObject.id;
 		trackObj.setAttribute('trackIndex',audioObject.id);
 		trackObj.innerHTML = '<span>'+audioObject.id+'</span>';
-		if (interfaceObjects[i].name != undefined) {
-			trackObj.setAttribute('interface-name',interfaceObjects[i].name);
+		if (this.name != undefined) {
+			trackObj.setAttribute('interface-name',this.name);
 		} else {
-			trackObj.setAttribute('interface-name',i);
+			trackObj.setAttribute('interface-name',this.id);
 		}
-		this.trackSliderObjects.push(trackObj);
-		var slider = document.getElementById("slider-"+trackObj.getAttribute("interface-name"));
-		var offset = Number(slider.attributes['marginsize'].value);
+		var offset = Number(this.canvas.attributes['marginsize'].value);
 		// Distribute it randomnly
 		var w = window.innerWidth - (offset+8)*2;
 		w = Math.random()*w;
 		w = Math.floor(w+(offset+8));
 		trackObj.style.left = w+'px';
-		slider.appendChild(trackObj);
+		this.canvas.appendChild(trackObj);
+		this.sliders.push(trackObj);
+		return trackObj;
+	};
+	
+	this.resize = function(event)
+	{
+		var holdValues = [];
+		for (var index = 0; index < this.sliders.length; index++)
+		{
+			holdValues.push(convSliderPosToRate(this.sliders[index])); 
+		}
+		var width = event.target.innerWidth;
+		var sliderDiv = this.canvas;
+		var sliderScaleDiv = this.scale;
+		var marginsize = Number(sliderDiv.attributes['marginsize'].value);
+		var w = (marginsize+8)*2;
+		sliderDiv.style.width = width - w + 'px';
+		var width = width - w;
+		// Move sliders into new position
+		for (var index = 0; index < this.sliders.length; index++)
+		{
+			var pos = holdValues[index];
+			var pix = pos * width;
+			this.sliders[index].style.left = pix+marginsize+'px';
+		}
+		
+		// Move scale labels
+		for (var index = 0; index < this.scale.children.length; index++)
+		{
+			var scaleObj = this.scale.children[index];
+			var position = Number(scaleObj.attributes['value'].value);
+			var pixelPosition = (position*width)+marginsize;
+			scaleObj.style.left = Math.floor((pixelPosition-($(scaleObj).width()/2)))+'px';
+		}
+	}
+}
+
+function sliderObject(audioObject,interfaceObjects) {
+	// Create a new slider object;
+	this.parent = audioObject;
+	this.trackSliderObjects = [];
+	for (var i=0; i<interfaceContext.interfaceSliders.length; i++)
+	{
+		var trackObj = interfaceContext.interfaceSliders[i].createSliderObject(audioObject);
+		this.trackSliderObjects.push(trackObj);
 	}
 
 	// Onclick, switch playback to that track
@@ -626,32 +681,10 @@ function resizeWindow(event){
 	// MANDATORY FUNCTION
 	
 	// Store the slider marker values
-	var holdValues = [];
-	$(".track-slider").each(function(index,sliderObj){
-		holdValues.push(convSliderPosToRate(sliderObj));
-	});
-	
-	var width = event.target.innerWidth;
-	var canvas = document.getElementById('sliderCanvasHolder');
-	var sliderDiv = canvas.children[0];
-	var sliderScaleDiv = canvas.children[1];
-	var marginsize = Number(sliderDiv.attributes['marginsize'].value);
-	var w = (marginsize+8)*2;
-	sliderDiv.style.width = width - w + 'px';
-	var width = width - w;
-	// Move sliders into new position
-	$(".track-slider").each(function(index,sliderObj){
-		var pos = holdValues[index];
-		var pix = pos * width;
-		sliderObj.style.left = pix+marginsize+'px';
-	});
-	
-	// Move scale labels
-	$(sliderScaleDiv.children).each(function(index,scaleObj){
-		var position = Number(scaleObj.attributes['value'].value);
-		var pixelPosition = (position*width)+marginsize;
-		scaleObj.style.left = Math.floor((pixelPosition-($(scaleObj).width()/2)))+'px';
-	});
+	for (var i=0; i<interfaceContext.interfaceSliders.length; i++)
+	{
+		interfaceContext.interfaceSliders[i].resize(event);
+	}
 }
 
 function pageXMLSave(store, testXML)
