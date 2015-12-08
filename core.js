@@ -649,7 +649,6 @@ function stateMachine()
 	
 	this.testPageCompleted = function(store, testXML, testId) {
 		// Function called each time a test page has been completed
-		// Can be used to over-rule default behaviour
 		var metric = document.createElement('metric');
 		if (audioEngineContext.metric.enableTestTimer)
 		{
@@ -658,17 +657,17 @@ function stateMachine()
 			testTime.textContent = audioEngineContext.timer.testDuration;
 			metric.appendChild(testTime);
 		}
-		testXML.appendChild(metric);
+		store.appendChild(metric);
 		var audioObjects = audioEngineContext.audioObjects;
 		for (var i=0; i<audioObjects.length; i++) 
 		{
 			var audioElement = audioEngineContext.audioObjects[i].exportXMLDOM();
 			audioElement.setAttribute('presentedId',i);
-			testXML.appendChild(audioElement);
+			store.appendChild(audioElement);
 		}
 		$(interfaceContext.commentQuestions).each(function(index,element){
 			var node = element.exportXMLDOM();
-			testXML.appendChild(node);
+			store.appendChild(node);
 		});
 		pageXMLSave(store, testXML);
 	};
@@ -914,10 +913,10 @@ function AudioEngine(specification) {
 		var maxId;
 		for (var i=0; i<this.audioObjects.length; i++)
 		{
-			lens.push(this.audioObjects[i].buffer.length);
-			if (length < this.audioObjects[i].buffer.length)
+			lens.push(this.audioObjects[i].buffer.buffer.length);
+			if (length < this.audioObjects[i].buffer.buffer.length)
 			{
-				length = this.audioObjects[i].buffer.length;
+				length = this.audioObjects[i].buffer.buffer.length;
 				maxId = i;
 			}
 		}
@@ -929,7 +928,7 @@ function AudioEngine(specification) {
 		// Extract the audio and zero-pad
 		for (var i=0; i<lens.length; i++)
 		{
-			var orig = this.audioObjects[i].buffer;
+			var orig = this.audioObjects[i].buffer.buffer;
 			var hold = audioContext.createBuffer(orig.numberOfChannels,length,orig.sampleRate);
 			for (var c=0; c<orig.numberOfChannels; c++)
 			{
@@ -938,7 +937,7 @@ function AudioEngine(specification) {
 				for (var n=0; n<orig.length; n++)
 				{inData[n] = outData[n];}
 			}
-			this.audioObjects[i].buffer = hold;
+			this.audioObjects[i].buffer.buffer = hold;
 			delete orig;
 		}
 	};
@@ -1077,7 +1076,15 @@ function audioObject(id) {
 		file.setAttribute('duration',this.buffer.duration);
 		root.appendChild(file);
 		if (this.specification.type != 'outsidereference') {
-			root.appendChild(this.interfaceDOM.exportXMLDOM(this));
+			var interfaceXML = this.interfaceDOM.exportXMLDOM(this);
+			if (interfaceXML.length == undefined) {
+				root.appendChild();
+			} else {
+				for (var i=0; i<interfaceXML.length; i++)
+				{
+					root.appendChild(interfaceXML[i]);
+				}
+			}
 			root.appendChild(this.commentDOM.exportXMLDOM(this));
 			if(this.specification.type == 'anchor') {
 				root.setAttribute('anchor',true);
@@ -1503,6 +1510,7 @@ function Specification() {
 		}
 		
 		this.commonInterface = new function() {
+			this.name = undefined;
 			this.OptionNode = function(child) {
 				this.type = child.nodeName;
 				if (this.type == 'option')
@@ -1536,6 +1544,10 @@ function Specification() {
 			};
 			this.options = [];
 			if (commonInterfaceNode != undefined) {
+				var name = commonInterfaceNode.getAttribute("name");
+				if (name != undefined) {
+					this.name = name;
+				}
 				var child = commonInterfaceNode.firstElementChild;
 				while (child != undefined) {
 					this.options.push(new this.OptionNode(child));
