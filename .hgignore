@@ -43,3 +43,6 @@ re:^docs/WAC2016/\._WAC2016\.tex$
 subject
 resample
 test-data
+*.fls
+Makefile
+*eps-converted-to.pdf
