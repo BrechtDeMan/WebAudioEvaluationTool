@@ -18,7 +18,7 @@ render_figures = True
 
 # XML results files location
 if len(sys.argv) == 1:
-    folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
+    folder_name = "../saves/"    # Looks in 'saves/' folder from 'scripts/' folder
     print "Use: python generate_report.py [results_folder] [no_render | -nr]"
     print "Using default path: " + folder_name
 elif len(sys.argv) == 2:
@@ -79,6 +79,7 @@ header = r'''\documentclass[11pt, oneside]{article}
           \geometry{a4paper}
           \usepackage[parfill]{parskip} % empty line instead of indent
           \usepackage{graphicx}    % figures
+          \usepackage[space]{grffile} % include figures with spaces in paths
           \usepackage{hyperref}
           \usepackage{tikz}           % pie charts
           \title{Report}
@@ -87,7 +88,7 @@ header = r'''\documentclass[11pt, oneside]{article}
           r'''}
           \graphicspath{{'''+\
           folder_name+\
-          r'''/}}
+          r'''}}
           %\setcounter{section}{-1} % Summary section 0 so number of sections equals number of files
           \begin{document}
           \maketitle
@@ -108,18 +109,21 @@ footer = '\n\t\t'+r'''\begin{thebibliography}{9}
 
 body = ''
 
+# make sure folder_name ends in '/'
+folder_name = os.path.join(folder_name, '')
+
 # generate images for later use
 if render_figures:
-    subprocess.call("python timeline_view_movement.py "+folder_name, shell=True)
-    subprocess.call("python score_parser.py "+folder_name, shell=True)
-    subprocess.call("python score_plot.py "+folder_name, shell=True)
+    subprocess.call("python timeline_view_movement.py '"+folder_name+"'", shell=True)
+    subprocess.call("python score_parser.py '"+folder_name+"'", shell=True)
+    subprocess.call("python score_plot.py '"+folder_name+"ratings/'", shell=True)
 
 # get every XML file in folder
 files_list = os.listdir(folder_name)
 for file in files_list: # iterate over all files in files_list
     if file.endswith(".xml"): # check if XML file
         number_of_XML_files += 1
-        tree = ET.parse(folder_name + '/' + file)
+        tree = ET.parse(folder_name + file)
         root = tree.getroot()
         
         # PRINT name as section
@@ -220,10 +224,10 @@ for file in files_list: # iterate over all files in files_list
             img_path = 'timelines_movement/'+file[:-4]+'-'+page_name+'.pdf'
             
             # check if available
-            if os.path.isfile(folder_name+'/'+img_path):
+            if os.path.isfile(folder_name+img_path):
                 # SHOW timeline image
                 timeline_plots += '\\includegraphics[width=\\textwidth]{'+\
-                         folder_name+'/'+img_path+'}\n\t\t'
+                         folder_name+img_path+'}\n\t\t'
             
             # keep track of duration in function of page index
             if len(duration_order)>page_number:
@@ -330,7 +334,7 @@ plt.xlabel('Page order')
 plt.xlim(.8, len(duration_order)+1)
 plt.xticks(np.arange(1,len(duration_order)+1)+.4, range(1,len(duration_order)+1))
 plt.ylabel('Average time [minutes]')
-plt.savefig(folder_name+"/time_per_page.pdf", bbox_inches='tight')
+plt.savefig(folder_name+"time_per_page.pdf", bbox_inches='tight')
 plt.close()
 #TODO add error bars
 
@@ -372,7 +376,7 @@ plt.xlabel('Audioholder')
 plt.xlim(.8, len(audioholder_names_ordered)+1)
 plt.xticks(np.arange(1,len(audioholder_names_ordered)+1)+.4, audioholder_names_ordered, rotation=90)
 plt.ylabel('Average time [minutes]')
-plt.savefig(folder_name+"/time_per_audioholder.pdf", bbox_inches='tight')
+plt.savefig(folder_name+"time_per_audioholder.pdf", bbox_inches='tight')
 plt.close()
 
 # SHOW bar plot of average time per page
@@ -385,7 +389,7 @@ ax = plt.gca()
 ylims = ax.get_ylim()
 yint = np.arange(int(np.floor(ylims[0])), int(np.ceil(ylims[1]))+1)
 plt.yticks(yint)
-plt.savefig(folder_name+"/subjects_per_audioholder.pdf", bbox_inches='tight')
+plt.savefig(folder_name+"subjects_per_audioholder.pdf", bbox_inches='tight')
 plt.close()
 
 # SHOW both figures
@@ -393,7 +397,7 @@ body += r'''
          \begin{figure}[htbp]
          \begin{center}
          \includegraphics[width=.65\textwidth]{'''+\
-         folder_name+"/time_per_page.pdf"+\
+         folder_name+'time_per_page.pdf'+\
         r'''}
         \caption{Average time spent per page.}
         \label{fig:avgtimeperpage}
@@ -404,7 +408,7 @@ body += r'''
 body += r'''\begin{figure}[htbp]
          \begin{center}
          \includegraphics[width=.65\textwidth]{'''+\
-         folder_name+"/time_per_audioholder.pdf"+\
+         folder_name+'time_per_audioholder.pdf'+\
         r'''}
         \caption{Average time spent per audioholder.}
         \label{fig:avgtimeperaudioholder}
@@ -415,7 +419,7 @@ body += r'''\begin{figure}[htbp]
 body += r'''\begin{figure}[htbp]
          \begin{center}
          \includegraphics[width=.65\textwidth]{'''+\
-         folder_name+"/subjects_per_audioholder.pdf"+\
+         folder_name+'subjects_per_audioholder.pdf'+\
         r'''}
         \caption{Number of subjects per audioholder.}
         \label{fig:subjectsperaudioholder}
@@ -430,11 +434,11 @@ body += r'''\begin{figure}[htbp]
 #TODO order in decreasing order of participants
 for audioholder_name in page_names: # get each name
     # plot boxplot if exists (not so for the 'alt' names)
-    if os.path.isfile(folder_name+'/ratings/'+audioholder_name+'-ratings-box.pdf'):
+    if os.path.isfile(folder_name+'ratings/'+audioholder_name+'-ratings-box.pdf'):
         body += r'''\begin{figure}[htbp]
              \begin{center}
              \includegraphics[width=.65\textwidth]{'''+\
-             folder_name+"/ratings/"+audioholder_name+'-ratings-box.pdf'+\
+             folder_name+"ratings/"+audioholder_name+'-ratings-box.pdf'+\
             r'''}
             \caption{Box plot of ratings for audioholder '''+\
             audioholder_name+' ('+str(subject_count[real_page_names.index(audioholder_name)])+\
@@ -505,21 +509,23 @@ body += r'''
 
 texfile = header+body+footer # add bits together
 
+print 'pdflatex -output-directory="'+folder_name+'"" "'+ folder_name + 'Report.tex"' # DEBUG
+
 # write TeX file
-with open(folder_name + '/' + 'Report.tex','w') as f:
+with open(folder_name + 'Report.tex','w') as f:
     f.write(texfile)
-proc=subprocess.Popen(shlex.split('pdflatex -output-directory='+folder_name+' '+ folder_name + '/Report.tex'))
+proc=subprocess.Popen(shlex.split('pdflatex -output-directory="'+folder_name+'" "'+ folder_name + 'Report.tex"'))
 proc.communicate()
 # run again
-proc=subprocess.Popen(shlex.split('pdflatex -output-directory='+folder_name+' '+ folder_name + '/Report.tex'))
+proc=subprocess.Popen(shlex.split('pdflatex -output-directory="'+folder_name+'" "'+ folder_name + 'Report.tex"'))
 proc.communicate()
 
 #TODO remove auxiliary LaTeX files
 try:
-    os.remove(folder_name + '/' + 'Report.aux')
-    os.remove(folder_name + '/' + 'Report.log')
-    os.remove(folder_name + '/' + 'Report.out')
-    os.remove(folder_name + '/' + 'Report.toc')
+    os.remove(folder_name + 'Report.aux')
+    os.remove(folder_name + 'Report.log')
+    os.remove(folder_name + 'Report.out')
+    os.remove(folder_name + 'Report.toc')
 except OSError:
     pass
     

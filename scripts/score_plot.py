@@ -115,7 +115,7 @@ plt.rc('font', **font)
 # CODE
 
 # get every csv file in folder
-for file in os.listdir(rating_folder): # You have to put this in folder where rating csv files are.
+for file in os.listdir(rating_folder):
     if file.endswith(".csv"):
         page_name = file[:-4] # file name (without extension) is page ID
 
