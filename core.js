@@ -1548,7 +1548,7 @@ function Specification() {
 		}
 		
 		// New check if we need to randomise the test order
-		if (this.randomiseOrder)
+		if (this.randomiseOrder && typeof randomiseOrder === "function")
 		{
 	 		this.audioHolders = randomiseOrder(this.audioHolders);
 	 		for (var i=0; i<this.audioHolders.length; i++)
@@ -1853,7 +1853,7 @@ function Specification() {
 				}
 			}
 			
-			if (this.randomiseOrder == true)
+			if (this.randomiseOrder == true && typeof randomiseOrder === "function")
 			{
 				this.audioElements = randomiseOrder(this.audioElements);
 			}
