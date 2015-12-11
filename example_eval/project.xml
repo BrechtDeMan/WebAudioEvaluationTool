@@ -71,13 +71,13 @@
             <scalerange min="25" max="75"/>
             <commentBoxPrefix>Comment on fragment</commentBoxPrefix>
         </interface>
-        <audioElements url="0.wav" id="0" type="anchor" marker="20"/>
-        <audioElements url="1.wav" id="1" type="reference" marker="80"/>
-        <audioElements url="2.wav" id="2"/>
-        <audioElements url="3.wav" id="3"/>
-        <audioElements url="4.wav" id="4"/>
-        <audioElements url="5.wav" id="5"/>
-        <audioElements url="6.wav" id="6" type="outsidereference"/>
+        <audioElements url="0.wav" gain="-6" id="0" type="anchor" marker="20"/>
+        <audioElements url="1.wav" gain="0.0" id="1" type="reference" marker="80"/>
+        <audioElements url="2.wav" gain="0.0" id="2"/>
+        <audioElements url="3.wav" gain="0.0" id="3"/>
+        <audioElements url="4.wav" gain="0.0" id="4"/>
+        <audioElements url="5.wav" gain="0.0" id="5"/>
+        <audioElements url="6.wav" gain="0.0" id="6" type="outsidereference"/>
         <CommentQuestion id='mixingExperience' type="text">What is your general experience with numbers?</CommentQuestion>
         <CommentQuestion id="preference" type="radio">
             <statement>Please enter your overall preference</statement>
