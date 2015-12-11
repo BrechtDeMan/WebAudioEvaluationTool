@@ -217,6 +217,16 @@ function interfaceXMLSave(){
 	return xmlDoc;
 }
 
+function linearToDecibel(gain)
+{
+	return 20.0*Math.log10(gain);
+}
+
+function decibelToLinear(gain)
+{
+	return Math.pow(10,gain/20.0);
+}
+
 function interfacePopup() {
 	// Creates an object to manage the popup
 	this.popup = null;
@@ -828,7 +838,7 @@ function AudioEngine(specification) {
 						this.audioObjects[i].outputGain.gain.value = 0.0;
 						this.audioObjects[i].stop();
 					} else if (i == id) {
-						this.audioObjects[id].outputGain.gain.value = 1.0;
+						this.audioObjects[id].outputGain.gain.value = this.audioObjects[id].specification.gain;
 						this.audioObjects[id].play(audioContext.currentTime+0.01);
 					}
 				}
@@ -870,11 +880,12 @@ function AudioEngine(specification) {
 		}
 		if (buffer == null)
 		{
-			console.log("[WARN]: Buffer was not loaded in pre-test!");
+			console.log("[WARN]: Buffer was not loaded in pre-test! "+URL);
 			buffer = new this.bufferObj(URL);
 			this.buffers.push(buffer);
 		}
 		this.audioObjects[audioObjectId].specification = element;
+		this.audioObjects[audioObjectId].url = URL;
 		this.audioObjects[audioObjectId].buffer = buffer;
 		if (buffer.buffer != null)
 		{
@@ -1041,39 +1052,6 @@ function audioObject(id) {
 		} else {
 			return 0;
 		}
-	};
-
-	this.constructTrack = function(url) {
-		var request = new XMLHttpRequest();
-		this.url = url;
-		request.open('GET',url,true);
-		request.responseType = 'arraybuffer';
-		
-		var audioObj = this;
-		
-		// Create callback to decode the data asynchronously
-		request.onloadend = function() {
-			audioContext.decodeAudioData(request.response, function(decodedData) {
-				audioObj.buffer = decodedData;
-				audioObj.state = 1;
-				if (audioObj.specification.type != 'outsidereference')
-					{audioObj.interfaceDOM.enable();}
-			}, function(){
-				// Should only be called if there was an error, but sometimes gets called continuously
-				// Check here if the error is genuine
-				if (audioObj.state == 0 || audioObj.buffer == undefined) {
-					// Genuine error
-					console.log('FATAL - Error loading buffer on '+audioObj.id);
-					if (request.status == 404)
-					{
-						console.log('FATAL - Fragment '+audioObj.id+' 404 error');
-						console.log('URL: '+audioObj.url);
-						errorSessionDump('Fragment '+audioObj.id+' 404 error');
-					}
-				}
-			});
-		};
-		request.send();
 	};
 	
 	this.exportXMLDOM = function() {
@@ -1992,18 +1970,23 @@ function Specification() {
 			this.type = "normal";
 			this.marker = false;
 			this.enforce = false;
+			this.gain = 1.0;
 			this.decode = function(parent,xml)
 			{
 				this.url = xml.getAttribute('url');
 				this.id = xml.id;
 				this.parent = parent;
 				this.type = xml.getAttribute('type');
+				var gain = xml.getAttribute('gain');
+				if (isNaN(gain) == false && gain != null)
+				{
+					this.gain = decibelToLinear(Number(gain));
+				}
 				if (this.type == null) {this.type = "normal";}
 				if (this.type == 'anchor') {this.anchor = true;}
 				else {this.anchor = false;}
 				if (this.type == 'reference') {this.reference = true;}
 				else {this.reference = false;}
-				
 				if (this.anchor == true || this.reference == true)
 				{
 					this.marker = xml.getAttribute('marker');
@@ -2035,6 +2018,7 @@ function Specification() {
 				AENode.id = this.id;
 				AENode.setAttribute("url",this.url);
 				AENode.setAttribute("type",this.type);
+				AENode.setAttribute("gain",linearToDecibel(this.gain));
 				if (this.marker != false)
 				{
 					AENode.setAttribute("marker",this.marker*100);
