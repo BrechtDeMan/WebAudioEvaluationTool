@@ -1752,7 +1752,7 @@
 					}
 					
 					// New check if we need to randomise the test order
-					if (this.randomiseOrder)
+					if (this.randomiseOrder && typeof randomiseOrder === "function")
 					{
 				 		this.audioHolders = randomiseOrder(this.audioHolders);
 				 		for (var i=0; i<this.audioHolders.length; i++)
@@ -2057,7 +2057,7 @@
 							}
 						}
 						
-						if (this.randomiseOrder == true)
+						if (this.randomiseOrder == true && typeof randomiseOrder === "function")
 						{
 							this.audioElements = randomiseOrder(this.audioElements);
 						}
@@ -2116,11 +2116,14 @@
 						this.title = undefined;
 						this.options = [];
 						this.scale = [];
+						this.name = undefined;
 						this.decode = function(DOM)
 						{
 							var title = DOM.getElementsByTagName('title');
 							if (title.length == 0) {this.title = null;}
 							else {this.title = title[0].textContent;}
+							var name = DOM.getAttribute("name");
+							if (name != undefined) {this.name = name;}
 							this.options = parent.commonInterface.options;
 							var scale = DOM.getElementsByTagName('scale');
 							this.scale = [];
@@ -2171,18 +2174,23 @@
 						this.type = "normal";
 						this.marker = false;
 						this.enforce = false;
+						this.gain = 1.0;
 						this.decode = function(parent,xml)
 						{
 							this.url = xml.getAttribute('url');
 							this.id = xml.id;
 							this.parent = parent;
 							this.type = xml.getAttribute('type');
+							var gain = xml.getAttribute('gain');
+							if (isNaN(gain) == false && gain != null)
+							{
+								this.gain = decibelToLinear(Number(gain));
+							}
 							if (this.type == null) {this.type = "normal";}
 							if (this.type == 'anchor') {this.anchor = true;}
 							else {this.anchor = false;}
 							if (this.type == 'reference') {this.reference = true;}
 							else {this.reference = false;}
-							
 							if (this.anchor == true || this.reference == true)
 							{
 								this.marker = xml.getAttribute('marker');
@@ -2214,6 +2222,7 @@
 							AENode.id = this.id;
 							AENode.setAttribute("url",this.url);
 							AENode.setAttribute("type",this.type);
+							AENode.setAttribute("gain",linearToDecibel(this.gain));
 							if (this.marker != false)
 							{
 								AENode.setAttribute("marker",this.marker*100);
@@ -2315,6 +2324,16 @@
 						};
 					};
 				};
+			}
+			
+			function linearToDecibel(gain)
+			{
+				return 20.0*Math.log10(gain);
+			}
+			
+			function decibelToLinear(gain)
+			{
+				return Math.pow(10,gain/20.0);
 			}
 		
 			function createDeleteNodeButton(node)
