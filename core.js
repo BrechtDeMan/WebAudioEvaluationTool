@@ -228,6 +228,13 @@ function interfacePopup() {
 	this.popupOptions = null;
 	this.currentIndex = null;
 	this.responses = null;
+	$(window).keypress(function(e){
+			if (e.keyCode == 13 && popup.popup.style.visibility == 'visible')
+			{
+				console.log(e);
+				popup.buttonProceed.onclick();
+			}
+		});
 	
 	this.createPopup = function(){
 		// Create popup window interface
@@ -305,12 +312,6 @@ function interfacePopup() {
 		var blank = document.getElementsByClassName('testHalt')[0];
 		blank.style.zIndex = 2;
 		blank.style.visibility = 'visible';
-		$(window).keypress(function(e){
-			if (e.keyCode == 13 && popup.popup.style.visibility == 'visible')
-			{
-				popup.buttonProceed.onclick();
-			}
-		});
 	};
 	
 	this.hidePopup = function(){
@@ -320,7 +321,6 @@ function interfacePopup() {
 		blank.style.zIndex = -2;
 		blank.style.visibility = 'hidden';
 		this.buttonPrevious.style.visibility = 'inherit';
-		$(window).keypress(function(e){});
 	};
 	
 	this.postNode = function() {

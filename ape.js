@@ -313,6 +313,7 @@ function loadTest(audioHolderObject)
 		
 		// Create a slider per track
 		audioObject.interfaceDOM = new sliderObject(audioObject,interfaceObj);
+		audioObject.metric.initialPosition = convSliderPosToRate(audioObject.interfaceDOM.trackSliderObjects[0]);
 		if (audioObject.state == 1)
 		{
 			audioObject.interfaceDOM.enable();
@@ -667,16 +668,24 @@ function pageXMLSave(store, testXML)
 	// Saves a specific test page
 	// You can use this space to add any extra nodes to your XML <audioHolder> saves
 	// Get the current <audioHolder> information in store (remember to appendChild your data to it)
+	if (interfaceContext.interfaceSliders.length == 1)
+	{
+		// If there is only one axis, there only needs to be one metric return
+		return;
+	}
 	var audioelements = store.getElementsByTagName("audioelement");
 	for (var i=0; i<audioelements.length; i++)
 	{
 		// Have to append the metric specific nodes
-		for (var k=0; k<interfaceContext.interfaceSliders.length; k++)
+		if (testXML.outsideReference == null || testXML.outsideReference.id != audioelements[i].id)
 		{
-			var node = interfaceContext.interfaceSliders[k].metrics[i].exportXMLDOM();
-			node.setAttribute("interface-name",interfaceContext.interfaceSliders[k].name);
-			node.setAttribute("interfaceid",interfaceContext.interfaceSliders[k].id);
-			audioelements[i].appendChild(node);
+			for (var k=0; k<interfaceContext.interfaceSliders.length; k++)
+			{
+				var node = interfaceContext.interfaceSliders[k].metrics[i].exportXMLDOM();
+				node.setAttribute("interface-name",interfaceContext.interfaceSliders[k].name);
+				node.setAttribute("interfaceid",interfaceContext.interfaceSliders[k].id);
+				audioelements[i].appendChild(node);
+			}
 		}
 	}
 }
