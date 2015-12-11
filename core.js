@@ -233,6 +233,7 @@ function interfacePopup() {
 			{
 				console.log(e);
 				popup.buttonProceed.onclick();
+				e.preventDefault();
 			}
 		});
 	
