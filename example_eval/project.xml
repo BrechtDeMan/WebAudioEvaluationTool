@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="save.php" randomiseOrder='false' collectMetrics='true' testPages="2">
+	<setup interface="APE" projectReturn="save.php" randomiseOrder='true' collectMetrics='true' testPages="2">
 		<PreTest>
 			<question id="sessionId" mandatory="true">Please enter your name.</question>
 			<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>

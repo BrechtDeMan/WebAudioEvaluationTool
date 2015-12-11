@@ -383,6 +383,7 @@ function loadTest(audioHolderObject)
 	if (audioHolderObject.outsideReference != null) {
 		var outsideReferenceHolder = document.createElement('div');
 		outsideReferenceHolder.id = 'outside-reference';
+		outsideReferenceHolder.className = 'outside-reference';
 		outsideReferenceHolderspan = document.createElement('span');
 		outsideReferenceHolderspan.textContent = 'Reference';
 		outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
@@ -535,7 +536,7 @@ function interfaceSliderHolder(interfaceObject)
 			var pixelPosition = (position*width)+marginsize;
 			scaleObj.style.left = Math.floor((pixelPosition-($(scaleObj).width()/2)))+'px';
 		}
-	}
+	};
 }
 
 function sliderObject(audioObject,interfaceObjects) {
