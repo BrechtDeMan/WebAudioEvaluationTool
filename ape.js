@@ -45,31 +45,40 @@ function loadInterface() {
 	};
 	
 	Interface.prototype.checkAllMoved = function() {
-		var audioObjs = audioEngineContext.audioObjects;
 		var state = true;
-		var strNums = [];
-		for (var i=0; i<audioObjs.length; i++)
+		var str = 'You have not moved the following sliders. ';
+		for (var i=0; i<this.interfaceSliders.length; i++)
 		{
-			if (audioObjs[i].metric.wasMoved == false && audioObjs[i].specification.type != 'outsidereference') {
-				state = false;
-				strNums.push(i);
+			var interfaceTID = [];
+			for (var j=0; j<this.interfaceSliders[i].metrics.length; j++)
+			{
+				if (this.interfaceSliders[i].metrics[j].wasMoved == false)
+				{
+					state = false;
+					interfaceTID.push(j);
+				}
+			}
+			if (interfaceTID.length != 0)
+			{
+				str += 'On axis "'+this.interfaceSliders[i].interfaceObject.title+'" you must move ';
+				if (interfaceTID.length == 1)
+				{
+					str += 'slider +'+interfaceTID[0]+'. ';
+				}
+				else {
+					str += 'sliders ';
+					for (var k=0; k<interfaceTID.length-1; k++)
+					{
+						str += interfaceTID[k]+', ';
+					}
+					str += interfaceTID[interfaceTID.length-1] +'. ';
+				}
 			}
 		}
-		if (state == false) {
-			if (strNums.length > 1) {
-				var str = "";
-		    	for (var i=0; i<strNums.length; i++) {
-		    		str = str + strNums[i];
-		    		if (i < strNums.length-2){
-		    			str += ", ";
-		    		} else if (i == strNums.length-2) {
-		    			str += " or ";
-		    		}
-		    	}
-		    	alert('You have not moved fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
-	       } else {
-	       		alert('You have not moved fragment ' + strNums[0] + ' yet. Please listen, rate and comment all samples before submitting.');
-	       }
+		if (state != true)
+		{
+			alert(str);
+			console.log(str);
 		}
 		return state;
 	};
