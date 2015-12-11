@@ -566,7 +566,7 @@ function sliderObject(audioObject,interfaceObjects) {
 		var obj = [];
 		$(this.trackSliderObjects).each(function(i,trackObj){
 			var node = document.createElement('value');
-			node.setAttribute("name",trackObj.getAttribute("interface-name"));
+			node.setAttribute("inteerface-name",trackObj.getAttribute("interface-name"));
 			node.textContent = convSliderPosToRate(trackObj);
 			obj.push(node);
 		});
@@ -679,12 +679,27 @@ function pageXMLSave(store, testXML)
 		// Have to append the metric specific nodes
 		if (testXML.outsideReference == null || testXML.outsideReference.id != audioelements[i].id)
 		{
+			var inject = audioelements[i].getElementsByTagName("metric");
+			if (inject.length == 0)
+			{
+				inject = document.createElement("metric");
+			} else {
+				inject = inject[0];
+			}
 			for (var k=0; k<interfaceContext.interfaceSliders.length; k++)
 			{
 				var node = interfaceContext.interfaceSliders[k].metrics[i].exportXMLDOM();
-				node.setAttribute("interface-name",interfaceContext.interfaceSliders[k].name);
-				node.setAttribute("interfaceid",interfaceContext.interfaceSliders[k].id);
-				audioelements[i].appendChild(node);
+				var mrnodes = node.getElementsByTagName("metricresult");
+				for (var j=0; j<mrnodes.length; j++)
+				{
+					var name = mrnodes[j].getAttribute("name");
+					if (name == "elementTracker" || name == "elementTrackerFull" || name == "elementInitialPosition" || name == "elementFlagMoved")
+					{
+						mrnodes[j].setAttribute("interface-name",interfaceContext.interfaceSliders[k].name);
+						mrnodes[j].setAttribute("interface-id",k);
+						inject.appendChild(mrnodes[j]);
+					}
+				}
 			}
 		}
 	}

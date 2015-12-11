@@ -1078,7 +1078,7 @@ function audioObject(id) {
 	this.exportXMLDOM = function() {
 		var root = document.createElement('audioElement');
 		root.id = this.specification.id;
-		root.setAttribute('url',this.url);
+		root.setAttribute('url',this.specification.url);
 		var file = document.createElement('file');
 		file.setAttribute('sampleRate',this.buffer.buffer.sampleRate);
 		file.setAttribute('channels',this.buffer.buffer.numberOfChannels);
