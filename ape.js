@@ -18,39 +18,6 @@ function loadInterface() {
 	var testContent = document.createElement('div');
 	
 	testContent.id = 'testContent';
-
-	
-	// Create APE specific metric functions
-	audioEngineContext.metric.initialiseTest = function()
-	{
-	};
-	
-	audioEngineContext.metric.sliderMoved = function()
-	{
-		var id = this.data;
-		this.data = -1;
-		var position = convSliderPosToRate(id);
-        console.log('slider ' + id + ': '+ position + ' (' + time + ')'); // DEBUG/SAFETY: show position and slider id
-		if (audioEngineContext.timer.testStarted)
-		{
-			audioEngineContext.audioObjects[id].metric.moved(time,position);
-		}
-	};
-	
-	audioEngineContext.metric.sliderPlayed = function(id)
-	{
-		var time = audioEngineContext.timer.getTestTime();
-		if (audioEngineContext.timer.testStarted)
-		{
-			if (this.lastClicked >= 0)
-			{
-				audioEngineContext.audioObjects[this.lastClicked].metric.listening(time);
-			}
-			this.lastClicked = id;
-			audioEngineContext.audioObjects[id].metric.listening(time);
-		}
-        console.log('slider ' + id + ' played (' + time + ')'); // DEBUG/SAFETY: show played slider id
-	};
 	
 	// Bindings for interfaceContext
 	Interface.prototype.checkAllPlayed = function()
@@ -373,6 +340,8 @@ function loadTest(audioHolderObject)
 		event.preventDefault();
 		var obj = interfaceContext.getSelectedObject();
 		if (obj == null) {return;}
+		var interfaceID = obj.parentElement.getAttribute("interfaceid");
+		var trackID = obj.getAttribute("trackindex");
 		if (interfaceContext.hasSelectedObjectMoved() == true)
 		{
 			var l = $(obj).css("left");
@@ -380,13 +349,13 @@ function loadTest(audioHolderObject)
 			var time = audioEngineContext.timer.getTestTime();
 			var rate = convSliderPosToRate(obj);
 			audioEngineContext.audioObjects[id].metric.moved(time,rate);
+			interfaceContext.interfaceSliders[interfaceID].metrics[trackID].moved(time,rate);
 			console.log("slider "+id+" moved to "+rate+' ('+time+')');
 		} else {
 			var id = Number(obj.attributes['trackIndex'].value);
 			//audioEngineContext.metric.sliderPlayed(id);
 			audioEngineContext.play(id);
 	        // Currently playing track red, rest green
-	        
 	        
 	        $('.track-slider').removeClass('track-slider-playing');
 	        var name = ".track-slider-"+obj.getAttribute("trackindex");
@@ -442,6 +411,7 @@ function loadTest(audioHolderObject)
 function interfaceSliderHolder(interfaceObject)
 {
 	this.sliders = [];
+	this.metrics = [];
 	this.id = document.getElementsByClassName("sliderCanvasDiv").length;
 	this.name = interfaceObject.name;
 	this.interfaceObject = interfaceObject;
@@ -467,6 +437,7 @@ function interfaceSliderHolder(interfaceObject)
 		this.canvas.id = 'slider-'+this.name;
 	else
 		this.canvas.id = 'slider-'+this.id;
+	this.canvas.setAttribute("interfaceid",this.id);
 	this.canvas.className = 'slider';
 	this.canvas.align = "left";
 	this.canvas.addEventListener('dragover',function(event){
@@ -529,6 +500,8 @@ function interfaceSliderHolder(interfaceObject)
 		trackObj.style.left = w+'px';
 		this.canvas.appendChild(trackObj);
 		this.sliders.push(trackObj);
+		this.metrics.push(new metricTracker(this));
+		this.metrics[this.metrics.length-1].initialPosition = convSliderPosToRate(trackObj);
 		return trackObj;
 	};
 	
@@ -680,7 +653,7 @@ function resizeWindow(event){
 	// Function called when the window has been resized.
 	// MANDATORY FUNCTION
 	
-	// Store the slider marker values
+	// Resize the slider objects
 	for (var i=0; i<interfaceContext.interfaceSliders.length; i++)
 	{
 		interfaceContext.interfaceSliders[i].resize(event);
@@ -691,5 +664,18 @@ function pageXMLSave(store, testXML)
 {
 	// MANDATORY
 	// Saves a specific test page
-	// You can use this space to add any extra nodes to your XML saves
+	// You can use this space to add any extra nodes to your XML <audioHolder> saves
+	// Get the current <audioHolder> information in store (remember to appendChild your data to it)
+	var audioelements = store.getElementsByTagName("audioelement");
+	for (var i=0; i<audioelements.length; i++)
+	{
+		// Have to append the metric specific nodes
+		for (var k=0; k<interfaceContext.interfaceSliders.length; k++)
+		{
+			var node = interfaceContext.interfaceSliders[k].metrics[i].exportXMLDOM();
+			node.setAttribute("interface-name",interfaceContext.interfaceSliders[k].name);
+			node.setAttribute("interfaceid",interfaceContext.interfaceSliders[k].id);
+			audioelements[i].appendChild(node);
+		}
+	}
 }
