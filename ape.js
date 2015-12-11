@@ -120,35 +120,46 @@ function loadInterface() {
 	{
 		var audioObjs = audioEngineContext.audioObjects;
 		var audioHolder = testState.stateMap[testState.stateIndex];
-		var interfaces = audioHolder.interfaces;
-		for (var i=0; i<interfaces.length; i++)
+		var state = true;
+		var str = '';
+		for (var i=0; i<this.interfaceSliders.length; i++)
 		{
-			var minRanking = convSliderPosToRate(audioObjs[0].interfaceDOM.trackSliderObjects[i]);
-			var maxRanking = minRanking;
-			
 			var minScale;
 			var maxScale;
-			for (var j=0; j<interfaces[i].options.length; j++)
+			var interfaceObject = interfaceContext.interfaceSliders[0].interfaceObject;
+			for (var j=0; j<interfaceObject.options.length; j++)
 			{
-				if (interfaces[i].options[j].check == "scalerange") {
-					minScale = interfaces[i].options[j].min;
-					maxScale = interfaces[i].options[j].max;
+				if (interfaceObject.options[j].check == "scalerange") {
+					minScale = interfaceObject.options[j].min;
+					maxScale = interfaceObject.options[j].max;
 					break;
 				}
 			}
-			for (var j=1; j<audioObjs.length; j++){
-				if (audioObjs[j].specification.type != 'outsidereference') {
-					var ranking = convSliderPosToRate(audioObjs[j].interfaceDOM.trackSliderObjects[i]);
-					if (ranking < minRanking) { minRanking = ranking;}
-					if (ranking > maxRanking) { maxRanking = ranking;}
+			var minRanking = convSliderPosToRate(this.interfaceSliders[i].sliders[0]);
+			var maxRanking = minRanking;
+			for (var j=1; j<this.interfaceSliders[i].sliders.length; j++)
+			{
+				var ranking = convSliderPosToRate(this.interfaceSliders[i].sliders[j]);
+				if (ranking < minRanking)
+				{
+					minRanking = ranking;
+				} else if (ranking > maxRanking)
+				{
+					maxRanking = ranking;
 				}
 			}
-			if (minRanking > minScale || maxRanking < maxScale) {
-				alert('Please use the full width of the scale');
-				return false;
+			if (minRanking > minScale || maxRanking < maxScale)
+			{
+				state = false;
+				str += 'On axis "'+this.interfaceSliders[i].interfaceObject.title+'" you have not used the full width of the scale. ';
 			}
 		}
-		return true;
+		if (state != true)
+		{
+			alert(str);
+			console.log(str);
+		}
+		return state;
 	};
 	
 	Interface.prototype.objectSelected = null;
