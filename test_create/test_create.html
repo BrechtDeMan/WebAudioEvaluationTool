@@ -2781,16 +2781,16 @@
 					var title = document.createElement("h3");
 					title.textContent = "Audio Elements";
 					audioElems.appendChild(title);
-					for (var i=0; i<aH.audioElements.length; i++)
+					for (var j=0; j<aH.audioElements.length; j++)
 					{
 						var entry = document.createElement("div");
 						entry.className = "SecondLevel";
-						entry.id = audioElems.id+"-"+aH.audioElements[i].id;
+						entry.id = audioElems.id+"-"+aH.audioElements[j].id;
 						var text = document.createElement("span");
 						text.textContent = "ID:";
 						var input = document.createElement("input");
 						input.id = entry.id+"-id";
-						input.value = aH.audioElements[i].id;
+						input.value = aH.audioElements[j].id;
 						input.onchange = function() {
 							var IDSplit = event.currentTarget.id.split("-");
 							var ahNode = specificationNode.audioHolders[IDSplit[1]];
@@ -2804,7 +2804,7 @@
 						text.textContent = "URL:";
 						input = document.createElement("input");
 						input.id = entry.id+"-URL";
-						input.value = aH.audioElements[i].url;
+						input.value = aH.audioElements[j].url;
 						input.onchange = function() {
 							var IDSplit = event.currentTarget.id.split("-");
 							var ahNode = specificationNode.audioHolders[IDSplit[1]];
@@ -2814,6 +2814,30 @@
 						input.style.margin = "5px";
 						entry.appendChild(text);
 						entry.appendChild(input);
+						text = document.createElement("span");
+						text.textContent = "Gain:";
+						input = document.createElement("input");
+						input.type = "range";
+						input.id = entry.id+"-gain";
+						input.value = aH.audioElements[j].gain;
+						input.min = -25;
+						input.max = 6;
+						input.step = 1;
+						input.onchange = function() {
+							var IDSplit = event.currentTarget.id.split("-");
+							var ahNode = specificationNode.audioHolders[IDSplit[1]];
+							ahNode.audioElements[IDSplit[3]].gain = decibelToLinear(Number(event.currentTarget.value));
+							var textRet = document.getElementById(event.currentTarget.id+"-ret");
+							textRet.textContent = String(event.currentTarget.value)+"dB";
+						};
+						var textRet = document.createElement("span");
+						textRet.textContent = String(linearToDecibel(aH.audioElements[j].gain))+"dB";
+						textRet.id = entry.id+"-gain-ret";
+						text.style.margin = "5px";
+						input.style.margin = "5px";
+						entry.appendChild(text);
+						entry.appendChild(input);
+						entry.appendChild(textRet);
 						var button_delete = document.createElement("button");
 						button_delete.textContent = "Delete";
 						button_delete.onclick = function() {
