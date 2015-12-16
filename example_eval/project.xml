@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BrowserEvalProjectDocument>
-	<setup interface="APE" projectReturn="save.php" randomiseOrder='true' collectMetrics='true' testPages="2">
+	<setup interface="APE" projectReturn="save.php" randomiseOrder='true' collectMetrics='true' testPages="2" loudness="-23">
 		<PreTest>
 			<question id="sessionId" mandatory="true">Please enter your name.</question>
 			<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
@@ -33,7 +33,7 @@
 			<option name="page-count"/>
 		</interface>
 	</setup>
-	<audioHolder id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true'>
+	<audioHolder id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true' loudness="-12">
 		<interface name="preference">
 			<title>Preference</title>
 			<scale position="0">Min</scale>
