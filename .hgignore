@@ -46,3 +46,6 @@ test-data
 *.fls
 Makefile
 *eps-converted-to.pdf
+re:^docs/DMRN+10/img/\._TestCreate\.png$
+re:^docs/DMRN+10/img/\._APE\.png$
+re:^docs/DMRN+10/img/\._MUSHRA\.png$
