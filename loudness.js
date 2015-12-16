@@ -94,8 +94,6 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 			}
 			var overallRelLoudness = calculateOverallLoudnessFromChannelBlocks(relgateEnergy);
 			buffer.lufs =  overallRelLoudness;
-			var diff = -23 -overallRelLoudness;
-			buffer.gain = decibelToLinear(diff);
 		}
 	}).catch(function(err) {
 		console.log(err);

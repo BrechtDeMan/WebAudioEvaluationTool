@@ -897,6 +897,13 @@ function AudioEngine(specification) {
 		this.audioObjects[audioObjectId].specification = element;
 		this.audioObjects[audioObjectId].url = URL;
 		this.audioObjects[audioObjectId].buffer = buffer;
+		var targetLUFS = this.audioObjects[audioObjectId].specification.parent.loudness;
+		if (typeof targetLUFS === "number")
+		{
+			buffer.buffer.gain = decibelToLinear(targetLUFS - buffer.buffer.lufs);
+		} else {
+			buffer.buffer.gain = 1.0;
+		}
 		if (buffer.buffer != null)
 		{
 			this.audioObjects[audioObjectId].state = 1;
@@ -1451,6 +1458,7 @@ function Specification() {
 	this.testPages = null;
 	this.audioHolders = [];
 	this.metrics = [];
+	this.loudness = null;
 	
 	this.decode = function(projectXML) {
 		// projectXML - DOM Parsed document
@@ -1471,6 +1479,14 @@ function Specification() {
 		} else {
 			this.testPages = Number(this.testPages);
 			if (this.testPages == 0) {this.testPages = null;}
+		}
+		if (setupNode.getAttribute('loudness') != null)
+		{
+			var XMLloudness = setupNode.getAttribute('loudness');
+			if (isNaN(Number(XMLloudness)) == false)
+			{
+				this.loudness = Number(XMLloudness);
+			}
 		}
 		var metricCollection = setupNode.getElementsByTagName('Metric');
 		
@@ -1587,6 +1603,7 @@ function Specification() {
 		setupNode.setAttribute('randomiseOrder',this.randomiseOrder);
 		setupNode.setAttribute('collectMetrics',this.collectMetrics);
 		setupNode.setAttribute('testPages',this.testPages);
+		if(this.loudness != null) {AHNode.setAttribute("loudness",this.loudness);}
 		
 		var setupPreTest = root.createElement("PreTest");
 		for (var i=0; i<this.preTest.options.length; i++)
@@ -1793,6 +1810,7 @@ function Specification() {
 		this.loop = undefined;
 		this.elementComments = undefined;
 		this.outsideReference = null;
+		this.loudness = null;
 		this.preTest = new parent.prepostNode("pretest");
 		this.postTest = new parent.prepostNode("pretest");
 		this.interfaces = [];
@@ -1813,7 +1831,18 @@ function Specification() {
 			else {this.loop == false;}
 			if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
 			else {this.elementComments = false;}
-			
+			if (typeof parent.loudness === "number")
+			{
+				this.loudness = parent.loudness;
+			}
+			if (xml.getAttribute('loudness') != null)
+			{
+				var XMLloudness = xml.getAttribute('loudness');
+				if (isNaN(Number(XMLloudness)) == false)
+				{
+					this.loudness = Number(XMLloudness);
+				}
+			}
 			var setupPreTestNode = xml.getElementsByTagName('PreTest');
 			if (setupPreTestNode.length != 0)
 			{
@@ -1880,6 +1909,7 @@ function Specification() {
 			AHNode.setAttribute("repeatCount",this.repeatCount);
 			AHNode.setAttribute("loop",this.loop);
 			AHNode.setAttribute("elementComments",this.elementComments);
+			if(this.loudness != null) {AHNode.setAttribute("loudness",this.loudness);}
 			
 			for (var i=0; i<this.interfaces.length; i++)
 			{
