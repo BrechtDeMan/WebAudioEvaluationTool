@@ -121,7 +121,7 @@ function calculateProcessedLoudness(buffer, winDur, overlap)
 		overlap = 0.5;
 	}
 	var winSize = buffer.sampleRate*winDur/1000;
-	var olapSize = overlap*winSize;
+	var olapSize = (1-overlap)*winSize;
 	var numberOfFrames = Math.floor(buffer.length/olapSize - winSize/olapSize + 1);
 	var blockEnergy = new Array(buffer.numberOfChannels);
 	for (var channel = 0; channel < buffer.numberOfChannels; channel++)
