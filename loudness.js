@@ -6,15 +6,17 @@
  *  multiple objects
  */
 
-function getLoudness(buffer, result, timescale, offlineContext)
+var interval_cal_loudness_event = null;
+
+function calculateLoudness(buffer, timescale, target, offlineContext)
 {
-	// This function returns the EBU R 128 specification loudness model
+	// This function returns the EBU R 128 specification loudness model and sets the linear gain required to match -23 LUFS
 	// buffer -> Web Audio API Buffer object
 	// timescale -> M or Momentary (returns Array), S or Short (returns Array),
 	//   I or Integrated (default, returns number)
+	// target -> default is -23 LUFS but can be any LUFS measurement.
 	
-	// Create the required filters
-	if (buffer == undefined || result == undefined)
+	if (buffer == undefined)
 	{
 		return 0;
 	}
@@ -22,10 +24,15 @@ function getLoudness(buffer, result, timescale, offlineContext)
 	{
 		timescale = "I";
 	}
+	if (target == undefined)
+	{
+		target = -23;
+	}
 	if (offlineContext == undefined)
 	{
 		offlineContext = new OfflineAudioContext(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
 	}
+	// Create the required filters
 	var KFilter = offlineContext.createBiquadFilter();
 	KFilter.type = "highshelf";
 	KFilter.gain.value = 4;
@@ -45,7 +52,6 @@ function getLoudness(buffer, result, timescale, offlineContext)
 	processSource.start();
 	offlineContext.startRendering().then(function(renderedBuffer) {
 		// Have the renderedBuffer information, now continue processing
-		console.log(renderedBuffer);
 		switch(timescale)
 		{
 		case "I":
@@ -87,11 +93,13 @@ function getLoudness(buffer, result, timescale, offlineContext)
 				}
 			}
 			var overallRelLoudness = calculateOverallLoudnessFromChannelBlocks(relgateEnergy);
-			result[0] =  overallRelLoudness;
+			buffer.lufs =  overallRelLoudness;
+			var diff = -23 -overallRelLoudness;
+			buffer.gain = decibelToLinear(diff);
 		}
 	}).catch(function(err) {
 		console.log(err);
-		result[0] = 1;
+		buffer.lufs = 1;
 	});
 }
 
