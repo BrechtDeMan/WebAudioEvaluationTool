@@ -19,6 +19,10 @@ var projectReturn; // Hold the URL for the return
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
+// Add a prototype to the bufferNode to hold the desired LINEAR gain
+AudioBuffer.prototype.gain = undefined;
+// Add a prototype to the bufferNode to hold the computed LUFS loudness
+AudioBuffer.prototype.lufs = undefined;
 
 window.onload = function() {
 	// Function called once the browser has loaded all files.
@@ -113,7 +117,8 @@ function loadProjectSpecCallback(response) {
 			}
 			if (buffer == null)
 			{
-				buffer = new audioEngineContext.bufferObj(URL);
+				buffer = new audioEngineContext.bufferObj();
+				buffer.getMedia(URL);
 				audioEngineContext.buffers.push(buffer);
 			}
 		});
@@ -757,45 +762,49 @@ function AudioEngine(specification) {
 	this.audioObjects = [];
 	
 	this.buffers = [];
-	this.bufferObj = function(url)
+	this.bufferObj = function()
 	{
-		this.url = url;
+		this.url = null;
 		this.buffer = null;
 		this.xmlRequest = new XMLHttpRequest();
 		this.users = [];
-		this.xmlRequest.open('GET',this.url,true);
-		this.xmlRequest.responseType = 'arraybuffer';
-		
-		var bufferObj = this;
-		
-		// Create callback to decode the data asynchronously
-		this.xmlRequest.onloadend = function() {
-			audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
-				bufferObj.buffer = decodedData;
-				for (var i=0; i<bufferObj.users.length; i++)
-				{
-					bufferObj.users[i].state = 1;
-					if (bufferObj.users[i].interfaceDOM != null)
+		this.getMedia = function(url) {
+			this.url = url;
+			this.xmlRequest.open('GET',this.url,true);
+			this.xmlRequest.responseType = 'arraybuffer';
+			
+			var bufferObj = this;
+			
+			// Create callback to decode the data asynchronously
+			this.xmlRequest.onloadend = function() {
+				audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
+					bufferObj.buffer = decodedData;
+					for (var i=0; i<bufferObj.users.length; i++)
 					{
-						bufferObj.users[i].interfaceDOM.enable();
+						bufferObj.users[i].state = 1;
+						if (bufferObj.users[i].interfaceDOM != null)
+						{
+							bufferObj.users[i].interfaceDOM.enable();
+						}
 					}
-				}
-			}, function(){
-				// Should only be called if there was an error, but sometimes gets called continuously
-				// Check here if the error is genuine
-				if (bufferObj.buffer == undefined) {
-					// Genuine error
-					console.log('FATAL - Error loading buffer on '+audioObj.id);
-					if (request.status == 404)
-					{
-						console.log('FATAL - Fragment '+audioObj.id+' 404 error');
-						console.log('URL: '+audioObj.url);
-						errorSessionDump('Fragment '+audioObj.id+' 404 error');
+					calculateLoudness(bufferObj.buffer,"I");
+				}, function(){
+					// Should only be called if there was an error, but sometimes gets called continuously
+					// Check here if the error is genuine
+					if (bufferObj.buffer == undefined) {
+						// Genuine error
+						console.log('FATAL - Error loading buffer on '+audioObj.id);
+						if (request.status == 404)
+						{
+							console.log('FATAL - Fragment '+audioObj.id+' 404 error');
+							console.log('URL: '+audioObj.url);
+							errorSessionDump('Fragment '+audioObj.id+' 404 error');
+						}
 					}
-				}
-			});
+				});
+			};
+			this.xmlRequest.send();
 		};
-		this.xmlRequest.send();
 	};
 	
 	this.play = function(id) {
@@ -838,7 +847,7 @@ function AudioEngine(specification) {
 						this.audioObjects[i].outputGain.gain.value = 0.0;
 						this.audioObjects[i].stop();
 					} else if (i == id) {
-						this.audioObjects[id].outputGain.gain.value = this.audioObjects[id].specification.gain;
+						this.audioObjects[id].outputGain.gain.value = this.audioObjects[id].specification.gain*this.audioObjects[id].buffer.buffer.gain;
 						this.audioObjects[id].play(audioContext.currentTime+0.01);
 					}
 				}
@@ -881,7 +890,8 @@ function AudioEngine(specification) {
 		if (buffer == null)
 		{
 			console.log("[WARN]: Buffer was not loaded in pre-test! "+URL);
-			buffer = new this.bufferObj(URL);
+			buffer = new this.bufferObj();
+			buffer.getMedia(URL);
 			this.buffers.push(buffer);
 		}
 		this.audioObjects[audioObjectId].specification = element;
@@ -931,24 +941,17 @@ function AudioEngine(specification) {
 	this.setSynchronousLoop = function() {
 		// Pads the signals so they are all exactly the same length
 		var length = 0;
-		var lens = [];
 		var maxId;
 		for (var i=0; i<this.audioObjects.length; i++)
 		{
-			lens.push(this.audioObjects[i].buffer.buffer.length);
 			if (length < this.audioObjects[i].buffer.buffer.length)
 			{
 				length = this.audioObjects[i].buffer.buffer.length;
 				maxId = i;
 			}
 		}
-		// Perform difference
-		for (var i=0; i<lens.length; i++)
-		{
-			lens[i] = length - lens[i];
-		}
 		// Extract the audio and zero-pad
-		for (var i=0; i<lens.length; i++)
+		for (var i=0; i<this.audioObjects.length; i++)
 		{
 			var orig = this.audioObjects[i].buffer.buffer;
 			var hold = audioContext.createBuffer(orig.numberOfChannels,length,orig.sampleRate);
@@ -959,8 +962,9 @@ function AudioEngine(specification) {
 				for (var n=0; n<orig.length; n++)
 				{inData[n] = outData[n];}
 			}
+			hold.gain = orig.gain;
+			hold.lufs = orig.lufs;
 			this.audioObjects[i].buffer.buffer = hold;
-			delete orig;
 		}
 	};
 	
@@ -994,7 +998,7 @@ function audioObject(id) {
 	this.buffer;
     
 	this.loopStart = function() {
-		this.outputGain.gain.value = 1.0;
+		this.outputGain.gain.value =  this.specification.gain*this.buffer.buffer.gain;
 		this.metric.startListening(audioEngineContext.timer.getTestTime());
 	};
 	
