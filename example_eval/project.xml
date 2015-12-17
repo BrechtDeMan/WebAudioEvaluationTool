@@ -35,7 +35,6 @@
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true' loudness="-12">
 		<interface name="preference">
-			<title>Preference</title>
 			<scale position="0">Min</scale>
 			<scale position="100">Max</scale>
 			<scale position="50">Middle</scale>

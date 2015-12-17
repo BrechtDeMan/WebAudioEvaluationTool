@@ -60,10 +60,15 @@ function loadInterface() {
 			}
 			if (interfaceTID.length != 0)
 			{
-				str += 'On axis "'+this.interfaceSliders[i].interfaceObject.title+'" you must move ';
+				var interfaceName = this.interfaceSliders[i].interfaceObject.title;
+				if (interfaceName == undefined) {
+					str += 'On axis '+String(i+1)+' you must move ';
+				} else {
+					str += 'On axis "'+interfaceName+'" you must move ';
+				}
 				if (interfaceTID.length == 1)
 				{
-					str += 'slider +'+interfaceTID[0]+'. ';
+					str += 'slider '+interfaceTID[0]+'. ';
 				}
 				else {
 					str += 'sliders ';
@@ -449,6 +454,8 @@ function interfaceSliderHolder(interfaceObject)
 	if (interfaceObject.title != undefined && typeof interfaceObject.title == "string")
 	{
 		titleSpan.textContent = interfaceObject.title;
+	} else {
+		titleSpan.textContent = "Axis "+String(this.id+1);
 	}
 	pagetitle.appendChild(titleSpan);
 	this.sliderDOM.appendChild(pagetitle);
