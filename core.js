@@ -1114,7 +1114,7 @@ function audioObject(id) {
 		if (this.specification.type != 'outsidereference') {
 			var interfaceXML = this.interfaceDOM.exportXMLDOM(this);
 			if (interfaceXML.length == undefined) {
-				root.appendChild();
+				root.appendChild(interfaceXML);
 			} else {
 				for (var i=0; i<interfaceXML.length; i++)
 				{
@@ -2755,7 +2755,7 @@ function Interface(specificationObject) {
 		for (var i = 0; i<audioEngineContext.audioObjects.length; i++)
 		{
 			var object = audioEngineContext.audioObjects[i];
-			var time = object.buffer.duration;
+			var time = object.buffer.buffer.duration;
 			var metric = object.metric;
 			var passed = false;
 			for (var j=0; j<metric.listenTracker.length; j++)
@@ -2779,7 +2779,7 @@ function Interface(specificationObject) {
 		}
 		if (check_pass == false)
 		{
-			var str_start = "You have not listened to fragments ";
+			var str_start = "You have not completely listened to fragments ";
 			for (var i=0; i<error_obj.length; i++)
 			{
 				str_start += error_obj[i];
