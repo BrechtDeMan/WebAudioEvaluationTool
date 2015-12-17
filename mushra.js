@@ -218,9 +218,32 @@ function sliderObject(audioObject)
 		return this.slider.value;
 	};
 	
+	this.resize = function(event)
+	{
+		this.holder.style.height = window.innerHeight-200 + 'px';
+		this.slider.style.height = window.innerHeight-250 + 'px';
+	}
+	
 	if (this.parent.state == 1)
 	{
 		this.enable();
+	}
+}
+
+function resizeWindow(event)
+{
+	// Function called when the window has been resized.
+	// MANDATORY FUNCTION
+	
+	// Auto-align
+	var numObj = audioEngineContext.audioObjects.length;
+	var totalWidth = (numObj-1)*150+100;
+	var diff = (window.innerWidth - totalWidth)/2;
+	document.getElementById('slider').style.height = window.innerHeight - 180 + 'px';
+	audioEngineContext.audioObjects[0].interfaceDOM.holder.style.marginLeft = diff + 'px';
+	for (var i in audioEngineContext.audioObjects)
+	{
+		audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
 	}
 }
 
