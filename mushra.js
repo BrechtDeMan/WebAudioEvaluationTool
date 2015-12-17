@@ -195,7 +195,7 @@ function sliderObject(audioObject)
 		console.log('slider '+id+' moved to '+this.value+' ('+time+')');
 	};
 	
-	this.play.textContent = "Play";
+	this.play.textContent = "Loading...";
 	this.play.value = audioObject.id;
 	this.play.style.float = "left";
 	this.play.style.width = "100%";
@@ -211,6 +211,7 @@ function sliderObject(audioObject)
 	
 	this.enable = function() {
 		this.play.disabled = false;
+		this.play.textContent = "Play";
 		$(this.slider).removeClass('track-slider-disabled');
 	};
 	
@@ -228,6 +229,12 @@ function sliderObject(audioObject)
 	{
 		this.holder.style.height = window.innerHeight-200 + 'px';
 		this.slider.style.height = window.innerHeight-250 + 'px';
+	}
+	this.updateLoading = function(progress)
+	{
+		progress = String(progress);
+		progress = progress.substr(0,5);
+		this.play.textContent = "Loading: "+progress+"%";
 	}
 	
 	if (this.parent.state == 1)

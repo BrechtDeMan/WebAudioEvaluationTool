@@ -767,6 +767,7 @@ function AudioEngine(specification) {
 		this.url = null;
 		this.buffer = null;
 		this.xmlRequest = new XMLHttpRequest();
+		this.xmlRequest.parent = this;
 		this.users = [];
 		this.getMedia = function(url) {
 			this.url = url;
@@ -807,7 +808,17 @@ function AudioEngine(specification) {
 			this.progressCallback = function(event){
 				if (event.lengthComputable)
 				{
-					this.progress = event.loaded / event.total;
+					this.parent.progress = event.loaded / event.total;
+					for (var i=0; i<this.parent.users.length; i++)
+					{
+						if(this.parent.users[i].interfaceDOM != null)
+						{
+							if (typeof this.parent.users[i].interfaceDOM.updateLoading === "function")
+							{
+								this.parent.users[i].interfaceDOM.updateLoading(this.parent.progress*100);
+							}
+						}
+					}
 				}
 			};
 			this.xmlRequest.addEventListener("progress", this.progressCallback);

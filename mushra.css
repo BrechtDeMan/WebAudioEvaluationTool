@@ -50,11 +50,8 @@ div.track-slider-playing {
 }
 
 input.track-slider-range {
-	width: 100%;
 	margin-left: 0px;
 	margin-right: 0px;
-	padding-left: 0px;
-	padding-top: 0px;
 }
 
 input[type=range][orient=vertical]
@@ -63,4 +60,5 @@ input[type=range][orient=vertical]
     -webkit-appearance: slider-vertical; /* WebKit */
     width: 8px;
     padding: 0 5px;
+    color: rgb(255, 144, 144);
 }
