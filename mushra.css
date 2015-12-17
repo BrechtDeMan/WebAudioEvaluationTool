@@ -45,11 +45,22 @@ div.track-slider {
 	padding:2px;
 }
 
+div.track-slider-playing {
+	background-color: #FFDDDD;
+}
+
+input.track-slider-range {
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-top: 0px;
+}
+
 input[type=range][orient=vertical]
 {
     writing-mode: bt-lr; /* IE */
     -webkit-appearance: slider-vertical; /* WebKit */
     width: 8px;
-    height: 175px;
     padding: 0 5px;
 }

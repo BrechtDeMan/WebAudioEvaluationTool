@@ -99,6 +99,10 @@ function loadTest(audioHolderObject)
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
 	var interfaceObj = audioHolderObject.interfaces;
+	if (interfaceObj.length > 1)
+	{
+		console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
+	}
 	
 	var sliderBox = document.getElementById('slider');
 	feedbackHolder.innerHTML = null;
@@ -171,12 +175,11 @@ function sliderObject(audioObject)
 	this.title.style.float = "left";
 	
 	this.slider.type = "range";
+	this.slider.className = "track-slider-range";
 	this.slider.min = "0";
 	this.slider.max = "1";
 	this.slider.step = "0.01";
 	this.slider.setAttribute('orient','vertical');
-	this.slider.style.float = "left";
-	this.slider.style.width = "100%";
 	this.slider.style.height = window.innerHeight-250 + 'px';
 	this.slider.onchange = function()
 	{
@@ -190,21 +193,19 @@ function sliderObject(audioObject)
 	this.play.value = audioObject.id;
 	this.play.style.float = "left";
 	this.play.style.width = "100%";
-	this.play.onclick = function()
+	this.play.disabled = true;
+	this.play.onclick = function(event)
 	{
-		audioEngineContext.play();
-		if (audioEngineContext.audioObjectsReady) {
-			var id = Number(event.srcElement.value);
-			//audioEngineContext.metric.sliderPlayed(id);
-			audioEngineContext.play(id);
-		}
+		var id = Number(event.srcElement.value);
+		//audioEngineContext.metric.sliderPlayed(id);
+		audioEngineContext.play(id);
+		$(".track-slider").removeClass('track-slider-playing');
+		$(event.currentTarget.parentElement).addClass('track-slider-playing');
 	};
 	
 	this.enable = function() {
-		if (this.parent.state == 1)
-		{
-			$(this.slider).removeClass('track-slider-disabled');
-		}
+		this.play.disabled = false;
+		$(this.slider).removeClass('track-slider-disabled');
 	};
 	
 	this.exportXMLDOM = function(audioObject) {
@@ -216,6 +217,11 @@ function sliderObject(audioObject)
 	this.getValue = function() {
 		return this.slider.value;
 	};
+	
+	if (this.parent.state == 1)
+	{
+		this.enable();
+	}
 }
 
 
