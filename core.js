@@ -2819,4 +2819,64 @@ function Interface(specificationObject) {
 			alert(str_start);
 		}
 	};
+	this.checkAllMoved = function()
+	{
+		var str = "You have not moved ";
+		var failed = [];
+		for (var i in audioEngineContext.audioObjects)
+		{
+			if(audioEngineContext.audioObjects[i].metric.wasMoved == false)
+			{
+				failed.push(audioEngineContext.audioObjects[i].id);
+			}
+		}
+		if (failed.length == 0)
+		{
+			return true;
+		} else if (failed.length == 1)
+		{
+			str += 'track '+failed[0];
+		} else {
+			str += 'tracks ';
+			for (var i=0; i<failed.length-1; i++)
+			{
+				str += failed[i]+', ';
+			}
+			str += 'and '+failed[i];
+		}
+		str +='.';
+		alert(str);
+		console.log(str);
+		return false;
+	};
+	this.checkAllPlayed = function()
+	{
+		var str = "You have not played ";
+		var failed = [];
+		for (var i in audioEngineContext.audioObjects)
+		{
+			if(audioEngineContext.audioObjects[i].metric.wasListenedTo == false)
+			{
+				failed.push(audioEngineContext.audioObjects[i].id);
+			}
+		}
+		if (failed.length == 0)
+		{
+			return true;
+		} else if (failed.length == 1)
+		{
+			str += 'track '+failed[0];
+		} else {
+			str += 'tracks ';
+			for (var i=0; i<failed.length-1; i++)
+			{
+				str += failed[i]+', ';
+			}
+			str += 'and '+failed[i];
+		}
+		str +='.';
+		alert(str);
+		console.log(str);
+		return false;
+	};
 }
