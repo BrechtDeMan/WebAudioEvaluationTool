@@ -1847,6 +1847,7 @@ function Specification() {
 		this.elementComments = undefined;
 		this.outsideReference = null;
 		this.loudness = null;
+		this.initialPosition = null;
 		this.preTest = new parent.prepostNode("pretest");
 		this.postTest = new parent.prepostNode("pretest");
 		this.interfaces = [];
@@ -1870,6 +1871,18 @@ function Specification() {
 			if (typeof parent.loudness === "number")
 			{
 				this.loudness = parent.loudness;
+			}
+			if (typeof xml.getAttribute('initial-position') === "string")
+			{
+				var xmlInitialPosition = Number(xml.getAttribute('initial-position'));
+				if (isNaN(xmlInitialPosition) == false)
+				{
+					if (xmlInitialPosition > 1)
+					{
+						xmlInitialPosition /= 100;
+					}
+					this.initialPosition = xmlInitialPosition;
+				}
 			}
 			if (xml.getAttribute('loudness') != null)
 			{
@@ -1946,7 +1959,9 @@ function Specification() {
 			AHNode.setAttribute("loop",this.loop);
 			AHNode.setAttribute("elementComments",this.elementComments);
 			if(this.loudness != null) {AHNode.setAttribute("loudness",this.loudness);}
-			
+			if(this.initialPosition != null) {
+				AHNode.setAttribute("loudness",this.initialPosition*100);
+				}
 			for (var i=0; i<this.interfaces.length; i++)
 			{
 				AHNode.appendChild(this.interfaces[i].encode(root));
