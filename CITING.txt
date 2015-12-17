@@ -1,0 +1,11 @@
+If you are using this tool in your work, please cite: 
+
+Nicholas Jillings, Brecht De Man, David Moffat and Joshua D. Reiss, "Web Audio Evaluation Tool: A Browser-Based Listening Test Environment," 12th Sound and Music Computing Conference, July 2015.
+
+
+Feel free to let us know how you have used it! We highly welcome any kind of feedback, bug reports and feature requests. 
+
+n.g.r.jillings@se14.qmul.ac.uk
+b.deman@qmul.ac.uk
+d.j.moffat@qmul.ac.uk
+joshua.reiss@qmul.ac.uk
