@@ -784,7 +784,7 @@ function AudioEngine(specification) {
 						bufferObj.users[i].state = 1;
 						if (bufferObj.users[i].interfaceDOM != null)
 						{
-							bufferObj.users[i].interfaceDOM.enable();
+							bufferObj.users[i].bufferLoaded(bufferObj);
 						}
 					}
 					calculateLoudness(bufferObj.buffer,"I");
@@ -904,19 +904,11 @@ function AudioEngine(specification) {
 		}
 		this.audioObjects[audioObjectId].specification = element;
 		this.audioObjects[audioObjectId].url = URL;
-		this.audioObjects[audioObjectId].buffer = buffer;
-		var targetLUFS = this.audioObjects[audioObjectId].specification.parent.loudness;
-		if (typeof targetLUFS === "number")
-		{
-			buffer.buffer.gain = decibelToLinear(targetLUFS - buffer.buffer.lufs);
-		} else {
-			buffer.buffer.gain = 1.0;
-		}
+		buffer.users.push(this.audioObjects[audioObjectId]);
 		if (buffer.buffer != null)
 		{
-			this.audioObjects[audioObjectId].state = 1;
+			this.audioObjects[audioObjectId].bufferLoaded(buffer);
 		}
-		buffer.users.push(this.audioObjects[audioObjectId]);
 		return this.audioObjects[audioObjectId];
 	};
 	
@@ -1011,6 +1003,42 @@ function audioObject(id) {
 	// the audiobuffer is not designed for multi-start playback
 	// When stopeed, the buffer node is deleted and recreated with the stored buffer.
 	this.buffer;
+	
+	this.bufferLoaded = function(callee)
+	{
+		// Called by the associated buffer when it has finished loading, will then 'bind' the buffer to the
+		// audioObject and trigger the interfaceDOM.enable() function for user feedback
+		if (audioEngineContext.loopPlayback){
+			// First copy the buffer into this.buffer
+			this.buffer = new audioEngineContext.bufferObj();
+			this.buffer.url = callee.url;
+			this.buffer.buffer = audioContext.createBuffer(callee.buffer.numberOfChannels, callee.buffer.length, callee.buffer.sampleRate);
+			for (var c=0; c<callee.buffer.numberOfChannels; c++)
+			{
+				var src = callee.buffer.getChannelData(c);
+				var dst = this.buffer.buffer.getChannelData(c);
+				for (var n=0; n<src.length; n++)
+				{
+					dst[n] = src[n];
+				}
+			}
+		} else {
+			this.buffer = callee;
+		}
+		this.state = 1;
+		this.buffer.buffer.gain = callee.buffer.gain;
+		this.buffer.buffer.lufs = callee.buffer.lufs;
+		var targetLUFS = this.specification.parent.loudness;
+		if (typeof targetLUFS === "number")
+		{
+			this.buffer.buffer.gain = decibelToLinear(targetLUFS - this.buffer.buffer.lufs);
+		} else {
+			this.buffer.buffer.gain = 1.0;
+		}
+		if (this.interfaceDOM != null) {
+			this.interfaceDOM.enable();
+		}
+	};
     
 	this.loopStart = function() {
 		this.outputGain.gain.value =  this.specification.gain*this.buffer.buffer.gain;
