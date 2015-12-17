@@ -269,7 +269,7 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 	// Check that the anchor and reference objects are correctly placed
 	if (interfaceContext.checkHiddenAnchor() == false) {return;}
 	if (interfaceContext.checkHiddenReference() == false) {return;}
-	/*
+	
 	for (var i=0; i<checks.length; i++) {
 		if (checks[i].type == 'check')
 		{
@@ -295,17 +295,20 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 				var checkState = interfaceContext.checkAllCommented();
 				if (checkState == false) {canContinue = false;}
 				break;
-			case 'scalerange':
+			//case 'scalerange':
 				// Check the scale is used to its full width outlined by the node
-				var checkState = interfaceContext.checkScaleRange();
-				if (checkState == false) {canContinue = false;}
+				//var checkState = interfaceContext.checkScaleRange();
+				//if (checkState == false) {canContinue = false;}
+			//	break;
+			default:
+				console.log("WARNING - Check option "+checks[i].check+" is not supported on this interface");
 				break;
 			}
 
 		}
 		if (!canContinue) {break;}
 	}
-   */
+	
     if (canContinue) {
 	    if (audioEngineContext.status == 1) {
 	        var playback = document.getElementById('playback-button');
