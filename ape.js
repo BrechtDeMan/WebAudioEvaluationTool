@@ -587,7 +587,17 @@ function sliderObject(audioObject,interfaceObjects) {
 			});
 		}
 	};
-	
+	this.updateLoading = function(progress)
+	{
+		if (progress != 100)
+		{
+			progress = String(progress);
+			progress = progress.split('.')[0];
+			this.trackSliderObjects[0].children[0].textContent = progress+'%';
+		} else {
+			this.trackSliderObjects[0].children[0].textContent = this.parent.id;
+		}
+	};
 	this.exportXMLDOM = function(audioObject) {
 		// Called by the audioObject holding this element. Must be present
 		var obj = [];
