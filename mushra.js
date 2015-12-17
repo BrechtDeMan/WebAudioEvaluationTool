@@ -137,8 +137,14 @@ function loadTest(audioHolderObject)
 		// Create a slider per track
 		audioObject.interfaceDOM = new sliderObject(audioObject);
 		
-		// Distribute it randomnly
-		audioObject.interfaceDOM.slider.value = Math.random();
+		if (typeof audioHolderObject.initialPosition === "number")
+		{
+			// Set the values
+			audioObject.interfaceDOM.slider.value = audioHolderObject.initalPosition;
+		} else {
+			// Distribute it randomnly
+			audioObject.interfaceDOM.slider.value = Math.random();
+		}
 		
 		sliderBox.appendChild(audioObject.interfaceDOM.holder);
 		audioObject.metric.initialised(audioObject.interfaceDOM.slider.value);
