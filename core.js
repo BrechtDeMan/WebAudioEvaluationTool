@@ -803,6 +803,14 @@ function AudioEngine(specification) {
 					}
 				});
 			};
+			this.progress = 0;
+			this.progressCallback = function(event){
+				if (event.lengthComputable)
+				{
+					this.progress = event.loaded / event.total;
+				}
+			};
+			this.xmlRequest.addEventListener("progress", this.progressCallback);
 			this.xmlRequest.send();
 		};
 	};
