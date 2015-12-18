@@ -69,9 +69,16 @@ function loadInterface() {
 	// Create a slider box
 	var sliderBox = document.createElement('div');
 	sliderBox.style.width = "100%";
-	sliderBox.style.height = window.innerHeight - 180 + 'px';
+	sliderBox.style.height = window.innerHeight - 200+12 + 'px';
+	sliderBox.style.marginBottom = '10px';
 	sliderBox.id = 'slider';
-	sliderBox.align = "center";
+	var scaleHolder = document.createElement('div');
+	scaleHolder.id = "scale-holder";
+	sliderBox.appendChild(scaleHolder);
+	var sliderObjectHolder = document.createElement('div');
+	sliderObjectHolder.id = 'slider-holder';
+	sliderObjectHolder.align = "center";
+	sliderBox.appendChild(sliderObjectHolder);
 	
 	// Global parent for the comment boxes on the page
 	var feedbackHolder = document.createElement('div');
@@ -109,7 +116,7 @@ function loadTest(audioHolderObject)
 		document.getElementById("pageTitle").textContent = interfaceObj.title;
 	}
 	
-	var sliderBox = document.getElementById('slider');
+	var sliderBox = document.getElementById('slider-holder');
 	feedbackHolder.innerHTML = null;
 	sliderBox.innerHTML = null;
 	
@@ -160,7 +167,7 @@ function loadTest(audioHolderObject)
 	var numObj = audioHolderObject.audioElements.length;
 	var totalWidth = (numObj-1)*150+100;
 	var diff = (window.innerWidth - totalWidth)/2;
-	audioEngineContext.audioObjects[0].interfaceDOM.holder.style.marginLeft = diff + 'px';
+	sliderBox.style.marginLeft = diff + 'px';
 }
 
 function sliderObject(audioObject)
@@ -178,7 +185,10 @@ function sliderObject(audioObject)
 	this.holder.appendChild(this.slider);
 	this.holder.appendChild(this.play);
 	this.holder.align = "center";
-	this.holder.style.marginLeft = "50px";
+	if (audioObject.id == 0)
+	{
+		this.holder.style.marginLeft = '0px';
+	}
 	this.holder.setAttribute('trackIndex',audioObject.id);
 	
 	this.title.textContent = audioObject.id;
@@ -259,7 +269,8 @@ function resizeWindow(event)
 	var totalWidth = (numObj-1)*150+100;
 	var diff = (window.innerWidth - totalWidth)/2;
 	document.getElementById('slider').style.height = window.innerHeight - 180 + 'px';
-	audioEngineContext.audioObjects[0].interfaceDOM.holder.style.marginLeft = diff + 'px';
+	if (diff <= 0){diff = 0;}
+	document.getElementById('slider-holder').style.marginLeft = diff + 'px';
 	for (var i in audioEngineContext.audioObjects)
 	{
 		audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
