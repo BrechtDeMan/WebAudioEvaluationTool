@@ -124,9 +124,9 @@ The tool is available in its entirety including source code on \url{https://code
 	\subsection{Local test}
 		If the test is hosted locally, you will need to run the local webserver provided with this tool. 
 		
-		\subsubsection{Mac OS X}
+		\subsubsection{Mac OS X \& Linux}
 
-			On Mac OS X, Python comes preinstalled. 
+			On Mac OS X, Python comes preinstalled, as with most Unix/Linux distributions.
 
 			Open the Terminal (find it in \textbf{Applications/Terminal} or via Spotlight), and go to the folder you downloaded. To do this, type \texttt{cd [folder]}, where \texttt{[folder]} is the folder where to find the \texttt{pythonServer.py} script you downloaded. For instance, if the location is \texttt{/Users/John/Documents/test/}, then type
 			
@@ -148,7 +148,7 @@ The tool is available in its entirety including source code on \url{https://code
 
 	        Alternatively, you can simply type \texttt{python} (follwed by a space) and drag the file into the Terminal window from Finder. % DOESN'T WORK YET
 			
-			You can leave this running throughout the different experiments (i.e. leave the Terminal open). 
+			You can leave this running throughout the different experiments (i.e. leave the Terminal open). Once running the terminal will report the current URL to type into your browser to initiate the test, usually this is http://localhost:8000/.
 
 			To start the test, open the browser and type 
 				
@@ -216,6 +216,8 @@ The tool is available in its entirety including source code on \url{https://code
 
 		Then, just go to the URL of the corresponding HTML file, e.g. \texttt{http://server.com/path/to/WAET/index.html?url=test/my-test.xml}. If storing on the server doesn't work at submission (e.g. if the \texttt{projectReturn} attribute isn't properly set), the result XML file will be presented to the subject on the client side, as a `Save file' link. 
 
+    \subsection{Multiple test documents}
+        By default the index page will load a demo page of tests. To automatically load a test document, you need to append the location in the URL. If your URL is normally http://localhost:8000/index.html you would append the following: \texttt{?url=/path/to/your/test.xml}. Replace the fields with your actual path, the path is local to the running directory, so if you have your test in the directory \texttt{example\_eval} called \texttt{project.xml} you would append \texttt{?url=/example\_eval/project.xml}.
 
 \clearpage
 
@@ -245,18 +247,15 @@ The tool is available in its entirety including source code on \url{https://code
 	As the example project showcases (nearly) all of these features, please refer to its configuration XML document for a demonstration of how to enable and adjust them. 
 
 	\subsection{Surveys}
-		\subsubsection{Pre- and post-page surveys}
-
-		\subsubsection{Pre- and post-test surveys}
-
+	    Surveys are conducted through an in-page popup window which can collect data using various HTML functions, see Survey elements below for a list. Survey questions are placed into the \texttt{<pretest>} or \texttt{<posttest>} nodes. Appending these nodes to the \texttt{<setup>} node will have the survey options appear before any test pages (if in the \texttt{<pretest>} node) or after all test pages. Placing the survey options in the \texttt{<audioholder>} node will have them appear before or after the test page they are a child of.
 		\subsubsection{Survey elements}
 			All survey elements (which `pop up' in the centre of the browser) have an \texttt{id} attribute, for retrieval of the responses in post-processing of the results, and a \texttt{mandatory} attribute, which if set to ``true'' requires the subjects to respond before they can continue. 
 
 			\begin{description}
 				\item[statement] Simply shows text to the subject until `Next' or `Start' is clicked. 
-				\item[question] Expects a text answer (in a text box). Has the \texttt{boxsize} argument: set to ``large'' or ``huge'' for a bigger box size.
-				\item[number] Expects a numerical value. Attribute \texttt{min="0"} specifies the minimum value - in this case the answer must be stricly positive before the subject can continue. 
-				\item[radio] Radio buttons. 
+				\item[question] Expects a text answer (in a text box). Has the \texttt{boxsize} argument: set to ``large'' or ``huge'' for a bigger box size, or ``small'' for small.
+				\item[number] Only accepts a numerical value. Attribute \texttt{min="0"} specifies the minimum value - in this case the answer must be stricly positive before the subject can continue.
+				\item[radio] Radio buttons. Presents a list of options to the user using radio buttons, where only one option from the list can be selected.
 				\item[checkbox] Checkboxes. Note that when making a checkbox question ``mandatory'', the subject is forced to select at least one option (which could be e.g. `Other' or `None').\\
 			\end{description}
 
@@ -307,31 +306,33 @@ The tool is available in its entirety including source code on \url{https://code
 	\subsection{Randomisation}
 
 		\subsubsection{Randomisation of configuration XML files}
+		    The python server has a special function to automatically cycle through a list of test pages. Instead of directly requesting an XML, simply setting the url item in the browser URL to \texttt{pseudo.xml} will cycle through a list of XMLs. These XMLs must be in the local directory called \texttt{pseudo}.
 			% how to
 			% explain how this is implemented in the pythonServer
-			%Nick? already implemented in the PHP? 
+			%Nick? already implemented in the PHP?
+			% Needs to be implemented in PHP and automated better, will complete soon
 
 
 		\subsubsection{Randomsation of page order}
-
+        The page order randomisation is set by the \texttt{<setup>} node attribute \texttt{randomise-order}, for example \texttt{<setup ... randomise-order="true">...</setup>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order.
 
 		\subsubsection{Randomisation of axis order}
 
 		\subsubsection{Randomisation of fragment order}
-
+        The audio fragment randomisation is set by the \texttt{<audioholder>} node attribute \texttt{randomise-order}, for example \texttt{<audioholder ... randomise-order="true">...</audioholder>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order.
 
 		\subsubsection{Randomisation of initial slider position}
-
+        By default slider values are randomised on start. The MUSHRA interface supports setting the initial values of all sliders throught the \texttt{<audioholder>} attribute \texttt{initial-position}. This takes an integer between 0 and 100 to signify the slider position.
 		% /subsubsection{Randomisation of survey question order}
 		% should be an attribute of the individual 'pretest' and 'posttest' elements
 		% uncomment once we have it
 
 	\subsection{Looping}
-		Loops the fragments 
-		% how to enable? 
+	    Looping enables the fragments to loop until stopped by the user. Looping is synchronous between samples so all samples start at the same time.
+		Individual test pages can have their playback looped by the \texttt{<audioholder>} attribute \texttt{loop} with a value of "true" or "false".
 		If the fragments are not of equal length initially, they are padded with zeros so that they are equal length, to enable looping without the fragments going out of sync relative to each other. 
 
-		Note that fragments cannot be played until all fragments are loaded when in looped mode, as the engine needs to assess whether all %Nick? Is this accurate? 
+		Note that fragments cannot be played until all page fragments are loaded when in looped mode, as the engine needs to know the amount to pad the fragments.
 
 	\subsection{Sample rate}
 		If you require the test to be conducted at a certain sample rate (i.e. you do not tolerate resampling of the elements to correspond with the system's sample rate), add \texttt{sampleRate="96000"} - where ``96000'' can be any support sample rate - so that a warning message is shown alerting the subject the system's sample rate is different from this enforced sample rate. This of course means that in one test, all sample rates must be equal as it is impossible to change the system's sample rates during the test (even if you were to manually change it, then the browser must be restarted for it to take effect). 
@@ -342,9 +343,9 @@ The tool is available in its entirety including source code on \url{https://code
 		Make visible by adding \texttt{<option name='playhead'/>} to the \texttt{interface} node (see Section \ref{sec:checks}: Checks). 
 
 	\subsection{Metrics}
-		Enable the collection of metrics by adding \texttt{collectMetrics=`true'} in the \texttt{setup} node. 
+		Enable the collection of metrics by adding \texttt{collectMetrics=`true'} in the \texttt{setup} node. % Should this always be on??
 
-		The \texttt{Metric} node, which contains the metrics to be tracked during the complete test, is a child of the \texttt{setup} node, and it could look as follows. 
+		The \texttt{Metric} node, which contains the metrics to be tracked during the complete test, is a child of the \texttt{setup} node, and it could look as follows.
 
 		\begin{lstlisting}
 <Metric>
@@ -362,32 +363,38 @@ The tool is available in its entirety including source code on \url{https://code
 
 		\subsubsection{Time test duration}
 			\texttt{testTimer}\\
+			One per test page. Presents the total test time from the first playback on the test page to the submission of the test page (exculding test time of the pre-/post- test surveys). This is presented in the results as \texttt{<metricresult id="testTime"> 8.60299319727892 </metricresult>}. The time is in seconds.
 
 		\subsubsection{Time fragment playback}
 			\texttt{elementTimer}\\
-			This keeps track of when each fragment is played back and stopped again, \emph{and} which part of the fragment has been played back at that time. 
-			% example output? 
+			One per audio fragment per test page. This totals up the entire time the audio fragment has been listened to in this test and presented \texttt{<metricresult name="enableElementTimer"> 1.0042630385487428 </metricresult>}. The time is in seconds.
 
 		\subsubsection{Initial positions}
 			\texttt{elementInitialPosition}\\
-			Tracks the initial position of the sliders, especially relevant when these are randomised, so their influence 
+			One per audio fragment per test page. Tracks the initial position of the sliders, especially relevant when these are randomised. Example result \texttt{<metricresult name="elementInitialPosition"> 0.8395522388059702 </metricresult>}.
 
 		\subsubsection{Track movements}
-
+		    \texttt{elementTracker}\\
+		    One per audio fragment per test page. Tracks the movement of each interface object. Each movement event has the time it occured at and the new value.
 		\subsubsection{Which fragments listened to}
-
+		    \texttt{elementFlagListenedTo}\\
+		    One per audio fragment per test page. Boolean response, set to true if listened to.
 		\subsubsection{Which fragments moved}
-			Binary check whether or not a the marker corresponding with a particular fragment was moved at all throughout the experiment. 
+		    \texttt{elementFlagMoved}\\
+			One per audio fragment per test page. Binary check whether or not a the marker corresponding with a particular fragment was moved at all throughout the experiment. 
 
-		\subsubsection{elementListenTracker} %Nick? No idea what this does, if it's not what I wrote under 'Time fragment playback'
+		\subsubsection{elementListenTracker}
+		    \texttt{elementListenTracker}\\
+		    One per audio fragment per test page. Tracks the playback events of each audio element pairing both the time in the test when playback started and when it stopped, it also gives the buffertime positions.
 
 	\subsection{References and anchors}
-		\subsubsection{Reference}
-		%...
+	    The audio elements, \texttt{<audioelement>} have the attribute \texttt{type}, which defaults to normal. Setting this to one of the following will have the following effects.
+		\subsubsection{Outside Reference}
+		    Set type to 'outside-reference'. This will place the object in a separate playback element clearly labelled as an outside reference. This is exempt of any movement checks but will still be included in any listening checks.
 		\subsubsection{Hidden reference} 
-		%...
+		    Set type to 'reference'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the 'reference' type in the results to quickly find it. The reference can be forced to be below a value before completing the test page by setting the attribute 'marker' to be a value between 0 and 100 representing the integer value position it must be equal to or above.
 		\subsubsection{Hidden anchor}
-		%...
+		    Set type to 'anchor'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the 'anchor' type in the results to quickly find it. The anchor can be forced to be below a value before completing the test page by setting the attribute 'marker' to be a value between 0 and 100 representing the integer value position it must be equal to or below.
 
 	\subsection{Checks}
 		\label{sec:checks}
@@ -464,12 +471,13 @@ The tool is available in its entirety including source code on \url{https://code
 	\subsection{Gain}
 		It is possible to set the gain (in decibel) applied to the different audioelements, as an attribute of the \texttt{audioelement} nodes in the configuration XML file: 
 
-		\texttt{<audioElements url="sample-01.wav" gain="-6" id="sample01quieter" />}
+		\texttt{<audioElements url="sample-01.wav" gain="-6" id="sample01quieter" />}\\
+		Please note, there are no checks on this to detect if accidentaly typed in linear.
 
 	\subsection{Loudness}
 		% automatic loudness equalisation
 		% guide to loudness.js 
-		Set the loudness for a complete test by adding \texttt{loudness="-23"} to the \texttt{setup} node in the configuration XML file, where -23 is an example loudness in LUFS. 
+		Each audio fragment on loading has its loudness calculated. The tool uses the EBU R 128 recommendation following the ITU-R BS.1770-4 loduness calculations to return the integreated LUFS loudness. The attribute \texttt{loudness} will set the loudness from the scope it is applied in. Applying it in the \texttt{<setup>} node will set the loudness for all test pages. Applying it in the \texttt{<audioholder>} node will set the loudness for that page. Applying it in the \texttt{<audioelement>} node will set the loudness for that fragment. The scope is set locally, so if there is a loudness on both the \texttt{<audioholder>} and \texttt{<setup>} nodes, that test page will take the value associated with the \texttt{<audioholder>}. The loudness attribute is set in LUFS
 
 \clearpage
 
@@ -484,6 +492,8 @@ The tool is available in its entirety including source code on \url{https://code
 	The tool examines your XML before exporting to ensure you do not export an invalid XML structure which would crash the test.
 	
 	This guide will help you to construct your own interface on top of the WAET (Web Audio Evaluation Tool) engine. The WAET engine resides in the core.js file, this contains prototype objects to handle most of the test creation, operation and data collection. The interface simply has to link into this at the correct points.
+	
+\section{Building your own interface}
 
 	\subsection{Nodes to familiarise}
 		Core.js handles several very important nodes which you should become familiar with. The first is the Audio Engine, initialised and stored in variable `AudioEngineContext'. This handles the playback of the web audio nodes as well as storing the `AudioObjects'. The `AudioObjects' are custom nodes which hold the audio fragments for playback. These nodes also have a link to two interface objects, the comment box if enabled and the interface providing the ranking. On creation of an `AudioObject' the interface link will be nulled, it is up to the interface to link these correctly.
