@@ -102,16 +102,16 @@ input.track-slider-not-moved[type=range]::-moz-range-track {
 	background: #aaa;
 }
 
+
 input[type=range]::-moz-range-thumb {
 	margin-left: -7px;
 	cursor: pointer;
-	margin-top: -1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-	box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d; /* Add cool effects to your sliders! */
+	margin-top: -1px;
+	box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
 }
 
 input[type=range]::-webkit-slider-thumb {
-	margin-left: -7px;
 	cursor: pointer;
-	margin-top: -1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-	box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d; /* Add cool effects to your sliders! */
+	margin-top: -1px;
+	margin-left: -4px;
 }
