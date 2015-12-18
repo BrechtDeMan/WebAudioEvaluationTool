@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt # plots
 import numpy as np # numbers
 
 # Command line arguments
-assert len(sys.argv)<4, "evaluation_stats takes at most 2 command line argument\n"+\
+assert len(sys.argv)<4, "generate_report takes at most 2 command line arguments\n"+\
                         "Use: python generate_report.py [results_folder] [no_render | -nr]"
 
 render_figures = True
