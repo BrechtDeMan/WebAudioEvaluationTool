@@ -32,7 +32,7 @@ We request that you acknowledge the authors and cite our work when using it \cit
 
 The tool is available in its entirety including source code on \url{https://code.soundsoftware.ac.uk/projects/webaudioevaluationtool/}, under the GNU General Public License v3.0 (\url{http://choosealicense.com/licenses/gpl-3.0/}), see also LICENSE.txt. 
 
-% TO DO: Linux
+% TO DO: Linux (Android, iOS)
 
 \tableofcontents
 
@@ -257,7 +257,7 @@ The tool is available in its entirety including source code on \url{https://code
 				\item[question] Expects a text answer (in a text box). Has the \texttt{boxsize} argument: set to ``large'' or ``huge'' for a bigger box size.
 				\item[number] Expects a numerical value. Attribute \texttt{min="0"} specifies the minimum value - in this case the answer must be stricly positive before the subject can continue. 
 				\item[radio] Radio buttons. 
-				\item[checkbox] Checkboxes.\\
+				\item[checkbox] Checkboxes. Note that when making a checkbox question ``mandatory'', the subject is forced to select at least one option (which could be e.g. `Other' or `None').\\
 			\end{description}
 
 			\textbf{Example usage:}\\
@@ -294,6 +294,11 @@ The tool is available in its entirety including source code on \url{https://code
 		<option name="good">Good</option>
 		<option name="great">Great</option>
 	</radio>
+	<checkbox id="checkboxtest" mandatory="true">
+				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
+				<option name="musician">Playing a musical instrument</option>
+				<option name="soundengineer">Recording or mixing audio</option>
+			</checkbox>
 	<statement>Thank you for taking this listening test. Please click 'Submit' and your results will appear in the 'saves/' folder.</statement>
 </PostTest>
 			\end{lstlisting}
@@ -641,9 +646,11 @@ The tool is available in its entirety including source code on \url{https://code
 
 \clearpage
 
-\section{Vocabulary} % just to keep track of what exactly we call things. Don't use terms that are too different, to avoid confusion.
+\section{Terminology} % just to keep track of what exactly we call things. Don't use terms that are too different, to avoid confusion.
+	As a guide to better understand the Instructions, and to expand them later, here is a list of terms that may be unclear or ambiguous unless properly defined. 
 	\begin{description}
 		\item[Subject] The word we use for a participant, user, ... of the test, i.e. not the experimenter who designs the test but the person who evaluates the audio under test as part of an experiment (or the preparation of one). 
+		\item[User] The person who uses the tool to configure, run and analyse the test - i.e. the experimenter, most likely a researcher - or at least 
 		\item[Page] A screen in a test; corresponds with an \texttt{audioholder}
 		\item[Fragment] An element or sample in a test; corresponds with an \texttt{audioelement}
 		\item[Test] A complete test which can consist of several pages; corresponds with an entire configuration XML file

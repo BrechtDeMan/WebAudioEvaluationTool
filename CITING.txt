@@ -5,7 +5,7 @@ Nicholas Jillings, Brecht De Man, David Moffat and Joshua D. Reiss, "Web Audio E
 
 Feel free to let us know how you have used it! We highly welcome any kind of feedback, bug reports and feature requests. 
 
-n.g.r.jillings@se14.qmul.ac.uk
+nicholas.jillings@mail.bcu.ac.uk
 b.deman@qmul.ac.uk
 d.j.moffat@qmul.ac.uk
 joshua.reiss@qmul.ac.uk

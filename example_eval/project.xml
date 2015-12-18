@@ -3,6 +3,14 @@
 	<setup interface="APE" projectReturn="save.php" randomiseOrder='true' collectMetrics='true' testPages="2" loudness="-23">
 		<PreTest>
 			<question id="sessionId" mandatory="true">Please enter your name.</question>
+			<checkbox id="checkboxtest" mandatory="true">
+				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
+				<option name="musician">Playing a musical instrument</option>
+				<option name="soundengineer">Recording or mixing audio</option>
+				<option name="developer">Developing audio software</option>
+				<option name="hwdesigner">Designing or building audio hardware</option>
+				<option name="researcher">Research in the field of audio</option>
+			</checkbox>
 			<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
 		</PreTest>
 		<PostTest>
