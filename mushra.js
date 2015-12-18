@@ -181,7 +181,7 @@ function sliderObject(audioObject)
 	this.title.style.float = "left";
 	
 	this.slider.type = "range";
-	this.slider.className = "track-slider-range";
+	this.slider.className = "track-slider-range track-slider-not-moved";
 	this.slider.min = "0";
 	this.slider.max = "1";
 	this.slider.step = "0.01";
@@ -193,6 +193,7 @@ function sliderObject(audioObject)
 		var id = Number(this.parentNode.getAttribute('trackIndex'));
 		audioEngineContext.audioObjects[id].metric.moved(time,this.value);
 		console.log('slider '+id+' moved to '+this.value+' ('+time+')');
+		$(this).removeClass('track-slider-not-moved');
 	};
 	
 	this.play.textContent = "Loading...";
@@ -202,7 +203,7 @@ function sliderObject(audioObject)
 	this.play.disabled = true;
 	this.play.onclick = function(event)
 	{
-		var id = Number(event.srcElement.value);
+		var id = Number(event.currentTarget.value);
 		//audioEngineContext.metric.sliderPlayed(id);
 		audioEngineContext.play(id);
 		$(".track-slider").removeClass('track-slider-playing');
@@ -229,13 +230,13 @@ function sliderObject(audioObject)
 	{
 		this.holder.style.height = window.innerHeight-200 + 'px';
 		this.slider.style.height = window.innerHeight-250 + 'px';
-	}
+	};
 	this.updateLoading = function(progress)
 	{
 		progress = String(progress);
 		progress = progress.substr(0,5);
 		this.play.textContent = "Loading: "+progress+"%";
-	}
+	};
 	
 	if (this.parent.state == 1)
 	{
