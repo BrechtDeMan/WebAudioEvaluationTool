@@ -97,7 +97,7 @@ for file in os.listdir(folder_name):
                                 filewriter.writerow(row + ['']*len(newfragments))
                     os.rename('temp.csv', file_name) # replace old file with temp file
                     headerrow = headerrow + newfragments
-
+                    
             # if not, create file and make header
             else:
                 headerrow = sorted(fragmentnamelist) # sort alphabetically
