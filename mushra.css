@@ -35,6 +35,21 @@ button {
 	background-color: #ddd
 }
 
+div#slider-holder {
+	height: inherit;
+	position: absolute;
+	top: 125px;
+	left: 0px;
+	z-index: 2;
+}
+
+div#scale-holder {
+	height: inherit;
+	position: absolute;
+	top: 125px;
+	left: 0px;
+	z-index: 3;
+}
 
 div.track-slider {
 	float: left;
@@ -43,6 +58,7 @@ div.track-slider {
 	border-width: 1px;
 	border-color: black;
 	padding:2px;
+	margin-left: 50px;
 }
 
 div.track-slider-playing {
