@@ -66,6 +66,18 @@ function loadProjectSpecCallback(response) {
 	
 	var parse = new DOMParser();
 	projectXML = parse.parseFromString(response,'text/xml');
+	var errorNode = projectXML.getElementsByTagName('parsererror');
+	if (errorNode.length >= 1)
+	{
+		var msg = document.createElement("h3");
+		msg.textContent = "FATAL ERROR";
+		var span = document.createElement("span");
+		span.textContent = "The XML parser returned the following errors when decoding your XML file";
+		document.getElementsByTagName('body')[0].appendChild(msg);
+		document.getElementsByTagName('body')[0].appendChild(span);
+		document.getElementsByTagName('body')[0].appendChild(errorNode[0]);
+		return;
+	}
 	
 	// Build the specification
 	specification.decode(projectXML);
@@ -185,11 +197,21 @@ function createProjectSave(destURL) {
 function errorSessionDump(msg){
 	// Create the partial interface XML save
 	// Include error node with message on why the dump occured
-	var xmlDoc = interfaceXMLSave();
+	popup.showPopup();
+	popup.popupContent.innerHTML = null;
 	var err = document.createElement('error');
-	err.textContent = msg;
-	xmlDoc.appendChild(err);
 	var parent = document.createElement("div");
+	if (typeof msg === "object")
+	{
+		err.appendChild(msg);
+		popup.popupContent.appendChild(msg);
+		
+	} else {
+		err.textContent = msg;
+		popup.popupContent.innerHTML = "ERROR : "+msg;
+	}
+	var xmlDoc = interfaceXMLSave();
+	xmlDoc.appendChild(err);
 	parent.appendChild(xmlDoc);
 	var file = [parent.innerHTML];
 	var bb = new Blob(file,{type : 'application/xml'});
@@ -200,8 +222,8 @@ function errorSessionDump(msg){
 	a.download = "save.xml";
 	a.textContent = "Save File";
 	
-	popup.showPopup();
-	popup.popupContent.innerHTML = "ERROR : "+msg;
+	
+	
 	popup.popupContent.appendChild(a);
 }
 

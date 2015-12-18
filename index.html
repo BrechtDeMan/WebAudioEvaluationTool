@@ -20,10 +20,6 @@
 		<script src='core.js'></script>
 		<script src='loudness.js'></script>
 		<script type="text/javascript">
-			window.onbeforeunload = function() {
-				return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
-			};
-
 			// SEARCH QUERY: By using the GET Request option ?url=loca/path/to/project.xml in the URL bar, you can load a project quickly
 			if (window.location.search.length != 0)
 			{
@@ -40,6 +36,9 @@
 					}
 				}
 				loadProjectSpec(url);
+				window.onbeforeunload = function() {
+					return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
+				};
 			}
 		</script>
 	</head>
