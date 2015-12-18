@@ -494,12 +494,14 @@ function interfacePopup() {
 		} else if (node.type == "radio") {
 			var optHold = this.popupResponse;
 			var hold = document.createElement('radio');
+			console.log("Checkbox: "+ node.statement);
 			var responseID = null;
 			var i=0;
 			while(responseID == null) {
 				var input = optHold.childNodes[i].getElementsByTagName('input')[0];
 				if (input.checked == true) {
 					responseID = i;
+					console.log("Selected: "+ node.options[i].name);
 				}
 				i++;
 			}
