@@ -103,6 +103,11 @@ function loadTest(audioHolderObject)
 	{
 		console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
 	}
+	interfaceObj = interfaceObj[0];
+	if(interfaceObj.title != null)
+	{
+		document.getElementById("pageTitle").textContent = interfaceObj.title;
+	}
 	
 	var sliderBox = document.getElementById('slider');
 	feedbackHolder.innerHTML = null;

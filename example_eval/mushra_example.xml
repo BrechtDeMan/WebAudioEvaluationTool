@@ -33,7 +33,8 @@
 		</interface>
 	</setup>
 	<audioHolder id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true' loudness="-12" initial-position='50'>
-		<interface name="preference">
+		<interface>
+			<title>Preference</title>
 			<check name='fragmentPlayed'/>
 			<scale position="0">Min</scale>
 			<scale position="100">Max</scale>
