@@ -20,7 +20,7 @@ function loadInterface() {
 	testContent.id = 'testContent';
 	
 	// Bindings for interfaceContext
-	Interface.prototype.checkAllPlayed = function()
+	interfaceContext.checkAllPlayed = function()
 	{
 		hasBeenPlayed = audioEngineContext.checkAllPlayed();
 		if (hasBeenPlayed.length > 0) // if a fragment has not been played yet
@@ -44,7 +44,7 @@ function loadInterface() {
 	    return true;
 	};
 	
-	Interface.prototype.checkAllMoved = function() {
+	interfaceContext.checkAllMoved = function() {
 		var state = true;
 		var str = 'You have not moved the following sliders. ';
 		for (var i=0; i<this.interfaceSliders.length; i++)
