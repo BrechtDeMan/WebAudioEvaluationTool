@@ -330,6 +330,12 @@ function loadTest(audioHolderObject)
 		// Find URL of track
 		// In this jQuery loop, variable 'this' holds the current audioElement.
 		
+		// Check if an outside reference
+		if (index == audioHolderObject.outsideReference)
+		{
+			return;
+		}
+		
 		// Now load each audio sample. First create the new track by passing the full URL
 		var trackURL = audioHolderObject.hostURL + element.url;
 		var audioObject = audioEngineContext.newTrack(element);
@@ -414,7 +420,7 @@ function loadTest(audioHolderObject)
 		outsideReferenceHolderspan.textContent = 'Reference';
 		outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
 		
-		var audioObject = audioEngineContext.newTrack(audioHolderObject.outsideReference);
+		var audioObject = audioEngineContext.newTrack(audioHolderObject.audioElements[audioHolderObject.outsideReference]);
 		
 		outsideReferenceHolder.onclick = function(event)
 		{
