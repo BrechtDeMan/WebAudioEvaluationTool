@@ -1932,12 +1932,14 @@ function Specification() {
 				this.commentBoxPrefix = "Comment on track";
 			}
 			var audioElementsDOM = xml.getElementsByTagName('audioElements');
+			var outsideReferenceHolder = null;
 			for (var i=0; i<audioElementsDOM.length; i++) {
 				var node = new this.audioElementNode();
 				node.decode(this,audioElementsDOM[i]);
 				if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
 					if (this.outsideReference == null) {
-						this.outsideReference = node;
+						outsideReferenceHolder = node;
+						this.outsideReference = i;
 					} else {
 						console.log('Error only one audioelement can be of type outsidereference per audioholder');
 						this.audioElements.push(node);
@@ -1952,6 +1954,12 @@ function Specification() {
 			{
 				this.audioElements = randomiseOrder(this.audioElements);
 			}
+			if (outsideReferenceHolder != null)
+			{
+				this.audioElements.push(outsideReferenceHolder);
+				this.outsideReference = this.audioElements.length-1;
+			}
+			
 			
 			var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
 			for (var i=0; i<commentQuestionsDOM.length; i++) {
