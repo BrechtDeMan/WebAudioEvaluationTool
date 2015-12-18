@@ -73,6 +73,7 @@ function loadProjectSpecCallback(response) {
 		msg.textContent = "FATAL ERROR";
 		var span = document.createElement("span");
 		span.textContent = "The XML parser returned the following errors when decoding your XML file";
+		document.getElementsByTagName('body')[0].innerHTML = null;
 		document.getElementsByTagName('body')[0].appendChild(msg);
 		document.getElementsByTagName('body')[0].appendChild(span);
 		document.getElementsByTagName('body')[0].appendChild(errorNode[0]);
