@@ -2858,7 +2858,7 @@ function Interface(specificationObject) {
 		var failed = [];
 		for (var i in audioEngineContext.audioObjects)
 		{
-			if(audioEngineContext.audioObjects[i].metric.wasMoved == false)
+			if(audioEngineContext.audioObjects[i].metric.wasMoved == false && audioEngineContext.audioObjects[i].specification.type != 'outsidereference')
 			{
 				failed.push(audioEngineContext.audioObjects[i].id);
 			}
