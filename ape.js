@@ -315,7 +315,7 @@ function loadTest(audioHolderObject)
 		}
 	}
 	
-	var commentBoxPrefix = "Comment on track";
+	var commentBoxPrefix = "Comment on fragment";
 	
 	var commentShow = audioHolderObject.elementComments;
 	
@@ -609,7 +609,7 @@ function sliderObject(audioObject,interfaceObjects) {
 		var obj = [];
 		$(this.trackSliderObjects).each(function(i,trackObj){
 			var node = document.createElement('value');
-			node.setAttribute("inteerface-name",trackObj.getAttribute("interface-name"));
+			node.setAttribute("interface-name",trackObj.getAttribute("interface-name"));
 			node.textContent = convSliderPosToRate(trackObj);
 			obj.push(node);
 		});
