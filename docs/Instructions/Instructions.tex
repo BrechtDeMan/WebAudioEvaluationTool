@@ -1,0 +1,683 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+								
+\usepackage{listings}				% Source code
+\usepackage{xcolor}					% colour (source code for instance)
+\definecolor{grey}{rgb}{0.1,0.1,0.1}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+
+\usepackage{amssymb}
+\usepackage{cite}
+\usepackage{hyperref}				% Hyperlinks
+\usepackage[nottoc,numbib]{tocbibind}	% 'References' in TOC
+
+\graphicspath{{img/}}					% Relative path where the images are stored. 
+
+\title{Instructions for \\ Web Audio Evaluation Tool}
+\author{Nicholas Jillings, Brecht De Man and David Moffat}
+\date{7 December 2015}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+These instructions are about use of the Web Audio Evaluation Tool on Windows and Mac OS X platforms. 
+
+We request that you acknowledge the authors and cite our work when using it \cite{waet}, see also CITING.txt. 
+
+The tool is available in its entirety including source code on \url{https://code.soundsoftware.ac.uk/projects/webaudioevaluationtool/}, under the GNU General Public License v3.0 (\url{http://choosealicense.com/licenses/gpl-3.0/}), see also LICENSE.txt. 
+
+% TO DO: Linux (Android, iOS)
+
+\tableofcontents
+
+\clearpage
+
+\section{Installation}
+	Download the folder (\url{https://code.soundsoftware.ac.uk/hg/webaudioevaluationtool/archive/tip.zip}) and unzip in a location of your choice, or pull the source code from \url{https://code.soundsoftware.ac.uk/hg/webaudioevaluationtool} (Mercurial). 
+	
+	\subsection{Contents}
+		The folder should contain the following elements: \\
+		
+		\textbf{Main folder:} 
+			\begin{itemize}
+	            	\item \texttt{analyse.html}: analysis and diagnostics of a set of result XML files
+	            	\item \texttt{ape.css, core.css, graphics.css, mushra.css, structure.css}: style files (edit to change appearance)
+	            	\item \texttt{ape.js}: JavaScript file for APE-style interface \cite{ape}
+	            	\item \texttt{CITING.txt, LICENSE.txt, README.txt}: text files with, respectively, the citation which we ask to include in any work where this tool or any portion thereof is used, modified or otherwise; the license under which the software is shared; and a general readme file referring to these instructions.
+	            	\item \texttt{core.js}: JavaScript file with core functionality
+	            	\item \texttt{index.html}: webpage where interface should appear (includes link to test configuration XML)
+	            	\item \texttt{jquery-2.1.4.js}: jQuery JavaScript Library
+	            	\item \texttt{loudness.js}: Allows for automatic calculation of loudness of Web Audio API Buffer objects, return gain values to correct for a target loudness or match loudness between multiple objects
+	            	\item \texttt{mushra.js}: JavaScript file for MUSHRA-style interface \cite{mushra}
+	            	\item \texttt{pythonServer.py}: webserver for running tests locally
+	            	\item \texttt{pythonServer-legacy.py}: webserver with limited functionality (no automatic storing of output XML files)
+	            	\item \texttt{save.php}: PHP script to store result XML files to web server\\
+			\end{itemize}
+	     \textbf{Documentation (./docs/)}
+	         \begin{itemize}
+	         		\item \href{http://c4dm.eecs.qmul.ac.uk/dmrn/events/dmrnp10/#posters}{DMRN+10}: PDF and \LaTeX source of poster for 10\textsuperscript{th} Digital Music Research Network One-Day workshop (``soft launch'')
+	         		\item Instructions: PDF and \LaTeX source of these instructions
+	            	\item Project Specification Document (\LaTeX/PDF)
+	            	\item Results Specification Document (\LaTeX/PDF)
+	            	\item SMC15: PDF and \LaTeX  source of 12th Sound and Music Computing Conference paper \cite{waet}
+	            	\item WAC2016: PDF and \LaTeX  source of 2nd Web Audio Conference paper\\
+			\end{itemize}
+         \textbf{Example project (./example\_eval/)}
+            	\begin{itemize}
+            		\item An example of what the set up XML should look like, with example audio files 0.wav-10.wav which are short recordings at 44.1kHz, 16bit of a woman saying the corresponding number (useful for testing randomisation and general familiarisation with the interface).\\ 
+            	\end{itemize}
+          \textbf{Output files (./saves/)}
+            	\begin{itemize}
+            		\item The output XML files of tests will be stored here by default by the \texttt{pythonServer.py} script.\\ 
+            	\end{itemize}
+          \textbf{Auxiliary scripts (./scripts/)}
+            	\begin{itemize}
+            		\item Helpful Python scripts for extraction and visualisation of data.\\ 
+            	\end{itemize}
+          \textbf{Test creation tool (./test\_create/)}
+            	\begin{itemize}
+            		\item Webpage for easily setting up your own test without having to delve into the XML.\\ 
+            	\end{itemize}
+                    	
+	\subsection{Compatibility}
+		As Microsoft Internet Explorer doesn't support the Web Audio API\footnote{\url{http://caniuse.com/\#feat=audio-api}}, you will need another browser like Google Chrome, Safari or Firefox (all three are tested and confirmed to work). 
+
+		Firefox does not currently support other bit depths than 8 or 16 bit for PCM wave files. In the future, this will throw a warning message to tell the user that their content is being quantised automatically. %Nick? Right? To be removed if and when actually implemented
+		
+		The tool is platform-independent and works in any browser that supports the Web Audio API. It does not require any specific, proprietary software. However, in case the tool is hosted locally (i.e. you are not hosting it on an actual webserver) you will need Python (2.7), which is a free programming language - see the next paragraph. 
+	
+\clearpage
+
+
+\section{Test setup}
+
+	\subsection{Sample rate}
+		Depending on how the experiment is set up, audio is resampled automatically (the Web Audio default) or the sample rate is enforced. In the latter case, you will need to make sure that the sample rate of the system is equal to the sample rate of these audio files. For this reason, all audio files in the experiment will have to have the same sample rate. 
+
+		Always make sure that all other digital equipment in the playback chain (clock, audio interface, digital-to-analog converter, ...) is set to this same sample rate.
+
+		Note that upon changing the sampling rate, the browser will have to be restarted for the change to take effect. 
+		
+		\subsubsection{Mac OS X}
+			To change the sample rate in Mac OS X, go to \textbf{Applications/Utilities/Audio MIDI Setup} or find this application with Spotlight (see Figure \ref{fig:audiomidisetup}). Then select the output of the audio interface you are using and change the `Format' to the appropriate number. Also make sure the bit depth and channel count are as desired. 
+			If you are using an external audio interface, you may have to go to the preference pane of that device to change the sample rate. 
+
+			Also make sure left and right channel gains are equal, as some applications alter this without changing it back, leading to a predominantly louder left or right channel. See Figure \ref{fig:audiomidisetup} for an example where the channel gains are different. 
+
+			\begin{figure}[tb]
+				\centering
+				\includegraphics[width=.65\textwidth]{img/audiomidisetup.png}
+				\caption{The Audio MIDI Setup window in Mac OS X}
+				\label{fig:audiomidisetup}
+			\end{figure}
+		
+		\subsubsection{Windows}
+			To change the sample rate in Windows, right-click on the speaker icon in the lower-right corner of your desktop and choose `Playback devices'. Right-click the appropriate playback device and click `Properties'. Click the `Advanced' tab and verify or change the sample rate under `Default Format'.    % NEEDS CONFIRMATION
+			If you are using an external audio interface, you may have to go to the preference pane of that device to change the sample rate. 
+
+	\subsection{Local test}
+		If the test is hosted locally, you will need to run the local webserver provided with this tool. 
+		
+		\subsubsection{Mac OS X \& Linux}
+
+			On Mac OS X, Python comes preinstalled, as with most Unix/Linux distributions.
+
+			Open the Terminal (find it in \textbf{Applications/Terminal} or via Spotlight), and go to the folder you downloaded. To do this, type \texttt{cd [folder]}, where \texttt{[folder]} is the folder where to find the \texttt{pythonServer.py} script you downloaded. For instance, if the location is \texttt{/Users/John/Documents/test/}, then type
+			
+				\texttt{cd /Users/John/Documents/test/}
+				
+			Then hit enter and run the Python script by typing
+
+				\texttt{python pythonServer.py}
+
+			and hit enter again. See also Figure \ref{fig:terminal}.
+			
+			\begin{figure}[htbp]
+	                \begin{center}
+	                \includegraphics[width=.75\textwidth]{pythonServer.png}
+	                \caption{Mac OS X: The Terminal window after going to the right folder (\texttt{cd [folder\_path]}) and running \texttt{pythonServer.py}.}
+	                \label{fig:terminal}
+	                \end{center}
+	                \end{figure}
+
+	        Alternatively, you can simply type \texttt{python} (follwed by a space) and drag the file into the Terminal window from Finder. % DOESN'T WORK YET
+			
+			You can leave this running throughout the different experiments (i.e. leave the Terminal open). Once running the terminal will report the current URL to type into your browser to initiate the test, usually this is http://localhost:8000/.
+
+			To start the test, open the browser and type 
+				
+			\texttt{localhost:8000}
+
+			and hit enter. The test should start (see Figure \ref{fig:test}). 
+
+			To quit the server, either close the terminal window or press Ctrl+C on your keyboard to forcibly shut the server.
+
+		\subsubsection{Windows}
+
+			On Windows, Python 2.7 is not generally preinstalled and therefore has to be downloaded\footnote{\url{https://www.python.org/downloads/windows/}} and installed to be able to run scripts such as the local webserver, necessary if the tool is hosted locally. 
+		
+			Simply double click the Python script \texttt{pythonServer.py} in the folder you downloaded. 
+			
+			You may see a warning like the one in Figure \ref{fig:warning}. Click `Allow access'. 
+			
+			\begin{figure}[htbp]
+            \begin{center}
+            \includegraphics[width=.6\textwidth]{warning.png}
+            \caption{Windows: Potential warning message when executing \texttt{pythonServer.py}.}
+            \label{fig:warning}
+            \end{center}
+            \end{figure}
+            
+            The process should now start, in the Command prompt that opens - see Figure \ref{fig:python}. 
+            
+            \begin{figure}[htbp]
+            \begin{center}
+            \includegraphics[width=.75\textwidth]{python.png}
+            \caption{Windows: The Command Prompt after running \texttt{pythonServer.py} and opening the corresponding website.}
+            \label{fig:python}
+            \end{center}
+            \end{figure}
+            
+            You can leave this running throughout the different experiments (i.e. leave the Command Prompt open). 
+
+		    To start the test, open the browser and type 
+				
+			\texttt{localhost:8000}
+		
+			and hit enter. The test should start (see Figure \ref{fig:test}). 
+		
+			\begin{figure}[htb]
+	        \begin{center}
+	        \includegraphics[width=.8\textwidth]{test.png}
+	        \caption{The start of the test in Google Chrome on Windows 7.}
+	        \label{fig:test}
+	        \end{center}
+	        \end{figure}
+                    
+        If at any point in the test the participant reports weird behaviour or an error of some kind, or the test needs to be interrupted, please notify the experimenter and/or refer to Section \ref{sec:troubleshooting}. 
+		
+		When the test is over (the subject should see a message to that effect, and click `Submit' one last time), the output XML file containing all collected data should have appeared in `saves/'. The names of these files are `test-0.xml', `test-1.xml', etc., in ascending order. The Terminal or Command prompt running the local web server will display the following file name. If such a file did not appear, please again refer to Section \ref{sec:troubleshooting}. 
+		
+		It is advised that you back up these results as often as possible, as a loss of this data means that the time and effort spent by the subject(s) has been in vain. Save the results to an external or network drive, and/or send them to the experimenter regularly. 
+		
+		To start the test again for a new participant, you do not need to close the browser or shut down the Terminal or Command Prompt. Simply refresh the page or go to \texttt{localhost:8000} again. 
+		
+
+	\subsection{Remote test}
+		Put all files on a web server which supports PHP. This allows the `save.php' script to store the XML result files in the `saves/' folder. If the web server is not able to store the XML file there at the end of the test, it will present the XML file locally to the user, as a `Save file' link. 
+
+		Make sure the \texttt{projectReturn} attribute of the \texttt{setup} node is set to the \texttt{save.php} script. 
+
+		Then, just go to the URL of the corresponding HTML file, e.g. \texttt{http://server.com/path/to/WAET/index.html?url=test/my-test.xml}. If storing on the server doesn't work at submission (e.g. if the \texttt{projectReturn} attribute isn't properly set), the result XML file will be presented to the subject on the client side, as a `Save file' link. 
+
+    \subsection{Multiple test documents}
+        By default the index page will load a demo page of tests. To automatically load a test document, you need to append the location in the URL. If your URL is normally http://localhost:8000/index.html you would append the following: \texttt{?url=/path/to/your/test.xml}. Replace the fields with your actual path, the path is local to the running directory, so if you have your test in the directory \texttt{example\_eval} called \texttt{project.xml} you would append \texttt{?url=/example\_eval/project.xml}.
+
+\clearpage
+
+\section{Interfaces}
+
+	The Web Audio Evaluation Tool comes with a number of interface styles, each of which can be customised extensively, either by configuring them differently using the many optional features, or by modifying the JavaScript files. 
+
+	To set the interface style for the whole test, %Nick? change when this is not the case anymore, i.e. when the interface can be set per page
+	add \texttt{interface="APE"} to the \texttt{setup} node, where \texttt{"APE"} is one of the interface names below. 
+
+	\subsection{APE}
+		The APE interface is based on \cite{ape}, and consists of one or more axes, each corresponding with an attribute to be rated, on which markers are placed. As such, it is a multiple stimulus interface where (for each dimension or attribute) all elements are on one axis so that they can be maximally compared against each other, as opposed to rated individually or with regards to a single reference. 
+		It also contains an optional text box for each element, to allow for clarification by the subject, tagging, and so on. 
+
+	\subsection{MUSHRA}
+		This is a straightforward implementation of \cite{mushra}, especially common for the rating of audio quality, for instance for the evaluation of audio codecs. 
+
+	
+\clearpage
+
+\section{Features}
+
+	This section goes over the different features implemented in the Web Audio Evaluation Tool, how to use them, and what to know about them. 
+
+	Unless otherwise specified, \emph{each} feature described here is optional, i.e. it can be enabled or disabled and adjusted to some extent. 
+
+	As the example project showcases (nearly) all of these features, please refer to its configuration XML document for a demonstration of how to enable and adjust them. 
+
+	\subsection{Surveys}
+	    Surveys are conducted through an in-page popup window which can collect data using various HTML functions, see Survey elements below for a list. Survey questions are placed into the \texttt{<pretest>} or \texttt{<posttest>} nodes. Appending these nodes to the \texttt{<setup>} node will have the survey options appear before any test pages (if in the \texttt{<pretest>} node) or after all test pages. Placing the survey options in the \texttt{<audioholder>} node will have them appear before or after the test page they are a child of.
+		\subsubsection{Survey elements}
+			All survey elements (which `pop up' in the centre of the browser) have an \texttt{id} attribute, for retrieval of the responses in post-processing of the results, and a \texttt{mandatory} attribute, which if set to ``true'' requires the subjects to respond before they can continue. 
+
+			\begin{description}
+				\item[statement] Simply shows text to the subject until `Next' or `Start' is clicked. 
+				\item[question] Expects a text answer (in a text box). Has the \texttt{boxsize} argument: set to ``large'' or ``huge'' for a bigger box size, or ``small'' for small.
+				\item[number] Only accepts a numerical value. Attribute \texttt{min="0"} specifies the minimum value - in this case the answer must be stricly positive before the subject can continue.
+				\item[radio] Radio buttons. Presents a list of options to the user using radio buttons, where only one option from the list can be selected.
+				\item[checkbox] Checkboxes. Note that when making a checkbox question ``mandatory'', the subject is forced to select at least one option (which could be e.g. `Other' or `None').\\
+			\end{description}
+
+			\textbf{Example usage:}\\
+
+			\lstset{
+			  basicstyle=\ttfamily,
+			  columns=fullflexible,
+			  showstringspaces=false,
+			  commentstyle=\color{grey}\upshape
+			}
+
+			\lstdefinelanguage{XML}
+			{
+			  morestring=[b]",
+			  morestring=[s]{>}{<},
+			  morecomment=[s]{<?}{?>},
+			  stringstyle=\color{black} \bfseries,
+			  identifierstyle=\color{darkblue} \bfseries,
+			  keywordstyle=\color{cyan} \bfseries,
+			  morekeywords={xmlns,version,type}, 
+			  breaklines=true% list your attributes here
+			}
+			\scriptsize
+			\lstset{language=XML}
+
+			\begin{lstlisting}
+<PostTest>
+	<question id="location" mandatory="true" boxsize="large">Please enter your location. (example mandatory text question)</question>
+	<number id="age" min="0">Please enter your age (example non-mandatory number question)</number>
+	<radio id="rating">
+		<statement>Please rate this interface (example radio button question)</statement>
+		<option name="bad">Bad</option>
+		<option name="poor">Poor</option>
+		<option name="good">Good</option>
+		<option name="great">Great</option>
+	</radio>
+	<checkbox id="checkboxtest" mandatory="true">
+				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
+				<option name="musician">Playing a musical instrument</option>
+				<option name="soundengineer">Recording or mixing audio</option>
+			</checkbox>
+	<statement>Thank you for taking this listening test. Please click 'Submit' and your results will appear in the 'saves/' folder.</statement>
+</PostTest>
+			\end{lstlisting}
+
+
+	\subsection{Randomisation}
+
+		\subsubsection{Randomisation of configuration XML files}
+		    The python server has a special function to automatically cycle through a list of test pages. Instead of directly requesting an XML, simply setting the url item in the browser URL to \texttt{pseudo.xml} will cycle through a list of XMLs. These XMLs must be in the local directory called \texttt{pseudo}.
+			% how to
+			% explain how this is implemented in the pythonServer
+			%Nick? already implemented in the PHP?
+			% Needs to be implemented in PHP and automated better, will complete soon
+
+
+		\subsubsection{Randomsation of page order}
+        The page order randomisation is set by the \texttt{<setup>} node attribute \texttt{randomise-order}, for example \texttt{<setup ... randomise-order="true">...</setup>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order.
+
+		\subsubsection{Randomisation of axis order}
+
+		\subsubsection{Randomisation of fragment order}
+        The audio fragment randomisation is set by the \texttt{<audioholder>} node attribute \texttt{randomise-order}, for example \texttt{<audioholder ... randomise-order="true">...</audioholder>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order.
+
+		\subsubsection{Randomisation of initial slider position}
+        By default slider values are randomised on start. The MUSHRA interface supports setting the initial values of all sliders throught the \texttt{<audioholder>} attribute \texttt{initial-position}. This takes an integer between 0 and 100 to signify the slider position.
+		% /subsubsection{Randomisation of survey question order}
+		% should be an attribute of the individual 'pretest' and 'posttest' elements
+		% uncomment once we have it
+
+	\subsection{Looping}
+	    Looping enables the fragments to loop until stopped by the user. Looping is synchronous between samples so all samples start at the same time.
+		Individual test pages can have their playback looped by the \texttt{<audioholder>} attribute \texttt{loop} with a value of "true" or "false".
+		If the fragments are not of equal length initially, they are padded with zeros so that they are equal length, to enable looping without the fragments going out of sync relative to each other. 
+
+		Note that fragments cannot be played until all page fragments are loaded when in looped mode, as the engine needs to know the amount to pad the fragments.
+
+	\subsection{Sample rate}
+		If you require the test to be conducted at a certain sample rate (i.e. you do not tolerate resampling of the elements to correspond with the system's sample rate), add \texttt{sampleRate="96000"} - where ``96000'' can be any support sample rate - so that a warning message is shown alerting the subject the system's sample rate is different from this enforced sample rate. This of course means that in one test, all sample rates must be equal as it is impossible to change the system's sample rates during the test (even if you were to manually change it, then the browser must be restarted for it to take effect). 
+
+	\subsection{Scrubber bar}
+		The scrubber bar, or transport bar (that is the name of the visualisation of the playhead thing with an indication of time and showing the portion of the file played so far) is at this point just a visual, and not a controller to adjust the playhead position.
+
+		Make visible by adding \texttt{<option name='playhead'/>} to the \texttt{interface} node (see Section \ref{sec:checks}: Checks). 
+
+	\subsection{Metrics}
+		Enable the collection of metrics by adding \texttt{collectMetrics=`true'} in the \texttt{setup} node. % Should this always be on??
+
+		The \texttt{Metric} node, which contains the metrics to be tracked during the complete test, is a child of the \texttt{setup} node, and it could look as follows.
+
+		\begin{lstlisting}
+<Metric>
+	<metricEnable>testTimer</metricEnable>
+	<metricEnable>elementTimer</metricEnable>
+	<metricEnable>elementInitialPosition</metricEnable>
+	<metricEnable>elementTracker</metricEnable>
+	<metricEnable>elementFlagListenedTo</metricEnable>
+	<metricEnable>elementFlagMoved</metricEnable>
+	<metricEnable>elementListenTracker</metricEnable>
+</Metric>
+		\end{lstlisting}
+
+		When in doubt, err on the inclusive side, as one never knows which information is needed in the future. Most of these metrics are necessary for post-processing scripts such as timeline\_view\_movement.py. 
+
+		\subsubsection{Time test duration}
+			\texttt{testTimer}\\
+			One per test page. Presents the total test time from the first playback on the test page to the submission of the test page (exculding test time of the pre-/post- test surveys). This is presented in the results as \texttt{<metricresult id="testTime"> 8.60299319727892 </metricresult>}. The time is in seconds.
+
+		\subsubsection{Time fragment playback}
+			\texttt{elementTimer}\\
+			One per audio fragment per test page. This totals up the entire time the audio fragment has been listened to in this test and presented \texttt{<metricresult name="enableElementTimer"> 1.0042630385487428 </metricresult>}. The time is in seconds.
+
+		\subsubsection{Initial positions}
+			\texttt{elementInitialPosition}\\
+			One per audio fragment per test page. Tracks the initial position of the sliders, especially relevant when these are randomised. Example result \texttt{<metricresult name="elementInitialPosition"> 0.8395522388059702 </metricresult>}.
+
+		\subsubsection{Track movements}
+		    \texttt{elementTracker}\\
+		    One per audio fragment per test page. Tracks the movement of each interface object. Each movement event has the time it occured at and the new value.
+		\subsubsection{Which fragments listened to}
+		    \texttt{elementFlagListenedTo}\\
+		    One per audio fragment per test page. Boolean response, set to true if listened to.
+		\subsubsection{Which fragments moved}
+		    \texttt{elementFlagMoved}\\
+			One per audio fragment per test page. Binary check whether or not a the marker corresponding with a particular fragment was moved at all throughout the experiment. 
+
+		\subsubsection{elementListenTracker}
+		    \texttt{elementListenTracker}\\
+		    One per audio fragment per test page. Tracks the playback events of each audio element pairing both the time in the test when playback started and when it stopped, it also gives the buffertime positions.
+
+	\subsection{References and anchors}
+	    The audio elements, \texttt{<audioelement>} have the attribute \texttt{type}, which defaults to normal. Setting this to one of the following will have the following effects.
+		\subsubsection{Outside Reference}
+		    Set type to 'outside-reference'. This will place the object in a separate playback element clearly labelled as an outside reference. This is exempt of any movement checks but will still be included in any listening checks.
+		\subsubsection{Hidden reference} 
+		    Set type to 'reference'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the 'reference' type in the results to quickly find it. The reference can be forced to be below a value before completing the test page by setting the attribute 'marker' to be a value between 0 and 100 representing the integer value position it must be equal to or above.
+		\subsubsection{Hidden anchor}
+		    Set type to 'anchor'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the 'anchor' type in the results to quickly find it. The anchor can be forced to be below a value before completing the test page by setting the attribute 'marker' to be a value between 0 and 100 representing the integer value position it must be equal to or below.
+
+	\subsection{Checks}
+		\label{sec:checks}
+
+		%blabla
+		These checks are enabled in the \texttt{interface} node, which is a child of the \texttt{setup} node. 
+		\subsubsection{Playback checks}
+				% what it does/is
+				Enforce playing each sample at least once, for at least a little bit (e.g. this test is satisfied even if you only play a tiny portion of the file), by alerting the user to which samples have not been played upon clicking `Submit'. When enabled, one cannot proceed to the next page, answer a survey question, or finish the test, before clicking each sample at least once. 
+				% how to enable/disable
+
+				Alternatively, one can check whether the \emph{entire} fragment was listened to at least once. 
+				% how to enable
+
+				Add \texttt{<check name="fragmentPlayed"/>} to the \texttt{interface} node. 
+				
+
+		\subsubsection{Movement check}
+			Enforce moving each sample at least once, for at least a little bit (e.g. this test is satisfied even if you only play a tiny portion of the file), by alerting the user to which samples have not been played upon clicking `Submit'. When enabled, one cannot proceed to the next page, answer a survey question, or finish the test, before clicking each sample at least once. 
+			If there are several axes, the warning will specify which samples have to be moved on which axis.
+
+			Add \texttt{<check name="fragmentMoved"/>} to the \texttt{interface} node.
+
+		\subsubsection{Comment check}
+			% How to enable/disable? 
+
+			Enforce commenting, by alerting the user to which samples have not been commented on upon clicking `Submit'. When enabled, one cannot proceed to the next page, answer a survey question, or finish the test, before putting at least one character in each comment box. 
+
+			Note that this does not apply to any extra (text, radio button, checkbox) elements, unless these have the `mandatory' option enabled. %Nick? is this extra 'mandatory' option implemented? 
+
+			Add \texttt{<check name="fragmentComments"/>} to the \texttt{interface} node. 
+
+			%ADD: how to add a custom comment box
+
+		\subsubsection{Scale use check}
+			It is possible to enforce a certain usage of the scale, meaning that at least one slider needs to be below and/or above a certain percentage of the slider. 
+
+			Add \texttt{<check name="scalerange" min="25" max="75"/>} to the \texttt{interface} node. 
+
+		\subsubsection{Note on the use of multiple rating axes}
+			I.e. what if more than one axis? How to specify which axis the checks relate to? %Nick? to add? 
+
+	\subsection{Layout options}
+		\texttt{title}, \texttt{scale}, \texttt{position}, \texttt{commentBoxPrefix}
+
+	\subsection{Multiple sliders}
+		(APE example)
+
+		\begin{lstlisting}
+<interface name="preference">
+	<title>Preference</title>
+	<scale position="0">Min</scale>
+	<scale position="100">Max</scale>
+	<scale position="50">Middle</scale>
+	<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+</interface>
+<interface name="depth">
+	<title>Depth</title>
+	<scale position="0">Low</scale>
+	<scale position="100">High</scale>
+	<scale position="50">Middle</scale>
+	<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+</interface>
+		\end{lstlisting}
+		where the \texttt{interface} nodes are children of the \texttt{audioholder} node. 
+
+	\subsection{Platform information}
+		% what does it do, what does it look like
+		% limitations? 
+
+	\subsection{Show progress}
+		Add \texttt{<option name="page-count"/>} to the \texttt{interface} node (see Section \ref{sec:checks}: Checks) to add the current page number and the total number of pages to the interface. 
+
+	\subsection{Gain}
+		It is possible to set the gain (in decibel) applied to the different audioelements, as an attribute of the \texttt{audioelement} nodes in the configuration XML file: 
+
+		\texttt{<audioElements url="sample-01.wav" gain="-6" id="sample01quieter" />}\\
+		Please note, there are no checks on this to detect if accidentaly typed in linear.
+
+	\subsection{Loudness}
+		% automatic loudness equalisation
+		% guide to loudness.js 
+		Each audio fragment on loading has its loudness calculated. The tool uses the EBU R 128 recommendation following the ITU-R BS.1770-4 loduness calculations to return the integreated LUFS loudness. The attribute \texttt{loudness} will set the loudness from the scope it is applied in. Applying it in the \texttt{<setup>} node will set the loudness for all test pages. Applying it in the \texttt{<audioholder>} node will set the loudness for that page. Applying it in the \texttt{<audioelement>} node will set the loudness for that fragment. The scope is set locally, so if there is a loudness on both the \texttt{<audioholder>} and \texttt{<setup>} nodes, that test page will take the value associated with the \texttt{<audioholder>}. The loudness attribute is set in LUFS
+
+\clearpage
+
+
+\section{Using the test create tool}
+	We provide a test creation tool, available in the directory test\_create. This tool is a self-contained web page, so doubling clicking will launch the page in your system default browser.
+
+	The test creation tool can help you build a simple test very quickly. By simply selecting your interface and clicking check-boxes you can build a test in minutes.
+
+	Include audio by dragging and dropping the stimuli you wish to include. 
+
+	The tool examines your XML before exporting to ensure you do not export an invalid XML structure which would crash the test.
+	
+	This guide will help you to construct your own interface on top of the WAET (Web Audio Evaluation Tool) engine. The WAET engine resides in the core.js file, this contains prototype objects to handle most of the test creation, operation and data collection. The interface simply has to link into this at the correct points.
+	
+\section{Building your own interface}
+
+	\subsection{Nodes to familiarise}
+		Core.js handles several very important nodes which you should become familiar with. The first is the Audio Engine, initialised and stored in variable `AudioEngineContext'. This handles the playback of the web audio nodes as well as storing the `AudioObjects'. The `AudioObjects' are custom nodes which hold the audio fragments for playback. These nodes also have a link to two interface objects, the comment box if enabled and the interface providing the ranking. On creation of an `AudioObject' the interface link will be nulled, it is up to the interface to link these correctly.
+
+		The specification document will be decoded and parsed into an object called `specification'. This will hold all of the specifications various nodes. The test pages and any pre/post test objects are processed by a test state which will proceed through the test when called to by the interface. Any checks (such as playback or movement checks) are to be completed by the interface before instructing the test state to proceed. The test state will call the interface on each page load with the page specification node.
+
+	\subsection{Modifying \texttt{core.js}}
+		Whilst there is very little code actually needed, you do need to instruct core.js to load your interface file when called for from a specification node. There is a function called `loadProjectSpecCallback' which handles the decoding of the specification and setting any external items (such as metric collection). At the very end of this function there is an if statement, add to this list with your interface string to link to the source. There is an example in there for both the APE and MUSHRA tests already included. Note: Any updates to core.js in future work will most likely overwrite your changes to this file, so remember to check your interface is still here after any update that interferes with core.js.
+		Any further files can be loaded here as well, such as css styling files. jQuery is already included.
+
+	\subsection{Building the Interface}
+		Your interface file will get loaded automatically when the `interface' attribute of the setup node matches the string in the `loadProjectSpecCallback' function. The following functions must be defined in your interface file.
+		\begin{itemize}
+		\item \texttt{loadInterface} - Called once when the document is parsed. This creates any necessary bindings, such as to the metric collection classes and any check commands. Here you can also start the structure for your test such as placing in any common nodes (such as the title and empty divs to drop content into later).
+		\item \texttt{loadTest(audioHolderObject)} - Called for each page load. The audioHolderObject contains a specification node holding effectively one of the audioHolder nodes.
+		\item \texttt{resizeWindow(event)} - Handle for any window resizing. Simply scale your interface accordingly. This function must be here, but can me an empty function call.
+		\end{itemize}
+
+		\subsubsection{loadInterface}
+			This function is called by the interface once the document has been parsed since some browsers may parse files asynchronously. The best method is simply to put `loadInterface()' at the top of your interface file, therefore when the JavaScript engine is ready the function is called.
+
+			By default the HTML file has an element with id ``topLevelBody'' where you can build your interface. Make sure you blank the contents of that object. This function is the perfect time to build any fixed items, such as the page title, session titles, interface buttons (Start, Stop, Submit) and any holding and structure elements for later on.
+
+			At the end of the function, insert these two function calls: testState.initialise() and testState.advanceState();. This will actually begin the test sequence, including the pre-test options (if any are included in the specification document).
+
+		\subsubsection{loadTest(audioHolderObject)}
+			This function is called on each new test page. It is this functions job to clear out the previous test and set up the new page. Use the function audioEngineContext.newTestPage(); to instruct the audio engine to prepare for a new page. ``audioEngineContext.audioObjects = [];'' will delete any audioObjects, interfaceContext.deleteCommentBoxes(); will delete any comment boxes and interfaceContext.deleteCommentQuestions(); will delete any extra comment boxes specified by commentQuestion nodes.
+
+			This function will need to instruct the audio engine to build each fragment. Just passing the constructor each element from the audioHolderObject will build the track, audioEngineContext.newTrack(element) (where element is the audioHolderObject audio element). This will return a reference to the constructed audioObject. Decoding of the audio will happen asynchronously.
+
+			You also need to link audioObject.interfaceDOM with your interface object for that audioObject. The interfaceDOM object has a few default methods. Firstly it must start disabled and become enabled once the audioObject has decoded the audio (function call: enable()). Next it must have a function exportXMLDOM(), this will return the xml node for your interface, however the default is for it to return a value node, with textContent equal to the normalised value. You can perform other functions, but our scripts may not work if something different is specified (as it will breach our results specifications). Finally it must also have a method getValue, which returns the normalised value.
+
+			It is also the job the interfaceDOM to call any metric collection functions necessary, however some functions may be better placed outside (for example, the APE interface uses drag and drop, therefore the best way was to call the metric functions from the dragEnd function, which is called when the interface object is dropped). Metrics based upon listening are handled by the audioObject. The interfaceDOM object must manage any movement metrics. For a list of valid metrics and their behaviours, look at the project specification document included in the repository/docs location. The same goes for any checks required when pressing the submit button, or any other method to proceed the test state.
+
+\clearpage
+\section{Analysis and diagnostics}
+	\subsection{In the browser}
+		See `analysis.html' in the main folder: immediate visualisation of (by default) all results in the `saves/' folder. 
+
+	\subsection{Python scripts}
+		The package includes Python (2.7) scripts (in `scripts/') to extract ratings and comments, generate visualisations of ratings and timelines, and produce a fully fledged report. 
+
+		Visualisation requires the free matplotlib toolbox (http://matplotlib.org), numpy and scipy. 
+		By default, the scripts can be run from the `scripts' folder, with the result files in the `saves' folder (the default location where result XMLs are stored). Each script takes the XML file folder as an argument, along with other arguments in some cases.
+		Note: to avoid all kinds of problems, please avoid using spaces in file and folder names (this may work on some systems, but others don't like it). 
+
+		\subsubsection{comment\_parser.py}
+			Extracts comments from the output XML files corresponding with the different subjects found in `saves/'. It creates a folder per `audioholder'/page it finds, and stores a CSV file with comments for every `audioelement'/fragment within these respective `audioholders'/pages. In this CSV file, every line corresponds with a subject/output XML file. Depending on the settings, the first column containing the name of the corresponding XML file can be omitted (for anonymisation). 
+			Beware of Excel: sometimes the UTF-8 is not properly imported, leading to problems with special characters in the comments (particularly cumbersome for foreign languages). 
+
+		\subsubsection{evaluation\_stats.py}
+			Shows a few statistics of tests in the `saves/' folder so far, mainly for checking for errors. Shows the number of files that are there, the audioholder IDs that were tested (and how many of each separate ID), the duration of each page, the duration of each complete test, the average duration per page, and the average duration in function of the page number. 
+
+		\subsubsection{generate\_report.py}
+			Similar to `evaluation\_stats.py', but generates a PDF report based on the output files in the `saves/' folder - or any folder specified as command line argument. Uses pdflatex to write a LaTeX document, then convert to a PDF. 
+
+		\subsubsection{score\_parser.py}
+			Extracts rating values from the XML to CSV - necessary for running visualisation of ratings. Creates the folder `saves/ratings/' if not yet created, to which it writes a separate file for every `audioholder'/page in any of the output XMLs it finds in `saves/'. Within each file, rows represent different subjects (output XML file names) and columns represent different `audioelements'/fragments. 
+
+		\subsubsection{score\_plot.py}
+			Plots the ratings as stored in the CSVs created by score\_parser.py
+			Depending on the settings, it displays and/or saves (in `saves/ratings/') a boxplot, confidence interval plot, scatter plot, or a combination of the aforementioned. 
+			Requires the free matplotlib library. 
+			At this point, more than one subjects are needed for this script to work. 
+
+		\subsubsection{timeline\_view\_movement.py}
+			Creates a timeline for every subject, for every `audioholder'/page, corresponding with any of the output XML files found in `saves/'. It shows the marker movements of the different fragments, along with when each fragment was played (red regions). Automatically takes fragment names, rating axis title, rating axis labels, and audioholder name from the XML file (if available). 
+
+		\subsubsection{timeline\_view.py} % should be omitted or absorbed by the above soon
+			Creates a timeline for every subject, for every `audioholder'/page, corresponding with any of the output XML files found in `saves/'. It shows when and for how long the subject listened to each of the fragments. 
+
+
+
+\clearpage
+\section{Troubleshooting} \label{sec:troubleshooting}
+	\subsection{Reporting bugs and requesting features}
+	Thanks to feedback from using the interface in experiments by the authors and others, many bugs have been caught and fatal crashes due to the interface seem to be a thing of the past entirely. 
+
+	We continually develop this tool to fix issues and implement features useful to us or our user base. See \url{https://code.soundsoftware.ac.uk/projects/webaudioevaluationtool/issues} for a list of feature requests and bug reports, and their status. 
+
+	Please contact the authors if you experience any bugs, if you would like additional functionality, if you spot any errors or gaps in the documentation, if you have questions about using the interface, or if you would like to give any feedback (even positive!) about the interface. We look forward to learning how the tool has (not) been useful to you. 
+
+
+	\subsection{First aid}
+		Meanwhile, if things do go wrong or the test needs to be interrupted for whatever reason, all data is not lost. In a normal scenario, the test needs to be completed until the end (the final `Submit'), at which point the output XML is stored in the \texttt{saves/}. If this stage is not reached, open the JavaScript Console (see below for how to find it) and type 
+
+		\texttt{createProjectSave()}
+
+		to present the result XML file on the client side, or
+
+		\texttt{createProjectSave(specification.projectReturn)}
+
+		to try to store it to the specified location, e.g. the `saves/' folder on the web server or the local machine (on failure the result XML should be presented directly in the web browser instead)
+
+		and hit enter. This will open a pop-up window with a hyperlink that reads `Save File'; click it and an XML file with results until that point should be stored in your download folder. 
+		
+		Alternatively, a lot of data can be read from the same console, in which the tool prints a lot of debug information. Specifically:
+	    	\begin{itemize}
+	        	\item the randomisation of pages and fragments are logged;
+	        	\item any time a slider is played, its ID and the time stamp (in seconds since the start of the test) are displayed;
+	        	\item any time a slider is dragged and dropped, the location where it is dropped including the time stamp are shown; 
+	        	\item any comments and pre- or post-test questions and their answers are logged as well. 
+	    	\end{itemize}
+
+		You can select all this and save into a text file, so that none of this data is lost. You may to choose to do this even when a test was successful as an extra precaution. 
+
+		If you encounter any issue which you believe to be caused by any aspect of the tool, and/or which the documentation does not mention, please do let us know! 
+
+		\subsubsection*{Opening the JavaScript Console}
+	        \begin{itemize}
+	            \item In Google Chrome, the JavaScript Console can be found in \textbf{View$>$Developer$>$JavaScript Console}, or via the keyboard shortcut Cmd + Alt + J (Mac OS X). 
+	            \item In Safari, the JavaScript Console can be found in \textbf{Develop$>$Show Error Console}, or via the keyboard shortcut Cmd + Alt + C (Mac OS X). Note that for the Developer menu to be visible, you have to go to Preferences (Cmd + ,) and enable `Show Develop menu in menu bar' in the `Advanced' tab. \textbf{Note that as long as the Developer menu is not visible, nothing is logged to the console, i.e. you will only be able to see diagnostic information from when you switched on the Developer tools onwards.}
+	            \item In Firefox, go to \textbf{Tools$>$Web Developer$>$Web Console}, or hit Cmd + Alt + K. 
+	        \end{itemize}
+
+	\subsection{Known issues and limitations}
+	\label{sec:knownissues}
+
+		The following is a non-exhaustive list of problems and limitations you may experience using this tool, due to not being supported yet by us, or by the Web Audio API and/or (some) browsers. 
+
+		\begin{itemize}
+			\item Issue \href{https://code.soundsoftware.ac.uk/issues/1463}{\textbf{\#1463}}: \textbf{Firefox} only supports 8 bit and 16 bit WAV files. Pending automatic requantisation (which deteriorates the audio signal's dynamic range to some extent), WAV format stimuli need to adhere to these limitations in order for the test to be compatible with Firefox. 
+			\item Issues \href{https://code.soundsoftware.ac.uk/issues/1474}{\textbf{\#1474}} and \href{https://code.soundsoftware.ac.uk/issues/1462}{\textbf{\#1462}}: On occasions, audio is not working - or only a continuous `beep' can be heard - notably in \textbf{Safari}. Refreshing, quitting the browser and even enabling Developer tools in Safari's Preferences pane (`Advanced' tab: ``Show `Develop' menu in menu bar'') has helped resolve this. If no (high quality) audio can be heard, make sure your entire playback system's settings are all correct. 
+		\end{itemize}
+
+\clearpage
+\bibliographystyle{ieeetr}
+\bibliography{Instructions}{}
+
+
+\clearpage
+\appendix
+
+\section{Legacy}
+	The APE interface and most of the functionality of the first WAET editions are inspired by the APE toolbox for MATLAB \cite{ape}. See \url{https://code.soundsoftware.ac.uk/projects/ape} for the source code and \url{http://brechtdeman.com/publications/aes136.pdf} for the corresponding paper. 
+
+\clearpage
+
+\section{Listening test instructions example}
+
+	Before each test, show the instructions below or similar and make sure it is available to the subject throughout the test. Make sure to ask whether the participant has any questions upon seeing and/or reading the instructions. 
+			
+	\begin{itemize}
+		\item You will be asked for your name (``John Smith'') and location (room identifier). 
+		\item An interface will appear, where you are asked to 
+		\begin{itemize}
+			\item click green markers to play the different mixes;
+			\item drag the markers on a scale to reflect your preference for the mixes;
+			\item comment on these mixes, using text boxes with corresponding numbers (in your \textbf{native language});
+			\item optionally comment on all mixes together, or on the song, in `General comments'. 
+		\end{itemize}
+		\item You are asked for your personal, honest opinion. Feel free to use the full range of the scale to convey your opinion of the various mixes. Don?t be afraid to be harsh and direct. 
+		\item The markers appear at random positions at first (which means some markers may hide behind others). 
+		\item The interface can take a few seconds to start playback, but switching between mixes should be instantaneous. 
+		\item This is a research experiment, so please forgive us if things go wrong. Let us know immediately and we will fix it or restart the test.  
+		\item When the test is finished (after all songs have been evaluated), just call the experimenter, do NOT close the window.  
+		\item After the test, please fill out our survey about your background, experience and feedback on the test. 
+		\item By participating, you consent to us using all collected data for research. Unless asked explicitly, all data will be anonymised when shared. 
+	\end{itemize}
+
+\clearpage
+
+\section{Terminology} % just to keep track of what exactly we call things. Don't use terms that are too different, to avoid confusion.
+	As a guide to better understand the Instructions, and to expand them later, here is a list of terms that may be unclear or ambiguous unless properly defined. 
+	\begin{description}
+		\item[Subject] The word we use for a participant, user, ... of the test, i.e. not the experimenter who designs the test but the person who evaluates the audio under test as part of an experiment (or the preparation of one). 
+		\item[User] The person who uses the tool to configure, run and analyse the test - i.e. the experimenter, most likely a researcher - or at least 
+		\item[Page] A screen in a test; corresponds with an \texttt{audioholder}
+		\item[Fragment] An element or sample in a test; corresponds with an \texttt{audioelement}
+		\item[Test] A complete test which can consist of several pages; corresponds with an entire configuration XML file
+		\item[Configuration XML file] The XML file containing the necessary information on interface, samples, survey questions, configurations, ... which the JavaScript modules read to produce the desired test.
+		\item[Results XML file] The output of a successful test, including ratings, comments, survey responses, timing information, and the complete configuration XML file with which the test was generated in the first place. 
+	\end{description}
+
+\clearpage
+
+\setcounter{secnumdepth}{0} % don't number this last bit
+\section{Contact details} % maybe add web pages, Twitter accounts, whatever you like
+\label{sec:contact}
+
+	\begin{itemize}
+		\item Nicholas Jillings: \texttt{nicholas.jillings@mail.bcu.ac.uk}
+		\item Brecht De Man: \texttt{b.deman@qmul.ac.uk}
+		\item David Moffat: \texttt{d.j.moffat@qmul.ac.uk}
+	\end{itemize}
+
+\end{document}  
