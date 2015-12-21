@@ -283,6 +283,12 @@ function loadTest(audioHolderObject)
 	feedbackHolder.innerHTML = null;
 	sliderHolder.innerHTML = null;
 	
+	// Delete outside reference
+	var outsideReferenceHolder = document.getElementById('outside-reference');
+	if (outsideReferenceHolder != null) {
+		document.getElementById('interface-buttons').removeChild(outsideReferenceHolder);
+	}
+	
 	var interfaceObj = audioHolderObject.interfaces;
 	for (var k=0; k<interfaceObj.length; k++) {
 		// Create the div box to center align
