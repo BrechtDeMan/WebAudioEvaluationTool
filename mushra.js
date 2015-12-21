@@ -47,6 +47,7 @@ function loadInterface() {
 	var playback = document.createElement("button");
 	playback.innerHTML = 'Stop';
 	playback.id = 'playback-button';
+	playback.style.float = 'left';
 	// onclick function. Check if it is playing or not, call the correct function in the
 	// audioEngine, change the button text to reflect the next state.
 	playback.onclick = function() {
@@ -62,6 +63,7 @@ function loadInterface() {
 	submit.innerHTML = 'Submit';
 	submit.onclick = buttonSubmitClick;
 	submit.id = 'submit-button';
+	submit.style.float = 'left';
 	// Append the interface buttons into the interfaceButtons object.
 	interfaceButtons.appendChild(playback);
 	interfaceButtons.appendChild(submit);
@@ -116,6 +118,12 @@ function loadTest(audioHolderObject)
 		document.getElementById("pageTitle").textContent = interfaceObj.title;
 	}
 	
+	// Delete outside reference
+	var outsideReferenceHolder = document.getElementById('outside-reference');
+	if (outsideReferenceHolder != null) {
+		document.getElementById('interface-buttons').removeChild(outsideReferenceHolder);
+	}
+	
 	var sliderBox = document.getElementById('slider-holder');
 	feedbackHolder.innerHTML = null;
 	sliderBox.innerHTML = null;
@@ -140,8 +148,12 @@ function loadTest(audioHolderObject)
 		// Find URL of track
 		// In this jQuery loop, variable 'this' holds the current audioElement.
 		
-		// Now load each audio sample. First create the new track by passing the full URL
-		var trackURL = audioHolderObject.hostURL + element.url;
+		// Check if an outside reference
+		if (index == audioHolderObject.outsideReference)
+		{
+			return;
+		}
+		
 		var audioObject = audioEngineContext.newTrack(element);
 		
 		var node = interfaceContext.createCommentBox(audioObject);
@@ -168,6 +180,32 @@ function loadTest(audioHolderObject)
 	var totalWidth = (numObj-1)*150+100;
 	var diff = (window.innerWidth - totalWidth)/2;
 	sliderBox.style.marginLeft = diff + 'px';
+	
+	// Construct outside reference;
+	if (audioHolderObject.outsideReference != null) {
+		var outsideReferenceHolder = document.createElement('div');
+		outsideReferenceHolder.id = 'outside-reference';
+		outsideReferenceHolder.className = 'outside-reference';
+		outsideReferenceHolderspan = document.createElement('span');
+		outsideReferenceHolderspan.textContent = 'Reference';
+		outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
+		
+		var audioObject = audioEngineContext.newTrack(audioHolderObject.audioElements[audioHolderObject.outsideReference]);
+		
+		outsideReferenceHolder.onclick = function(event)
+		{
+			audioEngineContext.play(audioEngineContext.audioObjects.length-1);
+			$('.track-slider').removeClass('track-slider-playing');
+            $('.comment-div').removeClass('comment-box-playing');
+            if (event.currentTarget.nodeName == 'DIV') {
+            	$(event.currentTarget).addClass('track-slider-playing');
+            } else {
+            	$(event.currentTarget.parentElement).addClass('track-slider-playing');
+            }
+		};
+		
+		document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
+	}
 }
 
 function sliderObject(audioObject)
@@ -223,6 +261,10 @@ function sliderObject(audioObject)
 		audioEngineContext.play(id);
 		$(".track-slider").removeClass('track-slider-playing');
 		$(event.currentTarget.parentElement).addClass('track-slider-playing');
+		var outsideReference = document.getElementById('outside-reference');
+		if (outsideReference != null) {
+			$(outsideReference).removeClass('track-slider-playing');
+		}
 	};
 	
 	this.enable = function() {

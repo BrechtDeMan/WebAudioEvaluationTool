@@ -61,6 +61,15 @@ div.track-slider {
 	margin-left: 50px;
 }
 
+div.outside-reference {
+	width:120px;
+	padding-left: 55px;
+	margin-left: 100px;
+	height:20px;
+	margin-bottom:5px;
+	background-color: rgb(100,200,100);
+}
+
 div.track-slider-playing {
 	background-color: #FFDDDD;
 }
