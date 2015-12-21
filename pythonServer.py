@@ -24,9 +24,9 @@ while(path.isfile('saves/'+curFileName)):
 	curSaveIndex += 1;
 	curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
-print "Next save - " + curFileName
 pseudo_index = curSaveIndex % len(pseudo_files)
-print "Next test in pseudo-random queue - " + pseudo_files[pseudo_index]
+
+print 'URL: http://localhost:8000/index.html'
 
 def send404(s):
 	s.send_response(404)
@@ -34,6 +34,8 @@ def send404(s):
 	s.end_headers()
 	
 def processFile(s):
+	s.path = s.path.rsplit('?')
+	s.path = s.path[0]
 	s.path = s.path[1:len(s.path)]
 	st = s.path.rsplit(',')
 	lenSt = len(st)
