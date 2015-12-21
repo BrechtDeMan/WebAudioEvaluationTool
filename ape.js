@@ -357,8 +357,10 @@ function loadTest(audioHolderObject)
 		}
         
 	});
-	
 	$('.track-slider').mousedown(function(event) {
+		interfaceContext.selectObject($(this)[0]);
+	});
+	$('.track-slider').on('touchstart',null,function(event) {
 		interfaceContext.selectObject($(this)[0]);
 	});
 	
@@ -371,6 +373,15 @@ function loadTest(audioHolderObject)
 		var obj = interfaceContext.getSelectedObject();
 		if (obj == null) {return;}
 		$(obj).css("left",event.clientX + "px");
+		interfaceContext.moveObject();
+	});
+	
+	$('.slider').on('touchmove',null,function(event) {
+		event.preventDefault();
+		var obj = interfaceContext.getSelectedObject();
+		if (obj == null) {return;}
+		var move = event.originalEvent.targetTouches[0].clientX - 6;
+		$(obj).css("left",move + "px");
 		interfaceContext.moveObject();
 	});
 
@@ -403,6 +414,24 @@ function loadTest(audioHolderObject)
 	        var outsideReference = document.getElementById('outside-reference');
 	        if (outsideReference != undefined)
 	        $(outsideReference).removeClass('track-slider-playing');
+		}
+		interfaceContext.releaseObject();
+	});
+	
+	$('.slider').on('touchend',null,function(event){
+		var obj = interfaceContext.getSelectedObject();
+		if (obj == null) {return;}
+		var interfaceID = obj.parentElement.getAttribute("interfaceid");
+		var trackID = obj.getAttribute("trackindex");
+		if (interfaceContext.hasSelectedObjectMoved() == true)
+		{
+			var l = $(obj).css("left");
+			var id = obj.getAttribute('trackIndex');
+			var time = audioEngineContext.timer.getTestTime();
+			var rate = convSliderPosToRate(obj);
+			audioEngineContext.audioObjects[id].metric.moved(time,rate);
+			interfaceContext.interfaceSliders[interfaceID].metrics[trackID].moved(time,rate);
+			console.log("slider "+id+" moved to "+rate+' ('+time+')');
 		}
 		interfaceContext.releaseObject();
 	});
