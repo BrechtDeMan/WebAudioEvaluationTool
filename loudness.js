@@ -8,6 +8,10 @@
 
 var interval_cal_loudness_event = null;
 
+if (typeof OfflineAudioContext == "undefined"){
+	var OfflineAudioContext = webkitOfflineAudioContext;
+}
+
 function calculateLoudness(buffer, timescale, target, offlineContext)
 {
 	// This function returns the EBU R 128 specification loudness model and sets the linear gain required to match -23 LUFS
@@ -50,8 +54,11 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 	KFilter.connect(HPFilter);
 	HPFilter.connect(offlineContext.destination);
 	processSource.start();
-	offlineContext.startRendering().then(function(renderedBuffer) {
+	offlineContext.oncomplete = function(renderedBuffer) {
 		// Have the renderedBuffer information, now continue processing
+		if (typeof renderedBuffer.renderedBuffer == 'object') {
+			renderedBuffer = renderedBuffer.renderedBuffer;
+		}
 		switch(timescale)
 		{
 		case "I":
@@ -95,10 +102,8 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 			var overallRelLoudness = calculateOverallLoudnessFromChannelBlocks(relgateEnergy);
 			buffer.lufs =  overallRelLoudness;
 		}
-	}).catch(function(err) {
-		console.log(err);
-		buffer.lufs = 1;
-	});
+	};
+	offlineContext.startRendering();
 }
 
 function calculateProcessedLoudness(buffer, winDur, overlap)
