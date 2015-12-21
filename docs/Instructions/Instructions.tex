@@ -240,11 +240,45 @@ The tool is available in its entirety including source code on \url{https://code
 
 \section{Features}
 
-	This section goes over the different features implemented in the Web Audio Evaluation Tool, how to use them, and what to know about them. 
+	This section covers the different features implemented in the Web Audio Evaluation Tool, how to use them, and what to know about them. 
 
 	Unless otherwise specified, \emph{each} feature described here is optional, i.e. it can be enabled or disabled and adjusted to some extent. 
 
 	As the example project showcases (nearly) all of these features, please refer to its configuration XML document for a demonstration of how to enable and adjust them. 
+
+	\subsection{Interface layout}
+		The \texttt{interface} node (child of \texttt{audioholder}) contains 
+
+		Example: 
+
+		\begin{lstlisting}
+<interface name="quality">
+	<title>Audio Quality</title>
+	<scale position="10">Poor</scale>
+	<scale position="90">Excellent</scale>
+	<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+</interface>
+		\end{lstlisting}
+
+		\subsubsection{Title}
+			Specifies the axis title as displayed on the interface. 
+
+			If this tag is absent, the title will default to `Axis \emph{[number]}'. Therefore, if no title is desired, just add the title tag (\texttt{<title/>}) without text. 
+
+		\subsubsection{Annotation}
+			Words or numbers can be placed on specific positions of the scale with the \texttt{scale} tag. The \texttt{position} attribute is a value from 0 to 100, corresponding to the percentage of the width/height of the scale where you want the string to be placed. 
+
+		\subsubsection{Comment box prefix}
+			If comment boxes corresponding with the fragments are enabled, this sets the comment box string after which the fragment number is appended. 
+
+			The default value is ``Comment on fragment''. So in this case, each comment box would have a header ``Comment on fragment \emph[number]''. 
+
+		\subsubsection{Multiple scales}
+			In the case of multiple rating scales, e.g. when the stimuli are to be rated in terms of attributes `timbre' and `spatial impression', multiple interface nodes will have to be added, each specifying the title and annotations. 
+
+			This is where the \texttt{interface}'s \texttt{name} attribute is particularly important: use this to retrieve the rating values, comments and metrics associated with the specified interface. 
+			If none is given, you can still use the automatically given \texttt{interface-id}, which is the interface number starting with 0 and corresponding to the order in which the rating scales appear. 
+
 
 	\subsection{Surveys}
 	    Surveys are conducted through an in-page popup window which can collect data using various HTML functions, see Survey elements below for a list. Survey questions are placed into the \texttt{<pretest>} or \texttt{<posttest>} nodes. Appending these nodes to the \texttt{<setup>} node will have the survey options appear before any test pages (if in the \texttt{<pretest>} node) or after all test pages. Placing the survey options in the \texttt{<audioholder>} node will have them appear before or after the test page they are a child of.
@@ -293,7 +327,7 @@ The tool is available in its entirety including source code on \url{https://code
 		<option name="good">Good</option>
 		<option name="great">Great</option>
 	</radio>
-	<checkbox id="checkboxtest" mandatory="true">
+	<checkbox id="background" mandatory="true">
 				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
 				<option name="musician">Playing a musical instrument</option>
 				<option name="soundengineer">Recording or mixing audio</option>
@@ -303,7 +337,9 @@ The tool is available in its entirety including source code on \url{https://code
 			\end{lstlisting}
 
 
+
 	\subsection{Randomisation}
+		[WORK IN PROGRESS]
 
 		\subsubsection{Randomisation of configuration XML files}
 		    The python server has a special function to automatically cycle through a list of test pages. Instead of directly requesting an XML, simply setting the url item in the browser URL to \texttt{pseudo.xml} will cycle through a list of XMLs. These XMLs must be in the local directory called \texttt{pseudo}.
@@ -437,33 +473,19 @@ The tool is available in its entirety including source code on \url{https://code
 		\subsubsection{Note on the use of multiple rating axes}
 			I.e. what if more than one axis? How to specify which axis the checks relate to? %Nick? to add? 
 
-	\subsection{Layout options}
-		\texttt{title}, \texttt{scale}, \texttt{position}, \texttt{commentBoxPrefix}
-
-	\subsection{Multiple sliders}
-		(APE example)
-
-		\begin{lstlisting}
-<interface name="preference">
-	<title>Preference</title>
-	<scale position="0">Min</scale>
-	<scale position="100">Max</scale>
-	<scale position="50">Middle</scale>
-	<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
-</interface>
-<interface name="depth">
-	<title>Depth</title>
-	<scale position="0">Low</scale>
-	<scale position="100">High</scale>
-	<scale position="50">Middle</scale>
-	<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
-</interface>
-		\end{lstlisting}
-		where the \texttt{interface} nodes are children of the \texttt{audioholder} node. 
-
 	\subsection{Platform information}
 		% what does it do, what does it look like
 		% limitations? 
+		For troubleshooting and usage statistics purposes, information about the browser and the operating system is logged in the results XML file. This is especially useful in the case of remote tests, when it is not certain which operating system, browser and/or browser were used. Note that this information is not always available and/or accurate, e.g. when the subject has taken steps to be more anonymous, so it should be treated as a guide only.
+
+		Example: 
+		\begin{lstlisting}
+<navigator>
+	<platform>MacIntel</platform>
+	<vendor>Google Inc.</vendor>
+	<uagent>Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36</uagent>
+</navigator>
+		\end{lstlisting}
 
 	\subsection{Show progress}
 		Add \texttt{<option name="page-count"/>} to the \texttt{interface} node (see Section \ref{sec:checks}: Checks) to add the current page number and the total number of pages to the interface. 
@@ -662,7 +684,7 @@ The tool is available in its entirety including source code on \url{https://code
 		\item[Subject] The word we use for a participant, user, ... of the test, i.e. not the experimenter who designs the test but the person who evaluates the audio under test as part of an experiment (or the preparation of one). 
 		\item[User] The person who uses the tool to configure, run and analyse the test - i.e. the experimenter, most likely a researcher - or at least 
 		\item[Page] A screen in a test; corresponds with an \texttt{audioholder}
-		\item[Fragment] An element or sample in a test; corresponds with an \texttt{audioelement}
+		\item[Fragment] An element, stimulus or sample in a test; corresponds with an \texttt{audioelement}
 		\item[Test] A complete test which can consist of several pages; corresponds with an entire configuration XML file
 		\item[Configuration XML file] The XML file containing the necessary information on interface, samples, survey questions, configurations, ... which the JavaScript modules read to produce the desired test.
 		\item[Results XML file] The output of a successful test, including ratings, comments, survey responses, timing information, and the complete configuration XML file with which the test was generated in the first place. 

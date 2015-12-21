@@ -54,7 +54,6 @@
 			<scale position="0">Low</scale>
 			<scale position="100">High</scale>
 			<scale position="50">Middle</scale>
-			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
 		</interface>
 		<audioElements url="0.wav" id="0" type="anchor"/>
 		<audioElements url="1.wav" id="1"/>
