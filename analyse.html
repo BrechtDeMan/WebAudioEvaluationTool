@@ -15,44 +15,18 @@
 		<script type="text/javascript">
 			// To aid 'one-page set-up' all scripts and CSS must be included directly in this file!
 			
-			//google.load("visualization", "1", {packages:["corechart"]});
+			google.load("visualization", "1", {packages:["corechart"]});
 			
 			/*************
 			*	SETUP   *
 			*************/
 			// folder where to find the XML files
-			xmlFileFolder = "analysis_test";
+			xmlFileFolder = "saves";
 			// array of XML files
-			var xmlFiles = ['McG-A-2013-09.xml', 'McG-A-2014-03.xml', 'McG-A-2014-12.xml', 'McG-B-2013-09.xml', 
-			'McG-B-2014-03.xml', 'McG-B-2014-12.xml', 'McG-C-2013-09.xml', 'McG-C-2014-03.xml', 'McG-C-2014-12.xml', 
-			'McG-D-2013-09.xml', 'McG-D-2014-03.xml', 'McG-D-2014-12.xml', 'McG-E-2013-09.xml', 'McG-E-2014-03.xml', 
-			'McG-E-2014-12.xml', 'McG-F-2013-09.xml', 'McG-F-2014-03.xml', 'McG-F-2014-12.xml', 'McG-G-2014-03.xml', 
-			'McG-G-2014-12.xml', 'McG-H-2013-09.xml', 'McG-H-2014-03.xml', 'McG-H-2014-12.xml', 'McG-I-2013-09.xml', 
-			'McG-I-2014-03.xml', 'McG-J-2013-09.xml', 'McG-J-2014-03.xml', 'McG-K-2013-09.xml', 'McG-K-2014-03.xml', 
-			'McG-L-2013-09.xml', 'McG-L-2014-03.xml', 'McG-M-2013-09.xml', 'McG-M-2014-03.xml', 'McG-N-2013-09.xml', 
-			'McG-N-2014-03.xml', 'McG-O-2013-09.xml', 'McG-O-2014-03.xml', 'McG-P-2013-09.xml', 'McG-P-2014-03.xml', 
-			'McG-pro1-2013-09.xml', 'McG-pro1-2014-03.xml', 'McG-pro1-2014-12.xml', 'McG-pro2-2013-09.xml', 
-			'McG-pro2-2014-03.xml', 'McG-pro2-2014-12.xml', 'McG-Q-2014-12.xml', 'McG-R-2014-12.xml', 
-			'McG-S-2014-12.xml', 'McG-subA-2013-09.xml', 'McG-subA-2014-03.xml', 'McG-subB-2014-03.xml', 
-			'McG-subB-2014-12.xml', 'McG-subC-2013-09.xml', 'McG-subC-2014-03.xml', 'McG-subC-2014-12.xml', 
-			'McG-subD-2013-09.xml', 'McG-subD-2014-12.xml', 'McG-subE-2014-12.xml', 'McG-subG-2014-12.xml', 
-			'McG-subH-2013-09.xml', 'McG-T-2014-12.xml', 'McG-U-2014-12.xml', 'McG-V-2014-12.xml', 
-			'McG-W-2014-12.xml', 'McG-X-2014-12.xml', 'MG1-2013-09.xml', 'MG2-2013-09.xml', 'MG3-2013-09.xml', 
-			'MG4-2013-09.xml', 'MG5-2013-09.xml', 'MG6-2013-09.xml', 'MG7-2013-09.xml', 'MG8-2013-09.xml', 
-			'MG9-2013-09.xml', 'QM-1-1.xml', 'QM-1-2.xml', 'QM-10-1.xml', 'QM-11-1.xml', 'QM-11-2.xml', 'QM-12-1.xml', 'QM-12-2.xml', 
-			'QM-13-1.xml', 'QM-14-1.xml', 'QM-15-1.xml', 'QM-16-1.xml', 'QM-17-1.xml', 'QM-18-1.xml', 'QM-18-2.xml', 
-			'QM-18-3.xml', 'QM-19-1.xml', 'QM-2-1.xml', 'QM-2-2.xml', 'QM-2-3.xml', 'QM-20-1.xml', 'QM-20-2.xml', 
-			'QM-20-3.xml', 'QM-21-1.xml', 'QM-21-2.xml', 'QM-3-1.xml', 'QM-3-2.xml', 'QM-3-3.xml', 'QM-4-1.xml', 'QM-5-1.xml', 
-			'QM-5-2.xml', 'QM-6-1.xml', 'QM-6-2.xml', 'QM-7-1.xml', 'QM-7-2.xml', 'QM-8-1.xml', 'QM-9-1.xml',
-			'PXL-L1.xml','PXL-L2.xml','PXL-L3.xml','PXL-L4.xml','PXL-L5.xml','PXL-S1.xml','PXL-S2.xml','PXL-S3.xml',
-			'PXL-S4.xml','PXL-S5.xml','PXL-S6.xml','PXL-S7.xml','PXL-pro.xml','DU-A1.xml','DU-A2.xml','DU-B1.xml',
-			'DU-B2.xml','DU-C1.xml','DU-C2.xml','DU-D1.xml','DU-D2.xml','DU-E1.xml','DU-F1.xml','DU-F2.xml','DU-G1.xml',
-			'DU-G2.xml','DU-H1.xml','DU-H2.xml','DU-I2.xml','DU-J2.xml','DU-K1.xml','DU-K2.xml','DU-L1.xml','DU-L2.xml',
-			'DU-M1.xml','DU-M2.xml','DU-N1.xml','DU-O1.xml','DU-O2.xml','DU-P1.xml','DU-P2.xml','DU-Q1.xml','DU-Q2.xml',
-			'DU-R1.xml','DU-R2.xml','DU-S1.xml','DU-S2.xml','DU-T1.xml','DU-T2.xml','DU-U1.xml','DU-U2.xml','DU-U3.xml'];
-			//['QM-1-1.xml','QM-2-1.xml','QM-2-2.xml','QM-2-3.xml','QM-3-1.xml','QM-3-2.xml','QM-4-1.xml','QM-5-1.xml','QM-5-2.xml','QM-6-1.xml','QM-6-2.xml','QM-7-1.xml','QM-7-2.xml','QM-8-1.xml','QM-9-1.xml','QM-10-1.xml','QM-11-1.xml','QM-12-1.xml','QM-12-2.xml','QM-13-1.xml','QM-14-1.xml','QM-15-1.xml','QM-16-1.xml','QM-17-1.xml','QM-18-1.xml','QM-18-2.xml','QM-18-3.xml','QM-19-1.xml','QM-20-1.xml','QM-20-2.xml','QM-20-3.xml','QM-21-1.xml','QM-21-2.xml'];
-			//['McG-A-2014-03.xml','McG-B-2014-03.xml','McG-C-2014-03.xml','McG-D-2014-03.xml','McG-E-2014-03.xml','McG-F-2014-03.xml','McG-G-2014-03.xml','McG-H-2014-03.xml'];
+			// THIS IS WHERE YOU SPECIFY RESULT XML FILES TO ANALYSE
+			var xmlFiles = ['test-0.xml','test-1.xml','test-2.xml','test-3.xml']; 
 							
+
 			//TODO: make retrieval of file names automatic / drag files on here
 			
 			/****************
@@ -103,8 +77,8 @@
 				var setup = document.createElement('div');
 				setup.id = 'setupTagDiv';
 				loadAllFiles();
+				makePlots();
 				printSurveyData() 
-				//makePlots();
 				// measure time at this point: 
 				lastTimeMeasured = new Date().getTime(); // in milliseconds
 			};
@@ -424,11 +398,11 @@
 							}
 						}
 
-						// mix experience
+						// post-test info
 						if (posttestnode) {
 							posttestcomments = posttestnode.getElementsByTagName('comment');
 							for (idx=0; idx < posttestcomments.length; idx++){
-								commentsToPrint = ['generalExperience', 'interfaceExperience'];
+								commentsToPrint = ['age', 'location']; // CHANGE WHAT TO PRINT
 								idAttribute = posttestcomments[idx].getAttribute('id');
 								if (commentsToPrint.indexOf(idAttribute) >= 0) { // if exists? 
 									document.getElementById('div_survey_'+xmlFileName).innerHTML += '<br><strong>'+idAttribute+': </strong>'+posttestcomments[idx].textContent;
