@@ -20,7 +20,7 @@ var projectReturn; // Hold the URL for the return
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
 // Add a prototype to the bufferNode to hold the desired LINEAR gain
-AudioBuffer.prototype.gain = undefined;
+AudioBuffer.prototype.playbackGain = undefined;
 // Add a prototype to the bufferNode to hold the computed LUFS loudness
 AudioBuffer.prototype.lufs = undefined;
 
@@ -400,7 +400,7 @@ function interfacePopup() {
 			for (var i=0; i<node.options.length; i++) {
 				var option = node.options[i];
 				var input = document.createElement('input');
-				input.id = option.id;
+				input.id = option.name;
 				input.type = 'checkbox';
 				var span = document.createElement('span');
 				span.textContent = option.text;
@@ -891,7 +891,7 @@ function AudioEngine(specification) {
 						this.audioObjects[i].outputGain.gain.value = 0.0;
 						this.audioObjects[i].stop();
 					} else if (i == id) {
-						this.audioObjects[id].outputGain.gain.value = this.audioObjects[id].specification.gain*this.audioObjects[id].buffer.buffer.gain;
+						this.audioObjects[id].outputGain.gain.value = this.audioObjects[id].specification.gain*this.audioObjects[id].buffer.buffer.playbackGain;
 						this.audioObjects[id].play(audioContext.currentTime+0.01);
 					}
 				}
@@ -1005,7 +1005,7 @@ function AudioEngine(specification) {
 				for (var n=0; n<orig.length; n++)
 				{inData[n] = outData[n];}
 			}
-			hold.gain = orig.gain;
+			hold.playbackGain = orig.playbackGain;
 			hold.lufs = orig.lufs;
 			this.audioObjects[i].buffer.buffer = hold;
 		}
@@ -1062,14 +1062,14 @@ function audioObject(id) {
 			this.buffer = callee;
 		}
 		this.state = 1;
-		this.buffer.buffer.gain = callee.buffer.gain;
+		this.buffer.buffer.playbackGain = callee.buffer.playbackGain;
 		this.buffer.buffer.lufs = callee.buffer.lufs;
 		var targetLUFS = this.specification.parent.loudness;
 		if (typeof targetLUFS === "number")
 		{
-			this.buffer.buffer.gain = decibelToLinear(targetLUFS - this.buffer.buffer.lufs);
+			this.buffer.buffer.playbackGain = decibelToLinear(targetLUFS - this.buffer.buffer.lufs);
 		} else {
-			this.buffer.buffer.gain = 1.0;
+			this.buffer.buffer.playbackGain = 1.0;
 		}
 		if (this.interfaceDOM != null) {
 			this.interfaceDOM.enable();
@@ -1077,7 +1077,7 @@ function audioObject(id) {
 	};
     
 	this.loopStart = function() {
-		this.outputGain.gain.value =  this.specification.gain*this.buffer.buffer.gain;
+		this.outputGain.gain.value =  this.specification.gain*this.buffer.buffer.playbackGain;
 		this.metric.startListening(audioEngineContext.timer.getTestTime());
 	};
 	
@@ -1778,7 +1778,10 @@ function Specification() {
 								this.statement = element.textContent;
 							} else if (element.nodeName == 'option') {
 								var node = new this.childOption();
-								node.id = element.id;
+                                if(element.getAttribute('id') != null) {
+                                    console.log(child.nodeName + ' node attribute id is deprecated, use name instead');
+                                    node.name = element.id;
+                                }
 								node.name = element.getAttribute('name');
 								node.text = element.textContent;
 								this.options.push(node);
