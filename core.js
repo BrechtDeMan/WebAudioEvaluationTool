@@ -399,7 +399,7 @@ function interfacePopup() {
 			for (var i=0; i<node.options.length; i++) {
 				var option = node.options[i];
 				var input = document.createElement('input');
-				input.id = option.id;
+				input.id = option.name;
 				input.type = 'checkbox';
 				var span = document.createElement('span');
 				span.textContent = option.text;
@@ -1779,8 +1779,13 @@ function Specification() {
 								this.statement = element.textContent;
 							} else if (element.nodeName == 'option') {
 								var node = new this.childOption();
-								node.id = element.id;
-								node.name = element.getAttribute('name');
+								if (element.getAttribute('id') != null)
+								{
+									console.log('Checkbox Option id is deprecated, use name instead');
+									node.name = element.getAttribute('id');
+								} else {
+									node.name = element.getAttribute('name');
+								}
 								node.text = element.textContent;
 								this.options.push(node);
 							}
@@ -1827,7 +1832,7 @@ function Specification() {
 					{
 						var option = this.options[i];
 						var optionNode = root.createElement("option");
-						optionNode.id = option.id;
+						optionNode.setAttribute("name",option.name);
 						optionNode.textContent = option.text;
 						node.appendChild(optionNode);
 					}
