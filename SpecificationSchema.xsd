@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://127.0.0.1:8020/webaudioevaluationtool/SpecificationSchema.xsd" xmlns="http://127.0.0.1:8020/webaudioevaluationtool/SpecificationSchema.xsd" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:annotation>
     <xs:documentation xml:lang="en">
       Schema for the Web Audio Evaluation Toolbox
@@ -39,6 +39,7 @@
       <xs:attribute name="collectMetrics" type="xs:boolean" default="true"/>
       <xs:attribute name="testPages" type="xs:nonNegativeInteger" default="0"/>
       <xs:attribute name="loudness" type="xs:nonPositiveInteger" default="-23"/>
+      <xs:attribute name="sampleRate" type="xs:positiveInteger" use="optional"/>
     </xs:complexType>
   </xs:element>
 
@@ -53,6 +54,8 @@
   <xs:element name="check">
     <xs:complexType>
       <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="min" type="xs:integer"/>
+      <xs:attribute name="max" type="xs:integer"/>
     </xs:complexType>
   </xs:element>
 
@@ -72,6 +75,13 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="scalerange">
+    <xs:complexType>
+      <xs:attribute name="min" type="xs:positiveInteger" use="required"/>
+      <xs:attribute name="max" type="xs:positiveInteger" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="interface">
     <xs:complexType>
       <xs:sequence>
@@ -79,7 +89,8 @@
         <xs:element ref="check" minOccurs="0" maxOccurs="200"/>
         <xs:element ref="show" minOccurs="0" maxOccurs="200"/>
         <xs:element ref="scale" minOccurs="0" maxOccurs="200"/>
-        <xs:element ref="commentBoxPrefix" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="scalerange" minOccurs="0" maxOccurs="200"/>
+        <xs:element name="commentBoxPrefix" minOccurs="0" maxOccurs="1"/>
         <xs:element name="option" minOccurs="0" maxOccurs="200">
           <xs:complexType>
             <xs:attribute name="name" type="xs:string" use="required"/>
@@ -95,16 +106,7 @@
       <xs:sequence>
         <xs:element ref="interface" minOccurs="0" maxOccurs="200"/>
         <xs:element ref="audioElements" minOccurs="1" maxOccurs="200"/>
-        <xs:element name="CommentQuestion" minOccurs="0" maxOccurs="200">
-          <xs:complexType>
-            <xs:simpleContent>
-              <xs:extension base="xs:string">
-                <xs:attribute name="id" type="xs:ID"/>
-                <xs:attribute name="type" type="xs:string"/>
-              </xs:extension>
-            </xs:simpleContent>
-          </xs:complexType>
-        </xs:element>
+        <xs:element ref="CommentQuestion" minOccurs="0" maxOccurs="200"/>
         <xs:element ref="PreTest"/>
         <xs:element ref="PostTest"/>
       </xs:sequence>
@@ -122,7 +124,7 @@
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required"/>
       <xs:attribute name="url" type="xs:anyURI" use="required"/>
-      <xs:attribute name="gain" type="xs:integer" default="0"/>
+      <xs:attribute name="gain" type="xs:decimal" default="0"/>
       <xs:attribute name="type" type="xs:string" default="normal"/>
       <xs:attribute name="marker">
         <xs:simpleType>
@@ -131,6 +133,25 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="CommentQuestion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="statement" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute ref="id"/>
+      <xs:attribute name="type" type="xs:string"/>
     </xs:complexType>
   </xs:element>
   
