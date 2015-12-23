@@ -16,14 +16,6 @@ var currentTrackOrder = []; // Hold the current XML tracks in their (randomised)
 var audioEngineContext; // The custome AudioEngine object
 var projectReturn; // Hold the URL for the return
 
-
-// Add a prototype to the bufferSourceNode to reference to the audioObject holding it
-AudioBufferSourceNode.prototype.owner = undefined;
-// Add a prototype to the bufferNode to hold the desired LINEAR gain
-AudioBuffer.prototype.gain = undefined;
-// Add a prototype to the bufferNode to hold the computed LUFS loudness
-AudioBuffer.prototype.lufs = undefined;
-
 window.onload = function() {
 	// Function called once the browser has loaded all files.
 	// This should perform any initial commands such as structure / loading documents
@@ -46,6 +38,13 @@ window.onload = function() {
 	interfaceContext = new Interface(specification);
 	// Define window callbacks for interface
 	window.onresize = function(event){interfaceContext.resizeWindow(event);};
+	
+	// Add a prototype to the bufferSourceNode to reference to the audioObject holding it
+	AudioBufferSourceNode.prototype.owner = undefined;
+	// Add a prototype to the bufferNode to hold the desired LINEAR gain
+	AudioBuffer.prototype.gain = 1.0;
+	// Add a prototype to the bufferNode to hold the computed LUFS loudness
+	AudioBuffer.prototype.lufs = -23;
 };
 
 function loadProjectSpec(url) {
@@ -813,7 +812,7 @@ function AudioEngine(specification) {
 							bufferObj.users[i].bufferLoaded(bufferObj);
 						}
 					}
-					calculateLoudness(bufferObj.buffer,"I");
+					//calculateLoudness(bufferObj.buffer,"I");
 				}, function(){
 					// Should only be called if there was an error, but sometimes gets called continuously
 					// Check here if the error is genuine
@@ -1064,6 +1063,7 @@ function audioObject(id) {
 		this.state = 1;
 		this.buffer.buffer.gain = callee.buffer.gain;
 		this.buffer.buffer.lufs = callee.buffer.lufs;
+		/*
 		var targetLUFS = this.specification.parent.loudness;
 		if (typeof targetLUFS === "number")
 		{
@@ -1071,6 +1071,7 @@ function audioObject(id) {
 		} else {
 			this.buffer.buffer.gain = 1.0;
 		}
+		*/
 		if (this.interfaceDOM != null) {
 			this.interfaceDOM.enable();
 		}
