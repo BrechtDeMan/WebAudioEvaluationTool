@@ -1,0 +1,143 @@
+
+\documentclass[a0,portrait]{a0poster}
+\input{sections/style}
+
+\usepackage{ragged2e} % full justification of reference
+\usepackage{enumitem} % compacter itemize
+\usepackage{array} % align vertically
+
+\usepackage[framemethod=tikz]{mdframed}
+\definecolor{backblue}{rgb}{0.93,0.93,1}
+\definecolor{backred}{rgb}{1,0.9,0.9} 
+\definecolor{qmulheaderblue}{rgb}{0.1484375,0.26171875,0.58984375}
+\definecolor{emphasisered}{rgb}{0.4921,0.132812,0.164062}
+\mdfdefinestyle{customSt}{
+	innertopmargin=40pt,
+	innerbottommargin=30pt,
+	innerleftmargin = 15pt,
+	innerrightmargin = 15pt,
+	leftmargin = 15 pt,
+	middlelinecolor = qmulheaderblue,
+	middlelinewidth = 3pt,
+	backgroundcolor = backblue,
+	roundcorner = 20pt
+}
+
+\mdfdefinestyle{emphSt}{
+	innertopmargin=40pt,
+	innerbottommargin=30pt,
+	innerleftmargin = 15pt,
+	innerrightmargin = 15pt,
+	leftmargin = 15 pt,
+	middlelinecolor = emphasisered,
+	middlelinewidth = 3pt,
+	backgroundcolor = backred,
+	roundcorner = 20pt
+}
+
+\mdfdefinestyle{headerSt}{
+	innertopmargin=5pt,
+	innerbottommargin=5pt,
+	innerleftmargin = 15pt,
+	%innerrightmargin = 15pt,
+	leftmargin = 15 pt,
+	middlelinecolor = qmulheaderblue,
+	middlelinewidth = 25pt,
+	backgroundcolor = qmulheaderblue,
+	roundcorner = 20pt
+}
+
+\begin{document}
+\begin{mdframed}[style=headerSt]
+\input{sections/header}
+\end{mdframed}
+
+
+% ----------------------------------------------------------------
+
+% rounded corners?
+\centering
+\veryHuge
+\textbf{\underline{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}}
+\normalsize
+
+\begin{multicols}{2}
+
+\begin{mdframed}[style=customSt]
+\input{sections/intro}
+\end{mdframed}
+
+\vspace{0.3cm}
+
+\begin{mdframed}[style=customSt]
+\input{sections/interfaces} \vspace{0.8cm}
+\end{mdframed}
+
+%\vspace{.8cm}
+%\begin{mdframed}[style=customSt]
+%\begin{center}
+%\resizebox*{0.35\columnwidth}{!}{\includegraphics{img/qrcode}}\\
+%\end{center}
+%\end{mdframed}
+
+\vspace{.8cm}
+\begin{mdframed}[style=customSt]
+\input{sections/infrastructure} \vspace{0.8cm}
+\end{mdframed}
+
+\vspace{1cm}
+
+%% THIS GOES BEFORE AN EMPHASISED CELL
+%\makeatletter
+%\renewcommand{\section}{\@startsection
+%        {section}                          % the name 
+%        {1}                                % the level
+%        {0mm}                              % the indent
+%        {-0.7\baselineskip}                % the beforeskip
+%        {5mm}                              % the afterskip
+%        {\center\Huge\color{emphasisered}\bfseries}} % the style
+%\makeatother
+%
+%\begin{mdframed}[style=emphSt]
+%\input{sections/future} \vspace{0.8cm}
+%\end{mdframed}
+
+% GO BACK TO NORMAL
+\makeatletter
+\renewcommand{\section}{\@startsection
+        {section}                          % the name 
+        {1}                                % the level
+        {0mm}                              % the indent
+        {-0.7\baselineskip}                % the beforeskip
+        {5mm}                              % the afterskip
+        {\center\Huge\color{qmuldarkblue}\bfseries}} % the style
+\makeatother
+
+\vspace{1cm}
+\begin{mdframed}[style=customSt]
+\input{sections/testcreate} \vspace{0.8cm}
+\end{mdframed}
+
+\vspace{1cm}
+\begin{mdframed}[style=customSt]
+\input{sections/analysis} \vspace{0.8cm}
+\end{mdframed}
+
+
+
+\normalsize{\justifying{[1] Nicholas Jillings, Brecht De Man, David Moffat and Joshua D. Reiss, { \it``Web Audio Evaluation Tool: A browser-based listening test environment,''} 12th Sound and Music Computing Conference, July 2015. }\par}
+
+\resizebox*{.32\columnwidth}{!}{\includegraphics{img/qrcode}}\\
+
+\end{multicols}
+
+
+% ----------------------------------------------------------------
+
+\vspace{0.6cm}
+
+\begin{mdframed}[style=headerSt]
+\input{sections/footer}
+\end{mdframed}
+
+\end{document}
