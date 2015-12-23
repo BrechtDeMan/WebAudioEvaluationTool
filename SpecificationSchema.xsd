@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://127.0.0.1:8020/webaudioevaluationtool/SpecificationSchema.xsd" xmlns="http://127.0.0.1:8020/webaudioevaluationtool/SpecificationSchema.xsd" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      Schema for the Web Audio Evaluation Toolbox
+    </xs:documentation>
+  </xs:annotation>
+  <!-- definition of simple objects-->
+  <xs:element name="statement" type="xs:string"></xs:element>
+  <xs:element name="title" type="xs:string"></xs:element>
+  
+  <!-- definition of common attributes-->
+  <xs:attribute name="id" type="xs:ID"></xs:attribute>
+  <xs:attribute name="mandatory" type="xs:boolean"></xs:attribute>
+  <xs:attribute name="name" type="xs:string"></xs:attribute>
+  <xs:attribute name="url" type="xs:anyURI"></xs:attribute>
+
+  <!-- definition of the complex nodes-->
+  <xs:element name="BrowserEvalProjectDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="setup" maxOccurs="1"/>
+        <xs:element ref="audioHolder" minOccurs="1" maxOccurs="200"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="setup">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="PreTest"/>
+        <xs:element ref="PostTest"/>
+        <xs:element ref="Metric"/>
+        <xs:element ref="interface"/>
+      </xs:sequence>
+      <xs:attribute name="interface" type="xs:string" use="required"/>
+      <xs:attribute name="projectReturn" type="xs:string" use="required"/>
+      <xs:attribute name="randomiseOrder" type="xs:boolean" default="false"/>
+      <xs:attribute name="collectMetrics" type="xs:boolean" default="true"/>
+      <xs:attribute name="testPages" type="xs:nonNegativeInteger" default="0"/>
+      <xs:attribute name="loudness" type="xs:nonPositiveInteger" default="-23"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Metric">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="metricEnable" type="xs:string" minOccurs="0" maxOccurs="200"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="check">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="show">
+    <xs:complexType>
+      <xs:attribute ref="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="scale">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="position" type="xs:nonNegativeInteger" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="interface">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="title" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="check" minOccurs="0" maxOccurs="200"/>
+        <xs:element ref="show" minOccurs="0" maxOccurs="200"/>
+        <xs:element ref="scale" minOccurs="0" maxOccurs="200"/>
+        <xs:element ref="commentBoxPrefix" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="option" minOccurs="0" maxOccurs="200">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="audioHolder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="interface" minOccurs="0" maxOccurs="200"/>
+        <xs:element ref="audioElements" minOccurs="1" maxOccurs="200"/>
+        <xs:element name="CommentQuestion" minOccurs="0" maxOccurs="200">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="id" type="xs:ID"/>
+                <xs:attribute name="type" type="xs:string"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="PreTest"/>
+        <xs:element ref="PostTest"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="hostURL" type="xs:string" use="required"/>
+      <xs:attribute name="randomiseOrder" type="xs:string" default="false"/>
+      <xs:attribute name="repeatCount" type="xs:nonNegativeInteger" default="0"/>
+      <xs:attribute name="loop" type="xs:boolean" default="false"/>
+      <xs:attribute name="elementComments" type="xs:boolean" default="true"/>
+      <xs:attribute name="loudness" type="xs:nonPositiveInteger" default="-23"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="audioElements">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required"/>
+      <xs:attribute name="url" type="xs:anyURI" use="required"/>
+      <xs:attribute name="gain" type="xs:integer" default="0"/>
+      <xs:attribute name="type" type="xs:string" default="normal"/>
+      <xs:attribute name="marker">
+        <xs:simpleType>
+          <xs:restriction base="xs:positiveInteger">
+            <xs:maxInclusive value="100"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  
+  <!-- Survery Nodes -->
+  <xs:element name="PreTest">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="statement" minOccurs="0"/>
+        <xs:element ref="question" minOccurs="0"/>
+        <xs:element ref="number" minOccurs="0"/>
+        <xs:element ref="radio" minOccurs="0"/>
+        <xs:element ref="checkbox" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="PostTest">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="statement" minOccurs="0"/>
+        <xs:element ref="question" minOccurs="0"/>
+        <xs:element ref="number" minOccurs="0"/>
+        <xs:element ref="radio" minOccurs="0"/>
+        <xs:element ref="checkbox" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="question">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="id" type="xs:string" use="required"/>
+          <xs:attribute name="mandatory" type="xs:string" default="false"/>
+          <xs:attribute name="boxsize" default="normal">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="small"/>
+                <xs:enumeration value="normal"/>
+                <xs:enumeration value="large"/>
+                <xs:enumeration value="hude"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="number">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="id" type="xs:string" use="required"/>
+          <xs:attribute name="mandatory" type="xs:string" default="false"/>
+          <xs:attribute name="min" type="xs:decimal"/>
+          <xs:attribute name="max" type="xs:decimal"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="checkbox">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="statement" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="option" minOccurs="1" maxOccurs="200">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="mandatory" type="xs:string" default="false"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="radio">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="statement" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="option" minOccurs="1" maxOccurs="200">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="mandatory" type="xs:string" default="false"/>
+    </xs:complexType>
+  </xs:element>
+  
+</xs:schema>
