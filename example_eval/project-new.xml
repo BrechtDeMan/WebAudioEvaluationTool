@@ -1,30 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Uses the new specification -->
-<waet>
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://127.0.0.1:8020/webaudioevaluationtool/test-schema.xsd">
 	<setup interface="APE" project-return="save.php" randomise-order='true' test-pages="2" loudness="-23" sample-rate="44100">
 		<survey location="before">
-			<question id="sessionId" mandatory="true">Please enter your name.</question>
-			<checkbox id="checkboxtest" mandatory="true">
+			<surveyentry type="question" id="sessionId" mandatory="true">
+        <statement>Please enter your name.</statement>
+      </surveyentry>
+      <surveyentry type="checkbox" id="checkboxtest" mandatory="true">
 				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
 				<option name="musician">Playing a musical instrument</option>
 				<option name="soundengineer">Recording or mixing audio</option>
 				<option name="developer">Developing audio software</option>
 				<option name="hwdesigner">Designing or building audio hardware</option>
 				<option name="researcher">Research in the field of audio</option>
-			</checkbox>
-			<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
+			</surveyentry>
+      <surveyentry type="statement">
+        <statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
+      </surveyentry>
 		</survey>
 		<survey location="after">
-			<question id="location" mandatory="true" boxsize="large">Please enter your location. (example mandatory text question)</question>
-			<number id="age" min="0">Please enter your age (example non-mandatory number question)</number>
-			<radio id="rating">
+			<surveyentry type="question" id="location" mandatory="true" boxsize="large">
+        <statement>Please enter your location. (example mandatory text question)</statement>
+      </surveyentry>
+			<surveyentry type="number" id="age" min="0">
+        <statement>Please enter your age (example non-mandatory number question)</statement>
+      </surveyentry>
+			<surveyentry type="radio" id="rating">
 				<statement>Please rate this interface (example radio button question)</statement>
 				<option name="bad">Bad</option>
 				<option name="poor">Poor</option>
 				<option name="good">Good</option>
 				<option name="great">Great</option>
-			</radio>
-			<statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
+			</surveyentry>
+			<surveyentry type="statement">
+        <statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
+    </surveyentry>
 		</survey>
 		<metric>
 			<metricenable>testTimer</metricenable>
@@ -50,7 +60,7 @@
                 <scalelabel position="100">Max</scalelabel>
                 <scalelabel position="50">Middle</scalelabel>
                 <scalelabel position="20">20</scalelabel>
-            </scales
+            </scales>
 		</interface>
 		<interface name="depth">
 			<title>Depth</title>
@@ -67,10 +77,14 @@
 		<audioelement url="3.wav" id="track-3"/>
 		<audioelement url="4.wav" id="track-4"/>
 		<survey location="before">
-			<statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%. </statement>
+      <surveyentry type="statement">
+        <statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%. </statement>
+      </surveyentry>
 		</survey>
 		<survey location="after">
-			<question id="genre" mandatory="true">Please enter the genre.</question>
+      <surveyentry type="question" id="genre-0" mandatory="true">
+        <statement>Please enter the genre.</statement>
+      </surveyentry>
 		</survey>
 	</page>
     <page id='test-1' host-URL="example_eval/" randomise-order='true' repeat-count='0' loop='false' show-element-comments='true'>
@@ -90,8 +104,8 @@
         <audioelement url="3.wav" gain="0.0" id="track-8"/>
         <audioelement url="4.wav" gain="0.0" id="track-9"/>
         <audioelement url="5.wav" gain="0.0" id="track-10"/>
-        <audioelement url="6.wav" gain="0.0" id="track-11" type="outsidereference"/>
-        <commentquestion id='mixingExperience' type="text">
+        <audioelement url="6.wav" gain="0.0" id="track-11" type="outside-reference"/>
+        <commentquestion id='mixingExperience' type="question">
           <statement>What is your general experience with numbers?</statement>
         </commentquestion>
         <commentquestion id="preference" type="radio">
@@ -109,11 +123,15 @@
             <option name="laidback">Laid back</option>
             <option name="heavy">Heavy</option>
         </commentquestion>
-        <survey location="pre">
-        	<statement>Example of an 'APE' style interface with outside reference 'six', hidden anchor 'zero' (which needs to be below 20%), hidden reference 'one' (which needs to be above 80%), randomisation of marker labels, and a forced scale usage of at least 25%-75%. </statement>
-        </survey>
-        <survey location="post">
-            <question id="genre" mandatory="true">Please enter the genre.</question>
-        </survey>
+        <survey location="before">
+          <surveyentry type="statement">
+            <statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%. </statement>
+          </surveyentry>
+		    </survey>
+		    <survey location="after">
+          <surveyentry type="question" id="genre-1" mandatory="true">
+            <statement>Please enter the genre.</statement>
+          </surveyentry>
+		    </survey>
     </page>
 </waet>
