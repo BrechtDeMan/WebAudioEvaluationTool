@@ -371,14 +371,12 @@ function loadTest(audioHolderObject)
 		
 		var node = interfaceContext.createCommentBox(audioObject);
 		// Create a slider per track
-		audioObject.interfaceDOM = new sliderObject(audioObject,interfaceObj);
-		audioObject.metric.initialise(convSliderPosToRate(audioObject.interfaceDOM.trackSliderObjects[0]));
-		if (audioObject.state == 1)
-		{
-			audioObject.interfaceDOM.enable();
-		}
-        
+		var sliderNode = new sliderObject(audioObject,interfaceObj);
+		audioObject.bindInterface(sliderNode);
 	});
+	
+	// Initialse the interfaceSlider object metrics
+	
 	$('.track-slider').mousedown(function(event) {
 		interfaceContext.selectObject($(this)[0]);
 	});
@@ -566,7 +564,7 @@ function interfaceSliderHolder(interfaceObject)
 		this.canvas.appendChild(trackObj);
 		this.sliders.push(trackObj);
 		this.metrics.push(new metricTracker(this));
-		this.metrics[this.metrics.length-1].initialPosition = convSliderPosToRate(trackObj);
+		this.metrics[this.metrics.length-1].initialise(convSliderPosToRate(trackObj));
 		return trackObj;
 	};
 	
@@ -654,8 +652,8 @@ function sliderObject(audioObject,interfaceObjects) {
 function buttonSubmitClick()
 {
 	var checks = [];
-	checks.concat(testState.currentStateMap.interfaces[0].options);
-	checks.concat(specification.interfaces.options);
+	checks = checks.concat(testState.currentStateMap.interfaces[0].options);
+	checks = checks.concat(specification.interfaces.options);
 	var canContinue = true;
 	
 	// Check that the anchor and reference objects are correctly placed
@@ -665,7 +663,7 @@ function buttonSubmitClick()
 	for (var i=0; i<checks.length; i++) {
 		if (checks[i].type == 'check')
 		{
-			switch(checks[i].check) {
+			switch(checks[i].name) {
 			case 'fragmentPlayed':
 				// Check if all fragments have been played
 				var checkState = interfaceContext.checkAllPlayed();
@@ -692,7 +690,7 @@ function buttonSubmitClick()
 				if (checkState == false) {canContinue = false;}
 				break;
 			default:
-				console.log("WARNING - Check option "+checks[i].check+" is not supported on this interface");
+				console.log("WARNING - Check option "+checks[i].name+" is not supported on this interface");
 				break;
 			}
 
