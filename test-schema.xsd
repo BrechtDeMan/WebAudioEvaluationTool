@@ -28,11 +28,11 @@
         <xs:element ref="interface" maxOccurs="1"/>
       </xs:sequence>
       <xs:attribute name="interface" type="xs:string" use="required"/>
-      <xs:attribute name="project-return" use="required" type="xs:string"/>
-      <xs:attribute name="randomise-order" type="xs:boolean" default="false"/>
-      <xs:attribute name="test-pages" type="xs:nonNegativeInteger" default="0"/>
+      <xs:attribute name="projectReturn" use="required" type="xs:string"/>
+      <xs:attribute name="randomiseOrder" type="xs:boolean" default="false"/>
+      <xs:attribute name="testPages" type="xs:nonNegativeInteger" default="0"/>
       <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional"/>
-      <xs:attribute name="sample-rate" type="xs:positiveInteger" use="optional"/>
+      <xs:attribute name="sampleRate" type="xs:positiveInteger" use="optional"/>
     </xs:complexType>
   </xs:element>
 
@@ -47,11 +47,11 @@
         <xs:element ref="survey" maxOccurs="2"/>
       </xs:sequence>
       <xs:attribute ref="id" use="required"/>
-      <xs:attribute name="host-URL" type="xs:anyURI" use="required"/>
-      <xs:attribute name="randomise-order" type="xs:boolean" default="false"/>
-      <xs:attribute name="repeat-count" type="xs:nonNegativeInteger" default="0"/>
+      <xs:attribute name="hostURL" type="xs:anyURI" use="required"/>
+      <xs:attribute name="randomiseOrder" type="xs:boolean" default="false"/>
+      <xs:attribute name="repeatCount" type="xs:nonNegativeInteger" default="0"/>
       <xs:attribute name="loop" type="xs:boolean" default="false"/>
-      <xs:attribute name="show-element-comments" type="xs:boolean" default="false"/>
+      <xs:attribute name="showElementComments" type="xs:boolean" default="false"/>
       <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional"/>
     </xs:complexType>
   </xs:element>
@@ -115,7 +115,7 @@
     <xs:complexType>
       <xs:attribute ref="id" use="required"/>
       <xs:attribute name="url" type="xs:anyURI" use="required"/>
-      <xs:attribute name="gain" type="xs:decimal"/>
+      <xs:attribute name="gain" type="xs:decimal" default="0"/>
       <xs:attribute name="type">
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -184,8 +184,8 @@
             </xs:sequence>
             <xs:attribute ref="id"/>
             <xs:attribute ref="mandatory"/>
-            <xs:attribute name="min"/>
-            <xs:attribute name="max"/>
+            <xs:attribute name="min" type="xs:decimal"/>
+            <xs:attribute name="max" type="xs:decimal"/>
             <xs:attribute name="type" use="required">
               <xs:simpleType>
                 <xs:restriction base="xs:string">

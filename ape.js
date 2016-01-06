@@ -337,8 +337,31 @@ function loadTest(audioHolderObject)
 		// In this jQuery loop, variable 'this' holds the current audioElement.
 		
 		// Check if an outside reference
-		if (index == audioHolderObject.outsideReference)
+		if (element.type == 'outside-reference')
 		{
+			// Construct outside reference;
+			var outsideReferenceHolder = document.createElement('div');
+			outsideReferenceHolder.id = 'outside-reference';
+			outsideReferenceHolder.className = 'outside-reference';
+			outsideReferenceHolderspan = document.createElement('span');
+			outsideReferenceHolderspan.textContent = 'Reference';
+			outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
+			
+			var audioObject = audioEngineContext.newTrack(element);
+			
+			outsideReferenceHolder.onclick = function(event)
+			{
+				audioEngineContext.play(audioEngineContext.audioObjects.length-1);
+				$('.track-slider').removeClass('track-slider-playing');
+	            $('.comment-div').removeClass('comment-box-playing');
+	            if (event.currentTarget.nodeName == 'DIV') {
+	            	$(event.currentTarget).addClass('track-slider-playing');
+	            } else {
+	            	$(event.currentTarget.parentElement).addClass('track-slider-playing');
+	            }
+			};
+			
+			document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
 			return;
 		}
 		
@@ -347,10 +370,9 @@ function loadTest(audioHolderObject)
 		var audioObject = audioEngineContext.newTrack(element);
 		
 		var node = interfaceContext.createCommentBox(audioObject);
-		
 		// Create a slider per track
 		audioObject.interfaceDOM = new sliderObject(audioObject,interfaceObj);
-		audioObject.metric.initialPosition = convSliderPosToRate(audioObject.interfaceDOM.trackSliderObjects[0]);
+		audioObject.metric.initialise(convSliderPosToRate(audioObject.interfaceDOM.trackSliderObjects[0]));
 		if (audioObject.state == 1)
 		{
 			audioObject.interfaceDOM.enable();
@@ -437,7 +459,7 @@ function loadTest(audioHolderObject)
 	});
 	
 	
-	if (commentShow) {
+	if (audioHolderObject.showElementComments) {
 		interfaceContext.showCommentBoxes(feedbackHolder,true);
 	}
 	
@@ -445,32 +467,6 @@ function loadTest(audioHolderObject)
 		var node = interfaceContext.createCommentQuestion(element);
 		feedbackHolder.appendChild(node.holder);
 	});
-	
-	// Construct outside reference;
-	if (audioHolderObject.outsideReference != null) {
-		var outsideReferenceHolder = document.createElement('div');
-		outsideReferenceHolder.id = 'outside-reference';
-		outsideReferenceHolder.className = 'outside-reference';
-		outsideReferenceHolderspan = document.createElement('span');
-		outsideReferenceHolderspan.textContent = 'Reference';
-		outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
-		
-		var audioObject = audioEngineContext.newTrack(audioHolderObject.audioElements[audioHolderObject.outsideReference]);
-		
-		outsideReferenceHolder.onclick = function(event)
-		{
-			audioEngineContext.play(audioEngineContext.audioObjects.length-1);
-			$('.track-slider').removeClass('track-slider-playing');
-            $('.comment-div').removeClass('comment-box-playing');
-            if (event.currentTarget.nodeName == 'DIV') {
-            	$(event.currentTarget).addClass('track-slider-playing');
-            } else {
-            	$(event.currentTarget.parentElement).addClass('track-slider-playing');
-            }
-		};
-		
-		document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
-	}
 	
 	
 	//testWaitIndicator();
@@ -533,15 +529,14 @@ function interfaceSliderHolder(interfaceObject)
 	this.sliderDOM.appendChild(this.scale);
 	var positionScale = this.canvas.style.width.substr(0,this.canvas.style.width.length-2);
 	var offset = Number(this.canvas.attributes['marginsize'].value);
-	for (var index=0; index<interfaceObject.scale.length; index++)
+	for (var scaleObj of interfaceObject.scales)
 	{
-		var scaleObj = interfaceObject.scale[index];
 		var value = document.createAttribute('value');
-		var position = Number(scaleObj[0])*0.01;
+		var position = Number(scaleObj.position)*0.01;
 		value.nodeValue = position;
 		var pixelPosition = (position*positionScale)+offset;
 		var scaleDOM = document.createElement('span');
-		scaleDOM.textContent = scaleObj[1];
+		scaleDOM.textContent = scaleObj.text;
 		this.scale.appendChild(scaleDOM);
 		scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
 		scaleDOM.setAttributeNode(value);
@@ -652,13 +647,15 @@ function sliderObject(audioObject,interfaceObjects) {
 		return obj;
 	};
 	this.getValue = function() {
-		return convSliderPosToRate(this.trackSliderObj);
+		return convSliderPosToRate(this.trackSliderObjects[0]);
 	};
 }
 
 function buttonSubmitClick()
 {
-	var checks = testState.currentStateMap[testState.currentIndex].interfaces[0].options;
+	var checks = [];
+	checks.concat(testState.currentStateMap.interfaces[0].options);
+	checks.concat(specification.interfaces.options);
 	var canContinue = true;
 	
 	// Check that the anchor and reference objects are correctly placed
@@ -743,12 +740,15 @@ function resizeWindow(event){
 	}
 }
 
-function pageXMLSave(store, testXML)
+function pageXMLSave(store, pageSpecification)
 {
 	// MANDATORY
 	// Saves a specific test page
 	// You can use this space to add any extra nodes to your XML <audioHolder> saves
-	// Get the current <audioHolder> information in store (remember to appendChild your data to it)
+	// Get the current <page> information in store (remember to appendChild your data to it)
+	// pageSpecification is the current page node configuration
+	// To create new XML nodes, use storage.document.createElement();
+	
 	if (interfaceContext.interfaceSliders.length == 1)
 	{
 		// If there is only one axis, there only needs to be one metric return
@@ -758,19 +758,18 @@ function pageXMLSave(store, testXML)
 	for (var i=0; i<audioelements.length; i++)
 	{
 		// Have to append the metric specific nodes
-		if (testXML.outsideReference == null || testXML.outsideReference.id != audioelements[i].id)
+		if (pageSpecification.outsideReference == null || pageSpecification.outsideReference.id != audioelements[i].id)
 		{
 			var inject = audioelements[i].getElementsByTagName("metric");
 			if (inject.length == 0)
 			{
-				inject = document.createElement("metric");
+				inject = storage.document.createElement("metric");
 			} else {
 				inject = inject[0];
 			}
 			for (var k=0; k<interfaceContext.interfaceSliders.length; k++)
 			{
-				var node = interfaceContext.interfaceSliders[k].metrics[i].exportXMLDOM();
-				var mrnodes = node.getElementsByTagName("metricresult");
+				var mrnodes = interfaceContext.interfaceSliders[k].metrics[i].exportXMLDOM(inject);
 				for (var j=0; j<mrnodes.length; j++)
 				{
 					var name = mrnodes[j].getAttribute("name");
