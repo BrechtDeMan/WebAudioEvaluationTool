@@ -1127,6 +1127,16 @@ function audioObject(id) {
 		this.storeDOM.setAttribute('presentedId',this.id);
 		this.storeDOM.setAttribute('playGain',linearToDecibel(this.onplayGain));
 	};
+	
+	this.bindInterface = function(interfaceObject)
+	{
+		this.interfaceDOM = interfaceObject;
+		this.metric.initialise(interfaceObject.getValue());
+		if (this.state == 1)
+		{
+			this.interfaceDOM.enable();
+		}
+	};
     
 	this.loopStart = function() {
 		this.outputGain.gain.value = this.onplayGain;
@@ -1335,12 +1345,13 @@ function metricTracker(caller)
 	{
 		if (this.initialPosition == -1) {
 			this.initialPosition = position;
+			this.moved(0,position);
 		}
 	};
 	
 	this.moved = function(time,position)
 	{
-		this.wasMoved = true;
+		if (time > 0) {this.wasMoved = true;}
 		this.movementTracker[this.movementTracker.length] = [time, position];
 	};
 	
@@ -2641,7 +2652,7 @@ function Interface(specificationObject) {
 		{
 			if (ao.specification.type == "anchor")
 			{
-				if (ao.interfaceDOM.getValue() > ao.specification.marker && ao.interfaceDOM.enforce == true) {
+				if (ao.interfaceDOM.getValue() > (ao.specification.marker/100) && ao.specification.marker > 0) {
 					// Anchor is not set below
 					console.log('Anchor node not below marker value');
 					alert('Please keep listening');
@@ -2658,7 +2669,7 @@ function Interface(specificationObject) {
 		{
 			if (ao.specification.type == "reference")
 			{
-				if (ao.interfaceDOM.getValue() < ao.specification.marker && ao.interfaceDOM.enforce == true) {
+				if (ao.interfaceDOM.getValue() < (ao.specification.marker/100) && ao.specification.marker > 0) {
 					// Anchor is not set below
 					console.log('Reference node not below marker value');
 					alert('Please keep listening');
