@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Uses the new specification -->
-<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://127.0.0.1:8020/webaudioevaluationtool/test-schema.xsd">
-	<setup interface="APE" project-return="save.php" randomise-order='true' test-pages="2" loudness="-23" sample-rate="44100">
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+	<setup interface="APE" projectReturn="save.php" randomiseOrder='true' testPages="2" loudness="-23" sampleRate="44100">
 		<survey location="before">
 			<surveyentry type="question" id="sessionId" mandatory="true">
-        <statement>Please enter your name.</statement>
-      </surveyentry>
-      <surveyentry type="checkbox" id="checkboxtest" mandatory="true">
+				<statement>Please enter your name.</statement>
+			</surveyentry>
+			<surveyentry type="radio" id="checkboxtest" mandatory="true">
 				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
 				<option name="musician">Playing a musical instrument</option>
 				<option name="soundengineer">Recording or mixing audio</option>
@@ -14,17 +13,17 @@
 				<option name="hwdesigner">Designing or building audio hardware</option>
 				<option name="researcher">Research in the field of audio</option>
 			</surveyentry>
-      <surveyentry type="statement">
-        <statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
-      </surveyentry>
+			<surveyentry type="statement">
+				<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
+			</surveyentry>
 		</survey>
 		<survey location="after">
 			<surveyentry type="question" id="location" mandatory="true" boxsize="large">
-        <statement>Please enter your location. (example mandatory text question)</statement>
-      </surveyentry>
+				<statement>Please enter your location. (example mandatory text question)</statement>
+			</surveyentry>
 			<surveyentry type="number" id="age" min="0">
-        <statement>Please enter your age (example non-mandatory number question)</statement>
-      </surveyentry>
+				<statement>Please enter your age (example non-mandatory number question)</statement>
+			</surveyentry>
 			<surveyentry type="radio" id="rating">
 				<statement>Please rate this interface (example radio button question)</statement>
 				<option name="bad">Bad</option>
@@ -33,8 +32,8 @@
 				<option name="great">Great</option>
 			</surveyentry>
 			<surveyentry type="statement">
-        <statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
-    </surveyentry>
+				<statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
+			</surveyentry>
 		</survey>
 		<metric>
 			<metricenable>testTimer</metricenable>
@@ -52,24 +51,24 @@
 			<interfaceoption type="show" name="page-count"/>
 		</interface>
 	</setup>
-	<page id='test-0' host-URL="example_eval/" randomise-order='true' repeat-count='0' loop='true' show-element-comments='true' loudness="-12">
-        <commentboxprefix>Comment on fragment</commentboxprefix>
+	<page id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' showElementComments='true' loudness="-12">
+		<commentboxprefix>Comment on fragment</commentboxprefix>
 		<interface name="preference">
-            <scales>
-                <scalelabel position="0">Min</scalelabel>
-                <scalelabel position="100">Max</scalelabel>
-                <scalelabel position="50">Middle</scalelabel>
-                <scalelabel position="20">20</scalelabel>
-            </scales>
+			<scales>
+				<scalelabel position="0">Min</scalelabel>
+				<scalelabel position="100">Max</scalelabel>
+				<scalelabel position="50">Middle</scalelabel>
+				<scalelabel position="20">20</scalelabel>
+			</scales>
 		</interface>
 		<interface name="depth">
 			<title>Depth</title>
-            <scales>
-                <scalelabel position="0">Low</scalelabel>
-                <scalelabel position="100">High</scalelabel>
-                <scalelabel position="50">Middle</scalelabel>
-                <scalelabel position="50">Middle</scalelabel>
-            </scales>
+			<scales>
+				<scalelabel position="0">Low</scalelabel>
+				<scalelabel position="100">High</scalelabel>
+				<scalelabel position="50">Middle</scalelabel>
+				<scalelabel position="50">Middle</scalelabel>
+			</scales>
 		</interface>
 		<audioelement url="0.wav" id="track-0" type="anchor"/>
 		<audioelement url="1.wav" id="track-1"/>
@@ -77,61 +76,61 @@
 		<audioelement url="3.wav" id="track-3"/>
 		<audioelement url="4.wav" id="track-4"/>
 		<survey location="before">
-      <surveyentry type="statement">
-        <statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%. </statement>
-      </surveyentry>
+			<surveyentry type="statement">
+				<statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%.</statement>
+			</surveyentry>
 		</survey>
 		<survey location="after">
-      <surveyentry type="question" id="genre-0" mandatory="true">
-        <statement>Please enter the genre.</statement>
-      </surveyentry>
+			<surveyentry type="question" id="genre-0" mandatory="true">
+				<statement>Please enter the genre.</statement>
+			</surveyentry>
 		</survey>
 	</page>
-    <page id='test-1' host-URL="example_eval/" randomise-order='true' repeat-count='0' loop='false' show-element-comments='true'>
-        <commentboxprefix>Comment on fragment</commentboxprefix>
-        <interface name="preference">
-            <title>Example Test Question</title>
-            <scales>
-                <scalelabel position="0">Min</scalelabel>
-                <scalelabel position="100">Max</scalelabel>
-                <scalelabel position="50">Middle</scalelabel>
-                <scalelabel position="20">20</scalelabel>
-            </scales>
-        </interface>
-        <audioelement url="0.wav" gain="-6" id="track-5" type="anchor" marker="20"/>
-        <audioelement url="1.wav" gain="0.0" id="track-6" type="reference" marker="80"/>
-        <audioelement url="2.wav" gain="0.0" id="track-7"/>
-        <audioelement url="3.wav" gain="0.0" id="track-8"/>
-        <audioelement url="4.wav" gain="0.0" id="track-9"/>
-        <audioelement url="5.wav" gain="0.0" id="track-10"/>
-        <audioelement url="6.wav" gain="0.0" id="track-11" type="outside-reference"/>
-        <commentquestion id='mixingExperience' type="question">
-          <statement>What is your general experience with numbers?</statement>
-        </commentquestion>
-        <commentquestion id="preference" type="radio">
-            <statement>Please enter your overall preference</statement>
-            <option name="worst">Very Bad</option>
-            <option name="bad"></option>
-            <option name="OK">OK</option>
-            <option name="Good"></option>
-            <option name="Great">Great</option>
-        </commentquestion>
-        <commentquestion id="character" type="checkbox">
-            <statement>Please describe the overall character</statement>
-            <option name="funky">Funky</option>
-            <option name="mellow">Mellow</option>
-            <option name="laidback">Laid back</option>
-            <option name="heavy">Heavy</option>
-        </commentquestion>
-        <survey location="before">
-          <surveyentry type="statement">
-            <statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%. </statement>
-          </surveyentry>
-		    </survey>
-		    <survey location="after">
-          <surveyentry type="question" id="genre-1" mandatory="true">
-            <statement>Please enter the genre.</statement>
-          </surveyentry>
-		    </survey>
-    </page>
+	<page id='test-1' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='false' showElementComments='true'>
+		<commentboxprefix>Comment on fragment</commentboxprefix>
+		<interface name="preference">
+			<title>Example Test Question</title>
+			<scales>
+				<scalelabel position="0">Min</scalelabel>
+				<scalelabel position="100">Max</scalelabel>
+				<scalelabel position="50">Middle</scalelabel>
+				<scalelabel position="20">20</scalelabel>
+			</scales>
+		</interface>
+		<audioelement url="0.wav" gain="-6" id="track-5" type="anchor" marker="20"/>
+		<audioelement url="1.wav" gain="0.0" id="track-6" type="reference" marker="80"/>
+		<audioelement url="2.wav" gain="0.0" id="track-7"/>
+		<audioelement url="3.wav" gain="0.0" id="track-8"/>
+		<audioelement url="4.wav" gain="0.0" id="track-9"/>
+		<audioelement url="5.wav" gain="0.0" id="track-10"/>
+		<audioelement url="6.wav" gain="0.0" id="track-11" type="outside-reference"/>
+		<commentquestion id='mixingExperience' type="question">
+			<statement>What is your general experience with numbers?</statement>
+		</commentquestion>
+		<commentquestion id="preference" type="radio">
+			<statement>Please enter your overall preference</statement>
+			<option name="worst">Very Bad</option>
+			<option name="bad"></option>
+			<option name="OK">OK</option>
+			<option name="Good"></option>
+			<option name="Great">Great</option>
+		</commentquestion>
+		<commentquestion id="character" type="checkbox">
+			<statement>Please describe the overall character</statement>
+			<option name="funky">Funky</option>
+			<option name="mellow">Mellow</option>
+			<option name="laidback">Laid back</option>
+			<option name="heavy">Heavy</option>
+		</commentquestion>
+		<survey location="before">
+			<surveyentry type="statement">
+				<statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%.</statement>
+			</surveyentry>
+		</survey>
+		<survey location="after">
+			<surveyentry type="question" id="genre-1" mandatory="true">
+				<statement>Please enter the genre.</statement>
+			</surveyentry>
+		</survey>
+	</page>
 </waet>

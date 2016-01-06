@@ -8,8 +8,10 @@
 /* create the web audio API context and store in audioContext*/
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
+var schemaXSD; // Hold the parsed schema XSD
 var specification;
 var interfaceContext;
+var storage;
 var popup; // Hold the interfacePopup object
 var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
@@ -44,6 +46,9 @@ window.onload = function() {
 	
 	// Create the interface object
 	interfaceContext = new Interface(specification);
+	
+	// Create the storage object
+	storage = new Storage();
 	// Define window callbacks for interface
 	window.onresize = function(event){interfaceContext.resizeWindow(event);};
 };
@@ -51,18 +56,56 @@ window.onload = function() {
 function loadProjectSpec(url) {
 	// Load the project document from the given URL, decode the XML and instruct audioEngine to get audio data
 	// If url is null, request client to upload project XML document
-	var r = new XMLHttpRequest();
-	r.open('GET',url,true);
-	r.onload = function() {
-		loadProjectSpecCallback(r.response);
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("GET",'test-schema.xsd',true);
+	xmlhttp.onload = function()
+	{
+		schemaXSD = xmlhttp.response;
+		var parse = new DOMParser();
+		specification.schema = parse.parseFromString(xmlhttp.response,'text/xml');
+		var r = new XMLHttpRequest();
+		r.open('GET',url,true);
+		r.onload = function() {
+			loadProjectSpecCallback(r.response);
+		};
+		r.send();
 	};
-	r.send();
+	xmlhttp.send();
 };
 
 function loadProjectSpecCallback(response) {
 	// Function called after asynchronous download of XML project specification
 	//var decode = $.parseXML(response);
 	//projectXML = $(decode);
+	
+	// First perform XML schema validation
+	var Module = {
+		xml: response,
+		schema: schemaXSD,
+		arguments:["--noout", "--schema", 'test-schema.xsd','document.xml']
+	};
+	
+	var xmllint = validateXML(Module);
+	console.log(xmllint);
+	if(xmllint != 'document.xml validates\n')
+	{
+		document.getElementsByTagName('body')[0].innerHTML = null;
+		var msg = document.createElement("h3");
+		msg.textContent = "FATAL ERROR";
+		var span = document.createElement("h4");
+		span.textContent = "The XML validator returned the following errors when decoding your XML file";
+		document.getElementsByTagName('body')[0].appendChild(msg);
+		document.getElementsByTagName('body')[0].appendChild(span);
+		xmllint = xmllint.split('\n');
+		for (var i in xmllint)
+		{
+			document.getElementsByTagName('body')[0].appendChild(document.createElement('br'));
+			var span = document.createElement("span");
+			span.textContent = xmllint[i];
+			document.getElementsByTagName('body')[0].appendChild(span);
+		}
+		return;
+	}
 	
 	var parse = new DOMParser();
 	projectXML = parse.parseFromString(response,'text/xml');
@@ -82,11 +125,12 @@ function loadProjectSpecCallback(response) {
 	
 	// Build the specification
 	specification.decode(projectXML);
+	storage.initialise();
 	
 	// Detect the interface to use and load the relevant javascripts.
 	var interfaceJS = document.createElement('script');
 	interfaceJS.setAttribute("type","text/javascript");
-	if (specification.interfaceType == 'APE') {
+	if (specification.interface == 'APE') {
 		interfaceJS.setAttribute("src","ape.js");
 		
 		// APE comes with a css file
@@ -96,7 +140,7 @@ function loadProjectSpecCallback(response) {
 		css.href = 'ape.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
-	} else if (specification.interfaceType == "MUSHRA")
+	} else if (specification.interface == "MUSHRA")
 	{
 		interfaceJS.setAttribute("src","mushra.js");
 		
@@ -113,12 +157,9 @@ function loadProjectSpecCallback(response) {
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine(specification);
 	
-	testState.stateMap.push(specification.preTest);
-	
-	$(specification.audioHolders).each(function(index,elem){
-		testState.stateMap.push(elem);
+	$(specification.pages).each(function(index,elem){
 		$(elem.audioElements).each(function(i,audioElem){
-			var URL = audioElem.parent.hostURL + audioElem.url;
+			var URL = elem.hostURL + audioElem.url;
 			var buffer = null;
 			for (var i=0; i<audioEngineContext.buffers.length; i++)
 			{
@@ -136,8 +177,6 @@ function loadProjectSpecCallback(response) {
 			}
 		});
 	});
-	
-	testState.stateMap.push(specification.postTest);
 }
 
 function createProjectSave(destURL) {
@@ -175,7 +214,7 @@ function createProjectSave(destURL) {
 			} else {
 				if (xmlhttp.responseXML == null)
 				{
-					return createProjectSave(null);
+					createProjectSave('null');
 				}
 				var response = xmlhttp.responseXML.childNodes[0];
 				if (response.getAttribute('state') == "OK")
@@ -231,18 +270,7 @@ function errorSessionDump(msg){
 // Only other global function which must be defined in the interface class. Determines how to create the XML document.
 function interfaceXMLSave(){
 	// Create the XML string to be exported with results
-	var xmlDoc = document.createElement("BrowserEvaluationResult");
-	var projectDocument = specification.projectXML;
-	projectDocument.setAttribute('file-name',url);
-	xmlDoc.appendChild(projectDocument);
-	xmlDoc.appendChild(returnDateNode());
-	xmlDoc.appendChild(interfaceContext.returnNavigator());
-	for (var i=0; i<testState.stateResults.length; i++)
-	{
-		xmlDoc.appendChild(testState.stateResults[i]);
-	}
-	
-	return xmlDoc;
+	return storage.finish();
 }
 
 function linearToDecibel(gain)
@@ -265,7 +293,8 @@ function interfacePopup() {
 	this.buttonPrevious = null;
 	this.popupOptions = null;
 	this.currentIndex = null;
-	this.responses = null;
+	this.node = null;
+	this.store = null;
 	$(window).keypress(function(e){
 			if (e.keyCode == 13 && popup.popup.style.visibility == 'visible')
 			{
@@ -366,15 +395,10 @@ function interfacePopup() {
 		// This will take the node from the popupOptions and display it
 		var node = this.popupOptions[this.currentIndex];
 		this.popupResponse.innerHTML = null;
-		if (node.type == 'statement') {
-			this.popupTitle.textContent = null;
-			var statement = document.createElement('span');
-			statement.textContent = node.statement;
-			this.popupResponse.appendChild(statement);
-		} else if (node.type == 'question') {
-			this.popupTitle.textContent = node.question;
+		this.popupTitle.textContent = node.specification.statement;
+		if (node.specification.type == 'question') {
 			var textArea = document.createElement('textarea');
-			switch (node.boxsize) {
+			switch (node.specification.boxsize) {
 			case 'small':
 				textArea.cols = "20";
 				textArea.rows = "1";
@@ -394,11 +418,8 @@ function interfacePopup() {
 			}
 			this.popupResponse.appendChild(textArea);
 			textArea.focus();
-		} else if (node.type == 'checkbox') {
-			this.popupTitle.textContent = node.statement;
-			var optHold = this.popupResponse;
-			for (var i=0; i<node.options.length; i++) {
-				var option = node.options[i];
+		} else if (node.specification.type == 'checkbox') {
+			for (var option of node.specification.options) {
 				var input = document.createElement('input');
 				input.id = option.name;
 				input.type = 'checkbox';
@@ -409,17 +430,14 @@ function interfacePopup() {
 				hold.style.padding = '4px';
 				hold.appendChild(input);
 				hold.appendChild(span);
-				optHold.appendChild(hold);
+				this.popupResponse.appendChild(hold);
 			}
-		} else if (node.type == 'radio') {
-			this.popupTitle.textContent = node.statement;
-			var optHold = this.popupResponse;
-			for (var i=0; i<node.options.length; i++) {
-				var option = node.options[i];
+		} else if (node.specification.type == 'radio') {
+			for (var option of node.specification.options) {
 				var input = document.createElement('input');
 				input.id = option.name;
 				input.type = 'radio';
-				input.name = node.id;
+				input.name = node.specification.id;
 				var span = document.createElement('span');
 				span.textContent = option.text;
 				var hold = document.createElement('div');
@@ -427,15 +445,14 @@ function interfacePopup() {
 				hold.style.padding = '4px';
 				hold.appendChild(input);
 				hold.appendChild(span);
-				optHold.appendChild(hold);
+				this.popupResponse.appendChild(hold);
 			}
-		} else if (node.type == 'number') {
-			this.popupTitle.textContent = node.statement;
+		} else if (node.specification.type == 'number') {
 			var input = document.createElement('input');
 			input.type = 'textarea';
-			if (node.min != null) {input.min = node.min;}
-			if (node.max != null) {input.max = node.max;}
-			if (node.step != null) {input.step = node.step;}
+			if (node.min != null) {input.min = node.specification.min;}
+			if (node.max != null) {input.max = node.specification.max;}
+			if (node.step != null) {input.step = node.specification.step;}
 			this.popupResponse.appendChild(input);
 		}
 		var content_height = Number(this.popup.offsetHeight.toFixed());
@@ -445,7 +462,7 @@ function interfacePopup() {
 		this.buttonProceed.style.top = content_height;
 		this.buttonPrevious.style.top = content_height;
 		if(this.currentIndex+1 == this.popupOptions.length) {
-			if (this.responses.nodeName == "PRETEST") {
+			if (this.node.location == "pre") {
 				this.buttonProceed.textContent = 'Start';
 			} else {
 				this.buttonProceed.textContent = 'Submit';
@@ -459,19 +476,20 @@ function interfacePopup() {
 			this.buttonPrevious.style.visibility = 'hidden';
 	};
 	
-	this.initState = function(node) {
+	this.initState = function(node,store) {
 		//Call this with your preTest and postTest nodes when needed to
 		// initialise the popup procedure.
-		this.popupOptions = node.options;
-		if (this.popupOptions.length > 0) {
-			if (node.type == 'pretest') {
-				this.responses = document.createElement('PreTest');
-			} else if (node.type == 'posttest') {
-				this.responses = document.createElement('PostTest');
-			} else {
-				console.log ('WARNING - popup node neither pre or post!');
-				this.responses = document.createElement('responses');
-			}
+		if (node.options.length > 0) {
+			this.popupOptions = [];
+			this.node = node;
+			this.store = store;
+			for (var opt of node.options)
+			{
+				this.popupOptions.push({
+					specification: opt,
+					response: null
+				});
+			}			
 			this.currentIndex = 0;
 			this.showPopup();
 			this.postNode();
@@ -483,56 +501,54 @@ function interfacePopup() {
 	this.proceedClicked = function() {
 		// Each time the popup button is clicked!
 		var node = this.popupOptions[this.currentIndex];
-		if (node.type == 'question') {
+		if (node.specification.type == 'question') {
 			// Must extract the question data
 			var textArea = $(popup.popupContent).find('textarea')[0];
-			if (node.mandatory == true && textArea.value.length == 0) {
+			if (node.specification.mandatory == true && textArea.value.length == 0) {
 				alert('This question is mandatory');
 				return;
 			} else {
 				// Save the text content
-				var hold = document.createElement('comment');
-				hold.id = node.id;
-				hold.innerHTML = textArea.value;
-				console.log("Question: "+ node.question);
+				console.log("Question: "+ node.specification.statement);
 				console.log("Question Response: "+ textArea.value);
-				this.responses.appendChild(hold);
+				node.response = textArea.value;
 			}
-		} else if (node.type == 'checkbox') {
+		} else if (node.specification.type == 'checkbox') {
 			// Must extract checkbox data
-			var optHold = this.popupResponse;
-			var hold = document.createElement('checkbox');
 			console.log("Checkbox: "+ node.statement);
-			hold.id = node.id;
-			for (var i=0; i<optHold.childElementCount; i++) {
-				var input = optHold.childNodes[i].getElementsByTagName('input')[0];
-				var statement = optHold.childNodes[i].getElementsByTagName('span')[0];
-				var response = document.createElement('option');
-				response.setAttribute('name',input.id);
-				response.textContent = input.checked;
-				hold.appendChild(response);
-				console.log(input.id +': '+ input.checked);
+			var inputs = this.popupResponse.getElementsByTagName('input');
+			node.response = [];
+			for (var i=0; i<node.specification.options.length; i++) {
+				node.response.push({
+					name: node.specification.options[i].name,
+					text: node.specification.options[i].text,
+					checked: inputs[i].checked
+				});
 			}
-			this.responses.appendChild(hold);
-		} else if (node.type == "radio") {
+		} else if (node.specification.type == "radio") {
 			var optHold = this.popupResponse;
-			var hold = document.createElement('radio');
-			console.log("Checkbox: "+ node.statement);
-			var responseID = null;
+			console.log("Radio: "+ node.specification.statement);
+			node.response = null;
 			var i=0;
-			while(responseID == null) {
-				var input = optHold.childNodes[i].getElementsByTagName('input')[0];
-				if (input.checked == true) {
-					responseID = i;
-					console.log("Selected: "+ node.options[i].name);
+			var inputs = optHold.getElementsByTagName('input');
+			while(node.response == null) {
+				if (i == inputs.length)
+				{
+					if (node.specification.mandatory == true)
+					{
+						alert("This radio is mandatory");
+					} else {
+						node.response = -1;
+					}
+					return;
+				}
+				if (inputs[i].checked == true) {
+					node.response = node.specification.options[i];
+					console.log("Selected: "+ node.specification.options[i].name);
 				}
 				i++;
 			}
-			hold.id = node.id;
-			hold.setAttribute('name',node.options[responseID].name);
-			hold.textContent = node.options[responseID].text;
-			this.responses.appendChild(hold);
-		} else if (node.type == "number") {
+		} else if (node.specification.type == "number") {
 			var input = this.popupContent.getElementsByTagName('input')[0];
 			if (node.mandatory == true && input.value.length == 0) {
 				alert('This question is mandatory. Please enter a number');
@@ -551,10 +567,7 @@ function interfacePopup() {
 				alert('Number is above the maximum value of '+node.max);
 				return;
 			}
-			var hold = document.createElement('number');
-			hold.id = node.id;
-			hold.textContent = input.value;
-			this.responses.appendChild(hold);
+			node.response = input.value;
 		}
 		this.currentIndex++;
 		if (this.currentIndex < this.popupOptions.length) {
@@ -562,10 +575,9 @@ function interfacePopup() {
 		} else {
 			// Reached the end of the popupOptions
 			this.hidePopup();
-			if (this.responses.nodeName == testState.stateResults[testState.stateIndex].nodeName) {
-				testState.stateResults[testState.stateIndex] = this.responses;
-			} else {
-				testState.stateResults[testState.stateIndex].appendChild(this.responses);
+			for (var node of this.popupOptions)
+			{
+				this.store.postResult(node);
 			}
 			advanceState();
 		}
@@ -632,13 +644,39 @@ function stateMachine()
 {
 	// Object prototype for tracking and managing the test state
 	this.stateMap = [];
+	this.preTestSurvey = null;
+	this.postTestSurvey = null;
 	this.stateIndex = null;
-	this.currentStateMap = [];
-	this.currentIndex = null;
+	this.currentStateMap = null;
+	this.currentStatePosition = null;
 	this.currentTestId = 0;
 	this.stateResults = [];
 	this.timerCallBackHolders = null;
 	this.initialise = function(){
+		
+		// Get the data from Specification
+		var pageHolder = [];
+		for (var page of specification.pages)
+		{
+			pageHolder.push(page);
+		}
+		if (specification.randomiseOrder)
+		{
+			pageHolder = randomiseOrder(pageHolder);
+		}
+		for (var i=0; i<pageHolder.length; i++)
+		{
+			pageHolder[i].presentedId = i;
+		}
+		for (var i=0; i<specification.pages.length; i++)
+		{
+			if (specification.testPages < i && specification.testPages != 0) {break;}
+			this.stateMap.push(pageHolder[i]);
+			
+		}
+		if (specification.preTest != null) {this.preTestSurvey = specification.preTest;}
+		if (specification.postTest != null) {this.postTestSurvey = specification.postTest;}
+		
 		if (this.stateMap.length > 0) {
 			if(this.stateIndex != null) {
 				console.log('NOTE - State already initialise');
@@ -666,97 +704,92 @@ function stateMachine()
 		}
 		if (this.stateIndex == -1) {
 			console.log('Starting test...');
-		}
-		if (this.currentIndex == null){
-			if (this.currentStateMap.type == "audioHolder") {
-				// Save current page
-				this.testPageCompleted(this.stateResults[this.stateIndex],this.currentStateMap,this.currentTestId);
-				this.currentTestId++;
+			if (this.preTestSurvey != null)
+			{
+				popup.initState(this.preTestSurvey,storage.globalPreTest);
 			}
 			this.stateIndex++;
-			if (this.stateIndex >= this.stateMap.length) {
-				console.log('Test Completed');
-				createProjectSave(specification.projectReturn);
+		} else if (this.stateIndex == this.stateMap.length)
+		{
+			// All test pages complete, post test
+			console.log('Ending test ...');
+			this.stateIndex++;
+			if (this.postTestSurvey == null) {
+				this.advanceState();
 			} else {
-				this.currentStateMap = this.stateMap[this.stateIndex];
-				if (this.currentStateMap.type == "audioHolder") {
-					console.log('Loading test page');
-					interfaceContext.newPage(this.currentStateMap);
-					this.initialiseInnerState(this.currentStateMap);
-				} else if (this.currentStateMap.type == "pretest" || this.currentStateMap.type == "posttest") {
-					if (this.currentStateMap.options.length >= 1) {
-						popup.initState(this.currentStateMap);
-					} else {
-						this.advanceState();
-					}
-				} else {
-					this.advanceState();
-				}
+				popup.initState(this.postTestSurvey,storage.globalPostTest);
 			}
-		} else {
-			this.advanceInnerState();
+		} else if (this.stateIndex > this.stateMap.length)
+		{
+			createProjectSave(specification.projectReturn);
+		}
+		else
+		{
+			if (this.currentStateMap == null)
+			{
+				this.currentStateMap = this.stateMap[this.stateIndex];
+				storage.createTestPageStore(this.currentStateMap);
+				if (this.currentStateMap.preTest != null)
+				{
+					this.currentStatePosition = 'pre';
+					popup.initState(this.currentStateMap.preTest,storage.testPages[this.stateIndex].preTest);
+				} else {
+					this.currentStatePosition = 'test';
+				}
+				interfaceContext.newPage(this.currentStateMap,storage.testPages[this.stateIndex]);
+				return;
+			}
+			switch(this.currentStatePosition)
+			{
+			case 'pre':
+				this.currentStatePosition = 'test';
+				break;
+			case 'test':
+				this.currentStatePosition = 'post';
+				// Save the data
+				this.testPageCompleted();
+				if (this.currentStateMap.postTest == null)
+				{
+					this.advanceState();
+					return;
+				} else {
+					popup.initState(this.currentStateMap.postTest,storage.testPages[this.stateIndex].postTest);
+				}
+				break;
+			case 'post':
+				this.stateIndex++;
+				this.currentStateMap = null;
+				this.advanceState();
+				break;
+			};
 		}
 	};
 	
-	this.testPageCompleted = function(store, testXML, testId) {
+	this.testPageCompleted = function() {
 		// Function called each time a test page has been completed
-		var metric = document.createElement('metric');
+		var storePoint = storage.testPages[this.stateIndex];
+		// First get the test metric
+		
+		var metric = storePoint.XMLDOM.getElementsByTagName('metric')[0];
 		if (audioEngineContext.metric.enableTestTimer)
 		{
-			var testTime = document.createElement('metricResult');
+			var testTime = storePoint.parent.document.createElement('metricresult');
 			testTime.id = 'testTime';
 			testTime.textContent = audioEngineContext.timer.testDuration;
 			metric.appendChild(testTime);
 		}
-		store.appendChild(metric);
+		
 		var audioObjects = audioEngineContext.audioObjects;
-		for (var i=0; i<audioObjects.length; i++) 
+		for (var ao of audioEngineContext.audioObjects) 
 		{
-			var audioElement = audioEngineContext.audioObjects[i].exportXMLDOM();
-			audioElement.setAttribute('presentedId',i);
-			store.appendChild(audioElement);
+			ao.exportXMLDOM();
 		}
-		$(interfaceContext.commentQuestions).each(function(index,element){
-			var node = element.exportXMLDOM();
-			store.appendChild(node);
-		});
-		pageXMLSave(store, testXML);
-	};
-	
-	this.initialiseInnerState = function(node) {
-		// Parses the received testXML for pre and post test options
-		this.currentStateMap = [];
-		var preTest = node.preTest;
-		var postTest = node.postTest;
-		if (preTest == undefined) {preTest = document.createElement("preTest");}
-		if (postTest == undefined){postTest= document.createElement("postTest");}
-		this.currentStateMap.push(preTest);
-		this.currentStateMap.push(node);
-		this.currentStateMap.push(postTest);
-		this.currentIndex = -1;
-		this.advanceInnerState();
-	};
-	
-	this.advanceInnerState = function() {
-		this.currentIndex++;
-		if (this.currentIndex >= this.currentStateMap.length) {
-			this.currentIndex = null;
-			this.currentStateMap = this.stateMap[this.stateIndex];
-			this.advanceState();
-		} else {
-			if (this.currentStateMap[this.currentIndex].type == "audioHolder") {
-				console.log("Loading test page"+this.currentTestId);
-			} else if (this.currentStateMap[this.currentIndex].type == "pretest") {
-				popup.initState(this.currentStateMap[this.currentIndex]);
-			} else if (this.currentStateMap[this.currentIndex].type == "posttest") {
-				popup.initState(this.currentStateMap[this.currentIndex]);
-			} else {
-				this.advanceInnerState();
-			}
+		for (var element of interfaceContext.commentQuestions)
+		{
+			element.exportXMLDOM(storePoint);
 		}
+		pageXMLSave(storePoint.XMLDOM, this.currentStateMap);
 	};
-	
-	this.previousState = function(){};
 }
 
 function AudioEngine(specification) {
@@ -782,6 +815,8 @@ function AudioEngine(specification) {
 	this.metric = new sessionMetrics(this,specification);
 	
 	this.loopPlayback = false;
+	
+	this.pageStore = null;
 	
 	// Create store for new audioObjects
 	this.audioObjects = [];
@@ -891,7 +926,7 @@ function AudioEngine(specification) {
 						this.audioObjects[i].outputGain.gain.value = 0.0;
 						this.audioObjects[i].stop();
 					} else if (i == id) {
-						this.audioObjects[id].outputGain.gain.value = this.audioObjects[id].specification.gain*this.audioObjects[id].buffer.buffer.playbackGain;
+						this.audioObjects[id].outputGain.gain.value = this.audioObjects[id].onplayGain;
 						this.audioObjects[id].play(audioContext.currentTime+0.01);
 					}
 				}
@@ -921,7 +956,7 @@ function AudioEngine(specification) {
 		this.audioObjects[audioObjectId] = new audioObject(audioObjectId);
 
 		// Check if audioObject buffer is currently stored by full URL
-		var URL = element.parent.hostURL + element.url;
+		var URL = testState.currentStateMap.hostURL + element.url;
 		var buffer = null;
 		for (var i=0; i<this.buffers.length; i++)
 		{
@@ -941,6 +976,16 @@ function AudioEngine(specification) {
 		this.audioObjects[audioObjectId].specification = element;
 		this.audioObjects[audioObjectId].url = URL;
 		buffer.users.push(this.audioObjects[audioObjectId]);
+		// Obtain store node
+		var aeNodes = this.pageStore.XMLDOM.getElementsByTagName('audioelement');
+		for (var i=0; i<aeNodes.length; i++)
+		{
+			if(aeNodes[i].id == element.id)
+			{
+				this.audioObjects[audioObjectId].storeDOM = aeNodes[i];
+				break;
+			}
+		}
 		if (buffer.buffer != null)
 		{
 			this.audioObjects[audioObjectId].bufferLoaded(buffer);
@@ -948,7 +993,8 @@ function AudioEngine(specification) {
 		return this.audioObjects[audioObjectId];
 	};
 	
-	this.newTestPage = function() {
+	this.newTestPage = function(store) {
+		this.pageStore = store;
 		this.state = 0;
 		this.audioObjectsReady = false;
 		this.metric.reset();
@@ -1021,6 +1067,7 @@ function audioObject(id) {
 	this.state = 0; // 0 - no data, 1 - ready
 	this.url = null; // Hold the URL given for the output back to the results.
 	this.metric = new metricTracker(this);
+	this.storeDOM = null;
 	
 	// Bindings for GUI
 	this.interfaceDOM = null;
@@ -1032,6 +1079,7 @@ function audioObject(id) {
 	
 	// Default output gain to be zero
 	this.outputGain.gain.value = 0.0;
+	this.onplayGain = 1.0;
 	
 	// Connect buffer to the audio graph
 	this.outputGain.connect(audioEngineContext.outputGain);
@@ -1074,10 +1122,14 @@ function audioObject(id) {
 		if (this.interfaceDOM != null) {
 			this.interfaceDOM.enable();
 		}
+		this.onplayGain = decibelToLinear(this.specification.gain)*this.buffer.buffer.playbackGain;
+		
+		this.storeDOM.setAttribute('presentedId',this.id);
+		this.storeDOM.setAttribute('playGain',linearToDecibel(this.onplayGain));
 	};
     
 	this.loopStart = function() {
-		this.outputGain.gain.value =  this.specification.gain*this.buffer.buffer.playbackGain;
+		this.outputGain.gain.value = this.onplayGain;
 		this.metric.startListening(audioEngineContext.timer.getTestTime());
 	};
 	
@@ -1138,34 +1190,30 @@ function audioObject(id) {
 	};
 	
 	this.exportXMLDOM = function() {
-		var root = document.createElement('audioElement');
-		root.id = this.specification.id;
-		root.setAttribute('url',this.specification.url);
-		var file = document.createElement('file');
+		var file = storage.document.createElement('file');
 		file.setAttribute('sampleRate',this.buffer.buffer.sampleRate);
 		file.setAttribute('channels',this.buffer.buffer.numberOfChannels);
 		file.setAttribute('sampleCount',this.buffer.buffer.length);
 		file.setAttribute('duration',this.buffer.buffer.duration);
-		root.appendChild(file);
-		if (this.specification.type != 'outsidereference') {
+		this.storeDOM.appendChild(file);
+		if (this.specification.type != 'outside-reference') {
 			var interfaceXML = this.interfaceDOM.exportXMLDOM(this);
 			if (interfaceXML.length == undefined) {
-				root.appendChild(interfaceXML);
+				this.storeDOM.appendChild(interfaceXML);
 			} else {
 				for (var i=0; i<interfaceXML.length; i++)
 				{
-					root.appendChild(interfaceXML[i]);
+					this.storeDOM.appendChild(interfaceXML[i]);
 				}
 			}
-			root.appendChild(this.commentDOM.exportXMLDOM(this));
-			if(this.specification.type == 'anchor') {
-				root.setAttribute('anchor',true);
-			} else if(this.specification.type == 'reference') {
-				root.setAttribute('reference',true);
-			}
+			this.storeDOM.appendChild(this.commentDOM.exportXMLDOM(this));
 		}
-		root.appendChild(this.metric.exportXMLDOM());
-		return root;
+		var nodes = this.metric.exportXMLDOM();
+		var mroot = this.storeDOM.getElementsByTagName('metric')[0];
+		for (var i=0; i<nodes.length; i++)
+		{
+			mroot.appendChild(nodes[i]);
+		}
 	};
 }
 
@@ -1232,10 +1280,10 @@ function sessionMetrics(engine,specification)
 	this.enableFlagMoved = false;
 	this.enableTestTimer = false;
 	// Obtain the metrics enabled
-	for (var i=0; i<specification.metrics.length; i++)
+	for (var i=0; i<specification.metrics.enabled.length; i++)
 	{
-		var node = specification.metrics[i];
-		switch(node.enabled)
+		var node = specification.metrics.enabled[i];
+		switch(node)
 		{
 		case 'testTimer':
 			this.enableTestTimer = true;
@@ -1283,7 +1331,7 @@ function metricTracker(caller)
 	this.hasComments = false;
 	this.parent = caller;
 	
-	this.initialised = function(position)
+	this.initialise = function(position)
 	{
 		if (this.initialPosition == -1) {
 			this.initialPosition = position;
@@ -1340,21 +1388,21 @@ function metricTracker(caller)
 	};
 	
 	this.exportXMLDOM = function() {
-		var root = document.createElement('metric');
+		var storeDOM = [];
 		if (audioEngineContext.metric.enableElementTimer) {
-			var mElementTimer = document.createElement('metricresult');
+			var mElementTimer = storage.document.createElement('metricresult');
 			mElementTimer.setAttribute('name','enableElementTimer');
 			mElementTimer.textContent = this.listenedTimer;
-			root.appendChild(mElementTimer);
+			storeDOM.push(mElementTimer);
 		}
 		if (audioEngineContext.metric.enableElementTracker) {
-			var elementTrackerFull = document.createElement('metricResult');
+			var elementTrackerFull = storage.document.createElement('metricResult');
 			elementTrackerFull.setAttribute('name','elementTrackerFull');
 			for (var k=0; k<this.movementTracker.length; k++)
 			{
-				var timePos = document.createElement('timePos');
+				var timePos = storage.document.createElement('timePos');
 				timePos.id = k;
-				var time = document.createElement('time');
+				var time = storage.document.createElement('time');
 				time.textContent = this.movementTracker[k][0];
 				var position = document.createElement('position');
 				position.textContent = this.movementTracker[k][1];
@@ -1362,36 +1410,36 @@ function metricTracker(caller)
 				timePos.appendChild(position);
 				elementTrackerFull.appendChild(timePos);
 			}
-			root.appendChild(elementTrackerFull);
+			storeDOM.push(elementTrackerFull);
 		}
 		if (audioEngineContext.metric.enableElementListenTracker) {
-			var elementListenTracker = document.createElement('metricResult');
+			var elementListenTracker = storage.document.createElement('metricResult');
 			elementListenTracker.setAttribute('name','elementListenTracker');
 			for (var k=0; k<this.listenTracker.length; k++) {
 				elementListenTracker.appendChild(this.listenTracker[k]);
 			}
-			root.appendChild(elementListenTracker);
+			storeDOM.push(elementListenTracker);
 		}
 		if (audioEngineContext.metric.enableElementInitialPosition) {
-			var elementInitial = document.createElement('metricResult');
+			var elementInitial = storage.document.createElement('metricResult');
 			elementInitial.setAttribute('name','elementInitialPosition');
 			elementInitial.textContent = this.initialPosition;
-			root.appendChild(elementInitial);
+			storeDOM.push(elementInitial);
 		}
 		if (audioEngineContext.metric.enableFlagListenedTo) {
-			var flagListenedTo = document.createElement('metricResult');
+			var flagListenedTo = storage.document.createElement('metricResult');
 			flagListenedTo.setAttribute('name','elementFlagListenedTo');
 			flagListenedTo.textContent = this.wasListenedTo;
-			root.appendChild(flagListenedTo);
+			storeDOM.push(flagListenedTo);
 		}
 		if (audioEngineContext.metric.enableFlagMoved) {
-			var flagMoved = document.createElement('metricResult');
+			var flagMoved = storage.document.createElement('metricResult');
 			flagMoved.setAttribute('name','elementFlagMoved');
 			flagMoved.textContent = this.wasMoved;
-			root.appendChild(flagMoved);
+			storeDOM.push(flagMoved);
 		}
 		if (audioEngineContext.metric.enableFlagComments) {
-			var flagComments = document.createElement('metricResult');
+			var flagComments = storage.document.createElement('metricResult');
 			flagComments.setAttribute('name','elementFlagComments');
 			if (this.parent.commentDOM == null)
 				{flag.textContent = 'false';}
@@ -1399,10 +1447,9 @@ function metricTracker(caller)
 				{flag.textContent = 'false';}
 			else 
 				{flag.textContet = 'true';}
-			root.appendChild(flagComments);
+			storeDOM.push(flagComments);
 		}
-		
-		return root;
+		return storeDOM;
 	};
 }
 
@@ -1479,23 +1526,16 @@ function returnDateNode()
 function Specification() {
 	// Handles the decoding of the project specification XML into a simple JavaScript Object.
 	
-	this.interfaceType = null;
-	this.commonInterface = new function()
-	{
-		this.options = [];
-		this.optionNode = function(input)
-		{
-			var name = input.getAttribute('name');
-			this.type = name;
-			if(this.type == "option")
-			{
-				this.name = input.id;
-			} else if (this.type == "check")
-			{
-				this.check = input.id;
-			}
-		};
-	};
+	this.interface = null;
+	this.projectReturn = null;
+	this.randomiseOrder = null;
+	this.testPages = null;
+	this.pages = [];
+	this.metrics = null;
+	this.interfaces = null;
+	this.loudness = null;
+	this.errors = [];
+	this.schema = null;
 	
 	this.randomiseOrder = function(input)
 	{
@@ -1524,223 +1564,163 @@ function Specification() {
 		console.log(outputSequence.toString()); 	// print randomised array to console
 		return holdArr;
 	};
-	this.projectReturn = null;
-	this.randomiseOrder = null;
-	this.collectMetrics = null;
-	this.testPages = null;
-	this.audioHolders = [];
-	this.metrics = [];
-	this.loudness = null;
+	
+	this.processAttribute = function(attribute,schema)
+	{
+		// attribute is the string returned from getAttribute on the XML
+		// schema is the <xs:attribute> node
+		if (schema.getAttribute('name') == undefined && schema.getAttribute('ref') != undefined)
+		{
+			schema = this.schema.getElementsByName(schema.getAttribute('ref'))[0];
+		}
+		var defaultOpt = schema.getAttribute('default');
+		if (attribute == null) {
+			attribute = defaultOpt;
+		}
+		var dataType = schema.getAttribute('type');
+		if (typeof dataType == "string") { dataType = dataType.substr(3);}
+		else {dataType = "string";}
+		if (attribute == null)
+		{
+			return attribute;
+		}
+		switch(dataType)
+		{
+		case "boolean":
+			if (attribute == 'true'){attribute = true;}else{attribute=false;}
+			break;
+		case "negativeInteger":
+		case "positiveInteger":
+		case "nonNegativeInteger":
+		case "nonPositiveInteger":
+		case "integer":
+		case "decimal":
+		case "short":
+			attribute = Number(attribute);
+			break;
+		case "string":
+		default:
+			attribute = String(attribute);
+			break;
+		}
+		return attribute;
+	};
 	
 	this.decode = function(projectXML) {
+		this.errors = [];
 		// projectXML - DOM Parsed document
 		this.projectXML = projectXML.childNodes[0];
 		var setupNode = projectXML.getElementsByTagName('setup')[0];
-		this.interfaceType = setupNode.getAttribute('interface');
-		this.projectReturn = setupNode.getAttribute('projectReturn');
-		this.testPages = setupNode.getAttribute('testPages');
-		if (setupNode.getAttribute('randomiseOrder') == "true") {
-			this.randomiseOrder = true;
-		} else {this.randomiseOrder = false;}
-		if (setupNode.getAttribute('collectMetrics') == "true") {
-			this.collectMetrics = true;
-		} else {this.collectMetrics = false;}
-		if (isNaN(Number(this.testPages)) || this.testPages == undefined)
+		var schemaSetup = this.schema.getElementsByName('setup')[0];
+		// First decode the attributes
+		var attributes = schemaSetup.getElementsByTagName('attribute');
+		for (var i in attributes)
 		{
-			this.testPages = null;
-		} else {
-			this.testPages = Number(this.testPages);
-			if (this.testPages == 0) {this.testPages = null;}
-		}
-		if (setupNode.getAttribute('loudness') != null)
-		{
-			var XMLloudness = setupNode.getAttribute('loudness');
-			if (isNaN(Number(XMLloudness)) == false)
+			if (isNaN(Number(i)) == true){break;}
+			var attributeName = attributes[i].getAttribute('name');
+			var projectAttr = setupNode.getAttribute(attributeName);
+			projectAttr = this.processAttribute(projectAttr,attributes[i]);
+			switch(typeof projectAttr)
 			{
-				this.loudness = Number(XMLloudness);
+			case "number":
+			case "boolean":
+				eval('this.'+attributeName+' = '+projectAttr);
+				break;
+			case "string":
+				eval('this.'+attributeName+' = "'+projectAttr+'"');
+				break;
 			}
-		}
-		var metricCollection = setupNode.getElementsByTagName('Metric');
-		
-		var setupPreTestNode = setupNode.getElementsByTagName('PreTest');
-		if (setupPreTestNode.length != 0)
-		{
-			setupPreTestNode = setupPreTestNode[0];
-			this.preTest.construct(setupPreTestNode);
+			
 		}
 		
-		var setupPostTestNode = setupNode.getElementsByTagName('PostTest');
-		if (setupPostTestNode.length != 0)
-		{
-			setupPostTestNode = setupPostTestNode[0];
-			this.postTest.construct(setupPostTestNode);
-		}
-		
-		if (metricCollection.length > 0) {
-			metricCollection = metricCollection[0].getElementsByTagName('metricEnable');
-			for (var i=0; i<metricCollection.length; i++) {
-				this.metrics.push(new this.metricNode(metricCollection[i].textContent));
-			}
-		}
-		
-		var commonInterfaceNode = setupNode.getElementsByTagName('interface');
-		if (commonInterfaceNode.length > 0) {
-			commonInterfaceNode = commonInterfaceNode[0];
-		} else {
-			commonInterfaceNode = undefined;
-		}
-		
-		this.commonInterface = new function() {
-			this.OptionNode = function(child) {
-				this.type = child.nodeName;
-				if (this.type == 'option')
+		this.metrics = {
+			enabled: [],
+			decode: function(parent, xml) {
+				var children = xml.getElementsByTagName('metricenable');
+				for (var i in children) { 
+					if (isNaN(Number(i)) == true){break;}
+					this.enabled.push(children[i].textContent);
+				}
+			},
+			encode: function(root) {
+				var node = root.createElement('metric');
+				for (var i in this.enabled)
 				{
-					this.name = child.getAttribute('name');
+					if (isNaN(Number(i)) == true){break;}
+					var child = root.createElement('metricenable');
+					child.textContent = this.enabled[i];
+					node.appendChild(child);
 				}
-				else if (this.type == 'check') {
-					this.check = child.getAttribute('name');
-					if (this.check == 'scalerange') {
-						this.min = child.getAttribute('min');
-						this.max = child.getAttribute('max');
-						if (this.min == null) {this.min = 1;}
-						else if (Number(this.min) > 1 && this.min != null) {
-							this.min = Number(this.min)/100;
-						} else {
-							this.min = Number(this.min);
-						}
-						if (this.max == null) {this.max = 0;}
-						else if (Number(this.max) > 1 && this.max != null) {
-							this.max = Number(this.max)/100;
-						} else {
-							this.max = Number(this.max);
-						}
-					}
-				} else if (this.type == 'anchor' || this.type == 'reference') {
-					this.value = Number(child.textContent);
-					this.enforce = child.getAttribute('enforce');
-					if (this.enforce == 'true') {this.enforce = true;}
-					else {this.enforce = false;}
-				}
-			};
-			this.options = [];
-			if (commonInterfaceNode != undefined) {
-				var child = commonInterfaceNode.firstElementChild;
-				while (child != undefined) {
-					this.options.push(new this.OptionNode(child));
-					child = child.nextElementSibling;
-				}
+				return node;
 			}
 		};
 		
-		var audioHolders = projectXML.getElementsByTagName('audioHolder');
-		for (var i=0; i<audioHolders.length; i++) {
-			var node = new this.audioHolderNode(this);
-			node.decode(this,audioHolders[i]);
-			this.audioHolders.push(node);
+		this.metrics.decode(this,setupNode.getElementsByTagName('metric')[0]);
+		
+		// Now process the survey node options
+		var survey = setupNode.getElementsByTagName('survey');
+		var surveySchema = specification.schema.getElementsByName('survey')[0];
+		for (var i in survey) {
+			if (isNaN(Number(i)) == true){break;}
+			var location = survey[i].getAttribute('location');
+			if (location == 'pre' || location == 'before')
+			{
+				if (this.preTest != null){this.errors.push("Already a pre/before test survey defined! Ignoring second!!");}
+				else {
+					this.preTest = new this.surveyNode();
+					this.preTest.decode(this,survey[i],surveySchema);
+				}
+			} else if (location == 'post' || location == 'after') {
+				if (this.postTest != null){this.errors.push("Already a post/after test survey defined! Ignoring second!!");}
+				else {
+					this.postTest = new this.surveyNode();
+					this.postTest.decode(this,survey[i],surveySchema);
+				}
+			}
 		}
 		
-		// New check if we need to randomise the test order
-		if (this.randomiseOrder && typeof randomiseOrder === "function")
+		var interfaceNode = setupNode.getElementsByTagName('interface');
+		if (interfaceNode.length > 1)
 		{
-	 		this.audioHolders = randomiseOrder(this.audioHolders);
-	 		for (var i=0; i<this.audioHolders.length; i++)
-	 		{
-	 			this.audioHolders[i].presentedId = i;
-	 		}
+			this.errors.push("Only one <interface> node in the <setup> node allowed! Others except first ingnored!");
+		}
+		this.interfaces = new this.interfaceNode();
+		if (interfaceNode.length != 0)
+		{
+			interfaceNode = interfaceNode[0];
+			this.interfaces.decode(this,interfaceNode,this.schema.getElementsByName('interface')[1]);
 		}
 		
-		if (this.testPages != null || this.testPages != undefined)
+		// Page tags
+		var pageTags = projectXML.getElementsByTagName('page');
+		var pageSchema = this.schema.getElementsByName('page')[0];
+		for (var i=0; i<pageTags.length; i++)
 		{
-			if (this.testPages > audioHolders.length)
-			{
-				console.log('Warning: You have specified '+audioHolders.length+' tests but requested '+this.testPages+' be completed!');
-				this.testPages = audioHolders.length;
-			}
-			var aH = this.audioHolders;
-			this.audioHolders = [];
-			for (var i=0; i<this.testPages; i++)
-			{
-				this.audioHolders.push(aH[i]);
-			}
+			var node = new this.page();
+			node.decode(this,pageTags[i],pageSchema);
+			this.pages.push(node);
 		}
 	};
 	
 	this.encode = function()
 	{
-		var root = document.implementation.createDocument(null,"BrowserEvalProjectDocument");
-		// First get all the <setup> tag compiled
-		var setupNode = root.createElement("setup");
-		setupNode.setAttribute('interface',this.interfaceType);
-		setupNode.setAttribute('projectReturn',this.projectReturn);
-		setupNode.setAttribute('randomiseOrder',this.randomiseOrder);
-		setupNode.setAttribute('collectMetrics',this.collectMetrics);
-		setupNode.setAttribute('testPages',this.testPages);
-		if(this.loudness != null) {AHNode.setAttribute("loudness",this.loudness);}
+		var root = document.implementation.createDocument(null,"waet");
 		
-		var setupPreTest = root.createElement("PreTest");
-		for (var i=0; i<this.preTest.options.length; i++)
-		{
-			setupPreTest.appendChild(this.preTest.options[i].exportXML(root));
-		}
+		// Build setup node
 		
-		var setupPostTest = root.createElement("PostTest");
-		for (var i=0; i<this.postTest.options.length; i++)
-		{
-			setupPostTest.appendChild(this.postTest.options[i].exportXML(root));
-		}
-		
-		setupNode.appendChild(setupPreTest);
-		setupNode.appendChild(setupPostTest);
-		
-		// <Metric> tag
-		var Metric = root.createElement("Metric");
-		for (var i=0; i<this.metrics.length; i++)
-		{
-			var metricEnable = root.createElement("metricEnable");
-			metricEnable.textContent = this.metrics[i].enabled;
-			Metric.appendChild(metricEnable);
-		}
-		setupNode.appendChild(Metric);
-		
-		// <interface> tag
-		var CommonInterface = root.createElement("interface");
-		for (var i=0; i<this.commonInterface.options.length; i++)
-		{
-			var CIObj = this.commonInterface.options[i];
-			var CINode = root.createElement(CIObj.type);
-			if (CIObj.type == "check") {CINode.setAttribute("name",CIObj.check);}
-			else {CINode.setAttribute("name",CIObj.name);}
-			CommonInterface.appendChild(CINode);
-		}
-		setupNode.appendChild(CommonInterface);
-		
-		root.getElementsByTagName("BrowserEvalProjectDocument")[0].appendChild(setupNode);
-		// Time for the <audioHolder> tags
-		for (var ahIndex = 0; ahIndex < this.audioHolders.length; ahIndex++)
-		{
-			var node = this.audioHolders[ahIndex].encode(root);
-			root.getElementsByTagName("BrowserEvalProjectDocument")[0].appendChild(node);
-		}
 		return root;
 	};
 	
-	this.prepostNode = function(type) {
-		this.type = type;
+	this.surveyNode = function() {
+		this.location = null;
 		this.options = [];
+		this.schema = null;
 		
 		this.OptionNode = function() {
-			
-			this.childOption = function() {
-				this.type = 'option';
-				this.id = null;
-				this.name = undefined;
-				this.text = null;
-			};
-			
 			this.type = undefined;
+			this.schema = undefined;
 			this.id = undefined;
 			this.mandatory = undefined;
-			this.question = undefined;
 			this.statement = undefined;
 			this.boxsize = undefined;
 			this.options = [];
@@ -1748,69 +1728,62 @@ function Specification() {
 			this.max = undefined;
 			this.step = undefined;
 			
-			this.decode = function(child)
+			this.decode = function(parent,child,schema)
 			{
-				this.type = child.nodeName;
-				if (child.nodeName == "question") {
-					this.id = child.id;
-					this.mandatory;
-					if (child.getAttribute('mandatory') == "true") {this.mandatory = true;}
-					else {this.mandatory = false;}
-					this.question = child.textContent;
-					if (child.getAttribute('boxsize') == null) {
-						this.boxsize = 'normal';
-					} else {
-						this.boxsize = child.getAttribute('boxsize');
+				this.schema = schema;
+				var attributeMap = schema.getElementsByTagName('attribute');
+				for (var i in attributeMap){
+					if(isNaN(Number(i)) == true){break;}
+					var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
+					var projectAttr = child.getAttribute(attributeName);
+					projectAttr = parent.processAttribute(projectAttr,attributeMap[i]);
+					switch(typeof projectAttr)
+					{
+					case "number":
+					case "boolean":
+						eval('this.'+attributeName+' = '+projectAttr);
+						break;
+					case "string":
+						eval('this.'+attributeName+' = "'+projectAttr+'"');
+						break;
 					}
-				} else if (child.nodeName == "statement") {
-					this.statement = child.textContent;
-				} else if (child.nodeName == "checkbox" || child.nodeName == "radio") {
-					var element = child.firstElementChild;
-					this.id = child.id;
-					if (element == null) {
+				}
+				this.statement = child.getElementsByTagName('statement')[0].textContent;
+				if (this.type == "checkbox" || this.type == "radio") {
+					var children = child.getElementsByTagName('option');
+					if (children.length == null) {
 						console.log('Malformed' +child.nodeName+ 'entry');
 						this.statement = 'Malformed' +child.nodeName+ 'entry';
 						this.type = 'statement';
 					} else {
 						this.options = [];
-						while (element != null) {
-							if (element.nodeName == 'statement' && this.statement == undefined){
-								this.statement = element.textContent;
-							} else if (element.nodeName == 'option') {
-								var node = new this.childOption();
-                                if(element.getAttribute('id') != null) {
-                                    console.log(child.nodeName + ' node attribute id is deprecated, use name instead');
-                                    node.name = element.id;
-                                }
-								node.name = element.getAttribute('name');
-								node.text = element.textContent;
-								this.options.push(node);
-							}
-							element = element.nextElementSibling;
+						for (var i in children)
+						{
+							if (isNaN(Number(i))==true){break;}
+							this.options.push({
+								name: children[i].getAttribute('name'),
+								text: children[i].textContent
+							});
 						}
 					}
-				} else if (child.nodeName == "number") {
-					this.statement = child.textContent;
-					this.id = child.id;
-					this.min = child.getAttribute('min');
-					this.max = child.getAttribute('max');
-					this.step = child.getAttribute('step');
 				}
 			};
 			
 			this.exportXML = function(root)
 			{
-				var node = root.createElement(this.type);
+				var node = root.createElement('surveyelement');
+				node.setAttribute('type',this.type);
+				var statement = root.createElement('statement');
+				statement.textContent = this.statement;
+				node.appendChild(statement);
 				switch(this.type)
 				{
 				case "statement":
-					node.textContent = this.statement;
 					break;
 				case "question":
 					node.id = this.id;
 					node.setAttribute("mandatory",this.mandatory);
 					node.setAttribute("boxsize",this.boxsize);
-					node.textContent = this.question;
 					break;
 				case "number":
 					node.id = this.id;
@@ -1818,27 +1791,10 @@ function Specification() {
 					node.setAttribute("min", this.min);
 					node.setAttribute("max", this.max);
 					node.setAttribute("step", this.step);
-					node.textContent = this.statement;
 					break;
 				case "checkbox":
-					node.id = this.id;
-					var statement = root.createElement("statement");
-					statement.textContent = this.statement;
-					node.appendChild(statement);
-					for (var i=0; i<this.options.length; i++)
-					{
-						var option = this.options[i];
-						var optionNode = root.createElement("option");
-						optionNode.id = option.id;
-						optionNode.textContent = option.text;
-						node.appendChild(optionNode);
-					}
-					break;
 				case "radio":
 					node.id = this.id;
-					var statement = root.createElement("statement");
-					statement.textContent = this.statement;
-					node.appendChild(statement);
 					for (var i=0; i<this.options.length; i++)
 					{
 						var option = this.options[i];
@@ -1852,145 +1808,191 @@ function Specification() {
 				return node;
 			};
 		};
-		this.construct = function(Collection)
-		{
-			if (Collection.childElementCount != 0) {
-				var child = Collection.firstElementChild;
+		this.decode = function(parent,xml,schema) {
+			this.schema = schema;
+			this.location = xml.getAttribute('location');
+			if (this.location == 'before'){this.location = 'pre';}
+			else if (this.location == 'after'){this.location = 'post';}
+			var surveyentrySchema = schema.getElementsByTagName('element')[0];
+			for (var i in xml.children)
+			{
+				if(isNaN(Number(i))==true){break;}
 				var node = new this.OptionNode();
-				node.decode(child);
+				node.decode(parent,xml.children[i],surveyentrySchema);
 				this.options.push(node);
-				while (child.nextElementSibling != null) {
-					child = child.nextElementSibling;
-					node = new this.OptionNode();
-					node.decode(child);
-					this.options.push(node);
+			}
+		};
+		this.encode = function(root) {
+			var node = root.createElement('survey');
+			node.setAttribute('location',this.location);
+			for (var i=0; i<this.options.length; i++)
+			{
+				node.appendChild(this.options[i].exportXML());
+			}
+			return node;
+		};
+	};
+	
+	this.interfaceNode = function()
+	{
+		this.title = null;
+		this.name = null;
+		this.options = [];
+		this.scales = [];
+		this.schema = null;
+		
+		this.decode = function(parent,xml,schema) {
+			this.schema = schema;
+			this.name = xml.getAttribute('name');
+			var titleNode = xml.getElementsByTagName('title');
+			if (titleNode.length == 1)
+			{
+				this.title = titleNode[0].textContent;
+			}
+			var interfaceOptionNodes = xml.getElementsByTagName('interfaceoption');
+			// Extract interfaceoption node schema
+			var interfaceOptionNodeSchema = schema.getElementsByTagName('element');
+			for (var i=0; i<interfaceOptionNodeSchema.length; i++) {
+				if (interfaceOptionNodeSchema[i].getAttribute('name') == 'interfaceoption') {
+					interfaceOptionNodeSchema = interfaceOptionNodeSchema[i];
+					break;
+				}
+			}
+			var attributeMap = interfaceOptionNodeSchema.getElementsByTagName('attribute');
+			for (var i=0; i<interfaceOptionNodes.length; i++)
+			{
+				var ioNode = interfaceOptionNodes[i];
+				var option = {};
+				for (var j=0; j<attributeMap.length; j++)
+				{
+					var attributeName = attributeMap[j].getAttribute('name') || attributeMap[j].getAttribute('ref');
+					var projectAttr = ioNode.getAttribute(attributeName);
+					projectAttr = parent.processAttribute(projectAttr,attributeMap[j]);
+					switch(typeof projectAttr)
+					{
+					case "number":
+					case "boolean":
+						eval('option.'+attributeName+' = '+projectAttr);
+						break;
+					case "string":
+						eval('option.'+attributeName+' = "'+projectAttr+'"');
+						break;
+					}
+				}
+				this.options.push(option);
+			}
+			
+			// Now the scales nodes
+			var scaleParent = xml.getElementsByTagName('scales');
+			if (scaleParent.length == 1) {
+				scaleParent = scaleParent[0];
+				for (var i=0; i<scaleParent.children.length; i++) {
+					var child = scaleParent.children[i];
+					this.scales.push({
+						text: child.textContent,
+						position: Number(child.getAttribute('position'))
+					});
 				}
 			}
 		};
-	};
-	this.preTest = new this.prepostNode("pretest");
-	this.postTest = new this.prepostNode("posttest");
-	
-	this.metricNode = function(name) {
-		this.enabled = name;
+		
+		this.encode = function(root) {
+			
+		};
 	};
 	
-	this.audioHolderNode = function(parent) {
-		this.type = 'audioHolder';
+	this.page = function() {
 		this.presentedId = undefined;
 		this.id = undefined;
 		this.hostURL = undefined;
-		this.sampleRate = undefined;
 		this.randomiseOrder = undefined;
 		this.loop = undefined;
-		this.elementComments = undefined;
+		this.showElementComments = undefined;
 		this.outsideReference = null;
 		this.loudness = null;
-		this.initialPosition = null;
-		this.preTest = new parent.prepostNode("pretest");
-		this.postTest = new parent.prepostNode("pretest");
+		this.preTest = null;
+		this.postTest = null;
 		this.interfaces = [];
 		this.commentBoxPrefix = "Comment on track";
 		this.audioElements = [];
 		this.commentQuestions = [];
+		this.schema = null;
 		
-		this.decode = function(parent,xml)
+		this.decode = function(parent,xml,schema)
 		{
-			this.presentedId = parent.audioHolders.length;
-			this.id = xml.id;
-			this.hostURL = xml.getAttribute('hostURL');
-			this.sampleRate = xml.getAttribute('sampleRate');
-			if (xml.getAttribute('randomiseOrder') == "true") {this.randomiseOrder = true;}
-			else {this.randomiseOrder = false;}
-			this.repeatCount = xml.getAttribute('repeatCount');
-			if (xml.getAttribute('loop') == 'true') {this.loop = true;}
-			else {this.loop == false;}
-			if (xml.getAttribute('elementComments') == "true") {this.elementComments = true;}
-			else {this.elementComments = false;}
-			if (typeof parent.loudness === "number")
+			this.schema = schema;
+			var attributeMap = this.schema.getElementsByTagName('attribute');
+			for (var i=0; i<attributeMap.length; i++)
 			{
-				this.loudness = parent.loudness;
-			}
-			if (typeof xml.getAttribute('initial-position') === "string")
-			{
-				var xmlInitialPosition = Number(xml.getAttribute('initial-position'));
-				if (isNaN(xmlInitialPosition) == false)
+				var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
+				var projectAttr = xml.getAttribute(attributeName);
+				projectAttr = parent.processAttribute(projectAttr,attributeMap[i]);
+				switch(typeof projectAttr)
 				{
-					if (xmlInitialPosition > 1)
-					{
-						xmlInitialPosition /= 100;
-					}
-					this.initialPosition = xmlInitialPosition;
+				case "number":
+				case "boolean":
+					eval('this.'+attributeName+' = '+projectAttr);
+					break;
+				case "string":
+					eval('this.'+attributeName+' = "'+projectAttr+'"');
+					break;
 				}
 			}
-			if (xml.getAttribute('loudness') != null)
-			{
-				var XMLloudness = xml.getAttribute('loudness');
-				if (isNaN(Number(XMLloudness)) == false)
-				{
-					this.loudness = Number(XMLloudness);
-				}
-			}
-			var setupPreTestNode = xml.getElementsByTagName('PreTest');
-			if (setupPreTestNode.length != 0)
-			{
-				setupPreTestNode = setupPreTestNode[0];
-				this.preTest.construct(setupPreTestNode);
+			
+			// Get the Comment Box Prefix
+			var CBP = xml.getElementsByTagName('commentboxprefix');
+			if (CBP.length != 0) {
+				this.commentBoxPrefix = CBP[0].textContent;
 			}
 			
-			var setupPostTestNode = xml.getElementsByTagName('PostTest');
-			if (setupPostTestNode.length != 0)
+			// Now decode the interfaces
+			var interfaceNode = xml.getElementsByTagName('interface');
+			for (var i=0; i<interfaceNode.length; i++)
 			{
-				setupPostTestNode = setupPostTestNode[0];
-				this.postTest.construct(setupPostTestNode);
-			}
-			
-			var interfaceDOM = xml.getElementsByTagName('interface');
-			for (var i=0; i<interfaceDOM.length; i++) {
-				var node = new this.interfaceNode();
-				node.decode(interfaceDOM[i]);
+				var node = new parent.interfaceNode();
+				node.decode(this,interfaceNode[i],parent.schema.getElementsByName('interface')[1]);
 				this.interfaces.push(node);
 			}
-			this.commentBoxPrefix = xml.getElementsByTagName('commentBoxPrefix');
-			if (this.commentBoxPrefix.length != 0) {
-				this.commentBoxPrefix = this.commentBoxPrefix[0].textContent;
-			} else {
-				this.commentBoxPrefix = "Comment on track";
-			}
-			var audioElementsDOM = xml.getElementsByTagName('audioElements');
-			var outsideReferenceHolder = null;
-			for (var i=0; i<audioElementsDOM.length; i++) {
-				var node = new this.audioElementNode();
-				node.decode(this,audioElementsDOM[i]);
-				if (audioElementsDOM[i].getAttribute('type') == 'outsidereference') {
-					if (this.outsideReference == null) {
-						outsideReferenceHolder = node;
-						this.outsideReference = i;
-					} else {
-						console.log('Error only one audioelement can be of type outsidereference per audioholder');
-						this.audioElements.push(node);
-						console.log('Element id '+audioElementsDOM[i].id+' made into normal node');
+			
+			// Now process the survey node options
+			var survey = xml.getElementsByTagName('survey');
+			var surveySchema = parent.schema.getElementsByName('survey')[0];
+			for (var i in survey) {
+				if (isNaN(Number(i)) == true){break;}
+				var location = survey[i].getAttribute('location');
+				if (location == 'pre' || location == 'before')
+				{
+					if (this.preTest != null){this.errors.push("Already a pre/before test survey defined! Ignoring second!!");}
+					else {
+						this.preTest = new parent.surveyNode();
+						this.preTest.decode(parent,survey[i],surveySchema);
 					}
-				} else {
-					this.audioElements.push(node);
+				} else if (location == 'post' || location == 'after') {
+					if (this.postTest != null){this.errors.push("Already a post/after test survey defined! Ignoring second!!");}
+					else {
+						this.postTest = new parent.surveyNode();
+						this.postTest.decode(parent,survey[i],surveySchema);
+					}
 				}
 			}
 			
-			if (this.randomiseOrder == true && typeof randomiseOrder === "function")
+			// Now process the audioelement tags
+			var audioElements = xml.getElementsByTagName('audioelement');
+			var audioElementSchema = parent.schema.getElementsByName('audioelement')[0];
+			for (var i=0; i<audioElements.length; i++)
 			{
-				this.audioElements = randomiseOrder(this.audioElements);
-			}
-			if (outsideReferenceHolder != null)
-			{
-				this.audioElements.push(outsideReferenceHolder);
-				this.outsideReference = this.audioElements.length-1;
+				var node = new this.audioElementNode();
+				node.decode(this,audioElements[i],audioElementSchema);
+				this.audioElements.push(node);
 			}
 			
-			
-			var commentQuestionsDOM = xml.getElementsByTagName('CommentQuestion');
-			for (var i=0; i<commentQuestionsDOM.length; i++) {
+			// Now decode the commentquestions
+			var commentQuestions = xml.getElementsByTagName('commentquestion');
+			var commentQuestionSchema = parent.schema.getElementsByName('commentquestion')[0];
+			for (var i=0; i<commentQuestions.length; i++)
+			{
 				var node = new this.commentQuestionNode();
-				node.decode(commentQuestionsDOM[i]);
+				node.decode(parent,commentQuestions[i],commentQuestionSchema);
 				this.commentQuestions.push(node);
 			}
 		};
@@ -2040,58 +2042,31 @@ function Specification() {
 			return AHNode;
 		};
 		
-		this.interfaceNode = function() {
-			this.title = undefined;
+		this.commentQuestionNode = function() {
+			this.id = null;
+			this.type = undefined;
 			this.options = [];
-			this.scale = [];
-			this.name = undefined;
-			this.decode = function(DOM)
+			this.statement = undefined;
+			this.schema = null;
+			this.decode = function(parent,xml,schema)
 			{
-				var title = DOM.getElementsByTagName('title');
-				if (title.length == 0) {this.title = null;}
-				else {this.title = title[0].textContent;}
-				var name = DOM.getAttribute("name");
-				if (name != undefined) {this.name = name;}
-				this.options = parent.commonInterface.options;
-				var scale = DOM.getElementsByTagName('scale');
-				this.scale = [];
-				for (var i=0; i<scale.length; i++) {
-					var arr = [null, null];
-					arr[0] = scale[i].getAttribute('position');
-					arr[1] = scale[i].textContent;
-					this.scale.push(arr);
+				this.id = xml.id;
+				this.type = xml.getAttribute('type');
+				this.statement = xml.getElementsByTagName('statement')[0].textContent;
+				var optNodes = xml.getElementsByTagName('option');
+				for (var i=0; i<optNodes.length; i++)
+				{
+					var optNode = optNodes[i];
+					this.options.push({
+						name: optNode.getAttribute('name'),
+						text: optNode.textContent
+					});
 				}
 			};
+			
 			this.encode = function(root)
 			{
-				var node = root.createElement("interface");
-				if (this.title != undefined)
-				{
-					var title = root.createElement("title");
-					title.textContent = this.title;
-					node.appendChild(title);
-				}
-				for (var i=0; i<this.options.length; i++)
-				{
-					var optionNode = root.createElement(this.options[i].type);
-					if (this.options[i].type == "option")
-					{
-						optionNode.setAttribute("name",this.options[i].name);
-					} else if (this.options[i].type == "check") {
-						optionNode.setAttribute("check",this.options[i].check);
-					} else if (this.options[i].type == "scalerange") {
-						optionNode.setAttribute("min",this.options[i].min*100);
-						optionNode.setAttribute("max",this.options[i].max*100);
-					}
-					node.appendChild(optionNode);
-				}
-				for (var i=0; i<this.scale.length; i++) {
-					var scale = root.createElement("scale");
-					scale.setAttribute("position",this.scale[i][0]);
-					scale.textContent = this.scale[i][1];
-					node.appendChild(scale);
-				}
-				return node;
+				
 			};
 		};
 		
@@ -2099,50 +2074,34 @@ function Specification() {
 			this.url = null;
 			this.id = null;
 			this.parent = null;
-			this.type = "normal";
+			this.type = null;
 			this.marker = false;
 			this.enforce = false;
 			this.gain = 1.0;
-			this.decode = function(parent,xml)
+			this.schema = null;
+			this.parent = null;
+			this.decode = function(parent,xml,schema)
 			{
-				this.url = xml.getAttribute('url');
-				this.id = xml.id;
+				this.schema = schema;
 				this.parent = parent;
-				this.type = xml.getAttribute('type');
-				var gain = xml.getAttribute('gain');
-				if (isNaN(gain) == false && gain != null)
+				var attributeMap = this.schema.getElementsByTagName('attribute');
+				for (var i=0; i<attributeMap.length; i++)
 				{
-					this.gain = decibelToLinear(Number(gain));
-				}
-				if (this.type == null) {this.type = "normal";}
-				if (this.type == 'anchor') {this.anchor = true;}
-				else {this.anchor = false;}
-				if (this.type == 'reference') {this.reference = true;}
-				else {this.reference = false;}
-				if (this.anchor == true || this.reference == true)
-				{
-					this.marker = xml.getAttribute('marker');
-					if (this.marker != undefined)
+					var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
+					var projectAttr = xml.getAttribute(attributeName);
+					projectAttr = specification.processAttribute(projectAttr,attributeMap[i]);
+					switch(typeof projectAttr)
 					{
-						this.marker = Number(this.marker);
-						if (isNaN(this.marker) == false)
-						{
-							if (this.marker > 1)
-							{	this.marker /= 100.0;}
-							if (this.marker >= 0 && this.marker <= 1)
-							{
-								this.enforce = true;
-								return;
-							} else {
-								console.log("ERROR - Marker of audioElement "+this.id+" is not between 0 and 1 (float) or 0 and 100 (integer)!");
-								console.log("ERROR - Marker not enforced!");
-							}
-						} else {
-							console.log("ERROR - Marker of audioElement "+this.id+" is not a number!");
-							console.log("ERROR - Marker not enforced!");
-						}
+					case "number":
+					case "boolean":
+						eval('this.'+attributeName+' = '+projectAttr);
+						break;
+					case "string":
+						eval('this.'+attributeName+' = "'+projectAttr+'"');
+						break;
 					}
 				}
+				
 			};
 			this.encode = function(root)
 			{
@@ -2158,99 +2117,6 @@ function Specification() {
 				return AENode;
 			};
 		};
-		
-		this.commentQuestionNode = function(xml) {
-			this.id = null;
-			this.type = undefined;
-			this.question = undefined;
-			this.options = [];
-			this.statement = undefined;
-			
-			this.childOption = function() {
-				this.type = 'option';
-				this.name = null;
-				this.text = null;
-			};
-			this.exportXML = function(root)
-			{
-				var CQNode = root.createElement("CommentQuestion");
-				CQNode.id = this.id;
-				CQNode.setAttribute("type",this.type);
-				switch(this.type)
-				{
-				case "text":
-					CQNode.textContent = this.question;
-					break;
-				case "radio":
-					var statement = root.createElement("statement");
-					statement.textContent = this.statement;
-					CQNode.appendChild(statement);
-					for (var i=0; i<this.options.length; i++)
-					{
-						var optionNode = root.createElement("option");
-						optionNode.setAttribute("name",this.options[i].name);
-						optionNode.textContent = this.options[i].text;
-						CQNode.appendChild(optionNode);
-					}
-					break;
-				case "checkbox":
-					var statement = root.createElement("statement");
-					statement.textContent = this.statement;
-					CQNode.appendChild(statement);
-					for (var i=0; i<this.options.length; i++)
-					{
-						var optionNode = root.createElement("option");
-						optionNode.setAttribute("name",this.options[i].name);
-						optionNode.textContent = this.options[i].text;
-						CQNode.appendChild(optionNode);
-					}
-					break;
-				}
-				return CQNode;
-			};
-			this.decode = function(xml) {
-				this.id = xml.id;
-				if (xml.getAttribute('mandatory') == 'true') {this.mandatory = true;}
-				else {this.mandatory = false;}
-				this.type = xml.getAttribute('type');
-				if (this.type == undefined) {this.type = 'text';}
-				switch (this.type) {
-				case 'text':
-					this.question = xml.textContent;
-					break;
-				case 'radio':
-					var child = xml.firstElementChild;
-					this.options = [];
-					while (child != undefined) {
-						if (child.nodeName == 'statement' && this.statement == undefined) {
-							this.statement = child.textContent;
-						} else if (child.nodeName == 'option') {
-							var node = new this.childOption();
-							node.name = child.getAttribute('name');
-							node.text = child.textContent;
-							this.options.push(node);
-						}
-						child = child.nextElementSibling;
-					}
-					break;
-				case 'checkbox':
-					var child = xml.firstElementChild;
-					this.options = [];
-					while (child != undefined) {
-						if (child.nodeName == 'statement' && this.statement == undefined) {
-							this.statement = child.textContent;
-						} else if (child.nodeName == 'option') {
-							var node = new this.childOption();
-							node.name = child.getAttribute('name');
-							node.text = child.textContent;
-							this.options.push(node);
-						}
-						child = child.nextElementSibling;
-					}
-					break;
-				}
-			};
-		};
 	};
 }
 			
@@ -2259,9 +2125,9 @@ function Interface(specificationObject) {
 	this.specification = specificationObject;
 	this.insertPoint = document.getElementById("topLevelBody");
 	
-	this.newPage = function(audioHolderObject)
+	this.newPage = function(audioHolderObject,store)
 	{
-		audioEngineContext.newTestPage();
+		audioEngineContext.newTestPage(store);
 		/// CHECK FOR SAMPLE RATE COMPATIBILITY
 		if (audioHolderObject.sampleRate != undefined) {
 			if (Number(audioHolderObject.sampleRate) != audioContext.sampleRate) {
@@ -2276,7 +2142,7 @@ function Interface(specificationObject) {
 		audioEngineContext.audioObjects = [];
 		interfaceContext.deleteCommentBoxes();
 		interfaceContext.deleteCommentQuestions();
-		loadTest(audioHolderObject);
+		loadTest(audioHolderObject,store);
 	};
 	
 	// Bounded by interface!!
@@ -2382,7 +2248,7 @@ function Interface(specificationObject) {
 		this.holder.className = 'comment-div';
 		// Create a string next to each comment asking for a comment
 		this.string = document.createElement('span');
-		this.string.innerHTML = commentQuestion.question;
+		this.string.innerHTML = commentQuestion.statement;
 		// Create the HTML5 comment box 'textarea'
 		this.textArea = document.createElement('textarea');
 		this.textArea.rows = '4';
@@ -2442,7 +2308,7 @@ function Interface(specificationObject) {
 		this.span.style.marginTop = '15px';
 		
 		var optCount = commentQuestion.options.length;
-		for (var i=0; i<optCount; i++)
+		for (var optNode of commentQuestion.options)
 		{
 			var div = document.createElement('div');
 			div.style.width = '80px';
@@ -2450,7 +2316,7 @@ function Interface(specificationObject) {
 			var input = document.createElement('input');
 			input.type = 'radio';
 			input.name = commentQuestion.id;
-			input.setAttribute('setvalue',commentQuestion.options[i].name);
+			input.setAttribute('setvalue',optNode.name);
 			input.className = 'comment-radio';
 			div.appendChild(input);
 			this.inputs.appendChild(div);
@@ -2461,7 +2327,7 @@ function Interface(specificationObject) {
 			div.style.float = 'left';
 			div.align = 'center';
 			var span = document.createElement('span');
-			span.textContent = commentQuestion.options[i].text;
+			span.textContent = optNode.text;
 			span.className = 'comment-radio-span';
 			div.appendChild(span);
 			this.span.appendChild(div);
@@ -2662,7 +2528,7 @@ function Interface(specificationObject) {
 	
 	this.createCommentQuestion = function(element) {
 		var node;
-		if (element.type == 'text') {
+		if (element.type == 'question') {
 			node = new this.commentBox(element);
 		} else if (element.type == 'radio') {
 			node = new this.radioBox(element);
@@ -2771,16 +2637,16 @@ function Interface(specificationObject) {
 	// These functions will help enforce the checkers
 	this.checkHiddenAnchor = function()
 	{
-		var audioHolder = testState.currentStateMap[testState.currentIndex];
-		if (audioHolder.anchorId != null)
+		for (var ao of audioEngineContext.audioObjects)
 		{
-			var audioObject = audioEngineContext.audioObjects[audioHolder.anchorId];
-			if (audioObject.interfaceDOM.getValue() > audioObject.specification.marker && audioObject.interfaceDOM.enforce == true)
+			if (ao.specification.type == "anchor")
 			{
-				// Anchor is not set below
-				console.log('Anchor node not below marker value');
-				alert('Please keep listening');
-				return false;
+				if (ao.interfaceDOM.getValue() > ao.specification.marker && ao.interfaceDOM.enforce == true) {
+					// Anchor is not set below
+					console.log('Anchor node not below marker value');
+					alert('Please keep listening');
+					return false;
+				}
 			}
 		}
 		return true;
@@ -2788,16 +2654,16 @@ function Interface(specificationObject) {
 	
 	this.checkHiddenReference = function()
 	{
-		var audioHolder = testState.currentStateMap[testState.currentIndex];
-		if (audioHolder.referenceId != null)
+		for (var ao of audioEngineContext.audioObjects)
 		{
-			var audioObject = audioEngineContext.audioObjects[audioHolder.referenceId];
-			if (audioObject.interfaceDOM.getValue() < audioObject.specification.marker && audioObject.interfaceDOM.enforce == true)
+			if (ao.specification.type == "reference")
 			{
-				// Anchor is not set below
-				console.log('Reference node not above marker value');
-				alert('Please keep listening');
-				return false;
+				if (ao.interfaceDOM.getValue() < ao.specification.marker && ao.interfaceDOM.enforce == true) {
+					// Anchor is not set below
+					console.log('Reference node not below marker value');
+					alert('Please keep listening');
+					return false;
+				}
 			}
 		}
 		return true;
@@ -2914,5 +2780,146 @@ function Interface(specificationObject) {
 		alert(str);
 		console.log(str);
 		return false;
+	};
+}
+
+function Storage()
+{
+	// Holds results in XML format until ready for collection
+	this.globalPreTest = null;
+	this.globalPostTest = null;
+	this.testPages = [];
+	this.document = document.implementation.createDocument(null,"waetresult");
+	this.root = this.document.children[0];
+	this.state = 0;
+	
+	this.initialise = function()
+	{
+		this.globalPreTest = new this.surveyNode(this,this.root,specification.preTest);
+		this.globalPostTest = new this.surveyNode(this,this.root,specification.postTest);
+	};
+	
+	this.createTestPageStore = function(specification)
+	{
+		var store = new this.pageNode(this,specification);
+		this.testPages.push(store);
+		return this.testPages[this.testPages.length-1];
+	};
+	
+	this.surveyNode = function(parent,root,specification)
+	{
+		this.specification = specification;
+		this.parent = parent;
+		this.XMLDOM = this.parent.document.createElement('survey');
+		this.XMLDOM.setAttribute('location',this.specification.location);
+		for (var optNode of this.specification.options)
+		{
+			if (optNode.type != 'statement')
+			{
+				var node = this.parent.document.createElement('surveyresult');
+				node.id = optNode.id;
+				node.setAttribute('type',optNode.type);
+				this.XMLDOM.appendChild(node);
+			}
+		}
+		root.appendChild(this.XMLDOM);
+		
+		this.postResult = function(node)
+		{
+			// From popup: node is the popupOption node containing both spec. and results
+			// ID is the position
+			if (node.specification.type == 'statement'){return;}
+			var surveyresult = this.parent.document.getElementById(node.specification.id);
+			switch(node.specification.type)
+			{
+			case "number":
+			case "question":
+				var child = this.parent.document.createElement('response');
+				child.textContent = node.response;
+				surveyresult.appendChild(child);
+				break;
+			case "radio":
+				var child = this.parent.document.createElement('response');
+				child.setAttribute('name',node.response.name);
+				child.textContent = node.response.text;
+				surveyresult.appendChild(child);
+				break;
+			case "checkbox":
+				for (var i=0; i<node.response.length; i++)
+				{
+					var checkNode = this.parent.document.createElement('response');
+					child.setAttribute('name',node.response.name);
+					child.setAttribute('checked',node.response.checked);
+					child.textContent = node.response.text;
+					surveyresult.appendChild(child);
+				}
+				break;
+			}
+		};
+	};
+	
+	this.pageNode = function(parent,specification)
+	{
+		// Create one store per test page
+		this.specification = specification;
+		this.parent = parent;
+		this.XMLDOM = this.parent.document.createElement('page');
+		this.XMLDOM.setAttribute('id',specification.id);
+		this.XMLDOM.setAttribute('presentedId',specification.presentedId);
+		this.preTest = new this.parent.surveyNode(parent,this.XMLDOM,specification.preTest);
+		this.postTest = new this.parent.surveyNode(parent,this.XMLDOM,specification.postTest);
+		
+		// Add any page metrics
+		var page_metric = this.parent.document.createElement('metric');
+		this.XMLDOM.appendChild(page_metric);
+		
+		// Add the audioelement
+		for (var element of this.specification.audioElements)
+		{
+			var aeNode = this.parent.document.createElement('audioelement');
+			aeNode.id = element.id;
+			aeNode.setAttribute('type',element.type);
+			aeNode.setAttribute('url', element.url);
+			aeNode.setAttribute('gain', element.gain);
+			if (element.type == 'anchor' || element.type == 'reference')
+			{
+				if (element.marker > 0)
+				{
+					aeNode.setAttribute('marker',element.marker);
+				}
+			}
+			var ae_metric = this.parent.document.createElement('metric');
+			aeNode.appendChild(ae_metric); 
+			this.XMLDOM.appendChild(aeNode);
+		}
+		
+		// Add any commentQuestions
+		for (var element of this.specification.commentQuestions)
+		{
+			var cqNode = this.parent.document.createElement('commentquestion');
+			cqNode.id = element.id;
+			cqNode.setAttribute('type',element.type);
+			var statement = this.parent.document.createElement('statement');
+			statement.textContent = cqNode.statement;
+			cqNode.appendChild(statement);
+			var response = this.parent.document.createElement('response');
+			cqNode.appendChild(response);
+			this.XMLDOM.appendChild(cqNode);
+		}
+		
+		this.parent.root.appendChild(this.XMLDOM);
+	};
+	this.finish = function()
+	{
+		if (this.state == 0)
+		{
+			var projectDocument = specification.projectXML;
+			projectDocument.setAttribute('file-name',url);
+			this.root.appendChild(projectDocument);
+			this.root.appendChild(returnDateNode());
+			this.root.appendChild(interfaceContext.returnNavigator());
+		}
+		this.state = 1;
+		return this.root;
 	};
 }
