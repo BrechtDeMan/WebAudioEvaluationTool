@@ -1,97 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<BrowserEvalProjectDocument>
-	<setup interface="MUSHRA" projectReturn="save.php" randomiseOrder='true' collectMetrics='true' testPages="2" loudness="-23">
-		<PreTest>
-			<question id="sessionId" mandatory="true">Please enter your name.</question>
-			<statement>This is an example of a 'MUSHRA'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
-		</PreTest>
-		<PostTest>
-			<question id="location" mandatory="true" boxsize="large">Please enter your location. (example mandatory text question)</question>
-			<number id="age" min="0">Please enter your age (example non-mandatory number question)</number>
-			<radio id="rating">
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+	<setup interface="MUSHRA" projectReturn="save.php" randomiseOrder='true' testPages="2" loudness="-23" sampleRate="44100">
+		<survey location="before">
+			<surveyentry type="question" id="sessionId" mandatory="true">
+				<statement>Please enter your name.</statement>
+			</surveyentry>
+			<surveyentry type="checkbox" id="checkboxtest" mandatory="true">
+				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
+				<option name="musician">Playing a musical instrument</option>
+				<option name="soundengineer">Recording or mixing audio</option>
+				<option name="developer">Developing audio software</option>
+				<option name="hwdesigner">Designing or building audio hardware</option>
+				<option name="researcher">Research in the field of audio</option>
+			</surveyentry>
+			<surveyentry type="statement">
+				<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
+			</surveyentry>
+		</survey>
+		<survey location="after">
+			<surveyentry type="question" id="location" mandatory="true" boxsize="large">
+				<statement>Please enter your location. (example mandatory text question)</statement>
+			</surveyentry>
+			<surveyentry type="number" id="age" min="0">
+				<statement>Please enter your age (example non-mandatory number question)</statement>
+			</surveyentry>
+			<surveyentry type="radio" id="rating">
 				<statement>Please rate this interface (example radio button question)</statement>
 				<option name="bad">Bad</option>
 				<option name="poor">Poor</option>
 				<option name="good">Good</option>
 				<option name="great">Great</option>
-			</radio>
-			<statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
-		</PostTest>
-		<Metric>
-			<metricEnable>testTimer</metricEnable>
-			<metricEnable>elementTimer</metricEnable>
-			<metricEnable>elementInitialPosition</metricEnable>
-			<metricEnable>elementTracker</metricEnable>
-			<metricEnable>elementFlagListenedTo</metricEnable>
-			<metricEnable>elementFlagMoved</metricEnable>
-			<metricEnable>elementListenTracker</metricEnable>
-		</Metric>
+			</surveyentry>
+			<surveyentry type="statement">
+				<statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
+			</surveyentry>
+		</survey>
+		<metric>
+			<metricenable>testTimer</metricenable>
+			<metricenable>elementTimer</metricenable>
+			<metricenable>elementInitialPosition</metricenable>
+			<metricenable>elementTracker</metricenable>
+			<metricenable>elementFlagListenedTo</metricenable>
+			<metricenable>elementFlagMoved</metricenable>
+			<metricenable>elementListenTracker</metricenable>
+		</metric>
 		<interface>
-			<check name="fragmentMoved"/>
-			<option name='playhead'/>
-			<option name="page-count"/>
+			<interfaceoption type="check" name="fragmentMoved"/>
+			<interfaceoption type="check" name="scalerange" min="25" max="75"/>
+			<interfaceoption type="show" name='playhead'/>
+			<interfaceoption type="show" name="page-count"/>
 		</interface>
 	</setup>
-	<audioHolder id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' elementComments='true' loudness="-12" initial-position='50'>
+	<page id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' showElementComments='true' loudness="-12">
+		<commentboxprefix>Comment on fragment</commentboxprefix>
 		<interface>
-			<title>Preference</title>
-			<check name='fragmentPlayed'/>
-			<scale position="0">Min</scale>
-			<scale position="100">Max</scale>
-			<scale position="50">Middle</scale>
-			<scale position="20">20</scale>
-			<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
+			<scales>
+				<scalelabel position="0">Min</scalelabel>
+				<scalelabel position="100">Max</scalelabel>
+				<scalelabel position="50">Middle</scalelabel>
+				<scalelabel position="20">20</scalelabel>
+			</scales>
 		</interface>
-		<audioElements url="0.wav" id="0" type="anchor"/>
-		<audioElements url="1.wav" id="1"/>
-		<audioElements url="2.wav" id="2"/>
-		<audioElements url="3.wav" id="3"/>
-		<audioElements url="4.wav" id="4"/>
-		<PreTest>
-			<statement>Example of an 'MUSHRA' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, mandatory listening of every sample and set initialisation to 50% </statement>
-		</PreTest>
-		<PostTest>
-			<question id="genre" mandatory="true">Please enter the genre.</question>
-		</PostTest>
-	</audioHolder>
-    <audioHolder id='test-1' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='false' elementComments='true'>
-        <interface name="preference">
-            <title>Example Test Question</title>
-            <scale position="0">Min</scale>
-            <scale position="100">Max</scale>
-            <scale position="50">Middle</scale>
-            <scale position="75">75</scale>
-            <scalerange min="25" max="75"/>
-            <commentBoxPrefix>Comment on fragment</commentBoxPrefix>
-        </interface>
-        <audioElements url="0.wav" gain="-6" id="0" type="anchor" marker="20"/>
-        <audioElements url="1.wav" gain="0.0" id="1" type="reference" marker="80"/>
-        <audioElements url="2.wav" gain="0.0" id="2"/>
-        <audioElements url="3.wav" gain="0.0" id="3"/>
-        <audioElements url="4.wav" gain="0.0" id="4"/>
-        <audioElements url="5.wav" gain="0.0" id="5"/>
-        <audioElements url="6.wav" gain="0.0" id="6" type="outsidereference"/>
-        <CommentQuestion id='mixingExperience' type="text">What is your general experience with numbers?</CommentQuestion>
-        <CommentQuestion id="preference" type="radio">
-            <statement>Please enter your overall preference</statement>
-            <option name="worst">Very Bad</option>
-            <option name="bad"></option>
-            <option name="OK">OK</option>
-            <option name="Good"></option>
-            <option name="Great">Great</option>
-        </CommentQuestion>
-        <CommentQuestion id="preference" type="checkbox">
-            <statement>Please describe the overall character</statement>
-            <option name="funky">Funky</option>
-            <option name="mellow">Mellow</option>
-            <option name="laidback">Laid back</option>
-            <option name="heavy">Heavy</option>
-        </CommentQuestion>
-        <PreTest>
-        	<statement>Example of an 'MUSHRA' style interface with outside reference 'six', hidden anchor 'zero' (which needs to be below 20%), hidden reference 'one' (which needs to be above 80%), randomisation of marker labels. </statement>
-        </PreTest>
-        <PostTest>
-            <question id="genre" mandatory="true">Please enter the genre.</question>
-        </PostTest>
-    </audioHolder>
-</BrowserEvalProjectDocument>
+		<audioelement url="0.wav" id="track-0" type="anchor"/>
+		<audioelement url="1.wav" id="track-1"/>
+		<audioelement url="2.wav" id="track-2"/>
+		<audioelement url="3.wav" id="track-3"/>
+		<audioelement url="4.wav" id="track-4"/>
+		<survey location="before">
+			<surveyentry type="statement">
+				<statement>Example of a 'MUSHRA' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%.</statement>
+			</surveyentry>
+		</survey>
+		<survey location="after">
+			<surveyentry type="question" id="genre-0" mandatory="true">
+				<statement>Please enter the genre.</statement>
+			</surveyentry>
+		</survey>
+	</page>
+	<page id='test-1' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='false' showElementComments='true'>
+		<commentboxprefix>Comment on fragment</commentboxprefix>
+		<interface name="preference">
+			<title>Example Test Question</title>
+			<scales>
+				<scalelabel position="0">Min</scalelabel>
+				<scalelabel position="100">Max</scalelabel>
+				<scalelabel position="50">Middle</scalelabel>
+				<scalelabel position="20">20</scalelabel>
+			</scales>
+		</interface>
+		<audioelement url="0.wav" gain="-6" id="track-5" type="anchor" marker="20"/>
+		<audioelement url="1.wav" gain="0.0" id="track-6" type="reference" marker="80"/>
+		<audioelement url="2.wav" gain="0.0" id="track-7"/>
+		<audioelement url="3.wav" gain="0.0" id="track-8"/>
+		<audioelement url="4.wav" gain="0.0" id="track-9"/>
+		<audioelement url="5.wav" gain="0.0" id="track-10"/>
+		<audioelement url="6.wav" gain="0.0" id="track-11" type="outside-reference"/>
+		<commentquestion id='mixingExperience' type="question">
+			<statement>What is your general experience with numbers?</statement>
+		</commentquestion>
+		<commentquestion id="preference" type="radio">
+			<statement>Please enter your overall preference</statement>
+			<option name="worst">Very Bad</option>
+			<option name="bad"></option>
+			<option name="OK">OK</option>
+			<option name="Good"></option>
+			<option name="Great">Great</option>
+		</commentquestion>
+		<commentquestion id="character" type="checkbox">
+			<statement>Please describe the overall character</statement>
+			<option name="funky">Funky</option>
+			<option name="mellow">Mellow</option>
+			<option name="laidback">Laid back</option>
+			<option name="heavy">Heavy</option>
+		</commentquestion>
+		<survey location="before">
+			<surveyentry type="statement">
+				<statement>Example of a 'MUSHRA' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%.</statement>
+			</surveyentry>
+		</survey>
+		<survey location="after">
+			<surveyentry type="question" id="genre-1" mandatory="true">
+				<statement>Please enter the genre.</statement>
+			</surveyentry>
+		</survey>
+	</page>
+</waet>

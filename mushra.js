@@ -171,7 +171,7 @@ function loadTest(audioHolderObject)
 		}
 		
 		sliderBox.appendChild(audioObject.interfaceDOM.holder);
-		audioObject.metric.initialised(audioObject.interfaceDOM.slider.value);
+		audioObject.metric.initialise(audioObject.interfaceDOM.slider.value);
         
 	});
 	
@@ -322,7 +322,9 @@ function resizeWindow(event)
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-	var checks = testState.currentStateMap[testState.currentIndex].interfaces[0].options;
+	var checks = [];
+	checks = checks.concat(testState.currentStateMap.interfaces[0].options);
+	checks = checks.concat(specification.interfaces.options);
 	var canContinue = true;
 	
 	// Check that the anchor and reference objects are correctly placed
@@ -332,7 +334,7 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 	for (var i=0; i<checks.length; i++) {
 		if (checks[i].type == 'check')
 		{
-			switch(checks[i].check) {
+			switch(checks[i].name) {
 			case 'fragmentPlayed':
 				// Check if all fragments have been played
 				var checkState = interfaceContext.checkAllPlayed();

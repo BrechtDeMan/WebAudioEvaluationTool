@@ -515,7 +515,7 @@ function interfacePopup() {
 			}
 		} else if (node.specification.type == 'checkbox') {
 			// Must extract checkbox data
-			console.log("Checkbox: "+ node.statement);
+			console.log("Checkbox: "+ node.specification.statement);
 			var inputs = this.popupResponse.getElementsByTagName('input');
 			node.response = [];
 			for (var i=0; i<node.specification.options.length; i++) {
@@ -524,6 +524,7 @@ function interfacePopup() {
 					text: node.specification.options[i].text,
 					checked: inputs[i].checked
 				});
+				console.log(node.specification.options[i].name+": "+ inputs[i].checked);
 			}
 		} else if (node.specification.type == "radio") {
 			var optHold = this.popupResponse;
@@ -2859,10 +2860,9 @@ function Storage()
 				for (var i=0; i<node.response.length; i++)
 				{
 					var checkNode = this.parent.document.createElement('response');
-					child.setAttribute('name',node.response.name);
-					child.setAttribute('checked',node.response.checked);
-					child.textContent = node.response.text;
-					surveyresult.appendChild(child);
+					checkNode.setAttribute('name',node.response.name);
+					checkNode.setAttribute('checked',node.response.checked);
+					surveyresult.appendChild(checkNode);
 				}
 				break;
 			}
