@@ -277,76 +277,44 @@ function resizeWindow(event)
 	document.getElementById('submit').style.left = (window.innerWidth-250)/2 + 'px';
 }
 
-function buttonSubmitClick() // TODO: Only when all songs have been played!
+function buttonSubmitClick()
 {
 	var checks = [];
 	checks = checks.concat(testState.currentStateMap.interfaces[0].options);
 	checks = checks.concat(specification.interfaces.options);
-	var canContinue = true;
-	
-	// Check that the anchor and reference objects are correctly placed
-	if (interfaceContext.checkHiddenAnchor() == false) {return;}
-	if (interfaceContext.checkHiddenReference() == false) {return;}
 	
 	for (var i=0; i<checks.length; i++) {
 		if (checks[i].type == 'check')
 		{
 			switch(checks[i].name) {
-			case 'fragmentPlayed':
-				// Check if all fragments have been played
-				var checkState = interfaceContext.checkAllPlayed();
-				if (checkState == false) {canContinue = false;}
-				break;
-			case  'fragmentFullPlayback':
-				// Check all fragments have been played to their full length
-				var checkState = interfaceContext.checkAllPlayed();
-				if (checkState == false) {canContinue = false;}
-				console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
-				break;
-			case 'fragmentMoved':
-				// Check all fragment sliders have been moved.
-				var checkState = interfaceContext.checkAllMoved();
-				if (checkState == false) {canContinue = false;}
-				break;
-			case 'fragmentComments':
-				// Check all fragment sliders have been moved.
-				var checkState = interfaceContext.checkAllCommented();
-				if (checkState == false) {canContinue = false;}
-				break;
-			//case 'scalerange':
-				// Check the scale is used to its full width outlined by the node
-				//var checkState = interfaceContext.checkScaleRange();
-				//if (checkState == false) {canContinue = false;}
-			//	break;
 			default:
 				console.log("WARNING - Check option "+checks[i].check+" is not supported on this interface");
 				break;
 			}
 
 		}
-		if (!canContinue) {break;}
 	}
-	
-    if (canContinue) {
-	    if (audioEngineContext.status == 1) {
-	        var playback = document.getElementById('playback-button');
-	        playback.click();
-	    // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
-	    } else
-	    {
-	        if (audioEngineContext.timer.testStarted == false)
-	        {
-	            alert('You have not started the test! Please press start to begin the test!');
-	            return;
-	        }
-	    }
-	    testState.advanceState();
-    } 
+    if (audioEngineContext.status == 1) {
+        var playback = document.getElementById('playback-button');
+        playback.click();
+    // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
+    } else
+    {
+        if (audioEngineContext.timer.testStarted == false)
+        {
+            alert('You have not started the test! Please press start to begin the test!');
+            return;
+        }
+    }
+    testState.advanceState();
 }
 
-function pageXMLSave(store, testXML)
+function pageXMLSave(store, pageSpecification)
 {
 	// MANDATORY
 	// Saves a specific test page
-	// You can use this space to add any extra nodes to your XML saves
+	// You can use this space to add any extra nodes to your XML <audioHolder> saves
+	// Get the current <page> information in store (remember to appendChild your data to it)
+	// pageSpecification is the current page node configuration
+	// To create new XML nodes, use storage.document.createElement();
 }

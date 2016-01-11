@@ -433,9 +433,12 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
     } 
 }
 
-function pageXMLSave(store, testXML)
+function pageXMLSave(store, pageSpecification)
 {
 	// MANDATORY
 	// Saves a specific test page
-	// You can use this space to add any extra nodes to your XML saves
+	// You can use this space to add any extra nodes to your XML <audioHolder> saves
+	// Get the current <page> information in store (remember to appendChild your data to it)
+	// pageSpecification is the current page node configuration
+	// To create new XML nodes, use storage.document.createElement();
 }
