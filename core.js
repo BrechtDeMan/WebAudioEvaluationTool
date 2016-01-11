@@ -130,7 +130,9 @@ function loadProjectSpecCallback(response) {
 	// Detect the interface to use and load the relevant javascripts.
 	var interfaceJS = document.createElement('script');
 	interfaceJS.setAttribute("type","text/javascript");
-	if (specification.interface == 'APE') {
+	switch(specification.interface)
+	{
+		case "APE":
 		interfaceJS.setAttribute("src","ape.js");
 		
 		// APE comes with a css file
@@ -140,8 +142,9 @@ function loadProjectSpecCallback(response) {
 		css.href = 'ape.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
-	} else if (specification.interface == "MUSHRA")
-	{
+		break;
+		
+		case "MUSHRA":
 		interfaceJS.setAttribute("src","mushra.js");
 		
 		// MUSHRA comes with a css file
@@ -149,6 +152,18 @@ function loadProjectSpecCallback(response) {
 		css.rel = 'stylesheet';
 		css.type = 'text/css';
 		css.href = 'mushra.css';
+		
+		document.getElementsByTagName("head")[0].appendChild(css);
+		break;
+		
+		case "AB":
+		interfaceJS.setAttribute("src","AB.js");
+		
+		// AB comes with a css file
+		var css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.type = 'text/css';
+		css.href = 'AB.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
 	}
