@@ -279,7 +279,7 @@ function sliderObject(audioObject)
 	
 	this.exportXMLDOM = function(audioObject) {
 		// Called by the audioObject holding this element. Must be present
-		var node = document.createElement('value');
+		var node = storage.document.createElement('value');
 		node.textContent = this.slider.value;
 		return node;
 	};

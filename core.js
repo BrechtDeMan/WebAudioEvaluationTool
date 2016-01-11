@@ -1232,7 +1232,9 @@ function audioObject(id) {
 					this.storeDOM.appendChild(interfaceXML[i]);
 				}
 			}
-			this.storeDOM.appendChild(this.commentDOM.exportXMLDOM(this));
+			if (this.commentDOM != null) {
+				this.storeDOM.appendChild(this.commentDOM.exportXMLDOM(this));
+			}
 		}
 		var nodes = this.metric.exportXMLDOM();
 		var mroot = this.storeDOM.getElementsByTagName('metric')[0];
