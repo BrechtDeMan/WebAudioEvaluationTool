@@ -38,17 +38,19 @@ button {
 div#slider-holder {
 	height: inherit;
 	position: absolute;
-	top: 125px;
 	left: 0px;
-	z-index: 2;
+	z-index: 3;
 }
 
 div#scale-holder {
 	height: inherit;
 	position: absolute;
-	top: 125px;
 	left: 0px;
-	z-index: 3;
+	z-index: 2;
+}
+
+canvas#scale-canvas {
+	position: relative;
 }
 
 div.track-slider {
