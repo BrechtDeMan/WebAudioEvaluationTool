@@ -78,6 +78,9 @@ function loadInterface() {
 	var scaleHolder = document.createElement('div');
 	scaleHolder.id = "scale-holder";
 	sliderBox.appendChild(scaleHolder);
+	var scaleText = document.createElement('div');
+	scaleText.id = "scale-text-holder";
+	scaleHolder.appendChild(scaleText);
 	var scaleCanvas = document.createElement('canvas');
 	scaleCanvas.id = "scale-canvas";
 	scaleHolder.appendChild(scaleCanvas);
@@ -319,8 +322,9 @@ function resizeWindow(event)
 		audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
 	}
 	document.getElementById('scale-holder').style.marginLeft = (diff-100) + 'px';
+	document.getElementById('scale-text-holder').style.height = window.innerHeight-194 + 'px';
 	var canvas = document.getElementById('scale-canvas');
-	canvas.width = totalWidth+100;
+	canvas.width = totalWidth;
 	canvas.height = window.innerHeight-194;
 	drawScale();
 }
@@ -337,17 +341,28 @@ function drawScale()
 	var height = canvas.height;
 	var width = canvas.width;
 	var draw_heights = [24, height-34];
+	var textHolder = document.getElementById('scale-text-holder');
+	textHolder.innerHTML = null;
+	var lastHeight = 0;
 	for (var scale of scales)
 	{
 		var posPercent = scale.position / 100.0;
 		var posPix = (1-posPercent)*(draw_heights[1]-draw_heights[0])+draw_heights[0];
-		ctx.font = "20px Georgia";
-		ctx.fillText(scale.text,0,Math.floor(posPix)+10);
 		ctx.fillStyle = "#000000";
 		ctx.setLineDash([1,2]);
-		ctx.moveTo(100,posPix);
+		ctx.moveTo(0,posPix);
 		ctx.lineTo(width,posPix);
 		ctx.stroke();
+		var text = document.createElement('div');
+		text.align = "right";
+		var textC = document.createElement('span');
+		textC.textContent = scale.text;
+		text.appendChild(textC);
+		text.className = "scale-text";
+		textHolder.appendChild(text);
+		text.style.top = (posPix-9) + 'px';
+		text.style.left = 100 - ($(text).width()+3) + 'px';
+		lastHeight = posPix;
 	}
 }
 

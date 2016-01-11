@@ -49,8 +49,18 @@ div#scale-holder {
 	z-index: 2;
 }
 
+div#scale-text-holder {
+	position:relative;
+	width: 100px;
+	float: left;
+}
+div.scale-text {
+	position: absolute;
+}
+
 canvas#scale-canvas {
 	position: relative;
+	float: left;
 }
 
 div.track-slider {
