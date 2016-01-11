@@ -31,23 +31,39 @@ button {
 	background-color: #ddd
 }
 
+button.big-button {
+	width: 250px;
+	height: 40px;
+	font-size: 1.2em;
+}
+
 div.comparitor-holder {
 	width: 260px;
 	height: 300px;
 	border:  black 1px solid;
 	position: absolute;
+	padding-top: 5px;
 }
 
 div.comparitor-selector {
-	width: 250px;
+	width: 248px;
 	height: 250px;
 	border: black 1px solid;
 	position: relative;
+	background-color: #FF0000;
 }
 
-div.comparitor-button {
+div.selected {
+	background-color: #008000;
+}
+
+div.comparitor-selector span {
+	font-size: 4em;
+}
+
+button.comparitor-button {
 	width: 250px;
-	height: 50px;
+	height: 38px;
 	position: relative;
-	background-color: #FF0000;
+	margin-top: 5px;
 }

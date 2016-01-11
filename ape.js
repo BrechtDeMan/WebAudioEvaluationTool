@@ -636,7 +636,7 @@ function sliderObject(audioObject,interfaceObjects) {
 		// Called by the audioObject holding this element. Must be present
 		var obj = [];
 		$(this.trackSliderObjects).each(function(i,trackObj){
-			var node = document.createElement('value');
+			var node = storage.document.createElement('value');
 			node.setAttribute("interface-name",trackObj.getAttribute("interface-name"));
 			node.textContent = convSliderPosToRate(trackObj);
 			obj.push(node);

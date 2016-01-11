@@ -65,6 +65,46 @@ function loadInterface() {
 	var feedbackHolder = document.createElement('div');
 	feedbackHolder.id = 'feedbackHolder';
 	
+	// Construct the AB Boxes
+	var boxes = document.createElement('div');
+	boxes.align = "center";
+	var boxA = document.createElement('div');
+	boxA.className = 'comparitor-holder';
+	boxA.id = 'comparitor-A';
+	var selector = document.createElement('div');
+	selector.className = 'comparitor-selector';
+	selector.innerHTML = '<span>A</span>';
+	var playback = document.createElement('button');
+	playback.className = 'comparitor-button';
+	playback.textContent = "Listen";
+	boxA.appendChild(selector);
+	boxA.appendChild(playback); 
+	boxes.appendChild(boxA);
+	
+	var boxB = document.createElement('div');
+	boxB.className = 'comparitor-holder';
+	boxB.id = 'comparitor-B';
+	var selector = document.createElement('div');
+	selector.className = 'comparitor-selector';
+	selector.innerHTML = '<span>B</span>';
+	var playback = document.createElement('button');
+	playback.className = 'comparitor-button';
+	playback.textContent = "Listen";
+	boxB.appendChild(selector);
+	boxB.appendChild(playback); 
+	boxes.appendChild(boxB);
+	
+	var submit = document.createElement('button');
+	submit.id = "submit";
+	submit.onclick = function() {interfaceContext.comparitor.submitButton();};
+	submit.className = "big-button";
+	submit.textContent = "submit";
+	submit.style.position = "absolute";
+	submit.style.top = '466px';
+		
+	feedbackHolder.appendChild(boxes);
+	feedbackHolder.appendChild(submit);
+	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
 	testContent.appendChild(pagetitle);
@@ -75,6 +115,7 @@ function loadInterface() {
 	// Load the full interface
 	testState.initialise();
 	testState.advanceState();
+	resizeWindow(null);
 }
 
 function loadTest(audioHolderObject)
@@ -94,6 +135,7 @@ function loadTest(audioHolderObject)
 	
 	// Populate the comparitor object
 	interfaceContext.comparitor = new Comparitor(audioHolderObject);
+	interfaceContext.comparitor.progress();
 }
 
 function Comparitor(audioHolderObject)
@@ -101,23 +143,20 @@ function Comparitor(audioHolderObject)
 	this.pairs = [];
 	this.listened = [false, false];
 	this.selected = null;
-	this.index = 0;
-	this.feedbackHolder = document.getElementById('feedbackHolder');
-	this.injectA = document.createElement('div');
-	this.injectA.id = 'inject-A';
-	this.injectB = document.createElement('div');
-	this.injectB.id = 'inject-B';
-	this.submitButton = document.createElement('button');
+	this.index = -1;
+	this.currentPair = null;
 	this.progress = function()
 	{
+		this.index++;
 		if (this.index >= this.pairs.length)
 		{
 			buttonSubmitClick();
 			return;
 		}
+		$(".comparitor-selector").removeClass('selected');
 		this.listened = [false, false];
 		this.selected = null;
-		var pair = this.pairs[this.index];
+		this.currentPair = this.pairs[this.index];
 	};
 	
 	// First generate the Audio Objects for the Audio Engine
@@ -144,14 +183,38 @@ function Comparitor(audioHolderObject)
 			this.pairs.push(pair);
 		}
 	}
-	this.feedbackHolder.innerHTML = null;
-	this.feedbackHolder.appendChild(this.injectA);
-	this.feedbackHolder.appendChild(this.injectB);
-	this.feedbackHolder.appendChild(this.submitButton);
 	
-	this.submitButton.id = 'submit';
-	this.submitButton.onclick = function()
+	// Generate Interface Bindings
+	$('.comparitor-selector').click(function(){
+		$(".comparitor-selector").removeClass('selected');
+		if (interfaceContext.comparitor.currentPair != null)
+		{
+			var side = this.parentElement.id.split('-')[1];
+			var pair = interfaceContext.comparitor.currentPair;
+			var selected = eval('interfaceContext.comparitor.currentPair.'+side);
+			interfaceContext.comparitor.selected = selected;
+			$(this).addClass('selected');
+		}
+	});
+	
+	$('.comparitor-button').click(function(){
+		$('.comparitor-button').text('Listen');
+		if (interfaceContext.comparitor.currentPair != null)
+		{
+			var side = this.parentElement.id.split('-')[1];
+			var pair = interfaceContext.comparitor.currentPair;
+			var selected = eval('interfaceContext.comparitor.currentPair.'+side);
+			audioEngineContext.play(selected.id);
+			$(this).text('Playing');
+			if (side == 'A') {interfaceContext.comparitor.listened[0] = true;}
+			else if (side == 'B') {interfaceContext.comparitor.listened[1] = true;}
+		}
+	});
+	
+	this.submitButton = function()
 	{
+		audioEngineContext.stop();
+		$('.comparitor-button').text('Listen');
 		// Check both A and B have been listened to
 		if (this.listened[0] == false || this.listened[1] == false)
 		{
@@ -165,7 +228,15 @@ function Comparitor(audioHolderObject)
 			alert("Select either A or B before submitting");
 			return;
 		}
-		this.pairs[this.index].A
+		this.pairs[this.index].A.interfaceDOM.results.push({
+			compair: this.pairs[this.index].B.specification.id,
+			choice: this.selected
+		});
+		this.pairs[this.index].B.interfaceDOM.results.push({
+			compair: this.pairs[this.index].A.specification.id,
+			choice: this.selected
+		});
+		this.progress();
 	};
 	return this;
 }
@@ -174,25 +245,36 @@ function comparitorElementObject(audioObject)
 {
 	// The Interface Object for the comparitor
 	this.parent = audioObject;
-	this.holder = document.createElement('div');
-	this.play = document.createElement('button');
-	this.select = document.createElement('div');
-	
-	this.holder.className = "comparitor-holder";
-	this.holder.appendChild(this.select);
-	this.holder.appendChild(this.play);
-	this.holder.align = "center";
-	this.holder.setAttribute('trackIndex',audioObject.id);
-	
-	this.play.className = "comparitor-button";
-	this.play.textContent = "Listen";
-	
-	this.select.className = "comparitor-selector";
+	this.results = [];
+	this.state = 0;
+	this.enable = function()
+	{
+		this.state = 1;
+	};
+	this.exportXMLDOM = function(audioObject) {
+		var obj = [];
+		for (var result of this.results)
+		{
+			var node = storage.document.createElement('value');
+			node.setAttribute('comparitorId',result.compair);
+			node.setAttribute('selectedId',result.choice.specification.id);
+			node.textContent = result.choice.specification.id;
+			obj.push(node);
+		}
+		return obj;
+	};
+	this.getValue = function() {
+		return 0;
+	};
 }
 
 function resizeWindow(event)
 {
-	
+	var totalWidth = 620;
+	var diff = (window.innerWidth - totalWidth)/2;
+	document.getElementById('comparitor-A').style.left = diff +'px';
+	document.getElementById('comparitor-B').style.left = diff +360 +'px';
+	document.getElementById('submit').style.left = (window.innerWidth-250)/2 + 'px';
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
