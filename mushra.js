@@ -42,6 +42,7 @@ function loadInterface() {
 	// Create Interface buttons!
 	var interfaceButtons = document.createElement('div');
 	interfaceButtons.id = 'interface-buttons';
+	interfaceButtons.style.height = '25px';
 	
 	// Create playback start/stop points
 	var playback = document.createElement("button");
@@ -77,6 +78,9 @@ function loadInterface() {
 	var scaleHolder = document.createElement('div');
 	scaleHolder.id = "scale-holder";
 	sliderBox.appendChild(scaleHolder);
+	var scaleCanvas = document.createElement('canvas');
+	scaleCanvas.id = "scale-canvas";
+	scaleHolder.appendChild(scaleCanvas);
 	var sliderObjectHolder = document.createElement('div');
 	sliderObjectHolder.id = 'slider-holder';
 	sliderObjectHolder.align = "center";
@@ -176,10 +180,7 @@ function loadTest(audioHolderObject)
 	});
 	
 	// Auto-align
-	var numObj = audioHolderObject.audioElements.length;
-	var totalWidth = (numObj-1)*150+100;
-	var diff = (window.innerWidth - totalWidth)/2;
-	sliderBox.style.marginLeft = diff + 'px';
+	resizeWindow(null);
 	
 	// Construct outside reference;
 	if (audioHolderObject.outsideReference != null) {
@@ -317,8 +318,38 @@ function resizeWindow(event)
 	{
 		audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
 	}
+	document.getElementById('scale-holder').style.marginLeft = (diff-100) + 'px';
+	var canvas = document.getElementById('scale-canvas');
+	canvas.width = totalWidth+100;
+	canvas.height = window.innerHeight-194;
+	drawScale();
 }
 
+function drawScale()
+{
+	var interfaceObj = testState.currentStateMap.interfaces[0];
+	var scales = testState.currentStateMap.interfaces[0].scales;
+	scales = scales.sort(function(a,b) {
+		return a.position - b.position;
+	});
+	var canvas = document.getElementById('scale-canvas');
+	var ctx = canvas.getContext("2d");
+	var height = canvas.height;
+	var width = canvas.width;
+	var draw_heights = [24, height-34];
+	for (var scale of scales)
+	{
+		var posPercent = scale.position / 100.0;
+		var posPix = (1-posPercent)*(draw_heights[1]-draw_heights[0])+draw_heights[0];
+		ctx.font = "20px Georgia";
+		ctx.fillText(scale.text,0,Math.floor(posPix)+10);
+		ctx.fillStyle = "#000000";
+		ctx.setLineDash([1,2]);
+		ctx.moveTo(100,posPix);
+		ctx.lineTo(width,posPix);
+		ctx.stroke();
+	}
+}
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
