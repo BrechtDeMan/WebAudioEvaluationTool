@@ -212,7 +212,7 @@ function createProjectSave(destURL) {
 		a.textContent = "Save File";
 		
 		popup.showPopup();
-		popup.popupContent.innerHTML = null;
+		popup.popupContent.innerHTML = "</span>Please save the file below to give to your test supervisor</span><br>";
 		popup.popupContent.appendChild(a);
 	} else {
 		var xmlhttp = new XMLHttpRequest;
@@ -246,6 +246,9 @@ function createProjectSave(destURL) {
 			}
 		};
 		xmlhttp.send(file);
+		popup.showPopup();
+		popup.popupContent.innerHTML = null;
+		popup.popupContent.textContent = "Submitting. Please Wait";
 	}
 }
 
