@@ -346,12 +346,13 @@ function loadTest(audioHolderObject)
 			outsideReferenceHolderspan = document.createElement('span');
 			outsideReferenceHolderspan.textContent = 'Reference';
 			outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
+			outsideReferenceHolder.setAttribute('track-id',index);
 			
 			var audioObject = audioEngineContext.newTrack(element);
 			
 			outsideReferenceHolder.onclick = function(event)
 			{
-				audioEngineContext.play(audioEngineContext.audioObjects.length-1);
+				audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
 				$('.track-slider').removeClass('track-slider-playing');
 	            $('.comment-div').removeClass('comment-box-playing');
 	            if (event.currentTarget.nodeName == 'DIV') {
@@ -362,17 +363,17 @@ function loadTest(audioHolderObject)
 			};
 			
 			document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
-			return;
+		} else {
+		
+			// Now load each audio sample. First create the new track by passing the full URL
+			var trackURL = audioHolderObject.hostURL + element.url;
+			var audioObject = audioEngineContext.newTrack(element);
+			
+			var node = interfaceContext.createCommentBox(audioObject);
+			// Create a slider per track
+			var sliderNode = new sliderObject(audioObject,interfaceObj);
+			audioObject.bindInterface(sliderNode);
 		}
-		
-		// Now load each audio sample. First create the new track by passing the full URL
-		var trackURL = audioHolderObject.hostURL + element.url;
-		var audioObject = audioEngineContext.newTrack(element);
-		
-		var node = interfaceContext.createCommentBox(audioObject);
-		// Create a slider per track
-		var sliderNode = new sliderObject(audioObject,interfaceObj);
-		audioObject.bindInterface(sliderNode);
 	});
 	
 	// Initialse the interfaceSlider object metrics
@@ -549,7 +550,6 @@ function interfaceSliderHolder(interfaceObject)
 		trackObj.className = 'track-slider track-slider-disabled track-slider-'+audioObject.id;
 		trackObj.id = 'track-slider-'+this.id+'-'+audioObject.id;
 		trackObj.setAttribute('trackIndex',audioObject.id);
-		trackObj.innerHTML = '<span>'+audioObject.id+'</span>';
 		if (this.name != undefined) {
 			trackObj.setAttribute('interface-name',this.name);
 		} else {
@@ -564,6 +564,7 @@ function interfaceSliderHolder(interfaceObject)
 		this.canvas.appendChild(trackObj);
 		this.sliders.push(trackObj);
 		this.metrics.push(new metricTracker(this));
+		trackObj.innerHTML = '<span>'+(this.metrics.length-1)+'</span>';
 		this.metrics[this.metrics.length-1].initialise(convSliderPosToRate(trackObj));
 		return trackObj;
 	};
@@ -646,6 +647,10 @@ function sliderObject(audioObject,interfaceObjects) {
 	};
 	this.getValue = function() {
 		return convSliderPosToRate(this.trackSliderObjects[0]);
+	};
+	this.getPresentedId = function()
+	{
+		return this.trackSliderObjects[0].children[0].textContent;
 	};
 }
 

@@ -203,6 +203,10 @@ function Comparitor(audioHolderObject)
 		this.getValue = function() {
 			return this.value;	
 		};
+		this.getPresentedId = function()
+	{
+		return this.selector.children[0].textContent;
+	};
 	};
 	
 	this.boxHolders = document.getElementById('box-holders');
