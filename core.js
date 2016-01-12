@@ -747,6 +747,10 @@ function stateMachine()
 			if (this.currentStateMap == null)
 			{
 				this.currentStateMap = this.stateMap[this.stateIndex];
+				if (this.currentStateMap.randomiseOrder)
+				{
+					this.currentStateMap.audioElements = randomiseOrder(this.currentStateMap.audioElements);
+				}
 				storage.createTestPageStore(this.currentStateMap);
 				if (this.currentStateMap.preTest != null)
 				{
