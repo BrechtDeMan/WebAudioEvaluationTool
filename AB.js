@@ -138,9 +138,16 @@ function Comparitor(audioHolderObject)
 		this.box.appendChild(this.playback);
 		this.selector.onclick = function()
 		{
+			var time = audioEngineContext.timer.getTestTime();
 			if ($(event.currentTarget).hasClass('disabled'))
 			{
 				console.log("Please wait until sample has loaded");
+				return;
+			}
+			if (audioEngineContext.status == 0)
+			{
+				alert("Please listen to the samples before making a selection");
+				console.log("Please listen to the samples before making a selection");
 				return;
 			}
 			$(".comparitor-selector").removeClass('selected');
@@ -155,8 +162,9 @@ function Comparitor(audioHolderObject)
 				} else {
 					obj.value = 0;
 				}
-				obj.parent.metric.moved(audioEngineContext.timer.getTestTime(),obj.value);
+				obj.parent.metric.moved(time,obj.value);
 			}
+			console.log("Selected "+id+' ('+time+')');
 		};
 		this.playback.onclick = function()
 		{
