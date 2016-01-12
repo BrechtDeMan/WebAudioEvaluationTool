@@ -69,14 +69,15 @@ function loadInterface() {
 	var boxes = document.createElement('div');
 	boxes.align = "center";
 	boxes.id = "box-holders";
+    boxes.style.float = "left";
 	
 	var submit = document.createElement('button');
 	submit.id = "submit";
 	submit.onclick = buttonSubmitClick;
 	submit.className = "big-button";
 	submit.textContent = "submit";
-	submit.style.position = "absolute";
-	submit.style.top = '466px';
+	submit.style.position = "relative";
+	submit.style.left = (window.innerWidth-250)/2 + 'px';
 		
 	feedbackHolder.appendChild(boxes);
 	feedbackHolder.appendChild(submit);
@@ -230,21 +231,16 @@ function resizeWindow(event)
 {
 	document.getElementById('submit').style.left = (window.innerWidth-250)/2 + 'px';
 	var numObj = interfaceContext.comparitor.comparitors.length;
-	var boxW = numObj*260;
-	var spaces = numObj-1;
-	var spaceSize = 50;
-	var remainder = window.innerWidth - boxW;
-	if (remainder < spaces*spaceSize)
-	{
-		spaceSize = Math.floor(spaces/remainder);
-	}
-	var totalW = boxW + spaces*spaceSize;
-	var diff = (window.innerWidth - totalW)/2;
-	for (var i=0; i<interfaceContext.comparitor.comparitors.length; i++)
-	{
-		var obj = interfaceContext.comparitor.comparitors[i];
-		obj.box.style.left = diff + (260+spaceSize)*i + 'px';
-	}
+	var boxW = numObj*312;
+    var diff = window.innerWidth - boxW;
+    while (diff < 0)
+    {
+        numObj = Math.ceil(numObj/2);
+        boxW = numObj*312;
+        diff = window.innerWidth - boxW;
+    }
+    document.getElementById('box-holders').style.marginLeft = diff/2 + 'px';
+    document.getElementById('box-holders').style.width = boxW + 'px';
 }
 
 function buttonSubmitClick()
