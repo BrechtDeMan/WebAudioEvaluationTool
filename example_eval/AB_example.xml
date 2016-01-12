@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-	<setup interface="AB" projectReturn="save.php" randomiseOrder='true' testPages="2" loudness="-23" sampleRate="44100">
+	<setup interface="AB" projectReturn="save.php" randomiseOrder='false' testPages="2" loudness="-23" sampleRate="44100">
 		<survey location="before">
 			<surveyentry type="question" id="sessionId" mandatory="true">
 				<statement>Please enter your name.</statement>
@@ -14,7 +14,7 @@
 				<option name="researcher">Research in the field of audio</option>
 			</surveyentry>
 			<surveyentry type="statement">
-				<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
+				<statement>This is an example of an 'AB'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
 			</surveyentry>
 		</survey>
 		<survey location="after">
@@ -38,7 +38,10 @@
 		<metric>
 			<metricenable>testTimer</metricenable>
 			<metricenable>elementTimer</metricenable>
+			<metricenable>elementInitialPosition</metricenable>
+			<metricenable>elementTracker</metricenable>
 			<metricenable>elementFlagListenedTo</metricenable>
+			<metricenable>elementFlagMoved</metricenable>
 			<metricenable>elementListenTracker</metricenable>
 		</metric>
 		<interface>
@@ -53,16 +56,38 @@
 		<interface>
 			<title>Depth</title>
 		</interface>
-		<audioelement url="0.wav" id="track-0" type="anchor"/>
+		<audioelement url="0.wav" id="track-0"/>
 		<audioelement url="1.wav" id="track-1"/>
-		<audioelement url="2.wav" id="track-2"/>
 		<survey location="before">
 			<surveyentry type="statement">
-				<statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%.</statement>
+				<statement>A two way comparison using randomised element order, automatic loudness and synchronised looping.</statement>
 			</surveyentry>
 		</survey>
 		<survey location="after">
 			<surveyentry type="question" id="genre-0" mandatory="true">
+				<statement>Please enter the genre.</statement>
+			</surveyentry>
+		</survey>
+	</page>
+	<page id='test-1' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='false' showElementComments='true' loudness="-12">
+		<commentboxprefix>Comment on fragment</commentboxprefix>
+		<interface>
+			<title>Depth</title>
+		</interface>
+		<audioelement url="0.wav" id="track-2"/>
+		<audioelement url="1.wav" id="track-3"/>
+		<audioelement url="2.wav" id="track-4"/>
+		<audioelement url="3.wav" id="track-5"/>
+		<audioelement url="4.wav" id="track-6"/>
+		<audioelement url="5.wav" id="track-7"/>
+		<audioelement url="6.wav" id="track-8"/>
+		<survey location="before">
+			<surveyentry type="statement">
+				<statement>A 7 way comparison using randomised element order and synchronised looping.</statement>
+			</surveyentry>
+		</survey>
+		<survey location="after">
+			<surveyentry type="question" id="genre-1" mandatory="true">
 				<statement>Please enter the genre.</statement>
 			</surveyentry>
 		</survey>
