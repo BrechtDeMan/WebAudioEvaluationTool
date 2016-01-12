@@ -151,68 +151,57 @@ function loadTest(audioHolderObject)
 	});
 	
 	// Find all the audioElements from the audioHolder
+	var label = 0;
 	$(audioHolderObject.audioElements).each(function(index,element){
 		// Find URL of track
 		// In this jQuery loop, variable 'this' holds the current audioElement.
 		
-		// Check if an outside reference
-		if (index == audioHolderObject.outsideReference)
-		{
-			return;
-		}
-		
 		var audioObject = audioEngineContext.newTrack(element);
-		
-		var node = interfaceContext.createCommentBox(audioObject);
-		
-		// Create a slider per track
-		audioObject.interfaceDOM = new sliderObject(audioObject);
-		
-		if (typeof audioHolderObject.initialPosition === "number")
+		if (element.type == 'outside-reference')
 		{
-			// Set the values
-			audioObject.interfaceDOM.slider.value = audioHolderObject.initalPosition;
+			var outsideReferenceHolder = document.createElement('button');
+			outsideReferenceHolder.id = 'outside-reference';
+			outsideReferenceHolder.className = 'outside-reference';
+			outsideReferenceHolder.setAttribute('track-id',index);
+			outsideReferenceHolder.textContent = "Play Reference";
+			
+			var audioObject = audioEngineContext.newTrack(element);
+			
+			outsideReferenceHolder.onclick = function(event)
+			{
+				audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
+				$('.track-slider').removeClass('track-slider-playing');
+	            $('.comment-div').removeClass('comment-box-playing');
+	            $(event.currentTarget).addClass('track-slider-playing');
+			};
+			
+			document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
 		} else {
-			// Distribute it randomnly
-			audioObject.interfaceDOM.slider.value = Math.random();
-		}
+			var node = interfaceContext.createCommentBox(audioObject);
 		
-		sliderBox.appendChild(audioObject.interfaceDOM.holder);
-		audioObject.metric.initialise(audioObject.interfaceDOM.slider.value);
+			// Create a slider per track
+			audioObject.bindInterface(new sliderObject(audioObject,label));
+			
+			if (typeof audioHolderObject.initialPosition === "number")
+			{
+				// Set the values
+				audioObject.interfaceDOM.slider.value = audioHolderObject.initalPosition;
+			} else {
+				// Distribute it randomnly
+				audioObject.interfaceDOM.slider.value = Math.random();
+			}
+			sliderBox.appendChild(audioObject.interfaceDOM.holder);
+			audioObject.metric.initialise(audioObject.interfaceDOM.slider.value);
+			label += 1;
+		}
         
 	});
 	
 	// Auto-align
 	resizeWindow(null);
-	
-	// Construct outside reference;
-	if (audioHolderObject.outsideReference != null) {
-		var outsideReferenceHolder = document.createElement('div');
-		outsideReferenceHolder.id = 'outside-reference';
-		outsideReferenceHolder.className = 'outside-reference';
-		outsideReferenceHolderspan = document.createElement('span');
-		outsideReferenceHolderspan.textContent = 'Reference';
-		outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
-		
-		var audioObject = audioEngineContext.newTrack(audioHolderObject.audioElements[audioHolderObject.outsideReference]);
-		
-		outsideReferenceHolder.onclick = function(event)
-		{
-			audioEngineContext.play(audioEngineContext.audioObjects.length-1);
-			$('.track-slider').removeClass('track-slider-playing');
-            $('.comment-div').removeClass('comment-box-playing');
-            if (event.currentTarget.nodeName == 'DIV') {
-            	$(event.currentTarget).addClass('track-slider-playing');
-            } else {
-            	$(event.currentTarget.parentElement).addClass('track-slider-playing');
-            }
-		};
-		
-		document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
-	}
 }
 
-function sliderObject(audioObject)
+function sliderObject(audioObject,label)
 {
 	// Constructs the slider object. We use the HTML5 slider object
 	this.parent = audioObject;
@@ -233,7 +222,7 @@ function sliderObject(audioObject)
 	}
 	this.holder.setAttribute('trackIndex',audioObject.id);
 	
-	this.title.textContent = audioObject.id;
+	this.title.textContent = label;
 	this.title.style.width = "100%";
 	this.title.style.float = "left";
 	
@@ -303,6 +292,10 @@ function sliderObject(audioObject)
 	{
 		this.enable();
 	}
+	this.getPresentedId = function()
+	{
+		return this.title.textContent;
+	};
 }
 
 function resizeWindow(event)
@@ -310,8 +303,14 @@ function resizeWindow(event)
 	// Function called when the window has been resized.
 	// MANDATORY FUNCTION
 	
+	var outsideRef = document.getElementById('outside-reference');
+	if(outsideRef != null)
+	{
+		outsideRef.style.left = (window.innerWidth-120)/2 + 'px';
+	}
+	
 	// Auto-align
-	var numObj = audioEngineContext.audioObjects.length;
+	var numObj = document.getElementsByClassName('track-slider').length;
 	var totalWidth = (numObj-1)*150+100;
 	var diff = (window.innerWidth - totalWidth)/2;
 	document.getElementById('slider').style.height = window.innerHeight - 180 + 'px';
@@ -319,7 +318,9 @@ function resizeWindow(event)
 	document.getElementById('slider-holder').style.marginLeft = diff + 'px';
 	for (var i in audioEngineContext.audioObjects)
 	{
-		audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
+		if (audioEngineContext.audioObjects[i].specification.type != 'outside-reference'){
+			audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
+		}
 	}
 	document.getElementById('scale-holder').style.marginLeft = (diff-100) + 'px';
 	document.getElementById('scale-text-holder').style.height = window.innerHeight-194 + 'px';

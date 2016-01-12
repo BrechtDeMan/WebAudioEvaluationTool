@@ -1146,8 +1146,6 @@ function audioObject(id) {
 			this.interfaceDOM.enable();
 		}
 		this.onplayGain = decibelToLinear(this.specification.gain)*this.buffer.buffer.playbackGain;
-		
-		this.storeDOM.setAttribute('presentedId',this.id);
 		this.storeDOM.setAttribute('playGain',linearToDecibel(this.onplayGain));
 	};
 	
@@ -1159,6 +1157,7 @@ function audioObject(id) {
 		{
 			this.interfaceDOM.enable();
 		}
+		this.storeDOM.setAttribute('presentedId',interfaceObject.getPresentedId());
 	};
     
 	this.loopStart = function() {
@@ -2543,18 +2542,13 @@ function Interface(specificationObject) {
 	};
 	
 	this.sortCommentBoxes = function() {
-		var holder = [];
-		while (this.commentBoxes.length > 0) {
-			var node = this.commentBoxes.pop(0);
-			holder[node.id] = node;
-		}
-		this.commentBoxes = holder;
+		this.commentBoxes.sort(function(a,b){return a.id - b.id;});
 	};
 	
 	this.showCommentBoxes = function(inject, sort) {
 		if (sort) {interfaceContext.sortCommentBoxes();}
-		for (var i=0; i<interfaceContext.commentBoxes.length; i++) {
-			inject.appendChild(this.commentBoxes[i].trackComment);
+		for (var box of interfaceContext.commentBoxes) {
+			inject.appendChild(box.trackComment);
 		}
 	};
 	
