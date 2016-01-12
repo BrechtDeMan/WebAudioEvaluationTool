@@ -126,6 +126,14 @@ function loadProjectSpecCallback(response) {
 	// Build the specification
 	specification.decode(projectXML);
 	storage.initialise();
+	/// CHECK FOR SAMPLE RATE COMPATIBILITY
+	if (specification.sampleRate != undefined) {
+		if (Number(specification.sampleRate) != audioContext.sampleRate) {
+			var errStr = 'Sample rates do not match! Requested '+Number(specification.sampleRate)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
+			alert(errStr);
+			return;
+		}
+	}
 	
 	// Detect the interface to use and load the relevant javascripts.
 	var interfaceJS = document.createElement('script');
@@ -2163,15 +2171,6 @@ function Interface(specificationObject) {
 	this.newPage = function(audioHolderObject,store)
 	{
 		audioEngineContext.newTestPage(store);
-		/// CHECK FOR SAMPLE RATE COMPATIBILITY
-		if (audioHolderObject.sampleRate != undefined) {
-			if (Number(audioHolderObject.sampleRate) != audioContext.sampleRate) {
-				var errStr = 'Sample rates do not match! Requested '+Number(audioHolderObject.sampleRate)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
-				alert(errStr);
-				return;
-			}
-		}
-		
 		audioEngineContext.loopPlayback = audioHolderObject.loop;
 		// Delete any previous audioObjects associated with the audioEngine
 		audioEngineContext.audioObjects = [];
