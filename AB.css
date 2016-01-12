@@ -53,6 +53,10 @@ div.comparitor-selector {
 	background-color: #FF0000;
 }
 
+div.disabled {
+	background-color: #AAA;
+}
+
 div.selected {
 	background-color: #008000;
 }
