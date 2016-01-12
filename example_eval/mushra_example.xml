@@ -55,10 +55,13 @@
 		<commentboxprefix>Comment on fragment</commentboxprefix>
 		<interface>
 			<scales>
-				<scalelabel position="0">Min</scalelabel>
-				<scalelabel position="100">Max</scalelabel>
-				<scalelabel position="50">Middle</scalelabel>
-				<scalelabel position="20">20</scalelabel>
+				<scalelabel position="12">Much Worse</scalelabel>
+				<scalelabel position="25">Worse</scalelabel>
+				<scalelabel position="38">Slightly Worse</scalelabel>
+				<scalelabel position="50">About the same</scalelabel>
+				<scalelabel position="62">Slightly Better</scalelabel>
+				<scalelabel position="75">Better</scalelabel>
+				<scalelabel position="88">Much Better</scalelabel>
 			</scales>
 		</interface>
 		<audioelement url="0.wav" id="track-0" type="anchor"/>
@@ -68,7 +71,7 @@
 		<audioelement url="4.wav" id="track-4"/>
 		<survey location="before">
 			<surveyentry type="statement">
-				<statement>Example of a 'MUSHRA' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%.</statement>
+				<statement>Example of a 'MUSHRA' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75% using a Comparison Category Rating Scale.</statement>
 			</surveyentry>
 		</survey>
 		<survey location="after">
