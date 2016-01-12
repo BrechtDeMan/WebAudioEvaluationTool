@@ -80,13 +80,13 @@ function loadInterface() {
 	submit.style.left = (window.innerWidth-250)/2 + 'px';
 		
 	feedbackHolder.appendChild(boxes);
-	feedbackHolder.appendChild(submit);
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
 	testContent.appendChild(pagetitle);
 	testContent.appendChild(interfaceButtons);
 	testContent.appendChild(feedbackHolder);
+	testContent.appendChild(submit);
 	interfaceContext.insertPoint.appendChild(testContent);
 
 	// Load the full interface
@@ -240,6 +240,7 @@ function resizeWindow(event)
         diff = window.innerWidth - boxW;
     }
     document.getElementById('box-holders').style.marginLeft = diff/2 + 'px';
+    document.getElementById('box-holders').style.marginRight = diff/2 + 'px';
     document.getElementById('box-holders').style.width = boxW + 'px';
 }
 
