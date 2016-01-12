@@ -1238,12 +1238,15 @@ function audioObject(id) {
 		this.storeDOM.appendChild(file);
 		if (this.specification.type != 'outside-reference') {
 			var interfaceXML = this.interfaceDOM.exportXMLDOM(this);
-			if (interfaceXML.length == undefined) {
-				this.storeDOM.appendChild(interfaceXML);
-			} else {
-				for (var i=0; i<interfaceXML.length; i++)
-				{
-					this.storeDOM.appendChild(interfaceXML[i]);
+			if (interfaceXML != null)
+			{
+				if (interfaceXML.length == undefined) {
+					this.storeDOM.appendChild(interfaceXML);
+				} else {
+					for (var i=0; i<interfaceXML.length; i++)
+					{
+						this.storeDOM.appendChild(interfaceXML[i]);
+					}
 				}
 			}
 			if (this.commentDOM != null) {
@@ -2730,8 +2733,8 @@ function Interface(specificationObject) {
 			if (passed == false)
 			{
 				check_pass = false;
-				console.log("Continue listening to track-"+i);
-				error_obj.push(i);
+				console.log("Continue listening to track-"+audioEngineContext.audioObjects.interfaceDOM.getPresentedId());
+				error_obj.push(audioEngineContext.audioObjects.interfaceDOM.getPresentedId());
 			}
 		}
 		if (check_pass == false)
@@ -2754,11 +2757,11 @@ function Interface(specificationObject) {
 	{
 		var str = "You have not moved ";
 		var failed = [];
-		for (var i in audioEngineContext.audioObjects)
+		for (var ao of audioEngineContext.audioObjects)
 		{
-			if(audioEngineContext.audioObjects[i].metric.wasMoved == false && audioEngineContext.audioObjects[i].specification.type != 'outsidereference')
+			if(ao.metric.wasMoved == false && ao.interfaceDOM.canMove() == true)
 			{
-				failed.push(audioEngineContext.audioObjects[i].id);
+				failed.push(ao.interfaceDOM.getPresentedId());
 			}
 		}
 		if (failed.length == 0)
@@ -2784,11 +2787,11 @@ function Interface(specificationObject) {
 	{
 		var str = "You have not played ";
 		var failed = [];
-		for (var i in audioEngineContext.audioObjects)
+		for (var ao of audioEngineContext.audioObjects)
 		{
-			if(audioEngineContext.audioObjects[i].metric.wasListenedTo == false)
+			if(ao.metric.wasListenedTo == false)
 			{
-				failed.push(audioEngineContext.audioObjects[i].id);
+				failed.push(ao.interfaceDOM.getPresentedId());
 			}
 		}
 		if (failed.length == 0)
