@@ -41,8 +41,9 @@ div.comparitor-holder {
 	width: 260px;
 	height: 300px;
 	border:  black 1px solid;
-	position: absolute;
+    float: left;
 	padding-top: 5px;
+    margin: 25px;
 }
 
 div.comparitor-selector {
