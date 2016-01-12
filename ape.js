@@ -335,40 +335,14 @@ function loadTest(audioHolderObject)
 	$(audioHolderObject.audioElements).each(function(index,element){
 		// Find URL of track
 		// In this jQuery loop, variable 'this' holds the current audioElement.
-		
+		var audioObject = audioEngineContext.newTrack(element);
 		// Check if an outside reference
 		if (element.type == 'outside-reference')
 		{
 			// Construct outside reference;
-			var outsideReferenceHolder = document.createElement('div');
-			outsideReferenceHolder.id = 'outside-reference';
-			outsideReferenceHolder.className = 'outside-reference';
-			outsideReferenceHolderspan = document.createElement('span');
-			outsideReferenceHolderspan.textContent = 'Reference';
-			outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
-			outsideReferenceHolder.setAttribute('track-id',index);
-			
-			var audioObject = audioEngineContext.newTrack(element);
-			
-			outsideReferenceHolder.onclick = function(event)
-			{
-				audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
-				$('.track-slider').removeClass('track-slider-playing');
-	            $('.comment-div').removeClass('comment-box-playing');
-	            if (event.currentTarget.nodeName == 'DIV') {
-	            	$(event.currentTarget).addClass('track-slider-playing');
-	            } else {
-	            	$(event.currentTarget.parentElement).addClass('track-slider-playing');
-	            }
-			};
-			
-			document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
+			var orNode = new outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
+			audioObject.bindInterface(orNode);
 		} else {
-		
-			// Now load each audio sample. First create the new track by passing the full URL
-			var trackURL = audioHolderObject.hostURL + element.url;
-			var audioObject = audioEngineContext.newTrack(element);
-			
 			var node = interfaceContext.createCommentBox(audioObject);
 			// Create a slider per track
 			var sliderNode = new sliderObject(audioObject,interfaceObj);
@@ -651,6 +625,69 @@ function sliderObject(audioObject,interfaceObjects) {
 	this.getPresentedId = function()
 	{
 		return this.trackSliderObjects[0].children[0].textContent;
+	};
+	this.canMove = function()
+	{
+		return true;
+	};
+}
+
+function outsideReferenceDOM(audioObject,index,inject)
+{
+	this.parent = audioObject;
+	this.outsideReferenceHolder = document.createElement('div');
+	this.outsideReferenceHolder.id = 'outside-reference';
+	this.outsideReferenceHolder.className = 'outside-reference track-slider-disabled';
+	var outsideReferenceHolderspan = document.createElement('span');
+	outsideReferenceHolderspan.textContent = 'Reference';
+	this.outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
+	this.outsideReferenceHolder.setAttribute('track-id',index);
+	
+	this.outsideReferenceHolder.onclick = function(event)
+	{
+		audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
+		$('.track-slider').removeClass('track-slider-playing');
+        $('.comment-div').removeClass('comment-box-playing');
+        if (event.currentTarget.nodeName == 'DIV') {
+        	$(event.currentTarget).addClass('track-slider-playing');
+        } else {
+        	$(event.currentTarget.parentElement).addClass('track-slider-playing');
+        }
+	};
+	inject.appendChild(this.outsideReferenceHolder);
+	this.enable = function()
+	{
+		if (this.parent.state == 1)
+		{
+			$(this.outsideReferenceHolder).removeClass('track-slider-disabled');
+		}
+	};
+	this.updateLoading = function(progress)
+	{
+		if (progress != 100)
+		{
+			progress = String(progress);
+			progress = progress.split('.')[0];
+			this.outsideReferenceHolder[0].children[0].textContent = progress+'%';
+		} else {
+			this.outsideReferenceHolder[0].children[0].textContent = "Play Reference";
+		}
+	};
+	this.exportXMLDOM = function(audioObject)
+	{
+		return null;
+	};
+	this.getValue = function()
+	{
+		return 0;
+	};
+	this.getPresentedId = function()
+	{
+		return 'reference';
+	};
+	this.canMove = function()
+	{
+		return false;
 	};
 }
 

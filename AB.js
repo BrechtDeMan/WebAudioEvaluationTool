@@ -204,9 +204,13 @@ function Comparitor(audioHolderObject)
 			return this.value;	
 		};
 		this.getPresentedId = function()
-	{
-		return this.selector.children[0].textContent;
-	};
+		{
+			return this.selector.children[0].textContent;
+		};
+		this.canMove = function()
+		{
+			return false;
+		};
 	};
 	
 	this.boxHolders = document.getElementById('box-holders');

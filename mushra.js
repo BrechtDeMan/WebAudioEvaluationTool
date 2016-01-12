@@ -159,23 +159,9 @@ function loadTest(audioHolderObject)
 		var audioObject = audioEngineContext.newTrack(element);
 		if (element.type == 'outside-reference')
 		{
-			var outsideReferenceHolder = document.createElement('button');
-			outsideReferenceHolder.id = 'outside-reference';
-			outsideReferenceHolder.className = 'outside-reference';
-			outsideReferenceHolder.setAttribute('track-id',index);
-			outsideReferenceHolder.textContent = "Play Reference";
-			
-			var audioObject = audioEngineContext.newTrack(element);
-			
-			outsideReferenceHolder.onclick = function(event)
-			{
-				audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
-				$('.track-slider').removeClass('track-slider-playing');
-	            $('.comment-div').removeClass('comment-box-playing');
-	            $(event.currentTarget).addClass('track-slider-playing');
-			};
-			
-			document.getElementById('interface-buttons').appendChild(outsideReferenceHolder);
+			// Construct outside reference;
+			var orNode = new outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
+			audioObject.bindInterface(orNode);
 		} else {
 			var node = interfaceContext.createCommentBox(audioObject);
 		
@@ -295,6 +281,64 @@ function sliderObject(audioObject,label)
 	this.getPresentedId = function()
 	{
 		return this.title.textContent;
+	};
+	this.canMove = function()
+	{
+		return true;
+	};
+}
+
+function outsideReferenceDOM(audioObject,index,inject)
+{
+	this.parent = audioObject;
+	this.outsideReferenceHolder = document.createElement('button');
+	this.outsideReferenceHolder.id = 'outside-reference';
+	this.outsideReferenceHolder.className = 'outside-reference';
+	this.outsideReferenceHolder.setAttribute('track-id',index);
+	this.outsideReferenceHolder.textContent = "Play Reference";
+	this.outsideReferenceHolder.disabled = true;
+	
+	this.outsideReferenceHolder.onclick = function(event)
+	{
+		audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
+		$('.track-slider').removeClass('track-slider-playing');
+        $('.comment-div').removeClass('comment-box-playing');
+        $(event.currentTarget).addClass('track-slider-playing');
+	};
+	inject.appendChild(this.outsideReferenceHolder);
+	this.enable = function()
+	{
+		if (this.parent.state == 1)
+		{
+			this.outsideReferenceHolder.disabled = false;
+		}
+	};
+	this.updateLoading = function(progress)
+	{
+		if (progress != 100)
+		{
+			progress = String(progress);
+			progress = progress.split('.')[0];
+			this.outsideReferenceHolder[0].children[0].textContent = progress+'%';
+		} else {
+			this.outsideReferenceHolder[0].children[0].textContent = "Play Reference";
+		}
+	};
+	this.exportXMLDOM = function(audioObject)
+	{
+		return null;
+	};
+	this.getValue = function()
+	{
+		return 0;
+	};
+	this.getPresentedId = function()
+	{
+		return 'reference';
+	};
+	this.canMove = function()
+	{
+		return false;
 	};
 }
 
