@@ -730,12 +730,14 @@ function stateMachine()
 			this.initialise();
 		}
 		if (this.stateIndex == -1) {
+			this.stateIndex++;
 			console.log('Starting test...');
 			if (this.preTestSurvey != null)
 			{
 				popup.initState(this.preTestSurvey,storage.globalPreTest);
+			} else {
+				this.advanceState();
 			}
-			this.stateIndex++;
 		} else if (this.stateIndex == this.stateMap.length)
 		{
 			// All test pages complete, post test
@@ -860,6 +862,17 @@ function AudioEngine(specification) {
 		this.xmlRequest = new XMLHttpRequest();
 		this.xmlRequest.parent = this;
 		this.users = [];
+		this.ready = function()
+		{
+			for (var i=0; i<this.users.length; i++)
+			{
+				this.users[i].state = 1;
+				if (this.users[i].interfaceDOM != null)
+				{
+					this.users[i].bufferLoaded(this);
+				}
+			}
+		};
 		this.getMedia = function(url) {
 			this.url = url;
 			this.xmlRequest.open('GET',this.url,true);
@@ -871,15 +884,8 @@ function AudioEngine(specification) {
 			this.xmlRequest.onloadend = function() {
 				audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
 					bufferObj.buffer = decodedData;
-					for (var i=0; i<bufferObj.users.length; i++)
-					{
-						bufferObj.users[i].state = 1;
-						if (bufferObj.users[i].interfaceDOM != null)
-						{
-							bufferObj.users[i].bufferLoaded(bufferObj);
-						}
-					}
-					calculateLoudness(bufferObj.buffer,"I");
+					calculateLoudness(bufferObj,"I");
+					
 				}, function(){
 					// Should only be called if there was an error, but sometimes gets called continuously
 					// Check here if the error is genuine
@@ -2827,8 +2833,8 @@ function Storage()
 	
 	this.initialise = function()
 	{
-		this.globalPreTest = new this.surveyNode(this,this.root,specification.preTest);
-		this.globalPostTest = new this.surveyNode(this,this.root,specification.postTest);
+		if (specification.preTest != undefined){this.globalPreTest = new this.surveyNode(this,this.root,specification.preTest);}
+		if (specification.postTest != undefined){this.globalPostTest = new this.surveyNode(this,this.root,specification.postTest);}
 	};
 	
 	this.createTestPageStore = function(specification)
@@ -2897,8 +2903,8 @@ function Storage()
 		this.XMLDOM = this.parent.document.createElement('page');
 		this.XMLDOM.setAttribute('id',specification.id);
 		this.XMLDOM.setAttribute('presentedId',specification.presentedId);
-		this.preTest = new this.parent.surveyNode(parent,this.XMLDOM,specification.preTest);
-		this.postTest = new this.parent.surveyNode(parent,this.XMLDOM,specification.postTest);
+		if (specification.preTest != undefined){this.preTest = new this.surveyNode(this,this.root,this.specification.preTest);}
+		if (specification.postTest != undefined){this.postTest = new this.surveyNode(this,this.root,this.specification.postTest);}
 		
 		// Add any page metrics
 		var page_metric = this.parent.document.createElement('metric');

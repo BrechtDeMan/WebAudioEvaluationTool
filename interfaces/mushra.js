@@ -166,18 +166,18 @@ function loadTest(audioHolderObject)
 			var node = interfaceContext.createCommentBox(audioObject);
 		
 			// Create a slider per track
-			audioObject.bindInterface(new sliderObject(audioObject,label));
+			var sliderObj = new sliderObject(audioObject,label);
 			
 			if (typeof audioHolderObject.initialPosition === "number")
 			{
 				// Set the values
-				audioObject.interfaceDOM.slider.value = audioHolderObject.initalPosition;
+				sliderObj.slider.value = audioHolderObject.initalPosition;
 			} else {
 				// Distribute it randomnly
-				audioObject.interfaceDOM.slider.value = Math.random();
+				sliderObj.slider.value = Math.random();
 			}
-			sliderBox.appendChild(audioObject.interfaceDOM.holder);
-			audioObject.metric.initialise(audioObject.interfaceDOM.slider.value);
+			sliderBox.appendChild(sliderObj.holder);
+			audioObject.bindInterface(sliderObj);
 			label += 1;
 		}
         

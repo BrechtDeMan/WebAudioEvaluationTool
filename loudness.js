@@ -34,7 +34,7 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 	}
 	if (offlineContext == undefined)
 	{
-		offlineContext = new OfflineAudioContext(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+		offlineContext = new OfflineAudioContext(buffer.buffer.numberOfChannels, buffer.buffer.length, buffer.buffer.sampleRate);
 	}
 	// Create the required filters
 	var KFilter = offlineContext.createBiquadFilter();
@@ -48,7 +48,7 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 	HPFilter.frequency.value = 60;
 	// copy Data into the process buffer
 	var processSource = offlineContext.createBufferSource();
-	processSource.buffer = buffer;
+	processSource.buffer = buffer.buffer;
 	
 	processSource.connect(KFilter);
 	KFilter.connect(HPFilter);
@@ -100,7 +100,8 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 				}
 			}
 			var overallRelLoudness = calculateOverallLoudnessFromChannelBlocks(relgateEnergy);
-			buffer.lufs =  overallRelLoudness;
+			buffer.buffer.lufs =  overallRelLoudness;
+			buffer.ready();
 		}
 	};
 	offlineContext.startRendering();
