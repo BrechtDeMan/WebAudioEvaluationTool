@@ -174,6 +174,17 @@ function loadProjectSpecCallback(response) {
 		css.href = 'interfaces/AB.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
+		case "ABC":
+		// Above enumerate to horizontal sliders
+		interfaceJS.setAttribute("src","interfaces/horizontal-sliders.js");
+		
+		// horizontal-sliders comes with a css file
+		var css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.type = 'text/css';
+		css.href = 'interfaces/horizontal-sliders.css';
+		
+		document.getElementsByTagName("head")[0].appendChild(css);
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
 	
