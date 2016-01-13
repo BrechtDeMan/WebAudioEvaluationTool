@@ -202,7 +202,7 @@ function sliderObject(audioObject,label)
 	this.holder.appendChild(this.slider);
 	this.holder.appendChild(this.play);
 	this.holder.align = "center";
-	if (audioObject.id == 0)
+	if (label == 0)
 	{
 		this.holder.style.marginLeft = '0px';
 	}
