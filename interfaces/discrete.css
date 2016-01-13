@@ -1,0 +1,106 @@
+/*
+ * Hold any style information for MUSHRA interface. Customise if you like to make the interface your own!
+ * 
+ */
+body {
+	/* Set the background colour (note US English spelling) to grey*/
+	background-color: #ddd
+}
+
+div.pageTitle {
+	width: auto;
+	height: 20px;
+	margin: 10px 0px;
+}
+
+div.pageTitle span{
+	font-size: 1.5em;
+}
+
+div.testHalt {
+	/* Specify any colouring during the test halt for pre/post questions */
+	background-color: rgba(0,0,0,0.5);
+	/* Don't mess with this bit */
+	z-index: 2;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+
+button {
+	/* Specify any button structure or style */
+	min-width: 20px;
+	background-color: #ddd
+}
+
+div#slider-holder {
+	height: inherit;
+	position: absolute;
+	left: 0px;
+	z-index: 3;
+	margin-top:25px;
+}
+
+div#scale-holder {
+	height: inherit;
+	position: absolute;
+	left: 0px;
+	z-index: 2;
+}
+
+div#scale-text-holder {
+	position:relative;
+	float: left;
+}
+div.scale-text {
+	position: absolute;
+	font-size: 1.2em;
+}
+
+canvas#scale-canvas {
+	position: relative;
+	float: left;
+}
+
+div.track-slider {
+	float: left;
+	height: 30px;
+	border: solid;
+	border-width: 1px;
+	border-color: black;
+	padding:2px;
+	margin-left: 94px;
+	margin-bottom: 30px;
+}
+
+div.track-slider-range {
+	float: left;
+	height: 100%;
+	margin: 0px 10px;
+}
+
+div.track-slider-title {
+	float: left;
+	padding-top: 5px;
+	width: 100px;
+}
+
+button.track-slider-button {
+	float: left;
+	width: 100px;
+	height: 30px;
+}
+
+
+button.outside-reference {
+	width:120px;
+	height:20px;
+	margin-bottom:5px;
+	position: absolute;
+}
+
+div.track-slider-playing {
+	background-color: #FFDDDD;
+}
