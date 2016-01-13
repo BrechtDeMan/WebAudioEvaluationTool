@@ -664,11 +664,13 @@ function interfacePopup() {
 	this.resize = function(event)
 	{
 		// Called on window resize;
-		this.popup.style.left = (window.innerWidth/2)-250 + 'px';
-		this.popup.style.top = (window.innerHeight/2)-125 + 'px';
-		var blank = document.getElementsByClassName('testHalt')[0];
-		blank.style.width = window.innerWidth;
-		blank.style.height = window.innerHeight;
+		if (this.popup != null) {
+			this.popup.style.left = (window.innerWidth/2)-250 + 'px';
+			this.popup.style.top = (window.innerHeight/2)-125 + 'px';
+			var blank = document.getElementsByClassName('testHalt')[0];
+			blank.style.width = window.innerWidth;
+			blank.style.height = window.innerHeight;
+		}
 	};
 }
 

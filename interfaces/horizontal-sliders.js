@@ -234,6 +234,11 @@ function sliderObject(audioObject,label)
 			$(outsideReference).removeClass('track-slider-playing');
 		}
 	};
+	this.resize = function(event)
+	{
+		this.holder.style.width = window.innerWidth-200 + 'px';
+		this.slider.style.width = window.innerWidth-420 + 'px';
+	};
 	this.enable = function()
 	{
 		// This is used to tell the interface object that playback of this node is ready
@@ -280,6 +285,12 @@ function resizeWindow(event)
 	var canvas = document.getElementById('scale-canvas');
 	canvas.width = window.innerWidth-420;
 	canvas.height = totalHeight;
+	for (var i in audioEngineContext.audioObjects)
+	{
+		if (audioEngineContext.audioObjects[i].specification.type != 'outside-reference'){
+			audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
+		}
+	}
 	drawScale();
 }
 
