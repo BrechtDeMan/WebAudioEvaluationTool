@@ -174,6 +174,11 @@ function loadProjectSpecCallback(response) {
 		css.href = 'interfaces/AB.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
+		break;
+		case "Bipolar":
+		case "ACR":
+		case "DCR":
+		case "CCR":
 		case "ABC":
 		// Above enumerate to horizontal sliders
 		interfaceJS.setAttribute("src","interfaces/horizontal-sliders.js");
@@ -185,6 +190,20 @@ function loadProjectSpecCallback(response) {
 		css.href = 'interfaces/horizontal-sliders.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
+		break;
+		case "discrete":
+		case "likert":
+		// Above enumerate to horizontal discrete radios
+		interfaceJS.setAttribute("src","interfaces/discrete.js");
+		
+		// horizontal-sliders comes with a css file
+		var css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.type = 'text/css';
+		css.href = 'interfaces/discrete.css';
+		
+		document.getElementsByTagName("head")[0].appendChild(css);
+		break;
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
 	
@@ -2916,8 +2935,8 @@ function Storage()
 		this.XMLDOM = this.parent.document.createElement('page');
 		this.XMLDOM.setAttribute('id',specification.id);
 		this.XMLDOM.setAttribute('presentedId',specification.presentedId);
-		if (specification.preTest != undefined){this.preTest = new this.surveyNode(this,this.root,this.specification.preTest);}
-		if (specification.postTest != undefined){this.postTest = new this.surveyNode(this,this.root,this.specification.postTest);}
+		if (specification.preTest != undefined){this.preTest = new this.parent.surveyNode(this.parent,this.XMLDOM,this.specification.preTest);}
+		if (specification.postTest != undefined){this.postTest = new this.parent.surveyNode(this.parent,this.XMLDOM,this.specification.postTest);}
 		
 		// Add any page metrics
 		var page_metric = this.parent.document.createElement('metric');
