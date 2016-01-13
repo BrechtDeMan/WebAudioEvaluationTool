@@ -141,37 +141,37 @@ function loadProjectSpecCallback(response) {
 	switch(specification.interface)
 	{
 		case "APE":
-		interfaceJS.setAttribute("src","ape.js");
+		interfaceJS.setAttribute("src","interfaces/ape.js");
 		
 		// APE comes with a css file
 		var css = document.createElement('link');
 		css.rel = 'stylesheet';
 		css.type = 'text/css';
-		css.href = 'ape.css';
+		css.href = 'interfaces/ape.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
 		break;
 		
 		case "MUSHRA":
-		interfaceJS.setAttribute("src","mushra.js");
+		interfaceJS.setAttribute("src","interfaces/mushra.js");
 		
 		// MUSHRA comes with a css file
 		var css = document.createElement('link');
 		css.rel = 'stylesheet';
 		css.type = 'text/css';
-		css.href = 'mushra.css';
+		css.href = 'interfaces/mushra.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
 		break;
 		
 		case "AB":
-		interfaceJS.setAttribute("src","AB.js");
+		interfaceJS.setAttribute("src","interfaces/AB.js");
 		
 		// AB comes with a css file
 		var css = document.createElement('link');
 		css.rel = 'stylesheet';
 		css.type = 'text/css';
-		css.href = 'AB.css';
+		css.href = 'interfaces/AB.css';
 		
 		document.getElementsByTagName("head")[0].appendChild(css);
 	}
