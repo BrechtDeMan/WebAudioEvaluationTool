@@ -23,7 +23,7 @@
   <xs:element name="setup">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="survey" maxOccurs="2"/>
+        <xs:element ref="survey" minOccurs="0" maxOccurs="2"/>
         <xs:element ref="metric" maxOccurs="1"/>
         <xs:element ref="interface" maxOccurs="1"/>
       </xs:sequence>
@@ -44,7 +44,7 @@
         <xs:element ref="interface" minOccurs="1" maxOccurs="unbounded"/>
         <xs:element ref="audioelement" minOccurs="1" maxOccurs="unbounded"/>
         <xs:element ref="commentquestion" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:element ref="survey" maxOccurs="2"/>
+        <xs:element ref="survey" minOccurs="0" maxOccurs="2"/>
       </xs:sequence>
       <xs:attribute ref="id" use="required"/>
       <xs:attribute name="hostURL" type="xs:anyURI" use="required"/>
