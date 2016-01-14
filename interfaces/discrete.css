@@ -44,7 +44,6 @@ div#slider-holder {
 }
 
 div#scale-holder {
-	height: inherit;
 	position: absolute;
 	left: 0px;
 	z-index: 2;
@@ -78,7 +77,8 @@ div.track-slider {
 div.track-slider-range {
 	float: left;
 	height: 100%;
-	margin: 0px 10px;
+	margin: 0px 50px;
+	position: relative;
 }
 
 div.track-slider-title {
@@ -93,6 +93,10 @@ button.track-slider-button {
 	height: 30px;
 }
 
+input.track-radio {
+	position: absolute;
+	margin: 9px 0px;
+}
 
 button.outside-reference {
 	width:120px;

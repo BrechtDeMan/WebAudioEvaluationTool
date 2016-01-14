@@ -20,9 +20,11 @@
 	<page id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' showElementComments='true' loudness="-12">
 		<interface>
 			<scales>
-				<scalelabel position="0">-50</scalelabel>
-				<scalelabel position="50">0</scalelabel>
-				<scalelabel position="100">50</scalelabel>
+				<scalelabel position="0">(1) Very Annoying</scalelabel>
+				<scalelabel position="25">(2) Annoying</scalelabel>
+				<scalelabel position="50">(3) Slightly Annoying</scalelabel>
+				<scalelabel position="75">(4) Audible but not Annoying</scalelabel>
+				<scalelabel position="100">(5) Inaudible</scalelabel>
 			</scales>
 		</interface>
 		<audioelement url="1.wav" id="track-1"/>

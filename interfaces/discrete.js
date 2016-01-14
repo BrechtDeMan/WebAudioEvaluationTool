@@ -80,7 +80,7 @@ function loadInterface() {
 	scaleHolder.appendChild(scaleText);
 	var scaleCanvas = document.createElement('canvas');
 	scaleCanvas.id = "scale-canvas";
-	scaleCanvas.style.marginLeft = "100px";
+	scaleCanvas.style.marginLeft = "150px";
 	scaleHolder.appendChild(scaleCanvas);
 	var sliderObjectHolder = document.createElement('div');
 	sliderObjectHolder.id = 'slider-holder';
@@ -147,7 +147,7 @@ function loadTest(page)
 	
 	// Find all the audioElements from the audioHolder
 	var label = 0;
-	var numScales = testState.currentStateMap.interfaces[0].scales.length;
+	var interfaceScales = testState.currentStateMap.interfaces[0].scales;
 	$(page.audioElements).each(function(index,element){
 		// Find URL of track
 		// In this jQuery loop, variable 'this' holds the current audioElement.
@@ -162,7 +162,7 @@ function loadTest(page)
 			var node = interfaceContext.createCommentBox(audioObject);
 		
 			// Create a slider per track
-			var sliderObj = new discreteObject(audioObject,label,numScales);
+			var sliderObj = new discreteObject(audioObject,label,interfaceScales);
 			sliderBox.appendChild(sliderObj.holder);
 			audioObject.bindInterface(sliderObj);
 			label += 1;
@@ -174,12 +174,12 @@ function loadTest(page)
 	resizeWindow(null);
 }
 
-function discreteObject(audioObject,label,numOptions)
+function discreteObject(audioObject,label,interfaceScales)
 {
 	// An example node, you can make this however you want for each audioElement.
 	// However, every audioObject (audioEngineContext.audioObject) MUST have an interface object with the following
 	// You attach them by calling audioObject.bindInterface( )
-	if (numOptions == null || numOptions == 0)
+	if (interfaceScales == null || interfaceScales.length == 0)
 	{
 		console.log("WARNING: The discrete radio's are built depending on the number of scale points specified! Ensure you have some specified. Defaulting to 5 for now!");
 		numOptions = 5;
@@ -202,21 +202,29 @@ function discreteObject(audioObject,label,numOptions)
 	this.title.className = 'track-slider-title';
 	
 	this.discreteHolder.className = "track-slider-range";
-	this.discreteHolder.style.width = window.innerWidth-420 + 'px';
-	for (var i=0; i<numOptions; i++)
+	this.discreteHolder.style.width = window.innerWidth-500 + 'px';
+	for (var i=0; i<interfaceScales.length; i++)
 	{
 		var node = document.createElement('input');
 		node.setAttribute('type','radio');
+		node.className = 'track-radio';
+		node.setAttribute('position',interfaceScales[i].position);
 		node.setAttribute('name',audioObject.specification.id);
 		node.setAttribute('id',audioObject.specification.id+'-'+String(i));
 		this.discretes.push(node);
 		this.discreteHolder.appendChild(node);
-		node.onchange = function(event)
+		node.onclick = function(event)
 		{
+			if (audioEngineContext.status == 0)
+			{
+				event.currentTarget.checked = false;
+				return;
+			}
 			var time = audioEngineContext.timer.getTestTime();
 			var id = Number(event.currentTarget.parentNode.parentNode.getAttribute('trackIndex'));
-			audioEngineContext.audioObjects[id].metric.moved(time,this.value);
-			console.log('slider '+id+' moved to '+this.value+' ('+time+')');
+			var value = event.currentTarget.getAttribute('position') / 100.0;
+			audioEngineContext.audioObjects[id].metric.moved(time,value);
+			console.log('slider '+id+' moved to '+value+' ('+time+')');
 		};
 	}
 	
@@ -239,8 +247,17 @@ function discreteObject(audioObject,label,numOptions)
 	this.resize = function(event)
 	{
 		this.holder.style.width = window.innerWidth-200 + 'px';
-		this.discreteHolder.style.width = window.innerWidth-420 + 'px';
-		
+		this.discreteHolder.style.width = window.innerWidth-500 + 'px';
+		//text.style.left = (posPix+150-($(text).width()/2)) +'px';
+		for (var i=0; i<this.discretes.length; i++)
+		{
+			var width = $(this.discreteHolder).width() - 20;
+			var node = this.discretes[i];
+			var nodeW = $(node).width();
+			var position = node.getAttribute('position');
+			var posPix = Math.round(width * (position / 100.0));
+			node.style.left = (posPix+10 - (nodeW/2)) + 'px';
+		}
 	};
 	this.enable = function()
 	{
@@ -255,8 +272,17 @@ function discreteObject(audioObject,label,numOptions)
 	};
 	this.getValue = function()
 	{
-		// Return the current value of the object. If there is no value, return 0
-		return 0;
+		// Return the current value of the object. If there is no value, return -1
+		var value = -1;
+		for (var i=0; i<this.discretes.length; i++)
+		{
+			if (this.discretes[i].checked == true)
+			{
+				value = this.discretes[i].getAttribute('position') / 100.0;
+				break;
+			}
+		}
+		return value;
 	};
 	this.getPresentedId = function()
 	{
@@ -274,7 +300,9 @@ function discreteObject(audioObject,label,numOptions)
 		// If there is no value node (such as outside reference), return null
 		// If there are multiple value nodes (such as multiple scale / 2D scales), return an array of nodes with each value node having an 'interfaceName' attribute
 		// Use storage.document.createElement('value'); to generate the XML node.
-		
+		var node = storage.document.createElement('value');
+		node.textContent = this.getValue();
+		return node;
 	};
 };
 
@@ -286,7 +314,7 @@ function resizeWindow(event)
 	var totalHeight = (numObj * 66)-30;
 	document.getElementById('scale-holder').style.width = window.innerWidth-220 + 'px';
 	var canvas = document.getElementById('scale-canvas');
-	canvas.width = window.innerWidth-420;
+	canvas.width = window.innerWidth-520;
 	canvas.height = totalHeight;
 	for (var i in audioEngineContext.audioObjects)
 	{
@@ -329,8 +357,8 @@ function drawScale()
 		text.appendChild(textC);
 		text.className = "scale-text";
 		textHolder.appendChild(text);
-		text.style.width = Math.ceil($(text).width())+'px';
-		text.style.left = (posPix+100-($(text).width()/2)) +'px';
+		text.style.width = $(text.children[0]).width()+'px';
+		text.style.left = (posPix+150-($(text).width()/2)) +'px';
 	}
 }
 
