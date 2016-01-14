@@ -137,7 +137,7 @@ function Comparitor(audioHolderObject)
 		this.playback.textContent = "Listen";
 		this.box.appendChild(this.selector);
 		this.box.appendChild(this.playback);
-		this.selector.onclick = function()
+		this.selector.onclick = function(event)
 		{
 			var time = audioEngineContext.timer.getTestTime();
 			if ($(event.currentTarget).hasClass('disabled'))
@@ -167,7 +167,7 @@ function Comparitor(audioHolderObject)
 			}
 			console.log("Selected "+id+' ('+time+')');
 		};
-		this.playback.onclick = function()
+		this.playback.onclick = function(event)
 		{
 			$('.comparitor-button').text('Listen');
 			var id = event.currentTarget.parentElement.getAttribute('track-id');

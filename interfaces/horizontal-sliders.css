@@ -112,7 +112,7 @@ input[type=range]
 }
 
 input[type=range]::-webkit-slider-runnable-track {
-	width: 8px;
+	height: 8px;
 	cursor: pointer;
 	background: #fff;
 	border-radius: 4px;
@@ -120,7 +120,7 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 input[type=range]::-moz-range-track {
-	width: 8px;
+	height: 8px;
 	cursor: pointer;
 	background: #fff;
 	border-radius: 4px;
