@@ -101,13 +101,13 @@ div.track-slider-playing {
 
 input.track-slider-range {
 	float: left;
-	margin: 2px 0px;
+	margin: 2px 10px;
 }
 
 input[type=range]
 {
     height: 94px;
-    padding: 0 10px;
+    padding: 0px;
     color: rgb(255, 144, 144);
 }
 

@@ -271,7 +271,9 @@ function sliderObject(audioObject,label)
 		// If there is no value node (such as outside reference), return null
 		// If there are multiple value nodes (such as multiple scale / 2D scales), return an array of nodes with each value node having an 'interfaceName' attribute
 		// Use storage.document.createElement('value'); to generate the XML node.
-		
+		var node = storage.document.createElement('value');
+        node.textContent = this.slider.value;
+        return node;
 	};
 };
 
