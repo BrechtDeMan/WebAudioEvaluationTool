@@ -26,6 +26,83 @@ AudioBuffer.prototype.playbackGain = undefined;
 // Add a prototype to the bufferNode to hold the computed LUFS loudness
 AudioBuffer.prototype.lufs = undefined;
 
+// Firefox does not have an XMLDocument.prototype.getElementsByName
+// and there is no searchAll style command, this custom function will
+// search all children recusrively for the name. Used for XSD where all
+// element nodes must have a name and therefore can pull the schema node
+XMLDocument.prototype.getAllElementsByName = function(name)
+{
+    name = String(name);
+    var selected = this.documentElement.getAllElementsByName(name);
+    return selected;
+}
+
+Element.prototype.getAllElementsByName = function(name)
+{
+    name = String(name);
+    var selected = [];
+    var node = this.firstElementChild;
+    while(node != null)
+    {
+        if (node.getAttribute('name') == name)
+        {
+            selected.push(node);
+        }
+        if (node.childElementCount > 0)
+        {
+            selected = selected.concat(node.getAllElementsByName(name));
+        }
+        node = node.nextElementSibling;
+    }
+    return selected;
+}
+
+XMLDocument.prototype.getAllElementsByTagName = function(name)
+{
+    name = String(name);
+    var selected = this.documentElement.getAllElementsByTagName(name);
+    return selected;
+}
+
+Element.prototype.getAllElementsByTagName = function(name)
+{
+    name = String(name);
+    var selected = [];
+    var node = this.firstElementChild;
+    while(node != null)
+    {
+        if (node.nodeName == name)
+        {
+            selected.push(node);
+        }
+        if (node.childElementCount > 0)
+        {
+            selected = selected.concat(node.getAllElementsByTagName(name));
+        }
+        node = node.nextElementSibling;
+    }
+    return selected;
+}
+
+// Firefox does not have an XMLDocument.prototype.getElementsByName
+if (typeof XMLDocument.prototype.getElementsByName != "function") {
+    XMLDocument.prototype.getElementsByName = function(name)
+    {
+        name = String(name);
+        var node = this.documentElement.firstElementChild;
+        var selected = [];
+        while(node != null)
+        {
+            if (node.getAttribute('name') == name)
+            {
+                selected.push(node);
+            }
+            node = node.nextElementSibling;
+        }
+        return selected;
+    }
+}
+
 window.onload = function() {
 	// Function called once the browser has loaded all files.
 	// This should perform any initial commands such as structure / loading documents
@@ -1181,7 +1258,7 @@ function audioObject(id) {
 		this.state = 1;
 		this.buffer.buffer.playbackGain = callee.buffer.playbackGain;
 		this.buffer.buffer.lufs = callee.buffer.lufs;
-		var targetLUFS = this.specification.parent.loudness;
+		var targetLUFS = this.specification.parent.loudness || specification.loudness;
 		if (typeof targetLUFS === "number")
 		{
 			this.buffer.buffer.playbackGain = decibelToLinear(targetLUFS - this.buffer.buffer.lufs);
@@ -1655,7 +1732,7 @@ function Specification() {
 		// schema is the <xs:attribute> node
 		if (schema.getAttribute('name') == undefined && schema.getAttribute('ref') != undefined)
 		{
-			schema = this.schema.getElementsByName(schema.getAttribute('ref'))[0];
+			schema = this.schema.getAllElementsByName(schema.getAttribute('ref'))[0];
 		}
 		var defaultOpt = schema.getAttribute('default');
 		if (attribute == null) {
@@ -1695,9 +1772,9 @@ function Specification() {
 		// projectXML - DOM Parsed document
 		this.projectXML = projectXML.childNodes[0];
 		var setupNode = projectXML.getElementsByTagName('setup')[0];
-		var schemaSetup = this.schema.getElementsByName('setup')[0];
+		var schemaSetup = this.schema.getAllElementsByName('setup')[0];
 		// First decode the attributes
-		var attributes = schemaSetup.getElementsByTagName('attribute');
+		var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
 		for (var i in attributes)
 		{
 			if (isNaN(Number(i)) == true){break;}
@@ -1743,7 +1820,7 @@ function Specification() {
 		
 		// Now process the survey node options
 		var survey = setupNode.getElementsByTagName('survey');
-		var surveySchema = specification.schema.getElementsByName('survey')[0];
+		var surveySchema = specification.schema.getAllElementsByName('survey')[0];
 		for (var i in survey) {
 			if (isNaN(Number(i)) == true){break;}
 			var location = survey[i].getAttribute('location');
@@ -1772,12 +1849,12 @@ function Specification() {
 		if (interfaceNode.length != 0)
 		{
 			interfaceNode = interfaceNode[0];
-			this.interfaces.decode(this,interfaceNode,this.schema.getElementsByName('interface')[1]);
+			this.interfaces.decode(this,interfaceNode,this.schema.getAllElementsByName('interface')[1]);
 		}
 		
 		// Page tags
 		var pageTags = projectXML.getElementsByTagName('page');
-		var pageSchema = this.schema.getElementsByName('page')[0];
+		var pageSchema = this.schema.getAllElementsByName('page')[0];
 		for (var i=0; i<pageTags.length; i++)
 		{
 			var node = new this.page();
@@ -1815,7 +1892,7 @@ function Specification() {
 			this.decode = function(parent,child,schema)
 			{
 				this.schema = schema;
-				var attributeMap = schema.getElementsByTagName('attribute');
+				var attributeMap = schema.getAllElementsByTagName('xs:attribute');
 				for (var i in attributeMap){
 					if(isNaN(Number(i)) == true){break;}
 					var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
@@ -1897,7 +1974,7 @@ function Specification() {
 			this.location = xml.getAttribute('location');
 			if (this.location == 'before'){this.location = 'pre';}
 			else if (this.location == 'after'){this.location = 'post';}
-			var surveyentrySchema = schema.getElementsByTagName('element')[0];
+			var surveyentrySchema = schema.getAllElementsByName('surveyentry')[0];
 			for (var i in xml.children)
 			{
 				if(isNaN(Number(i))==true){break;}
@@ -1935,14 +2012,8 @@ function Specification() {
 			}
 			var interfaceOptionNodes = xml.getElementsByTagName('interfaceoption');
 			// Extract interfaceoption node schema
-			var interfaceOptionNodeSchema = schema.getElementsByTagName('element');
-			for (var i=0; i<interfaceOptionNodeSchema.length; i++) {
-				if (interfaceOptionNodeSchema[i].getAttribute('name') == 'interfaceoption') {
-					interfaceOptionNodeSchema = interfaceOptionNodeSchema[i];
-					break;
-				}
-			}
-			var attributeMap = interfaceOptionNodeSchema.getElementsByTagName('attribute');
+			var interfaceOptionNodeSchema = schema.getAllElementsByName('interfaceoption')[0];
+			var attributeMap = interfaceOptionNodeSchema.getAllElementsByTagName('xs:attribute');
 			for (var i=0; i<interfaceOptionNodes.length; i++)
 			{
 				var ioNode = interfaceOptionNodes[i];
@@ -2005,7 +2076,7 @@ function Specification() {
 		this.decode = function(parent,xml,schema)
 		{
 			this.schema = schema;
-			var attributeMap = this.schema.getElementsByTagName('attribute');
+			var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
 			for (var i=0; i<attributeMap.length; i++)
 			{
 				var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
@@ -2034,13 +2105,13 @@ function Specification() {
 			for (var i=0; i<interfaceNode.length; i++)
 			{
 				var node = new parent.interfaceNode();
-				node.decode(this,interfaceNode[i],parent.schema.getElementsByName('interface')[1]);
+				node.decode(this,interfaceNode[i],parent.schema.getAllElementsByName('interface')[1]);
 				this.interfaces.push(node);
 			}
 			
 			// Now process the survey node options
 			var survey = xml.getElementsByTagName('survey');
-			var surveySchema = parent.schema.getElementsByName('survey')[0];
+			var surveySchema = parent.schema.getAllElementsByName('survey')[0];
 			for (var i in survey) {
 				if (isNaN(Number(i)) == true){break;}
 				var location = survey[i].getAttribute('location');
@@ -2062,7 +2133,7 @@ function Specification() {
 			
 			// Now process the audioelement tags
 			var audioElements = xml.getElementsByTagName('audioelement');
-			var audioElementSchema = parent.schema.getElementsByName('audioelement')[0];
+			var audioElementSchema = parent.schema.getAllElementsByName('audioelement')[0];
 			for (var i=0; i<audioElements.length; i++)
 			{
 				var node = new this.audioElementNode();
@@ -2072,7 +2143,7 @@ function Specification() {
 			
 			// Now decode the commentquestions
 			var commentQuestions = xml.getElementsByTagName('commentquestion');
-			var commentQuestionSchema = parent.schema.getElementsByName('commentquestion')[0];
+			var commentQuestionSchema = parent.schema.getAllElementsByName('commentquestion')[0];
 			for (var i=0; i<commentQuestions.length; i++)
 			{
 				var node = new this.commentQuestionNode();
@@ -2168,7 +2239,7 @@ function Specification() {
 			{
 				this.schema = schema;
 				this.parent = parent;
-				var attributeMap = this.schema.getElementsByTagName('attribute');
+				var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
 				for (var i=0; i<attributeMap.length; i++)
 				{
 					var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
