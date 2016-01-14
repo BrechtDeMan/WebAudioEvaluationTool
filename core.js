@@ -2918,8 +2918,8 @@ function Storage()
 				for (var i=0; i<node.response.length; i++)
 				{
 					var checkNode = this.parent.document.createElement('response');
-					checkNode.setAttribute('name',node.response.name);
-					checkNode.setAttribute('checked',node.response.checked);
+					checkNode.setAttribute('name',node.response[i].name);
+					checkNode.setAttribute('checked',node.response[i].checked);
 					surveyresult.appendChild(checkNode);
 				}
 				break;
