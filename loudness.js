@@ -172,10 +172,10 @@ function calculateOverallLoudnessFromChannelBlocks(blockEnergy)
 		var sigma = 0;
 		for (var i=0; i<blockEnergy[0].length; i++)
 		{
-			blockEnergy[channel][i] *= G;
 			sigma += blockEnergy[channel][i];
 		}
-		sigma /= blockEnergy.length;
+        sigma /= blockEnergy[0].length;
+        sigma *= G;
 		summation+= sigma;
 	}
 	return -0.691 + 10*Math.log10(summation);;
