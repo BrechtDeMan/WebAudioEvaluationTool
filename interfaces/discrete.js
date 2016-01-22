@@ -309,7 +309,6 @@ function discreteObject(audioObject,label,interfaceScales)
 function resizeWindow(event)
 {
 	// Called on every window resize event, use this to scale your page properly
-	
 	var numObj = document.getElementsByClassName('track-slider').length;
 	var totalHeight = (numObj * 66)-30;
 	document.getElementById('scale-holder').style.width = window.innerWidth-220 + 'px';
@@ -322,6 +321,8 @@ function resizeWindow(event)
 			audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
 		}
 	}
+    document.getElementById('slider-holder').style.height = totalHeight + 'px';
+    document.getElementById('slider').style.height = totalHeight + 70 + 'px';
 	drawScale();
 }
 

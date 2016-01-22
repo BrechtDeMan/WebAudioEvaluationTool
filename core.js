@@ -785,9 +785,7 @@ function stateMachine()
 	this.stateIndex = null;
 	this.currentStateMap = null;
 	this.currentStatePosition = null;
-	this.currentTestId = 0;
-	this.stateResults = [];
-	this.timerCallBackHolders = null;
+    this.currentStore = null;
 	this.initialise = function(){
 		
 		// Get the data from Specification
@@ -818,18 +816,6 @@ function stateMachine()
 				console.log('NOTE - State already initialise');
 			}
 			this.stateIndex = -1;
-			var that = this;
-			var aH_pId = 0;
-			for (var id=0; id<this.stateMap.length; id++){
-				var name = this.stateMap[id].type;
-				var obj = document.createElement(name);
-				if (name == 'audioHolder') {
-					obj.id = this.stateMap[id].id;
-					obj.setAttribute('presentedid',aH_pId);
-					aH_pId+=1;
-				}
-				this.stateResults.push(obj);
-			}
 		} else {
 			console.log('FATAL - StateMap not correctly constructed. EMPTY_STATE_MAP');
 		}
@@ -870,7 +856,7 @@ function stateMachine()
 				{
 					this.currentStateMap.audioElements = randomiseOrder(this.currentStateMap.audioElements);
 				}
-				storage.createTestPageStore(this.currentStateMap);
+                this.currentStore = storage.createTestPageStore(this.currentStateMap);
 				if (this.currentStateMap.preTest != null)
 				{
 					this.currentStatePosition = 'pre';
@@ -2791,7 +2777,56 @@ function Interface(specificationObject) {
 			}
 		};
 	};
-	
+    
+    this.volume = new function()
+    {
+        // An in-built volume module which can be viewed on page
+        // Includes trackers on page-by-page data
+        // Volume does NOT reset to 0dB on each page load
+        this.valueLin = 1.0;
+        this.valueDB = 0.0;
+        this.object = document.createElement('div');
+        this.object.id = 'master-volume-holder';
+        this.slider = document.createElement('input');
+        this.slider.id = 'master-volume-control';
+        this.slider.type = 'range';
+        this.valueText = document.createElement('span');
+        this.valueText.id = 'master-volume-feedback';
+        this.valueText.textContent = '0dB';
+        
+        this.slider.min = -60;
+        this.slider.max = 12;
+        this.slider.value = 0;
+        this.slider.step = 1;
+        this.slider.onmousemove = function(event)
+        {
+            interfaceContext.volume.valueDB = event.currentTarget.value;
+            interfaceContext.volume.valueLin = decibelToLinear(interfaceContext.volume.valueDB);
+            interfaceContext.volume.valueText.textContent = interfaceContext.volume.valueDB+'dB';
+            audioEngineContext.outputGain.gain.value = interfaceContext.volume.valueLin;
+        }
+        this.slider.onmouseup = function(event)
+        {
+            var storePoint = testState.currentStore.XMLDOM.children[0].getAllElementsByName('volumeTracker');
+            if (storePoint.length == 0)
+            {
+                storePoint = storage.document.createElement('metricresult');
+                storePoint.setAttribute('name','volumeTracker');
+                testState.currentStore.XMLDOM.children[0].appendChild(storePoint);
+            }
+            else {
+                storePoint = storePoint[0];
+            }
+            var node = storage.document.createElement('movement');
+            node.setAttribute('test-time',audioEngineContext.timer.getTestTime());
+            node.setAttribute('volume',interfaceContext.volume.valueDB);
+            node.setAttribute('format','dBFS');
+            storePoint.appendChild(node);
+        }
+        
+        this.object.appendChild(this.slider);
+        this.object.appendChild(this.valueText);
+    }
 	// Global Checkers
 	// These functions will help enforce the checkers
 	this.checkHiddenAnchor = function()

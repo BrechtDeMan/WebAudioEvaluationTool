@@ -98,3 +98,24 @@ div#playhead-scrubber {
 	position: relative;
 	background-color: #000;
 }
+
+div#master-volume-holder {
+    width: 250px;
+    height: 25px;
+    float: left;
+}
+
+input#master-volume-control {
+    width: 200px;
+    height: 25px;
+    float: left;
+    margin: 0px;
+    padding: 0px;
+}
+
+span#master-volume-feedback {
+    width: 45px;
+    height: 25px;
+    margin-left: 5px;
+    float: left;
+}
