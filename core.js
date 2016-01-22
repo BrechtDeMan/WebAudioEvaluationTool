@@ -2824,6 +2824,13 @@ function Interface(specificationObject) {
             storePoint.appendChild(node);
         }
         
+        var title = document.createElement('div');
+        title.innerHTML = '<span>Master Volume Control</span>';
+        title.style.fontSize = '0.75em';
+        title.style.width = "100%";
+        title.align = 'center';
+        this.object.appendChild(title);
+        
         this.object.appendChild(this.slider);
         this.object.appendChild(this.valueText);
     }
