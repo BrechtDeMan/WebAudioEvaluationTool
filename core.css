@@ -101,8 +101,10 @@ div#playhead-scrubber {
 
 div#master-volume-holder {
     width: 250px;
-    height: 25px;
     float: left;
+    border: black 1px solid;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 input#master-volume-control {
