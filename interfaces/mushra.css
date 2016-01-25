@@ -134,3 +134,14 @@ input[type=range]::-webkit-slider-thumb {
 	margin-top: -1px;
 	margin-left: -4px;
 }
+
+div#page-count {
+    float: left;
+    margin: 0px 5px;
+}
+
+div#master-volume-holder {
+    position: absolute;
+    top: 10px;
+    left: 120px;
+}

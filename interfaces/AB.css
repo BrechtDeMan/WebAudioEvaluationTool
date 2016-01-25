@@ -72,3 +72,18 @@ button.comparitor-button {
 	position: relative;
 	margin-top: 5px;
 }
+
+div.playhead {
+    margin: 5px;
+}
+
+div#page-count {
+    float: left;
+    margin: 0px 5px;
+}
+
+div#master-volume-holder {
+    position: absolute;
+    top: 10px;
+    left: 120px;
+}

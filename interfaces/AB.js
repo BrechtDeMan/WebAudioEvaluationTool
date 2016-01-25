@@ -108,6 +108,45 @@ function loadTest(audioHolderObject)
 	{
 		document.getElementById("pageTitle").textContent = interfaceObj.title;
 	}
+    
+    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    for (var option of interfaceOptions)
+    {
+        if (option.type == "show")
+        {
+            switch(option.name) {
+                case "playhead":
+                    var playbackHolder = document.getElementById('playback-holder');
+                    if (playbackHolder == null)
+                    {
+                        playbackHolder = document.createElement('div');
+                        playbackHolder.style.width = "100%";
+                        playbackHolder.style.float = "left";
+                        playbackHolder.align = 'center';
+                        playbackHolder.appendChild(interfaceContext.playhead.object);
+                        feedbackHolder.appendChild(playbackHolder);
+                    }
+                    break;
+                case "page-count":
+                    var pagecountHolder = document.getElementById('page-count');
+                    if (pagecountHolder == null)
+                    {
+                        pagecountHolder = document.createElement('div');
+                        pagecountHolder.id = 'page-count';
+                    }
+                    pagecountHolder.innerHTML = '<span>Page '+(audioHolderObject.presentedId+1)+' of '+specification.pages.length+'</span>';
+                    var inject = document.getElementById('interface-buttons');
+                    inject.appendChild(pagecountHolder);
+                    break;
+                case "volume":
+                    if (document.getElementById('master-volume-holder') == null)
+                    {
+                        feedbackHolder.appendChild(interfaceContext.volume.object);
+                    }
+                    break;
+            }
+        }
+    }
 	
 	// Populate the comparitor object
 	interfaceContext.comparitor = new Comparitor(audioHolderObject);
