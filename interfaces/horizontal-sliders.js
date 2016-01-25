@@ -113,6 +113,8 @@ function loadTest(page)
 	var id = page.id;
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
+    feedbackHolder.innerHTML = null;
+    
 	var interfaceObj = page.interfaces;
 	if (interfaceObj.length > 1)
 	{
@@ -124,6 +126,44 @@ function loadTest(page)
 		document.getElementById("pageTitle").textContent = interfaceObj.title;
 	}
 	
+    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    for (var option of interfaceOptions)
+    {
+        if (option.type == "show")
+        {
+            switch(option.name) {
+                case "playhead":
+                    var playbackHolder = document.getElementById('playback-holder');
+                    if (playbackHolder == null)
+                    {
+                        playbackHolder = document.createElement('div');
+                        playbackHolder.style.width = "100%";
+                        playbackHolder.align = 'center';
+                        playbackHolder.appendChild(interfaceContext.playhead.object);
+                        feedbackHolder.appendChild(playbackHolder);
+                    }
+                    break;
+                case "page-count":
+                    var pagecountHolder = document.getElementById('page-count');
+                    if (pagecountHolder == null)
+                    {
+                        pagecountHolder = document.createElement('div');
+                        pagecountHolder.id = 'page-count';
+                    }
+                    pagecountHolder.innerHTML = '<span>Page '+(page.presentedId+1)+' of '+specification.pages.length+'</span>';
+                    var inject = document.getElementById('interface-buttons');
+                    inject.appendChild(pagecountHolder);
+                    break;
+                case "volume":
+                    if (document.getElementById('master-volume-holder') == null)
+                    {
+                        feedbackHolder.appendChild(interfaceContext.volume.object);
+                    }
+                    break;
+            }
+        }
+    }
+    
 	// Delete outside reference
 	var outsideReferenceHolder = document.getElementById('outside-reference');
 	if (outsideReferenceHolder != null) {
@@ -131,7 +171,6 @@ function loadTest(page)
 	}
 	
 	var sliderBox = document.getElementById('slider-holder');
-	feedbackHolder.innerHTML = null;
 	sliderBox.innerHTML = null;
 	
 	var commentBoxPrefix = "Comment on track";
@@ -293,6 +332,7 @@ function resizeWindow(event)
 			audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
 		}
 	}
+    document.getElementById("slider").style.height = totalHeight+50+'px';
 	drawScale();
 }
 

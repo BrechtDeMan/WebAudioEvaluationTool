@@ -293,33 +293,43 @@ function loadTest(audioHolderObject)
 	for (var k=0; k<interfaceObj.length; k++) {
 		// Create the div box to center align
 		interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObj[k]));
-		for (var i=0; i<interfaceObj[k].options.length; i++)
-		{
-			if (interfaceObj[k].options[i].type == 'option' && interfaceObj[k].options[i].name == 'playhead')
-			{
-				var playbackHolder = document.getElementById('playback-holder');
-				if (playbackHolder == null)
-				{
-					playbackHolder = document.createElement('div');
-					playbackHolder.style.width = "100%";
-					playbackHolder.align = 'center';
-					playbackHolder.appendChild(interfaceContext.playhead.object);
-					feedbackHolder.appendChild(playbackHolder);
-				}
-			} else if (interfaceObj[k].options[i].type == 'option' && interfaceObj[k].options[i].name == 'page-count')
-			{
-				var pagecountHolder = document.getElementById('page-count');
-				if (pagecountHolder == null)
-				{
-					pagecountHolder = document.createElement('div');
-					pagecountHolder.id = 'page-count';
-				}
-				pagecountHolder.innerHTML = '<span>Page '+(audioHolderObject.presentedId+1)+' of '+specification.audioHolders.length+'</span>';
-				var inject = document.getElementById('interface-buttons');
-				inject.appendChild(pagecountHolder);
-			}
-		}
 	}
+    
+    var interfaceList = audioHolderObject.interfaces.concat(specification.interfaces);
+    for (var k=0; k<interfaceList.length; k++)
+    {
+        for (var i=0; i<interfaceList[k].options.length; i++)
+        {
+            if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'playhead')
+            {
+                var playbackHolder = document.getElementById('playback-holder');
+                if (playbackHolder == null)
+                {
+                    playbackHolder = document.createElement('div');
+                    playbackHolder.style.width = "100%";
+                    playbackHolder.align = 'center';
+                    playbackHolder.appendChild(interfaceContext.playhead.object);
+                    feedbackHolder.appendChild(playbackHolder);
+                }
+            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'page-count')
+            {
+                var pagecountHolder = document.getElementById('page-count');
+                if (pagecountHolder == null)
+                {
+                    pagecountHolder = document.createElement('div');
+                    pagecountHolder.id = 'page-count';
+                }
+                pagecountHolder.innerHTML = '<span>Page '+(audioHolderObject.presentedId+1)+' of '+specification.pages.length+'</span>';
+                var inject = document.getElementById('interface-buttons');
+                inject.appendChild(pagecountHolder);
+            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'volume') {
+                if (document.getElementById('master-volume-holder') == null)
+                {
+                    feedbackHolder.appendChild(interfaceContext.volume.object);
+                }
+            }
+        }
+    }
 	
 	var commentBoxPrefix = "Comment on fragment";
 	

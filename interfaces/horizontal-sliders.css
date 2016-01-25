@@ -133,3 +133,14 @@ input.track-slider-not-moved[type=range]::-webkit-slider-runnable-track {
 input.track-slider-not-moved[type=range]::-moz-range-track {
 	background: #aaa;
 }
+
+div#page-count {
+    float: left;
+    margin: 0px 5px;
+}
+
+div#master-volume-holder {
+    position: absolute;
+    top: 10px;
+    left: 120px;
+}

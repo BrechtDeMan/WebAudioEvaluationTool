@@ -108,3 +108,14 @@ button.outside-reference {
 div.track-slider-playing {
 	background-color: #FFDDDD;
 }
+
+div#page-count {
+    float: left;
+    margin: 0px 5px;
+}
+
+div#master-volume-holder {
+    position: absolute;
+    top: 10px;
+    left: 120px;
+}

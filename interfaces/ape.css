@@ -86,3 +86,9 @@ div.track-slider-playing {
 div.comment-box-playing {
 	background-color: #FFDDDD;
 }
+
+div#master-volume-holder {
+    position: absolute;
+    top: 10px;
+    left: 120px;
+}

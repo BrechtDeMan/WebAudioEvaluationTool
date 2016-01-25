@@ -15,6 +15,7 @@
 			<interfaceoption type="check" name="scalerange" min="25" max="75"/>
 			<interfaceoption type="show" name='playhead'/>
 			<interfaceoption type="show" name="page-count"/>
+            <interfaceoption type="show" name="volume"/>
 		</interface>
 	</setup>
 	<page id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='true' showElementComments='true' loudness="-12">
