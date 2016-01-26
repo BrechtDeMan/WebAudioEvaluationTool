@@ -34,7 +34,7 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 	}
 	if (offlineContext == undefined)
 	{
-		offlineContext = new OfflineAudioContext(buffer.buffer.numberOfChannels, buffer.buffer.length, buffer.buffer.sampleRate);
+		offlineContext = new OfflineAudioContext(audioContext.destination.channelCount, buffer.buffer.duration*audioContext.sampleRate, audioContext.sampleRate);
 	}
 	// Create the required filters
 	var KFilter = offlineContext.createBiquadFilter();
