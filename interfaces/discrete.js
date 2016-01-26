@@ -275,12 +275,6 @@ function discreteObject(audioObject,label,interfaceScales)
 		var id = Number(event.currentTarget.value);
 		//audioEngineContext.metric.sliderPlayed(id);
 		audioEngineContext.play(id);
-		$(".track-slider").removeClass('track-slider-playing');
-		$(event.currentTarget.parentElement).addClass('track-slider-playing');
-		var outsideReference = document.getElementById('outside-reference');
-		if (outsideReference != null) {
-			$(outsideReference).removeClass('track-slider-playing');
-		}
 	};
 	this.resize = function(event)
 	{
@@ -308,6 +302,23 @@ function discreteObject(audioObject,label,interfaceScales)
 	{
 		// progress is a value from 0 to 100 indicating the current download state of media files
 	};
+    
+    this.startPlayback = function()
+    {
+        // Called by audioObject when playback begins
+        $(".track-slider").removeClass('track-slider-playing');
+		$(this.holder).addClass('track-slider-playing');
+		var outsideReference = document.getElementById('outside-reference');
+		if (outsideReference != null) {
+			$(outsideReference).removeClass('track-slider-playing');
+		}
+    }
+    this.stopPlayback = function()
+    {
+        // Called by audioObject when playback stops
+        $(this.holder).removeClass('track-slider-playing');
+    }
+    
 	this.getValue = function()
 	{
 		// Return the current value of the object. If there is no value, return -1

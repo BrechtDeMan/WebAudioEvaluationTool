@@ -1060,24 +1060,24 @@ function AudioEngine(specification) {
 				interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
 			}
 			if (this.loopPlayback) {
+                var setTime = audioContext.currentTime+2;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
-					this.audioObjects[i].play(this.timer.getTestTime()+1);
+					this.audioObjects[i].play(setTime-2);
 					if (id == i) {
-						this.audioObjects[i].loopStart();
+						this.audioObjects[i].loopStart(setTime);
 					} else {
-						this.audioObjects[i].loopStop();
+						this.audioObjects[i].loopStop(setTime);
 					}
 				}
 			} else {
+                var setTime = audioContext.currentTime+0.1;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
 					if (i != id) {
-						this.audioObjects[i].outputGain.gain.value = 0.0;
-						this.audioObjects[i].stop();
+						this.audioObjects[i].stop(setTime);
 					} else if (i == id) {
-						this.audioObjects[id].outputGain.gain.value = this.audioObjects[id].onplayGain;
-						this.audioObjects[id].play(audioContext.currentTime+0.01);
+						this.audioObjects[id].play(setTime);
 					}
 				}
 			}
@@ -1088,9 +1088,10 @@ function AudioEngine(specification) {
 	this.stop = function() {
 		// Send stop and reset command to all playback buffers and set audioEngine state to stopped (1)
 		if (this.status == 1) {
+            var setTime = audioContext.currentTime+0.1;
 			for (var i=0; i<this.audioObjects.length; i++)
 			{
-				this.audioObjects[i].stop();
+				this.audioObjects[i].stop(setTime);
 			}
 			interfaceContext.playhead.stop();
 			this.status = 0;
@@ -1227,8 +1228,6 @@ function audioObject(id) {
 	this.bufferNode = undefined;
 	this.outputGain = audioContext.createGain();
 	
-	// Default output gain to be zero
-	this.outputGain.gain.value = 0.0;
 	this.onplayGain = 1.0;
 	
 	// Connect buffer to the audio graph
@@ -1287,16 +1286,18 @@ function audioObject(id) {
 		this.storeDOM.setAttribute('presentedId',interfaceObject.getPresentedId());
 	};
     
-	this.loopStart = function() {
-		this.outputGain.gain.value = this.onplayGain;
+	this.loopStart = function(setTime) {
+		this.outputGain.gain.linearRampToValueAtTime(this.onplayGain,setTime);
 		this.metric.startListening(audioEngineContext.timer.getTestTime());
+        this.interfaceDOM.startPlayback();
 	};
 	
-	this.loopStop = function() {
+	this.loopStop = function(setTime) {
 		if (this.outputGain.gain.value != 0.0) {
-			this.outputGain.gain.value = 0.0;
+			this.outputGain.gain.linearRampToValueAtTime(0.0,setTime);
 			this.metric.stopListening(audioEngineContext.timer.getTestTime());
 		}
+        this.interfaceDOM.stopPlayback();
 	};
 	
 	this.play = function(startTime) {
@@ -1309,22 +1310,29 @@ function audioObject(id) {
 			this.bufferNode.onended = function(event) {
 				// Safari does not like using 'this' to reference the calling object!
 				//event.currentTarget.owner.metric.stopListening(audioEngineContext.timer.getTestTime(),event.currentTarget.owner.getCurrentPosition());
-				event.currentTarget.owner.stop();
+				event.currentTarget.owner.stop(audioContext.currentTime+1);
 			};
 			if (this.bufferNode.loop == false) {
 				this.metric.startListening(audioEngineContext.timer.getTestTime());
-			}
+                this.outputGain.gain.setValueAtTime(this.onplayGain,startTime);
+                this.interfaceDOM.startPlayback();
+			} else {
+                 this.outputGain.gain.setValueAtTime(0.0,startTime);
+            }
 			this.bufferNode.start(startTime);
 		}
 	};
 	
-	this.stop = function() {
+	this.stop = function(stopTime) {
+        this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
 		if (this.bufferNode != undefined)
 		{
 			this.metric.stopListening(audioEngineContext.timer.getTestTime(),this.getCurrentPosition());
-			this.bufferNode.stop(0);
+			this.bufferNode.stop(stopTime);
 			this.bufferNode = undefined;
 		}
+        this.outputGain.gain.value = 0.0;
+        this.interfaceDOM.stopPlayback();
 	};
 	
 	this.getCurrentPosition = function() {
