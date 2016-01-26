@@ -549,9 +549,18 @@ function interfacePopup() {
 				textArea.rows = "10";
 				break;
 			}
+            if (node.response == undefined) {
+                node.response = "";
+            } else {
+                textArea.value = node.response;
+            }
 			this.popupResponse.appendChild(textArea);
 			textArea.focus();
 		} else if (node.specification.type == 'checkbox') {
+            if (node.response == undefined) {
+                node.response = Array(node.specification.options.length);
+            }
+            var index = 0;
 			for (var option of node.specification.options) {
 				var input = document.createElement('input');
 				input.id = option.name;
@@ -564,8 +573,18 @@ function interfacePopup() {
 				hold.appendChild(input);
 				hold.appendChild(span);
 				this.popupResponse.appendChild(hold);
+                if (node.response[index] != undefined){
+                    if (node.response[index].checked == true) {
+                        input.checked = "true";
+                    }
+                }
+                index++;
 			}
 		} else if (node.specification.type == 'radio') {
+            if (node.response == undefined) {
+                node.response = {name: "", text: ""};
+            }
+            var index = 0;
 			for (var option of node.specification.options) {
 				var input = document.createElement('input');
 				input.id = option.name;
@@ -579,6 +598,9 @@ function interfacePopup() {
 				hold.appendChild(input);
 				hold.appendChild(span);
 				this.popupResponse.appendChild(hold);
+                if (input.id == node.response.name) {
+                    input.checked = "true";
+                }
 			}
 		} else if (node.specification.type == 'number') {
 			var input = document.createElement('input');
@@ -586,6 +608,9 @@ function interfacePopup() {
 			if (node.min != null) {input.min = node.specification.min;}
 			if (node.max != null) {input.max = node.specification.max;}
 			if (node.step != null) {input.step = node.specification.step;}
+            if (node.response != undefined) {
+                input.value = node.response;
+            }
 			this.popupResponse.appendChild(input);
 		}
 		var content_height = Number(this.popup.offsetHeight.toFixed());
@@ -721,39 +746,7 @@ function interfacePopup() {
 		// Triggered when the 'Back' button is clicked in the survey
 		if (this.currentIndex > 0) {
 			this.currentIndex--;
-			var node = this.popupOptions[this.currentIndex];
-			if (node.type != 'statement') {
-				var prevResp = this.responses.childNodes[this.responses.childElementCount-1];
-				this.responses.removeChild(prevResp);
-			}
 			this.postNode();
-			if (node.type == 'question') {
-				this.popupContent.getElementsByTagName('textarea')[0].value = prevResp.textContent;
-			} else if (node.type == 'checkbox') {
-				var options = this.popupContent.getElementsByTagName('input');
-				var savedOptions = prevResp.getElementsByTagName('option');
-				for (var i=0; i<options.length; i++) {
-					var id = options[i].id;
-					for (var j=0; j<savedOptions.length; j++) {
-						if (savedOptions[j].getAttribute('name') == id) {
-							if (savedOptions[j].textContent == 'true') {options[i].checked = true;}
-							else {options[i].checked = false;}
-							break;
-						}
-					}
-				}
-			} else if (node.type == 'number') {
-				this.popupContent.getElementsByTagName('input')[0].value = prevResp.textContent;
-			} else if (node.type == 'radio') {
-				var options = this.popupContent.getElementsByTagName('input');
-				var name = prevResp.getAttribute('name');
-				for (var i=0; i<options.length; i++) {
-					if (options[i].id == name) {
-						options[i].checked = true;
-						break;
-					}
-				}
-			}
 		}
 	};
 	
