@@ -1136,7 +1136,7 @@ function AudioEngine(specification) {
 				break;
 			}
 		}
-		if (buffer.buffer != null)
+		if (buffer.buffer.lufs != undefined)
 		{
 			this.audioObjects[audioObjectId].bufferLoaded(buffer);
 		}

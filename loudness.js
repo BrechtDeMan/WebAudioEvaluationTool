@@ -75,6 +75,7 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
             var RK_gate = loudnessOfBlocks(RK);
             buffer.buffer.lufs = RK_gate;
 		}
+        buffer.ready();
 	};
 	offlineContext.startRendering();
 }
