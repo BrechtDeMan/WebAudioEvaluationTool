@@ -47,14 +47,12 @@ The tool is available in its entirety including source code on \url{https://code
 		\textbf{Main folder:} 
 			\begin{itemize}
 	            	\item \texttt{analyse.html}: analysis and diagnostics of a set of result XML files
-	            	\item \texttt{ape.css, core.css, graphics.css, mushra.css, structure.css}: style files (edit to change appearance)
-	            	\item \texttt{ape.js}: JavaScript file for APE-style interface \cite{ape}
+	            	\item \texttt{core.css, graphics.css, structure.css}: core style files (edit to change appearance)
 	            	\item \texttt{CITING.txt, LICENSE.txt, README.txt}: text files with, respectively, the citation which we ask to include in any work where this tool or any portion thereof is used, modified or otherwise; the license under which the software is shared; and a general readme file referring to these instructions.
 	            	\item \texttt{core.js}: JavaScript file with core functionality
 	            	\item \texttt{index.html}: webpage where interface should appear (includes link to test configuration XML)
 	            	\item \texttt{jquery-2.1.4.js}: jQuery JavaScript Library
 	            	\item \texttt{loudness.js}: Allows for automatic calculation of loudness of Web Audio API Buffer objects, return gain values to correct for a target loudness or match loudness between multiple objects
-	            	\item \texttt{mushra.js}: JavaScript file for MUSHRA-style interface \cite{mushra}
 	            	\item \texttt{pythonServer.py}: webserver for running tests locally
 	            	\item \texttt{pythonServer-legacy.py}: webserver with limited functionality (no automatic storing of output XML files)
 	            	\item \texttt{save.php}: PHP script to store result XML files to web server\\
@@ -72,6 +70,11 @@ The tool is available in its entirety including source code on \url{https://code
             	\begin{itemize}
             		\item An example of what the set up XML should look like, with example audio files 0.wav-10.wav which are short recordings at 44.1kHz, 16bit of a woman saying the corresponding number (useful for testing randomisation and general familiarisation with the interface).\\ 
             	\end{itemize}
+          \textbf{Interface files (./interfaces/}
+              \begin{itemize}
+                  \item Each interface class has a JavaScript file and an optional CSS style file. These are loaded as needed.
+              \end{itemize}
+
           \textbf{Output files (./saves/)}
             	\begin{itemize}
             		\item The output XML files of tests will be stored here by default by the \texttt{pythonServer.py} script.\\ 
@@ -216,7 +219,7 @@ The tool is available in its entirety including source code on \url{https://code
 
 		Then, just go to the URL of the corresponding HTML file, e.g. \texttt{http://server.com/path/to/WAET/index.html?url=test/my-test.xml}. If storing on the server doesn't work at submission (e.g. if the \texttt{projectReturn} attribute isn't properly set), the result XML file will be presented to the subject on the client side, as a `Save file' link. 
 
-    \subsection{Multiple test documents}
+    \subsection{Load a test / Multiple test documents}
         By default the index page will load a demo page of tests. To automatically load a test document, you need to append the location in the URL. If your URL is normally http://localhost:8000/index.html you would append the following: \texttt{?url=/path/to/your/test.xml}. Replace the fields with your actual path, the path is local to the running directory, so if you have your test in the directory \texttt{example\_eval} called \texttt{project.xml} you would append \texttt{?url=/example\_eval/project.xml}.
 
 \clearpage
@@ -225,18 +228,136 @@ The tool is available in its entirety including source code on \url{https://code
 
 	The Web Audio Evaluation Tool comes with a number of interface styles, each of which can be customised extensively, either by configuring them differently using the many optional features, or by modifying the JavaScript files. 
 
-	To set the interface style for the whole test, %Nick? change when this is not the case anymore, i.e. when the interface can be set per page
-	add \texttt{interface="APE"} to the \texttt{setup} node, where \texttt{"APE"} is one of the interface names below. 
+	To set the interface style for the whole test, set the attribute of the \texttt{setup} node to \texttt{interface="APE"}, where \texttt{"APE"} is one of the interface names below. 
 
 	\subsection{APE}
 		The APE interface is based on \cite{ape}, and consists of one or more axes, each corresponding with an attribute to be rated, on which markers are placed. As such, it is a multiple stimulus interface where (for each dimension or attribute) all elements are on one axis so that they can be maximally compared against each other, as opposed to rated individually or with regards to a single reference. 
 		It also contains an optional text box for each element, to allow for clarification by the subject, tagging, and so on. 
 
 	\subsection{MUSHRA}
-		This is a straightforward implementation of \cite{mushra}, especially common for the rating of audio quality, for instance for the evaluation of audio codecs. 
+		This is a straightforward implementation of \cite{mushra}, especially common for the rating of audio quality, for instance for the evaluation of audio codecs. This can also operate any vertical slider style test and does not necessarily have to match the MUSHRA specification.
+		
+	\subsection{AB}
+	    Performs a pairwise comparison, but supports ABX and n-way comparison (in the example we demonstrate it performing a 7-way comparison).
+	    
+	\subsection{discrete/Likert}
+	    Each audio element is given a discrete set of values based on the number of slider options specified. For instance, Likert specifies 5 values and therefore each audio element must be one of those 5 values.
+	    
+	\subsection{ACR/CCR/DCR/horizontal}
+	    Creates the same interfaces as MUSHRA except the sliders are horizontal, not vertical.
 
 	
 \clearpage
+
+\section{Project XML}
+
+    Each test is defined by its project XML file, examples of these can be seen in the ./example\_eval/ directory.
+    
+    In the XML there are several nodes which must be defined:
+	\begin{itemize}
+	    \item \texttt{<waet>}: The root node.
+	    \item \texttt{<setup>}: The first child node, defines whole-test parameters
+	    \item \texttt{<page>}: Specifies a test page, attached \emph{after} the \texttt{<setup>}.
+	    \item \texttt{<audioelement>}: Specifies an audio element.
+	\end{itemize}
+
+    The test uses XML validation, so the ordering of nodes is important to pass this validation. Some nodes also have specific attributes which must be set and may even have a certain format to apply them. This is done so error checking can be performed both quickly and succintly with easy to find errors before loading and running a test session.
+    
+    Before identifying any features, this part will walk you through the available nodes, their function and their attributes.
+    
+    \subsection{Root}
+        The root node is \texttt{<waet>}, it must have the following attributes:
+        
+        \texttt{xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"}
+        
+        \texttt{xsi:noNamespaceSchemaLocation="test-schema.xsd"}.
+        
+        This will ensure it is checked against the XML schema for validation.
+
+    \subsection{Set up}
+        The first child node, \texttt{<setup>} specifies any one time and global parameters. It takes the following attributes:
+        \begin{itemize}
+            \item \texttt{interface}: String, mandatory, specifies the interface to load
+            \item \texttt{projectReturn}: URL, mandatory, specifies the return point. Can be a 3rd party server or the local server. Set to null to disable automatic saving. Specifying "save.php" will trigger the return if either the PHP or python servers are used. On error, it will always default to presenting the save on page.
+            \item \texttt{randomiseOrder}: Boolean, optional, if true it will randomise the order of the test pages. Default is false.
+            \item \texttt{testPages}: non-negative integer, optional. Specifies the number of test pages to actually test with. Combined with randomiseOrder being true will give a random set of test pages per participant from the given pool of \texttt{<page>} nodes. Specifying 0 disables this option, default is 0.
+            \item \texttt{loudness}: non-positive integer, optional. Set the default LUFS target value. See \ref{sec:loudness} for more.
+            \item \texttt{sampleRate}: positive integer, optional. If set, the sample rate reported by the Web Audio API must match this number. See \ref{sec:samplerate}.
+        \end{itemize}
+        
+        The \texttt{<setup>} node takes the following child nodes, note these must appear in this order:
+        \begin{itemize}
+            \item \texttt{<survey>}: Min of 0, max of 2 occurences. See \ref{sec:survey}
+            \item \texttt{<metric>}: Must appear only once.
+            \item \texttt{<interface>}: Must appear only once.
+        \end{itemize}
+
+    \subsection{Page}
+        The only other first level child nodes, these specify the test pages. It takes the following attributes:
+        \begin{itemize}
+            \item \texttt{id}: ID, mandatory. A string which must be unique across the entire XML. It is used to identify the page on test completion as pages are returned in the results in the order they appeared, not specified.
+            \item \texttt{hostURL}: URL, mandatory. Used in conjuction with the \texttt{<audioelement>} url to specify where the audio files are located. For instance if all your files are in the directory \texttt{./test/} you can set this attribute to "/test/" and the \texttt{<audioelement>} url attribute only needs to file name. Set to "" if no hostURL prefix desired.
+            \item \texttt{randomiseOrder}: Boolean, optional. If true the audio fragments are presented randomly rather than the order specified. See \ref{sec:randomisation}. Default is false.
+            \item \texttt{repeatCount}: non-negative integer, optional. Specify the number of times to repeat the test page (re-present). Each presentation will appear as an individual page in the results. Default is 0.
+            \item \texttt{loop}: Boolean, optional. If true, the audio elements will loop synchronously with each other. See \ref{sec:looping}. Default is false.
+            \item \texttt{showElementComments}: Boolean, optional. If true then there will be a comment box on the test page for each audio element presented, see \ref{sec:commentboxes}.
+            \item \texttt{loudness}: non-positive integer, optional. Set the LUFS target value for this page. Supersedes the \texttt{<setup>} loudness attribute for this page. See \ref{sec:loudness} for more.
+        \end{itemize}
+        
+        The \texttt{<page>} node takes the following child, nodes note these must appear in this order:
+        \begin{itemize}
+            \item \texttt{<title>}: Appear once or not at all. The text content of this node specifies the title of the test page, for instance \texttt{<title>John Doe's Test</title>}
+            \item \texttt{<commentboxprefix}: Appear once or not at all. The text content specifies the prefix of the comment boxes, see \ref{sec:commentboxes}.
+            \item \texttt{<interface>}: Must appear only once.
+            \item \texttt{<audioelement>}: Minimum of one. Specifies an audio element, see \ref{sec:audioelement}.
+            \item \texttt{<commentquestion}: Min of 0, max unlimited occurences. See \ref{sec:commentboxes}.
+            \item \texttt{<survey>}: Min of 0, max of 2 occurences. See \ref{sec:survey}
+        \end{itemize}
+
+    \subsection{Survey}
+    \label{sec:survey}
+        These specify any survey items to be presented. The must be a maximum of two of these per \texttt{<setup>} and \texttt{<page>} nodes. These have one attribute, location, which must be set to one of the following: before, pre, after or post. In this case before == pre and after == post. This specifies where the survey must appear before or after the node it is associated with. When a child of \texttt{<setup>} then pre/before will be shown before the first test page and after/post shown after completing the last test page. When a child of \texttt{<page>} then pre/before is before the test commences and after/post is once the test has been submitted.
+        
+        The survey node takes as its only set of childs the \texttt{<surveyentry>} node of which there can be any number.
+        
+        \subsubsection{Survey Entry}
+        These nodes have the following attributes, which vary depending on the survey type wanted:
+        \begin{itemize}
+            \item \texttt{id}: ID, mandatory. Must be unique across the entire XML, used to identify the response in the results.
+            \item \texttt{type}: String, mandatory. Must be one of the following: statement, question, checkbox, radio or number. This defines the type to show.
+            \item \texttt{mandatory}: Boolean, optional. Defines if the survey must have a response or not. Does not apply to statements. Default is false.
+            \item \texttt{min}: Number, optional. Only applies when \texttt{type="number"}, the minimum valid response.
+            \item \texttt{max}: Number, optional. Only applies when \texttt{type="number"}, the maximum valid response.
+            \item \texttt{boxsize}: String, optional. Only applies when \texttt{type="question"} and must be one of the following: normal (default), small, large or huge.
+        \end{itemize}
+
+        The nodes have the following children, which vary depending on the survey type wanted.
+        \begin{itemize}
+            \item \texttt{<statement>}: Must appear only once. Its text content specifies the text to appear as the statement or question for the user to respond to.
+            \item \texttt{<option>}: Only valid if the parent node has the attribute \texttt{type} set to checkbox or radio. Has attribute \texttt{name} to identify the selected option in the results. The text content is the text to show next to the radio/checkbox.
+        \end{itemize}
+
+    \subsection{Interface}
+        This node specifies any interface specific options and test parameters. It has an optional \texttt{name} attribute used to set the axis name (where applicable), such as the multi-axis APE interface. Specifying multiple interface nodes in a \texttt{<page>} node will trigger multiple axis where applicable, otherwise only the \emph{first node} will be used and the rest ignored.
+        
+        The node has the following children, note the order these must appear in is as follows:
+        \begin{itemize}
+            \item \texttt{title}: Min 0, max 1 occurence. The text content specifies the name of the axis as shown to the user.
+            \item \texttt{interfaceoption}: Min 0, max unbounded. Specifies the interface options. See \ref{sec:interfaceoption}.
+            \item \texttt{scales}: Min 0, max 1 occurence. Contains \texttt{<scalelable>} nodes which define the displayed scales. See \ref{sec:scales}.
+        \end{itemize}
+
+    \subsection{Audio Element}
+    \label{sec:audioelement}
+    Appear as children of the \texttt{page} node. Each of these specify an individual interface fragment to display. Multiple fragments can reference the same file (allowing for repetition with different parameters or blind-doubles). The node has the following attributes:
+    \begin{itemize}
+        \item \texttt{id}: ID, mandatory. Must be unique across the test page. Used to identify the specific fragment in the results.
+        \item \texttt{url}: URL, mandatory. Used with the parent \texttt{page} nodes' \texttt{hostURL} attribute to get the full url of the audio file to load.
+        \item \texttt{gain}: Float, optional. Specify the gain in decibels to apply to the node after loudness normalisation. Default is 0.
+        \item \texttt{type}: String, optional. Must be one of the following: normal (default when not specified), anchor, reference or outside-reference. Normal, anchor and reference are presented as normal, outside-reference presents the node as a separate interface option.
+        \item \texttt{marker}: Integer between 0 and 100, optional. Only used when \texttt{type="anchor"|"reference"}. See \ref{sec:referencesandanchors}.
+    \end{itemize}
+
 
 \section{Features}
 
@@ -244,34 +365,26 @@ The tool is available in its entirety including source code on \url{https://code
 
 	Unless otherwise specified, \emph{each} feature described here is optional, i.e. it can be enabled or disabled and adjusted to some extent. 
 
-	As the example project showcases (nearly) all of these features, please refer to its configuration XML document for a demonstration of how to enable and adjust them. 
+	As the example project showcases (nearly) all of these features, please refer to its configuration XML document for a demonstration of how to enable and adjust them.
 
-	\subsection{Interface layout}
-		The \texttt{interface} node (child of \texttt{audioholder}) contains 
+	\subsection{Interface options}
+	    The interface node has children of interface options which are used to specify modifications to the test environment. These are divided into two catagories: check and show. Check are used to specify conditions which must be met before a page can be completed, these include checking all fragments have been played or checking all fragments have a comment and so on. Show is used to show an optional on page element or control, such as the playhead or master volume.
+	    
+	    Check items have the attribute "type" set to "check". The following list gives the string to give the "name" attribute along with a description of the check.
+	    \begin{itemize}
+	    \item \texttt{fragmentPlayed}: Checks that all fragments have been at least partially played
+	    \item \texttt{fragmentFullPlayback}: Checks that all fragments have been fully played. \emph{NOTE:} This will always clear if the page is looping as it is not possible to know every sample has been played.
+	    \item \texttt{fragmentMoved}: Checks that all fragments have been moved. This is interface dependent, for instance on AB this will always clear as there is no movement.
+	    \item \texttt{fragmentComments}: Cheks that all fragments have a comment. Will clear if there are no on page comments but with a console warning.
+	    \item \texttt{scalerange}: Has two extra attributes "min" and "max". Checks that at least one element is below the min value and one element is above the max value.
+	    \end{itemize}
 
-		Example: 
-
-		\begin{lstlisting}
-<interface name="quality">
-	<title>Audio Quality</title>
-	<scale position="10">Poor</scale>
-	<scale position="90">Excellent</scale>
-	<commentBoxPrefix>Comment on fragment</commentBoxPrefix>
-</interface>
-		\end{lstlisting}
-
-		\subsubsection{Title}
-			Specifies the axis title as displayed on the interface. 
-
-			If this tag is absent, the title will default to `Axis \emph{[number]}'. Therefore, if no title is desired, just add the title tag (\texttt{<title/>}) without text. 
-
-		\subsubsection{Annotation}
-			Words or numbers can be placed on specific positions of the scale with the \texttt{scale} tag. The \texttt{position} attribute is a value from 0 to 100, corresponding to the percentage of the width/height of the scale where you want the string to be placed. 
-
-		\subsubsection{Comment box prefix}
-			If comment boxes corresponding with the fragments are enabled, this sets the comment box string after which the fragment number is appended. 
-
-			The default value is ``Comment on fragment''. So in this case, each comment box would have a header ``Comment on fragment \emph[number]''. 
+        Show items have the attribute "type" set to "show". The following list gives the string to give the "name" attribute along with a description.
+        \begin{itemize}
+            \item \texttt{playhead}: Shows the playhead to the end user indicating where in the file they are currently listening
+            \item \texttt{page-count}: Shows the current test page number and the total number of test pages.
+            \item \texttt{volume}: Shows a master volume control to the user to manipulate the output gain of the page. This is tracked.
+        \end{itemize}
 
 		\subsubsection{Multiple scales}
 			In the case of multiple rating scales, e.g. when the stimuli are to be rated in terms of attributes `timbre' and `spatial impression', multiple interface nodes will have to be added, each specifying the title and annotations. 
@@ -279,70 +392,12 @@ The tool is available in its entirety including source code on \url{https://code
 			This is where the \texttt{interface}'s \texttt{name} attribute is particularly important: use this to retrieve the rating values, comments and metrics associated with the specified interface. 
 			If none is given, you can still use the automatically given \texttt{interface-id}, which is the interface number starting with 0 and corresponding to the order in which the rating scales appear. 
 
-
-	\subsection{Surveys}
-	    Surveys are conducted through an in-page popup window which can collect data using various HTML functions, see Survey elements below for a list. Survey questions are placed into the \texttt{<pretest>} or \texttt{<posttest>} nodes. Appending these nodes to the \texttt{<setup>} node will have the survey options appear before any test pages (if in the \texttt{<pretest>} node) or after all test pages. Placing the survey options in the \texttt{<audioholder>} node will have them appear before or after the test page they are a child of.
-		\subsubsection{Survey elements}
-			All survey elements (which `pop up' in the centre of the browser) have an \texttt{id} attribute, for retrieval of the responses in post-processing of the results, and a \texttt{mandatory} attribute, which if set to ``true'' requires the subjects to respond before they can continue. 
-
-			\begin{description}
-				\item[statement] Simply shows text to the subject until `Next' or `Start' is clicked. 
-				\item[question] Expects a text answer (in a text box). Has the \texttt{boxsize} argument: set to ``large'' or ``huge'' for a bigger box size, or ``small'' for small.
-				\item[number] Only accepts a numerical value. Attribute \texttt{min="0"} specifies the minimum value - in this case the answer must be stricly positive before the subject can continue.
-				\item[radio] Radio buttons. Presents a list of options to the user using radio buttons, where only one option from the list can be selected.
-				\item[checkbox] Checkboxes. Note that when making a checkbox question ``mandatory'', the subject is forced to select at least one option (which could be e.g. `Other' or `None').\\
-			\end{description}
-
-			\textbf{Example usage:}\\
-
-			\lstset{
-			  basicstyle=\ttfamily,
-			  columns=fullflexible,
-			  showstringspaces=false,
-			  commentstyle=\color{grey}\upshape
-			}
-
-			\lstdefinelanguage{XML}
-			{
-			  morestring=[b]",
-			  morestring=[s]{>}{<},
-			  morecomment=[s]{<?}{?>},
-			  stringstyle=\color{black} \bfseries,
-			  identifierstyle=\color{darkblue} \bfseries,
-			  keywordstyle=\color{cyan} \bfseries,
-			  morekeywords={xmlns,version,type}, 
-			  breaklines=true% list your attributes here
-			}
-			\scriptsize
-			\lstset{language=XML}
-
-			\begin{lstlisting}
-<PostTest>
-	<question id="location" mandatory="true" boxsize="large">Please enter your location. (example mandatory text question)</question>
-	<number id="age" min="0">Please enter your age (example non-mandatory number question)</number>
-	<radio id="rating">
-		<statement>Please rate this interface (example radio button question)</statement>
-		<option name="bad">Bad</option>
-		<option name="poor">Poor</option>
-		<option name="good">Good</option>
-		<option name="great">Great</option>
-	</radio>
-	<checkbox id="background" mandatory="true">
-				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
-				<option name="musician">Playing a musical instrument</option>
-				<option name="soundengineer">Recording or mixing audio</option>
-			</checkbox>
-	<statement>Thank you for taking this listening test. Please click 'Submit' and your results will appear in the 'saves/' folder.</statement>
-</PostTest>
-			\end{lstlisting}
-
-
-
 	\subsection{Randomisation}
+	\label{sec:randomisation}
 		[WORK IN PROGRESS]
 
 		\subsubsection{Randomisation of configuration XML files}
-		    The python server has a special function to automatically cycle through a list of test pages. Instead of directly requesting an XML, simply setting the url item in the browser URL to \texttt{pseudo.xml} will cycle through a list of XMLs. These XMLs must be in the local directory called \texttt{pseudo}.
+		    The python server has a special function to automatically cycle through a list of test pages. Instead of directly requesting an XML, simply setting the url item in the browser URL to \texttt{pseudo.xml} will cycle through a list of XMLs. These XMLs must be in the local directory called \texttt{./pseudo/}.
 			% how to
 			% explain how this is implemented in the pythonServer
 			%Nick? already implemented in the PHP?
@@ -364,19 +419,16 @@ The tool is available in its entirety including source code on \url{https://code
 		% uncomment once we have it
 
 	\subsection{Looping}
-	    Looping enables the fragments to loop until stopped by the user. Looping is synchronous between samples so all samples start at the same time.
-		Individual test pages can have their playback looped by the \texttt{<audioholder>} attribute \texttt{loop} with a value of "true" or "false".
+	\label{sec:looping}
+	    Looping enables the fragments to loop until stopped by the user. Looping is synchronous so all fragments start at the same time on each loop.
+		Individual test pages can have their playback looped by the \texttt{<page>} attribute \texttt{loop} with a value of "true" or "false".
 		If the fragments are not of equal length initially, they are padded with zeros so that they are equal length, to enable looping without the fragments going out of sync relative to each other. 
 
-		Note that fragments cannot be played until all page fragments are loaded when in looped mode, as the engine needs to know the amount to pad the fragments.
+		Note that fragments cannot be played until all page fragments are loaded when in looped mode, as the engine needs to know the length of each fragment to calculate the padding.
 
 	\subsection{Sample rate}
-		If you require the test to be conducted at a certain sample rate (i.e. you do not tolerate resampling of the elements to correspond with the system's sample rate), add \texttt{sampleRate="96000"} - where ``96000'' can be any support sample rate - so that a warning message is shown alerting the subject the system's sample rate is different from this enforced sample rate. This of course means that in one test, all sample rates must be equal as it is impossible to change the system's sample rates during the test (even if you were to manually change it, then the browser must be restarted for it to take effect). 
-
-	\subsection{Scrubber bar}
-		The scrubber bar, or transport bar (that is the name of the visualisation of the playhead thing with an indication of time and showing the portion of the file played so far) is at this point just a visual, and not a controller to adjust the playhead position.
-
-		Make visible by adding \texttt{<option name='playhead'/>} to the \texttt{interface} node (see Section \ref{sec:checks}: Checks). 
+	\label{sec:samplerate}
+		If you require the test to be conducted at a certain sample rate (i.e. you do not tolerate resampling of the elements to correspond with the system's sample rate), add \texttt{sampleRate="96000"} - where ``96000'' can be any support sample rate (in Hz) - so that a warning message is shown alerting the subject that their system's sample rate is different from this enforced sample rate. This is checked immediately after parsing and stops the page loading any other elements if this check has failed.
 
 	\subsection{Metrics}
 		Enable the collection of metrics by adding \texttt{collectMetrics=`true'} in the \texttt{setup} node. % Should this always be on??
@@ -424,6 +476,7 @@ The tool is available in its entirety including source code on \url{https://code
 		    One per audio fragment per test page. Tracks the playback events of each audio element pairing both the time in the test when playback started and when it stopped, it also gives the buffertime positions.
 
 	\subsection{References and anchors}
+	\label{sec:referencesandanchors}
 	    The audio elements, \texttt{<audioelement>} have the attribute \texttt{type}, which defaults to normal. Setting this to one of the following will have the following effects.
 		\subsubsection{Outside Reference}
 		    Set type to 'outside-reference'. This will place the object in a separate playback element clearly labelled as an outside reference. This is exempt of any movement checks but will still be included in any listening checks.
@@ -483,12 +536,9 @@ The tool is available in its entirety including source code on \url{https://code
 <navigator>
 	<platform>MacIntel</platform>
 	<vendor>Google Inc.</vendor>
-	<uagent>Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36</uagent>
+	<uagent>Mozilla/5.0 ... </uagent>
 </navigator>
 		\end{lstlisting}
-
-	\subsection{Show progress}
-		Add \texttt{<option name="page-count"/>} to the \texttt{interface} node (see Section \ref{sec:checks}: Checks) to add the current page number and the total number of pages to the interface. 
 
 	\subsection{Gain}
 		It is possible to set the gain (in decibel) applied to the different audioelements, as an attribute of the \texttt{audioelement} nodes in the configuration XML file: 
@@ -497,9 +547,10 @@ The tool is available in its entirety including source code on \url{https://code
 		Please note, there are no checks on this to detect if accidentaly typed in linear.
 
 	\subsection{Loudness}
+	\label{sec:loudness}
 		% automatic loudness equalisation
 		% guide to loudness.js 
-		Each audio fragment on loading has its loudness calculated. The tool uses the EBU R 128 recommendation following the ITU-R BS.1770-4 loduness calculations to return the integreated LUFS loudness. The attribute \texttt{loudness} will set the loudness from the scope it is applied in. Applying it in the \texttt{<setup>} node will set the loudness for all test pages. Applying it in the \texttt{<audioholder>} node will set the loudness for that page. Applying it in the \texttt{<audioelement>} node will set the loudness for that fragment. The scope is set locally, so if there is a loudness on both the \texttt{<audioholder>} and \texttt{<setup>} nodes, that test page will take the value associated with the \texttt{<audioholder>}. The loudness attribute is set in LUFS
+		Each audio fragment on loading has its loudness calculated. The tool uses the EBU R 128 recommendation following the ITU-R BS.1770-4 loduness calculations to return the integreated LUFS loudness. The attribute \texttt{loudness} will set the loudness from the scope it is applied in. Applying it in the \texttt{<setup>} node will set the loudness for all test pages. Applying it in the \texttt{<page>} node will set the loudness for that page. Applying it in the \texttt{<audioelement>} node will set the loudness for that fragment. The scope is set locally, so if there is a loudness on both the \texttt{<page>} and \texttt{<setup>} nodes, that test page will take the value associated with the \texttt{<page>}. The loudness attribute is set in LUFS
 
 \clearpage
 
