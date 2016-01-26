@@ -108,7 +108,7 @@ function WAVE()
             }
         } else if (this.type == 1)
         {
-            data_view = new Float32Array(this.num_samples);
+            data_view = new Float32Array(this.num_samples*this.num_channels);
             integerConvert(new Uint8Array(IOArrayBuffer.slice(sampleDataOffset,sampleDataOffset+this.data_size)),data_view,this.bits_per_sample/8);
         }
         deInterlace(data_view,this.decoded_data);
