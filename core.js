@@ -2322,16 +2322,20 @@ function Interface(specificationObject) {
 	
 	this.returnNavigator = function()
 	{
-		var node = document.createElement("navigator");
-		var platform = document.createElement("platform");
+		var node = storage.document.createElement("navigator");
+		var platform = storage.document.createElement("platform");
 		platform.textContent = navigator.platform;
-		var vendor = document.createElement("vendor");
+		var vendor = storage.document.createElement("vendor");
 		vendor.textContent = navigator.vendor;
-		var userAgent = document.createElement("uagent");
+		var userAgent = storage.document.createElement("uagent");
 		userAgent.textContent = navigator.userAgent;
+        var screen = storage.document.createElement("window");
+        screen.setAttribute('innerWidth',window.innerWidth);
+        screen.setAttribute('innerHeight',window.innerHeight);
 		node.appendChild(platform);
 		node.appendChild(vendor);
 		node.appendChild(userAgent);
+        node.appendChild(screen);
 		return node;
 	};
 	
