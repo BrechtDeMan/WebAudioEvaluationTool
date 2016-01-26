@@ -29,6 +29,14 @@ function interfaceObject()
 	{
 		// progress is a value from 0 to 100 indicating the current download state of media files
 	};
+    this.startPlayback = function()
+    {
+        // Called when playback has begun
+    };
+    this.stopPlayback = function()
+    {
+        // Called when playback has stopped. This gets called even if playback never started!
+    };
 	this.getValue = function()
 	{
 		// Return the current value of the object. If there is no value, return 0

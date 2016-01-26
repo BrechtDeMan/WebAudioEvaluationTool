@@ -266,12 +266,6 @@ function sliderObject(audioObject,label)
 		var id = Number(event.currentTarget.value);
 		//audioEngineContext.metric.sliderPlayed(id);
 		audioEngineContext.play(id);
-		$(".track-slider").removeClass('track-slider-playing');
-		$(event.currentTarget.parentElement).addClass('track-slider-playing');
-		var outsideReference = document.getElementById('outside-reference');
-		if (outsideReference != null) {
-			$(outsideReference).removeClass('track-slider-playing');
-		}
 	};
 	this.resize = function(event)
 	{
@@ -289,6 +283,21 @@ function sliderObject(audioObject,label)
 	{
 		// progress is a value from 0 to 100 indicating the current download state of media files
 	};
+    this.startPlayback = function()
+    {
+        // Called when playback has begun
+        $(".track-slider").removeClass('track-slider-playing');
+		$(this.holder).addClass('track-slider-playing');
+		var outsideReference = document.getElementById('outside-reference');
+		if (outsideReference != null) {
+			$(outsideReference).removeClass('track-slider-playing');
+		}
+    };
+    this.stopPlayback = function()
+    {
+        // Called when playback has stopped. This gets called even if playback never started!
+        $(this.holder).removeClass('track-slider-playing');
+    };
 	this.getValue = function()
 	{
 		// Return the current value of the object. If there is no value, return 0
@@ -315,6 +324,69 @@ function sliderObject(audioObject,label)
         return node;
 	};
 };
+
+function outsideReferenceDOM(audioObject,index,inject)
+{
+	this.parent = audioObject;
+	this.outsideReferenceHolder = document.createElement('button');
+	this.outsideReferenceHolder.id = 'outside-reference';
+	this.outsideReferenceHolder.className = 'outside-reference';
+	this.outsideReferenceHolder.setAttribute('track-id',index);
+	this.outsideReferenceHolder.textContent = "Play Reference";
+	this.outsideReferenceHolder.disabled = true;
+	
+	this.outsideReferenceHolder.onclick = function(event)
+	{
+		audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
+	};
+	inject.appendChild(this.outsideReferenceHolder);
+	this.enable = function()
+	{
+		if (this.parent.state == 1)
+		{
+			this.outsideReferenceHolder.disabled = false;
+		}
+	};
+	this.updateLoading = function(progress)
+	{
+		if (progress != 100)
+		{
+			progress = String(progress);
+			progress = progress.split('.')[0];
+			this.outsideReferenceHolder[0].children[0].textContent = progress+'%';
+		} else {
+			this.outsideReferenceHolder[0].children[0].textContent = "Play Reference";
+		}
+	};
+    this.startPlayback = function()
+    {
+        // Called when playback has begun
+        $('.track-slider').removeClass('track-slider-playing');
+        $('.comment-div').removeClass('comment-box-playing');
+        $(this.outsideReferenceHolder).addClass('track-slider-playing');
+    };
+    this.stopPlayback = function()
+    {
+        // Called when playback has stopped. This gets called even if playback never started!
+        $(this.outsideReferenceHolder).removeClass('track-slider-playing');
+    };
+	this.exportXMLDOM = function(audioObject)
+	{
+		return null;
+	};
+	this.getValue = function()
+	{
+		return 0;
+	};
+	this.getPresentedId = function()
+	{
+		return 'reference';
+	};
+	this.canMove = function()
+	{
+		return false;
+	};
+}
 
 function resizeWindow(event)
 {

@@ -295,6 +295,21 @@ function sliderObject(audioObject,label)
 		node.textContent = this.slider.value;
 		return node;
 	};
+    this.startPlayback = function()
+    {
+        // Called when playback has begun
+        $(".track-slider").removeClass('track-slider-playing');
+		$(this.holder).addClass('track-slider-playing');
+		var outsideReference = document.getElementById('outside-reference');
+		if (outsideReference != null) {
+			$(outsideReference).removeClass('track-slider-playing');
+		}
+    };
+    this.stopPlayback = function()
+    {
+        // Called when playback has stopped. This gets called even if playback never started!
+        $(this.holder).removeClass('track-slider-playing');
+    };
 	this.getValue = function() {
 		return this.slider.value;
 	};
@@ -338,9 +353,6 @@ function outsideReferenceDOM(audioObject,index,inject)
 	this.outsideReferenceHolder.onclick = function(event)
 	{
 		audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
-		$('.track-slider').removeClass('track-slider-playing');
-        $('.comment-div').removeClass('comment-box-playing');
-        $(event.currentTarget).addClass('track-slider-playing');
 	};
 	inject.appendChild(this.outsideReferenceHolder);
 	this.enable = function()
@@ -361,6 +373,18 @@ function outsideReferenceDOM(audioObject,index,inject)
 			this.outsideReferenceHolder[0].children[0].textContent = "Play Reference";
 		}
 	};
+    this.startPlayback = function()
+    {
+        // Called when playback has begun
+        $('.track-slider').removeClass('track-slider-playing');
+        $('.comment-div').removeClass('comment-box-playing');
+        $(this.outsideReferenceHolder).addClass('track-slider-playing');
+    };
+    this.stopPlayback = function()
+    {
+        // Called when playback has stopped. This gets called even if playback never started!
+        $(this.outsideReferenceHolder).removeClass('track-slider-playing');
+    };
 	this.exportXMLDOM = function(audioObject)
 	{
 		return null;

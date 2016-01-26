@@ -208,10 +208,8 @@ function Comparitor(audioHolderObject)
 		};
 		this.playback.onclick = function(event)
 		{
-			$('.comparitor-button').text('Listen');
 			var id = event.currentTarget.parentElement.getAttribute('track-id');
 			audioEngineContext.play(id);
-			$(event.currentTarget).text('Playing');
 		};
 		
 		this.enable = function()
@@ -233,6 +231,15 @@ function Comparitor(audioHolderObject)
 				this.playback.textContent = "Listen";
 			}
 		};
+        this.startPlayback = function()
+        {
+            $('.comparitor-button').text('Listen');
+            $(this.playback).text('Playing');
+        };
+        this.stopPlayback = function()
+        {
+            $(this.playback).text('Listen');
+        };
 		this.exportXMLDOM = function(audioObject)
 		{
 			var node = storage.document.createElement('value');
