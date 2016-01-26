@@ -62,121 +62,107 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 		switch(timescale)
 		{
 		case "I":
-			var blockEnergy = calculateProcessedLoudness(renderedBuffer, 400, 0.75);
-			// Apply the absolute gate
-			var loudness = calculateLoudnessFromChannelBlocks(blockEnergy);
-			var absgatedEnergy = new Array(blockEnergy.length);
-			for (var c=0; c<blockEnergy.length; c++)
-			{
-				absgatedEnergy[c] = [];
-			}
-			for (var i=0; i<loudness.length; i++)
-			{
-				if (loudness[i] >= -70)
-				{
-					for (var c=0; c<blockEnergy.length; c++)
-					{
-						absgatedEnergy[c].push(blockEnergy[c][i]);
-					}
-				}
-			}
-			var overallAbsLoudness = calculateOverallLoudnessFromChannelBlocks(absgatedEnergy);
-			
-			//applying the relative gate 8 dB down from overallAbsLoudness
-			var relGateLevel = overallAbsLoudness - 8;
-			var relgateEnergy = new Array(blockEnergy.length);
-			for (var c=0; c<blockEnergy.length; c++)
-			{
-				relgateEnergy[c] = [];
-			}
-			for (var i=0; i<loudness.length; i++)
-			{
-				if (loudness[i] >= relGateLevel)
-				{
-					for (var c=0; c<blockEnergy.length; c++)
-					{
-						relgateEnergy[c].push(blockEnergy[c][i]);
-					}
-				}
-			}
-			var overallRelLoudness = calculateOverallLoudnessFromChannelBlocks(relgateEnergy);
-			buffer.buffer.lufs =  overallRelLoudness;
-			buffer.ready();
+            // Calculate the Mean Squared of a signal
+            var MS = calculateMeanSquared(renderedBuffer,0.4,0.75);
+            // Calculate the Loudness of each block
+            var MSL = calculateLoudnessFromBlocks(MS);
+            // Get blocks from Absolute Gate
+            var LK = loudnessGate(MSL,MS,-70);
+            // Calculate Loudness
+            var LK_gate = loudnessOfBlocks(LK);
+            // Get blocks from Relative Gate
+            var RK = loudnessGate(MSL,MS,LK_gate-10);
+            var RK_gate = loudnessOfBlocks(RK);
+            buffer.buffer.lufs = RK_gate;
 		}
 	};
 	offlineContext.startRendering();
 }
 
-function calculateProcessedLoudness(buffer, winDur, overlap)
+function calculateMeanSquared(buffer,frame_dur,frame_overlap)
 {
-	// Buffer		Web Audio buffer node
-	// winDur		Window Duration in milliseconds
-	// overlap		Window overlap as normalised (0.5 = 50% overlap);
-	if (buffer == undefined)
-	{
-		return 0;
-	}
-	if (winDur == undefined)
-	{
-		winDur = 400;
-	}
-	if (overlap == undefined)
-	{
-		overlap = 0.5;
-	}
-	var winSize = buffer.sampleRate*winDur/1000;
-	var olapSize = (1-overlap)*winSize;
-	var numberOfFrames = Math.floor(buffer.length/olapSize - winSize/olapSize + 1);
-	var blockEnergy = new Array(buffer.numberOfChannels);
-	for (var channel = 0; channel < buffer.numberOfChannels; channel++)
-	{
-		blockEnergy[channel] = new Float32Array(numberOfFrames);
-		var data = buffer.getChannelData(channel);
-		for (var i=0; i<numberOfFrames; i++)
-		{
-			var sigma = 0;
-			for (var n=i*olapSize; n < i*olapSize+winSize; n++)
-			{
-				sigma += Math.pow(data[n],2);
-			}
-			blockEnergy[channel][i] = sigma/winSize;
-		}
-	}
-	return blockEnergy;
+    frame_size = Math.floor(buffer.sampleRate*frame_dur);
+    step_size = Math.floor(frame_size*(1.0-frame_overlap));
+    num_frames = Math.floor((buffer.length-frame_size)/step_size);
+    
+    MS = Array(buffer.numberOfChannels);
+    for (var c=0; c<buffer.numberOfChannels; c++)
+    {
+        MS[c] = new Float32Array(num_frames);
+        var data = buffer.getChannelData(c);
+        for (var no=0; no<num_frames; no++)
+        {
+            MS[c][no] = 0.0;
+            for (var ptr=0; ptr<frame_size; ptr++)
+            {
+                var sample = data[no*step_size+ptr];
+                MS[c][no] += sample*sample;
+            }
+            MS[c][no] /= frame_size;
+        }
+    }
+    return MS;
 }
-function calculateLoudnessFromChannelBlocks(blockEnergy)
+
+function calculateLoudnessFromBlocks(blocks)
 {
-	// Loudness
-	var loudness = new Float32Array(blockEnergy[0].length);
-	for (var i=0; i<blockEnergy[0].length; i++)
-	{
-		var sigma = 0;
-		for (var channel = 0; channel < blockEnergy.length; channel++)
-		{
-			var G = 1.0;
-			if (channel >= 4) {G = 1.41;}
-			sigma += blockEnergy[channel][i]*G;
-		}
-		loudness[i] = -0.691 + 10*Math.log10(sigma);
-	}
-	return loudness;
+    var num_frames = blocks[0].length;
+    var num_channels = blocks.length;
+    var MSL = Array(num_frames);
+    for (var n=0; n<num_frames; n++)
+    {
+        var sum = 0;
+        for (var c=0; c<num_channels; c++)
+        {
+            var G = 1.0;
+            if(G >= 3){G = 1.41;}
+            sum += blocks[c][n]*G;
+        }
+        MSL[n] = -0.691 + 10*Math.log10(sum);
+    }
+    return MSL;
 }
-function calculateOverallLoudnessFromChannelBlocks(blockEnergy)
+
+function loudnessGate(blocks,source,threshold)
 {
-	// Loudness
-	var summation = 0;
-	for (var channel = 0; channel < blockEnergy.length; channel++)
-	{
-		var G = 1.0;
-		if (channel >= 4) {G = 1.41;}
-		var sigma = 0;
-		for (var i=0; i<blockEnergy[0].length; i++)
-		{
-			sigma += blockEnergy[channel][i];
-		}
-        sigma /= blockEnergy[0].length;
-        sigma *= G;
-		summation+= sigma;
-	}
-	return -0.691 + 10*Math.log10(summation);;
+    var num_frames = source[0].length;
+    var num_channels = source.length;
+    var LK = Array(num_channels);
+    for (var c=0; c<num_channels; c++)
+    {
+        LK[c] = [];
+    }
+    
+    for (var n=0; n<num_frames; n++)
+    {
+        if (blocks[n] > threshold)
+        {
+            for (var c=0; c<num_channels; c++)
+            {
+                LK[c].push(source[c][n]);
+            }
+        }
+    }
+    return LK;
+}
+
+function loudnessOfBlocks(blocks)
+{
+    var num_frames = blocks[0].length;
+    var num_channels = blocks.length;
+    var loudness = 0.0;
+    for (var n=0; n<num_frames; n++)
+    {
+        var sum = 0;
+        for (var c=0; c<num_channels; c++)
+        {
+            var G = 1.0;
+            if(G >= 3){G = 1.41;}
+            sum += blocks[c][n]*G;
+        }
+        sum /= num_frames;
+        loudness += sum;
+    }
+    loudness = -0.691 + 10 * Math.log10(loudness);
+    return loudness;
 }
