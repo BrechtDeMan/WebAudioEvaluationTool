@@ -40,12 +40,12 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 	var KFilter = offlineContext.createBiquadFilter();
 	KFilter.type = "highshelf";
 	KFilter.gain.value = 4;
-	KFilter.frequency.value = 1480;
+	KFilter.frequency.value = 1500;
 	
 	var HPFilter = offlineContext.createBiquadFilter();
 	HPFilter.type = "highpass";
-	HPFilter.Q.value = 0.707;
-	HPFilter.frequency.value = 60;
+	HPFilter.Q.value = 0.5;
+	HPFilter.frequency.value = 38;
 	// copy Data into the process buffer
 	var processSource = offlineContext.createBufferSource();
 	processSource.buffer = buffer.buffer;
