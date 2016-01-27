@@ -293,6 +293,7 @@ The tool is available in its entirety including source code on \url{https://code
         \end{itemize}
 
     \subsection{Page}
+    \label{sec:page}
         The only other first level child nodes, these specify the test pages. It takes the following attributes:
         \begin{itemize}
             \item \texttt{id}: ID, mandatory. A string which must be unique across the entire XML. It is used to identify the page on test completion as pages are returned in the results in the order they appeared, not specified.
@@ -310,7 +311,7 @@ The tool is available in its entirety including source code on \url{https://code
             \item \texttt{<commentboxprefix}: Appear once or not at all. The text content specifies the prefix of the comment boxes, see \ref{sec:commentboxes}.
             \item \texttt{<interface>}: Must appear only once.
             \item \texttt{<audioelement>}: Minimum of one. Specifies an audio element, see \ref{sec:audioelement}.
-            \item \texttt{<commentquestion}: Min of 0, max unlimited occurences. See \ref{sec:commentboxes}.
+            \item \texttt{<commentquestion>}: Min of 0, max unlimited occurences. See \ref{sec:commentboxes}.
             \item \texttt{<survey>}: Min of 0, max of 2 occurences. See \ref{sec:survey}
         \end{itemize}
 
@@ -431,8 +432,6 @@ The tool is available in its entirety including source code on \url{https://code
 		If you require the test to be conducted at a certain sample rate (i.e. you do not tolerate resampling of the elements to correspond with the system's sample rate), add \texttt{sampleRate="96000"} - where ``96000'' can be any support sample rate (in Hz) - so that a warning message is shown alerting the subject that their system's sample rate is different from this enforced sample rate. This is checked immediately after parsing and stops the page loading any other elements if this check has failed.
 
 	\subsection{Metrics}
-		Enable the collection of metrics by adding \texttt{collectMetrics=`true'} in the \texttt{setup} node. % Should this always be on??
-
 		The \texttt{Metric} node, which contains the metrics to be tracked during the complete test, is a child of the \texttt{setup} node, and it could look as follows.
 
 		\begin{lstlisting}
@@ -447,7 +446,7 @@ The tool is available in its entirety including source code on \url{https://code
 </Metric>
 		\end{lstlisting}
 
-		When in doubt, err on the inclusive side, as one never knows which information is needed in the future. Most of these metrics are necessary for post-processing scripts such as timeline\_view\_movement.py. 
+		When in doubt, err on the inclusive side, as one never knows which information is needed in the future. Most of these metrics are necessary for post-processing scripts such as timeline\_view\_movement.py. % Brecht: should perhaps list somewhere what metrics are required for which analysis scripts.
 
 		\subsubsection{Time test duration}
 			\texttt{testTimer}\\
@@ -537,6 +536,7 @@ The tool is available in its entirety including source code on \url{https://code
 	<platform>MacIntel</platform>
 	<vendor>Google Inc.</vendor>
 	<uagent>Mozilla/5.0 ... </uagent>
+	<screen innerHeight="1900px" innerWidth="1920px"/>
 </navigator>
 		\end{lstlisting}
 
@@ -544,13 +544,19 @@ The tool is available in its entirety including source code on \url{https://code
 		It is possible to set the gain (in decibel) applied to the different audioelements, as an attribute of the \texttt{audioelement} nodes in the configuration XML file: 
 
 		\texttt{<audioElements url="sample-01.wav" gain="-6" id="sample01quieter" />}\\
-		Please note, there are no checks on this to detect if accidentaly typed in linear.
+		Please note, there are no checks on this to detect if accidentaly typed in linear. This gain is applied \emph{after} any loudness normalisation.
 
 	\subsection{Loudness}
 	\label{sec:loudness}
 		% automatic loudness equalisation
 		% guide to loudness.js 
 		Each audio fragment on loading has its loudness calculated. The tool uses the EBU R 128 recommendation following the ITU-R BS.1770-4 loduness calculations to return the integreated LUFS loudness. The attribute \texttt{loudness} will set the loudness from the scope it is applied in. Applying it in the \texttt{<setup>} node will set the loudness for all test pages. Applying it in the \texttt{<page>} node will set the loudness for that page. Applying it in the \texttt{<audioelement>} node will set the loudness for that fragment. The scope is set locally, so if there is a loudness on both the \texttt{<page>} and \texttt{<setup>} nodes, that test page will take the value associated with the \texttt{<page>}. The loudness attribute is set in LUFS
+		
+	\subsection{Comment Boxes}
+	\label{sec:commentboxes}
+	    There are two types of comment boxes which can be presented, those linked to the audio fragments on the page and those which pose a general question. The audio fragment boxes are shown by setting the attribute \texttt{showElementComments} to true of the page in question. This will then show a comment box below the main interface for every fragment on the page. There is some customisation around the text that accompanies the box, by default the text will read "Comment on fragment " followed by the fragment identifier (the number / letter shown by the interface). This 'prefix' can be modified using the page node \texttt{<commentboxprefix>}, see \ref{sec:page} for where to place this node in the document. The comment box prefix node takes no attribute and the text contained by the node represents to the prefix. For instance if we have a node \texttt{<commentboxprefix> Describe fragment </commentboxprefix>}, then the interface will show "Describe fragment " followed by the identifier.
+	    
+	    The second type of comment box is slightly more complex because it can handle different types of response data. These are called comment questions because they are located in the comment section of the test but pose a specific question.
 
 \clearpage
 
