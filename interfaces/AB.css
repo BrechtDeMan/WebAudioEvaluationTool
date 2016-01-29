@@ -1,0 +1,89 @@
+body {
+	/* Set the background colour (note US English spelling) to grey*/
+	background-color: #fff
+}
+
+div.pageTitle {
+	width: auto;
+	height: 20px;
+	margin-top: 20px;
+}
+
+div.pageTitle span{
+	font-size: 1.5em;
+}
+
+div.testHalt {
+	/* Specify any colouring during the test halt for pre/post questions */
+	background-color: rgba(0,0,0,0.5);
+	/* Don't mess with this bit */
+	z-index: 2;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+
+button {
+	/* Specify any button structure or style */
+	min-width: 20px;
+	background-color: #ddd
+}
+
+button.big-button {
+	width: 250px;
+	height: 40px;
+	font-size: 1.2em;
+}
+
+div.comparitor-holder {
+	width: 260px;
+	height: 300px;
+	border:  black 1px solid;
+    float: left;
+	padding-top: 5px;
+    margin: 25px;
+}
+
+div.comparitor-selector {
+	width: 248px;
+	height: 250px;
+	border: black 1px solid;
+	position: relative;
+	background-color: #FF0000;
+}
+
+div.disabled {
+	background-color: #AAA;
+}
+
+div.selected {
+	background-color: #008000;
+}
+
+div.comparitor-selector span {
+	font-size: 4em;
+}
+
+button.comparitor-button {
+	width: 250px;
+	height: 38px;
+	position: relative;
+	margin-top: 5px;
+}
+
+div.playhead {
+    margin: 5px;
+}
+
+div#page-count {
+    float: left;
+    margin: 0px 5px;
+}
+
+div#master-volume-holder {
+    position: absolute;
+    top: 10px;
+    left: 120px;
+}
