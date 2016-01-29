@@ -197,17 +197,21 @@ function loadTest(page)
 			var orNode = new outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
 			audioObject.bindInterface(orNode);
 		} else {
-			var node = interfaceContext.createCommentBox(audioObject);
-		
 			// Create a slider per track
 			var sliderObj = new discreteObject(audioObject,label,interfaceScales);
 			sliderBox.appendChild(sliderObj.holder);
 			audioObject.bindInterface(sliderObj);
+            interfaceContext.createCommentBox(audioObject);
 			label += 1;
 		}
         
 	});
 	
+    if (page.showElementComments)
+    {
+        interfaceContext.showCommentBoxes(feedbackHolder,true);
+    }
+    
 	// Auto-align
 	resizeWindow(null);
 }
@@ -246,6 +250,7 @@ function discreteObject(audioObject,label,interfaceScales)
 		var node = document.createElement('input');
 		node.setAttribute('type','radio');
 		node.className = 'track-radio';
+        node.disabled = true;
 		node.setAttribute('position',interfaceScales[i].position);
 		node.setAttribute('name',audioObject.specification.id);
 		node.setAttribute('id',audioObject.specification.id+'-'+String(i));
@@ -297,10 +302,22 @@ function discreteObject(audioObject,label,interfaceScales)
 		this.play.disabled = false;
 		this.play.textContent = "Play";
 		$(this.slider).removeClass('track-slider-disabled');
+        for (var radio of this.discretes)
+        {
+            radio.disabled = false;
+        }
 	};
 	this.updateLoading = function(progress)
 	{
 		// progress is a value from 0 to 100 indicating the current download state of media files
+        if (progress != 100)
+        {
+            progress = String(progress);
+            progress = progress.split('.')[0];
+            this.play.textContent = progress+'%';
+        } else {
+            this.play.textContent = "Play";
+        }
 	};
     
     this.startPlayback = function()
@@ -309,6 +326,7 @@ function discreteObject(audioObject,label,interfaceScales)
         $(".track-slider").removeClass('track-slider-playing');
 		$(this.holder).addClass('track-slider-playing');
 		var outsideReference = document.getElementById('outside-reference');
+        this.play.textContent = "Listening";
 		if (outsideReference != null) {
 			$(outsideReference).removeClass('track-slider-playing');
 		}
@@ -317,6 +335,7 @@ function discreteObject(audioObject,label,interfaceScales)
     {
         // Called by audioObject when playback stops
         $(this.holder).removeClass('track-slider-playing');
+        this.play.textContent = "Play";
     }
     
 	this.getValue = function()

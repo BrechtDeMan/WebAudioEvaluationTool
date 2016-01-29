@@ -950,8 +950,14 @@ function AudioEngine(specification) {
 		this.xmlRequest = new XMLHttpRequest();
 		this.xmlRequest.parent = this;
 		this.users = [];
+        this.progress = 0;
+        this.status = 0;
 		this.ready = function()
 		{
+            if (this.status >= 2)
+            {
+                this.status = 3;
+            }
 			for (var i=0; i<this.users.length; i++)
 			{
 				this.users[i].state = 1;
@@ -983,6 +989,7 @@ function AudioEngine(specification) {
                             buffer_ptr[n] = waveObj.decoded_data[c][n];
                         }
                     }
+                    
                     delete waveObj;
                 } else {
                     audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
@@ -999,11 +1006,13 @@ function AudioEngine(specification) {
                                 console.log('URL: '+audioObj.url);
                                 errorSessionDump('Fragment '+audioObj.id+' 404 error');
                             }
+                            this.status = -1;
                         }
                     });
                 }
                 if (bufferObj.buffer != undefined)
                 {
+                    bufferObj.status = 2;
                     calculateLoudness(bufferObj,"I");
                 }
 			};
@@ -1025,8 +1034,25 @@ function AudioEngine(specification) {
 				}
 			};
 			this.xmlRequest.addEventListener("progress", this.progressCallback);
+            this.status = 1;
 			this.xmlRequest.send();
 		};
+        
+        this.registerAudioObject = function(audioObject)
+        {
+            // Called by an audioObject to register to the buffer for use
+            // First check if already in the register pool
+            for (var objects of this.users)
+            {
+                if (audioObject.id == objects.id){return 0;}
+            }
+            this.users.push(audioObject);
+            if (this.status == 3)
+            {
+                // The buffer is already ready, trigger bufferLoaded
+                audioObject.bufferLoaded(this);
+            }
+        }
 	};
 	
 	this.play = function(id) {
@@ -1114,12 +1140,11 @@ function AudioEngine(specification) {
 		{
 			console.log("[WARN]: Buffer was not loaded in pre-test! "+URL);
 			buffer = new this.bufferObj();
+            this.buffers.push(buffer);
 			buffer.getMedia(URL);
-			this.buffers.push(buffer);
 		}
 		this.audioObjects[audioObjectId].specification = element;
 		this.audioObjects[audioObjectId].url = URL;
-		buffer.users.push(this.audioObjects[audioObjectId]);
 		// Obtain store node
 		var aeNodes = this.pageStore.XMLDOM.getElementsByTagName('audioelement');
 		for (var i=0; i<aeNodes.length; i++)
@@ -1130,10 +1155,7 @@ function AudioEngine(specification) {
 				break;
 			}
 		}
-		if (buffer.buffer.lufs != undefined)
-		{
-			this.audioObjects[audioObjectId].bufferLoaded(buffer);
-		}
+        buffer.registerAudioObject(this.audioObjects[audioObjectId]);
 		return this.audioObjects[audioObjectId];
 	};
 	
@@ -2351,7 +2373,7 @@ function Interface(specificationObject) {
 		this.trackComment.id = 'comment-div-'+audioObject.id;
 		// Create a string next to each comment asking for a comment
 		this.trackString = document.createElement('span');
-		this.trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.id;
+		this.trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.interfaceDOM.getPresentedId();
 		// Create the HTML5 comment box 'textarea'
 		this.trackCommentBox = document.createElement('textarea');
 		this.trackCommentBox.rows = '4';

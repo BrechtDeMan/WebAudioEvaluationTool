@@ -197,8 +197,6 @@ function loadTest(page)
 			var orNode = new outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
 			audioObject.bindInterface(orNode);
 		} else {
-			var node = interfaceContext.createCommentBox(audioObject);
-		
 			// Create a slider per track
 			var sliderObj = new sliderObject(audioObject,label);
 			
@@ -212,11 +210,15 @@ function loadTest(page)
 			}
 			sliderBox.appendChild(sliderObj.holder);
 			audioObject.bindInterface(sliderObj);
+            interfaceContext.createCommentBox(audioObject);
 			label += 1;
 		}
         
 	});
-	
+	if (page.showElementComments)
+    {
+        interfaceContext.showCommentBoxes(feedbackHolder,true);
+    }
 	// Auto-align
 	resizeWindow(null);
 }

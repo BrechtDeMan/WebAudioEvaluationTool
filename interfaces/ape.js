@@ -353,10 +353,10 @@ function loadTest(audioHolderObject)
 			var orNode = new outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
 			audioObject.bindInterface(orNode);
 		} else {
-			var node = interfaceContext.createCommentBox(audioObject);
 			// Create a slider per track
 			var sliderNode = new sliderObject(audioObject,interfaceObj);
 			audioObject.bindInterface(sliderNode);
+            interfaceContext.createCommentBox(audioObject);
 		}
 	});
 	

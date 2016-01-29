@@ -150,6 +150,18 @@ function loadTest(audioHolderObject)
 	
 	// Populate the comparitor object
 	interfaceContext.comparitor = new Comparitor(audioHolderObject);
+    if (audioHolderObject.showElementComments)
+    {
+        var commentHolder = document.createElement('div');
+        commentHolder.id = 'commentHolder';
+        document.getElementById('testContent').appendChild(commentHolder);
+        // Generate one comment box per presented page
+        for (var element of audioEngineContext.audioObjects)
+        {
+            interfaceContext.createCommentBox(element);
+        }
+        interfaceContext.showCommentBoxes(commentHolder,true);
+    }
 	resizeWindow(null);
 }
 
