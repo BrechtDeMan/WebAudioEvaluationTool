@@ -377,7 +377,7 @@ function loadTest(audioHolderObject)
 		event.preventDefault();
 		var obj = interfaceContext.getSelectedObject();
 		if (obj == null) {return;}
-		$(obj).css("left",event.clientX + "px");
+		$(obj).css("left",event.clientX-6 + "px");
 		interfaceContext.moveObject();
 	});
 	
@@ -502,25 +502,22 @@ function interfaceSliderHolder(interfaceObject)
 	this.sliderDOM.appendChild(this.scale);
 	var positionScale = this.canvas.style.width.substr(0,this.canvas.style.width.length-2);
 	var offset = Number(this.canvas.attributes['marginsize'].value);
+    var dest = document.getElementById("slider-holder").appendChild(this.sliderDOM);
 	for (var scaleObj of interfaceObject.scales)
 	{
-		var value = document.createAttribute('value');
 		var position = Number(scaleObj.position)*0.01;
-		value.nodeValue = position;
-		var pixelPosition = (position*positionScale)+offset;
+		var pixelPosition = (position*$(this.canvas).width())+offset;
 		var scaleDOM = document.createElement('span');
 		scaleDOM.textContent = scaleObj.text;
+        scaleDOM.setAttribute('value',position)
 		this.scale.appendChild(scaleDOM);
 		scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
-		scaleDOM.setAttributeNode(value);
 	}
-	
-	var dest = document.getElementById("slider-holder");
-	dest.appendChild(this.sliderDOM);
 	
 	this.createSliderObject = function(audioObject)
 	{
 		var trackObj = document.createElement('div');
+        trackObj.align = "center";
 		trackObj.className = 'track-slider track-slider-disabled track-slider-'+audioObject.id;
 		trackObj.id = 'track-slider-'+this.id+'-'+audioObject.id;
 		trackObj.setAttribute('trackIndex',audioObject.id);
