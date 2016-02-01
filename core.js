@@ -2735,7 +2735,7 @@ function Interface(specificationObject) {
 			// Update the playhead position, startPlay must be called
 			if (this.timePerPixel > 0) {
 				var time = this.playbackObject.getCurrentPosition();
-				if (time > 0) {
+				if (time > 0 && time < this.maxTime) {
 					var width = 490;
 					var pix = Math.floor(time/this.timePerPixel);
 					this.scrubberHead.style.left = pix+'px';
@@ -2851,6 +2851,7 @@ function Interface(specificationObject) {
 					// Anchor is not set below
 					console.log('Anchor node not below marker value');
 					alert('Please keep listening');
+                    this.storeErrorNode('Anchor node not below marker value');
 					return false;
 				}
 			}
@@ -2866,7 +2867,8 @@ function Interface(specificationObject) {
 			{
 				if (ao.interfaceDOM.getValue() < (ao.specification.marker/100) && ao.specification.marker > 0) {
 					// Anchor is not set below
-					console.log('Reference node not below marker value');
+					console.log('Reference node not above marker value');
+                    this.storeErrorNode('Reference node not above marker value');
 					alert('Please keep listening');
 					return false;
 				}
@@ -2924,6 +2926,7 @@ function Interface(specificationObject) {
 			}
 			str_start += ". Please keep listening";
 			console.log("[ALERT]: "+str_start);
+            this.storeErrorNode("[ALERT]: "+str_start);
 			alert(str_start);
 		}
 	};
@@ -2955,6 +2958,7 @@ function Interface(specificationObject) {
 		str +='.';
 		alert(str);
 		console.log(str);
+        this.storeErrorNode(str);
 		return false;
 	};
 	this.checkAllPlayed = function()
@@ -2985,8 +2989,18 @@ function Interface(specificationObject) {
 		str +='.';
 		alert(str);
 		console.log(str);
+        this.storeErrorNode(str);
 		return false;
 	};
+    
+    this.storeErrorNode = function(errorMessage)
+    {
+        var time = audioEngineContext.timer.getTestTime();
+        var node = storage.document.createElement('error');
+        node.setAttribute('time',time);
+        node.textContent = errorMessage;
+        testState.currentStore.XMLDOM.appendChild(node);
+    };
 }
 
 function Storage()
