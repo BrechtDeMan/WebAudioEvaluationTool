@@ -1159,7 +1159,7 @@ function AudioEngine(specification) {
 		return this.audioObjects[audioObjectId];
 	};
 	
-	this.newTestPage = function(store) {
+	this.newTestPage = function(audioHolderObject,store) {
 		this.pageStore = store;
 		this.state = 0;
 		this.audioObjectsReady = false;
@@ -1169,6 +1169,8 @@ function AudioEngine(specification) {
 			this.buffers[i].users = [];
 		}
 		this.audioObjects = [];
+        this.timer = new timer();
+        this.loopPlayback = audioHolderObject.loop;
 	};
 	
 	this.checkAllPlayed = function() {
@@ -2309,10 +2311,7 @@ function Interface(specificationObject) {
 	
 	this.newPage = function(audioHolderObject,store)
 	{
-		audioEngineContext.newTestPage(store);
-		audioEngineContext.loopPlayback = audioHolderObject.loop;
-		// Delete any previous audioObjects associated with the audioEngine
-		audioEngineContext.audioObjects = [];
+		audioEngineContext.newTestPage(audioHolderObject,store);
 		interfaceContext.deleteCommentBoxes();
 		interfaceContext.deleteCommentQuestions();
 		loadTest(audioHolderObject,store);
