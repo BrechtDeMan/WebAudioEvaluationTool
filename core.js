@@ -1724,34 +1724,6 @@ function Specification() {
 	this.errors = [];
 	this.schema = null;
 	
-	this.randomiseOrder = function(input)
-	{
-		// This takes an array of information and randomises the order
-		var N = input.length;
-		
-		var inputSequence = []; // For safety purposes: keep track of randomisation
-		for (var counter = 0; counter < N; ++counter) 
-			inputSequence.push(counter) // Fill array
-		var inputSequenceClone = inputSequence.slice(0);
-		
-		var holdArr = [];
-		var outputSequence = [];
-		for (var n=0; n<N; n++)
-		{
-			// First pick a random number
-			var r = Math.random();
-			// Multiply and floor by the number of elements left
-			r = Math.floor(r*input.length);
-			// Pick out that element and delete from the array
-			holdArr.push(input.splice(r,1)[0]);
-			// Do the same with sequence
-			outputSequence.push(inputSequence.splice(r,1)[0]);
-		}
-		console.log(inputSequenceClone.toString()); // print original array to console
-		console.log(outputSequence.toString()); 	// print randomised array to console
-		return holdArr;
-	};
-	
 	this.processAttribute = function(attribute,schema)
 	{
 		// attribute is the string returned from getAttribute on the XML
@@ -1870,11 +1842,37 @@ function Specification() {
 	
 	this.encode = function()
 	{
-		var root = document.implementation.createDocument(null,"waet");
-		
+		var RootDocument = document.implementation.createDocument(null,"waet");
+		var root = RootDocument.children[0];
+        root.setAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+        root.setAttribute("xsi:noNamespaceSchemaLocation","test-schema.xsd");
 		// Build setup node
-		
-		return root;
+        var setup = RootDocument.createElement("setup");
+        var schemaSetup = this.schema.getAllElementsByName('setup')[0];
+        // First decode the attributes
+        var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
+        for (var i=0; i<attributes.length; i++)
+        {
+            var name = attributes[i].getAttribute("name");
+            if (name == undefined) {
+                name = attributes[i].getAttribute("ref");
+            }
+            if(eval("this."+name+" != undefined") || attributes[i].getAttribute("use") == "required")
+            {
+                eval("setup.setAttribute('"+name+"',this."+name+")");
+            }
+        }
+        root.appendChild(setup);
+        // Survey node
+        setup.appendChild(this.preTest.encode(RootDocument));
+        setup.appendChild(this.postTest.encode(RootDocument));
+        setup.appendChild(this.metrics.encode(RootDocument));
+        setup.appendChild(this.interfaces.encode(RootDocument));
+        for (var page of this.pages)
+        {
+            root.appendChild(page.encode(RootDocument));
+        }
+		return RootDocument;
 	};
 	
 	this.surveyNode = function() {
@@ -1934,11 +1932,11 @@ function Specification() {
 				}
 			};
 			
-			this.exportXML = function(root)
+			this.exportXML = function(doc)
 			{
-				var node = root.createElement('surveyelement');
+				var node = doc.createElement('surveyelement');
 				node.setAttribute('type',this.type);
-				var statement = root.createElement('statement');
+				var statement = doc.createElement('statement');
 				statement.textContent = this.statement;
 				node.appendChild(statement);
 				switch(this.type)
@@ -1963,7 +1961,7 @@ function Specification() {
 					for (var i=0; i<this.options.length; i++)
 					{
 						var option = this.options[i];
-						var optionNode = root.createElement("option");
+						var optionNode = doc.createElement("option");
 						optionNode.setAttribute("name",option.name);
 						optionNode.textContent = option.text;
 						node.appendChild(optionNode);
@@ -1985,12 +1983,12 @@ function Specification() {
 				this.options.push(node);
 			}
 		};
-		this.encode = function(root) {
-			var node = root.createElement('survey');
+		this.encode = function(doc) {
+			var node = doc.createElement('survey');
 			node.setAttribute('location',this.location);
 			for (var i=0; i<this.options.length; i++)
 			{
-				node.appendChild(this.options[i].exportXML());
+				node.appendChild(this.options[i].exportXML(doc));
 			}
 			return node;
 		};
@@ -2052,8 +2050,29 @@ function Specification() {
 			}
 		};
 		
-		this.encode = function(root) {
-			
+		this.encode = function(doc) {
+			var node = doc.createElement("interface");
+            if (typeof name == "string")
+                node.setAttribute("name",this.name);
+            for (var option of this.options)
+            {
+                var child = doc.createElement("interfaceoption");
+                child.setAttribute("type",option.type);
+                child.setAttribute("name",option.name);
+                node.appendChild(child);
+            }
+            if (this.scales.length != 0) {
+                var scales = doc.createElement("scales");
+                for (var scale of this.scales)
+                {
+                    var child = doc.createElement("scalelabel");
+                    child.setAttribute("position",scale.position);
+                    child.textContent = scale.text;
+                    scales.appendChild(child);
+                }
+                node.appendChild(scales);
+            }
+            return node;
 		};
 	};
 	
@@ -2066,12 +2085,12 @@ function Specification() {
                 this.enabled.push(children[i].textContent);
             }
         }
-        this.encode = function(root) {
-            var node = root.createElement('metric');
+        this.encode = function(doc) {
+            var node = doc.createElement('metric');
             for (var i in this.enabled)
             {
                 if (isNaN(Number(i)) == true){break;}
-                var child = root.createElement('metricenable');
+                var child = doc.createElement('metricenable');
                 child.textContent = this.enabled[i];
                 node.appendChild(child);
             }
@@ -2174,18 +2193,26 @@ function Specification() {
 		
 		this.encode = function(root)
 		{
-			var AHNode = root.createElement("audioHolder");
-			AHNode.id = this.id;
-			AHNode.setAttribute("hostURL",this.hostURL);
-			AHNode.setAttribute("sampleRate",this.sampleRate);
-			AHNode.setAttribute("randomiseOrder",this.randomiseOrder);
-			AHNode.setAttribute("repeatCount",this.repeatCount);
-			AHNode.setAttribute("loop",this.loop);
-			AHNode.setAttribute("elementComments",this.elementComments);
+			var AHNode = root.createElement("page");
+            // First decode the attributes
+            var attributes = this.schema.getAllElementsByTagName('xs:attribute');
+            for (var i=0; i<attributes.length; i++)
+            {
+                var name = attributes[i].getAttribute("name");
+                if (name == undefined) {
+                    name = attributes[i].getAttribute("ref");
+                }
+                if(eval("this."+name+" != undefined") || attributes[i].getAttribute("use") == "required")
+                {
+                    eval("AHNode.setAttribute('"+name+"',this."+name+")");
+                }
+            }
 			if(this.loudness != null) {AHNode.setAttribute("loudness",this.loudness);}
-			if(this.initialPosition != null) {
-				AHNode.setAttribute("loudness",this.initialPosition*100);
-				}
+            // <commentboxprefix>
+            var commentboxprefix = root.createElement("commentboxprefix");
+            commentboxprefix.textContent = this.commentBoxPrefix;
+            AHNode.appendChild(commentboxprefix);
+            
 			for (var i=0; i<this.interfaces.length; i++)
 			{
 				AHNode.appendChild(this.interfaces[i].encode(root));
@@ -2197,23 +2224,11 @@ function Specification() {
 			// Create <CommentQuestion>
 			for (var i=0; i<this.commentQuestions.length; i++)
 			{
-				AHNode.appendChild(this.commentQuestions[i].exportXML(root));
+				AHNode.appendChild(this.commentQuestions[i].encode(root));
 			}
 			
-			// Create <PreTest>
-			var AHPreTest = root.createElement("PreTest");
-			for (var i=0; i<this.preTest.options.length; i++)
-			{
-				AHPreTest.appendChild(this.preTest.options[i].exportXML(root));
-			}
-			
-			var AHPostTest = root.createElement("PostTest");
-			for (var i=0; i<this.postTest.options.length; i++)
-			{
-				AHPostTest.appendChild(this.postTest.options[i].exportXML(root));
-			}
-			AHNode.appendChild(AHPreTest);
-			AHNode.appendChild(AHPostTest);
+			AHNode.appendChild(this.preTest.encode(root));
+            AHNode.appendChild(this.postTest.encode(root));
 			return AHNode;
 		};
 		
@@ -2241,7 +2256,20 @@ function Specification() {
 			
 			this.encode = function(root)
 			{
-				
+				var node = root.createElement("commentquestion");
+                node.id = this.id;
+                node.setAttribute("type",this.type);
+                var statement = root.createElement("statement");
+                statement.textContent = this.statement;
+                node.appendChild(statement);
+                for (var option of this.options)
+                {
+                    var child = root.createElement("option");
+                    child.setAttribute("name",option.name);
+                    child.textContent = option.text;
+                    node.appendChild(child);
+                }
+                return node;
 			};
 		};
 		
@@ -2279,15 +2307,19 @@ function Specification() {
 			};
 			this.encode = function(root)
 			{
-				var AENode = root.createElement("audioElements");
-				AENode.id = this.id;
-				AENode.setAttribute("url",this.url);
-				AENode.setAttribute("type",this.type);
-				AENode.setAttribute("gain",linearToDecibel(this.gain));
-				if (this.marker != false)
-				{
-					AENode.setAttribute("marker",this.marker*100);
-				}
+				var AENode = root.createElement("audioelement");
+				var attributes = this.schema.getAllElementsByTagName('xs:attribute');
+                for (var i=0; i<attributes.length; i++)
+                {
+                    var name = attributes[i].getAttribute("name");
+                    if (name == undefined) {
+                        name = attributes[i].getAttribute("ref");
+                    }
+                    if(eval("this."+name+" != undefined") || attributes[i].getAttribute("use") == "required")
+                    {
+                        eval("AENode.setAttribute('"+name+"',this."+name+")");
+                    }
+                }
 				return AENode;
 			};
 		};
