@@ -34,6 +34,25 @@ button#popup-proceed {
     bottom: 10px;
 }
 
+div.drag-area {
+    border: 3px black dashed;
+}
+div.drag-over {
+    background-color: aquamarine;
+}
+div.drag-dropped {
+    background-color: aqua;
+}
+div.drag-error {
+    background-color: coral
+}
+
+div#project-drop {
+    width: 99%;
+    height: 50px;
+    margin: 10px 0px;
+}
+
 div.popup-checkbox {
     padding: 5px;
 }

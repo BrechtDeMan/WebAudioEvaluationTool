@@ -195,8 +195,32 @@ function buildPage()
             span.textContent = "Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.0 version."
             this.content.appendChild(span);
             this.dragArea = document.createElement("div");
-            this.dragArea.classList = "drag-area";
+            this.dragArea.className = "drag-area";
+            this.dragArea.id = "project-drop";
             this.content.appendChild(this.dragArea);
+            
+            this.dragArea.addEventListener('dragenter',function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                e.currentTarget.className = "drag-area drag-over";
+            });
+            
+            this.dragArea.addEventListener('dragexit',function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                e.currentTarget.className = "drag-area";
+            });
+            
+            this.dragArea.addEventListener('drop',function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                e.currentTarget.className = "drag-area drag-dropped";
+                var files = e.dataTransfer.files[0];
+                
+            });
+            
 
             this.continue = function()
             {
@@ -779,7 +803,7 @@ function SpecificationToHTML()
                     break;
             }
             var value;
-            eval("value = specification."+this.name)
+            eval("value = node."+this.name)
             if (value != undefined)
             {
                 this.input.value = value;
@@ -825,6 +849,35 @@ function SpecificationToHTML()
     {
         //Performs the actual conversion using the given root DOM as the root
         this.injectDOM = root;
+        
+        // Build the export button
+        var exportButton = document.createElement("button");
+        exportButton.textContent = "Export to XML";
+        exportButton.onclick = function()
+        {
+            var doc = specification.encode();
+            var obj = {};
+            obj.title = "Export";
+            obj.content = document.createElement("div");
+            obj.content.id = "finish";
+            var span = document.createElement("span");
+            span.textContent = "Your XML document is linked below. On most browsers, simply right click on the link and select 'Save As'. Or clicking on the link may download the file directly."
+            obj.content.appendChild(span);
+            var link = document.createElement("div");
+            link.appendChild(doc.children[0]);
+            var file = [link.innerHTML];
+            var bb = new Blob(file,{type : 'application/xml'});
+            var dnlk = window.URL.createObjectURL(bb);
+            var a = document.createElement("a");
+            a.hidden = '';
+            a.href = dnlk;
+            a.download = "project-specification.xml";
+            a.textContent = "Save File";
+            obj.content.appendChild(a);
+            popupObject.show();
+            popupObject.postNode(obj);
+        }
+        this.injectDOM.appendChild(exportButton);
         
         // First perform the setupNode;
         var setupSchema = specification.schema.getAllElementsByName('setup')[0];
