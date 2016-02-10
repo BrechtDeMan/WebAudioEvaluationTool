@@ -50,12 +50,22 @@ button.popupButton {
 	 */
 	width: 50px;
 	height: 25px;
-	position: relative;
+	position: absolute;
 	border-radius: 5px;
 	border: #444;
 	border-width: 1px;
 	border-style: solid;
 	background-color: #fff;
+}
+
+button#popup-proceed {
+    bottom: 10px;
+    right: 10px;
+}
+
+button#popup-previous {
+    bottom: 10px;
+    left: 10px;
 }
 
 div.testHalt {
