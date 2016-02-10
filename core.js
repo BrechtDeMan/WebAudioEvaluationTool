@@ -117,8 +117,8 @@ window.onload = function() {
 	
 	// Create the popup interface object
 	popup = new interfacePopup();
-	
-	// Create the specification object
+    
+    // Create the specification object
 	specification = new Specification();
 	
 	// Create the interface object
@@ -1224,6 +1224,11 @@ function AudioEngine(specification) {
 			this.audioObjects[i].buffer.buffer = hold;
 		}
 	};
+    
+    this.exportXML = function()
+    {
+        
+    };
 	
 }
 
@@ -1823,33 +1828,12 @@ function Specification() {
 			
 		}
 		
-		this.metrics = {
-			enabled: [],
-			decode: function(parent, xml) {
-				var children = xml.getElementsByTagName('metricenable');
-				for (var i in children) { 
-					if (isNaN(Number(i)) == true){break;}
-					this.enabled.push(children[i].textContent);
-				}
-			},
-			encode: function(root) {
-				var node = root.createElement('metric');
-				for (var i in this.enabled)
-				{
-					if (isNaN(Number(i)) == true){break;}
-					var child = root.createElement('metricenable');
-					child.textContent = this.enabled[i];
-					node.appendChild(child);
-				}
-				return node;
-			}
-		};
+		this.metrics = new this.metricNode();
 		
 		this.metrics.decode(this,setupNode.getElementsByTagName('metric')[0]);
 		
 		// Now process the survey node options
 		var survey = setupNode.getElementsByTagName('survey');
-		var surveySchema = specification.schema.getAllElementsByName('survey')[0];
 		for (var i in survey) {
 			if (isNaN(Number(i)) == true){break;}
 			var location = survey[i].getAttribute('location');
@@ -1858,13 +1842,13 @@ function Specification() {
 				if (this.preTest != null){this.errors.push("Already a pre/before test survey defined! Ignoring second!!");}
 				else {
 					this.preTest = new this.surveyNode();
-					this.preTest.decode(this,survey[i],surveySchema);
+					this.preTest.decode(this,survey[i]);
 				}
 			} else if (location == 'post' || location == 'after') {
 				if (this.postTest != null){this.errors.push("Already a post/after test survey defined! Ignoring second!!");}
 				else {
 					this.postTest = new this.surveyNode();
-					this.postTest.decode(this,survey[i],surveySchema);
+					this.postTest.decode(this,survey[i]);
 				}
 			}
 		}
@@ -1904,11 +1888,11 @@ function Specification() {
 	this.surveyNode = function() {
 		this.location = null;
 		this.options = [];
-		this.schema = null;
+		this.schema = specification.schema.getAllElementsByName('survey')[0];
 		
 		this.OptionNode = function() {
 			this.type = undefined;
-			this.schema = undefined;
+			this.schema = specification.schema.getAllElementsByName('surveyentry')[0];
 			this.id = undefined;
 			this.mandatory = undefined;
 			this.statement = undefined;
@@ -1918,10 +1902,9 @@ function Specification() {
 			this.max = undefined;
 			this.step = undefined;
 			
-			this.decode = function(parent,child,schema)
+			this.decode = function(parent,child)
 			{
-				this.schema = schema;
-				var attributeMap = schema.getAllElementsByTagName('xs:attribute');
+				var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
 				for (var i in attributeMap){
 					if(isNaN(Number(i)) == true){break;}
 					var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
@@ -1998,17 +1981,15 @@ function Specification() {
 				return node;
 			};
 		};
-		this.decode = function(parent,xml,schema) {
-			this.schema = schema;
+		this.decode = function(parent,xml) {
 			this.location = xml.getAttribute('location');
 			if (this.location == 'before'){this.location = 'pre';}
 			else if (this.location == 'after'){this.location = 'post';}
-			var surveyentrySchema = schema.getAllElementsByName('surveyentry')[0];
 			for (var i in xml.children)
 			{
 				if(isNaN(Number(i))==true){break;}
 				var node = new this.OptionNode();
-				node.decode(parent,xml.children[i],surveyentrySchema);
+				node.decode(parent,xml.children[i]);
 				this.options.push(node);
 			}
 		};
@@ -2029,10 +2010,9 @@ function Specification() {
 		this.name = null;
 		this.options = [];
 		this.scales = [];
-		this.schema = null;
+		this.schema = specification.schema.getAllElementsByName('interface')[1];
 		
-		this.decode = function(parent,xml,schema) {
-			this.schema = schema;
+		this.decode = function(parent,xml) {
 			this.name = xml.getAttribute('name');
 			var titleNode = xml.getElementsByTagName('title');
 			if (titleNode.length == 1)
@@ -2041,7 +2021,7 @@ function Specification() {
 			}
 			var interfaceOptionNodes = xml.getElementsByTagName('interfaceoption');
 			// Extract interfaceoption node schema
-			var interfaceOptionNodeSchema = schema.getAllElementsByName('interfaceoption')[0];
+			var interfaceOptionNodeSchema = this.schema.getAllElementsByName('interfaceoption')[0];
 			var attributeMap = interfaceOptionNodeSchema.getAllElementsByTagName('xs:attribute');
 			for (var i=0; i<interfaceOptionNodes.length; i++)
 			{
@@ -2085,6 +2065,28 @@ function Specification() {
 		};
 	};
 	
+    this.metricNode = function() {
+        this.enabled = [];
+        this.decode = function(parent, xml) {
+            var children = xml.getElementsByTagName('metricenable');
+            for (var i in children) { 
+                if (isNaN(Number(i)) == true){break;}
+                this.enabled.push(children[i].textContent);
+            }
+        }
+        this.encode = function(root) {
+            var node = root.createElement('metric');
+            for (var i in this.enabled)
+            {
+                if (isNaN(Number(i)) == true){break;}
+                var child = root.createElement('metricenable');
+                child.textContent = this.enabled[i];
+                node.appendChild(child);
+            }
+            return node;
+        }
+    }
+    
 	this.page = function() {
 		this.presentedId = undefined;
 		this.id = undefined;
@@ -2100,11 +2102,10 @@ function Specification() {
 		this.commentBoxPrefix = "Comment on track";
 		this.audioElements = [];
 		this.commentQuestions = [];
-		this.schema = null;
+		this.schema = specification.schema.getAllElementsByName("page")[0];
 		
-		this.decode = function(parent,xml,schema)
+		this.decode = function(parent,xml)
 		{
-			this.schema = schema;
 			var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
 			for (var i=0; i<attributeMap.length; i++)
 			{
@@ -2162,21 +2163,19 @@ function Specification() {
 			
 			// Now process the audioelement tags
 			var audioElements = xml.getElementsByTagName('audioelement');
-			var audioElementSchema = parent.schema.getAllElementsByName('audioelement')[0];
 			for (var i=0; i<audioElements.length; i++)
 			{
 				var node = new this.audioElementNode();
-				node.decode(this,audioElements[i],audioElementSchema);
+				node.decode(this,audioElements[i]);
 				this.audioElements.push(node);
 			}
 			
 			// Now decode the commentquestions
 			var commentQuestions = xml.getElementsByTagName('commentquestion');
-			var commentQuestionSchema = parent.schema.getAllElementsByName('commentquestion')[0];
 			for (var i=0; i<commentQuestions.length; i++)
 			{
 				var node = new this.commentQuestionNode();
-				node.decode(parent,commentQuestions[i],commentQuestionSchema);
+				node.decode(parent,commentQuestions[i]);
 				this.commentQuestions.push(node);
 			}
 		};
@@ -2231,8 +2230,8 @@ function Specification() {
 			this.type = undefined;
 			this.options = [];
 			this.statement = undefined;
-			this.schema = null;
-			this.decode = function(parent,xml,schema)
+			this.schema = specification.schema.getAllElementsByName('commentquestion')[0];
+			this.decode = function(parent,xml)
 			{
 				this.id = xml.id;
 				this.type = xml.getAttribute('type');
@@ -2262,11 +2261,10 @@ function Specification() {
 			this.marker = false;
 			this.enforce = false;
 			this.gain = 1.0;
-			this.schema = null;
+			this.schema = specification.schema.getAllElementsByName('audioelement')[0];;
 			this.parent = null;
-			this.decode = function(parent,xml,schema)
+			this.decode = function(parent,xml)
 			{
-				this.schema = schema;
 				this.parent = parent;
 				var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
 				for (var i=0; i<attributeMap.length; i++)
