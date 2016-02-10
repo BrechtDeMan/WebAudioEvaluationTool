@@ -480,21 +480,19 @@ function interfacePopup() {
 		this.popupContent.appendChild(this.popupResponse);
 		
 		this.buttonProceed = document.createElement('button');
+        this.buttonProceed.id = "popup-proceed";
 		this.buttonProceed.className = 'popupButton';
-		this.buttonProceed.position = 'relative';
-		this.buttonProceed.style.left = '390px';
 		this.buttonProceed.innerHTML = 'Next';
 		this.buttonProceed.onclick = function(){popup.proceedClicked();};
 		
 		this.buttonPrevious = document.createElement('button');
+        this.buttonPrevious.id = "popup-previous";
 		this.buttonPrevious.className = 'popupButton';
-		this.buttonPrevious.position = 'relative';
-		this.buttonPrevious.style.left = '10px';
 		this.buttonPrevious.innerHTML = 'Back';
 		this.buttonPrevious.onclick = function(){popup.previousClick();};
 		
-		this.popupContent.appendChild(this.buttonPrevious);
-		this.popupContent.appendChild(this.buttonProceed);
+		this.popup.appendChild(this.buttonPrevious);
+		this.popup.appendChild(this.buttonProceed);
 		
 		this.popup.style.zIndex = -1;
 		this.popup.style.visibility = 'hidden';
@@ -613,12 +611,6 @@ function interfacePopup() {
             }
 			this.popupResponse.appendChild(input);
 		}
-		var content_height = Number(this.popup.offsetHeight.toFixed());
-		content_height -= Number(this.popupContent.offsetHeight.toFixed());
-		content_height -=Number(this.buttonProceed.offsetHeight.toFixed());
-		content_height = content_height + "px";
-		this.buttonProceed.style.top = content_height;
-		this.buttonPrevious.style.top = content_height;
 		if(this.currentIndex+1 == this.popupOptions.length) {
 			if (this.node.location == "pre") {
 				this.buttonProceed.textContent = 'Start';
