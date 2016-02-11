@@ -269,17 +269,16 @@ function sliderObject(audioObject,label)
 	this.play.style.float = "left";
 	this.play.style.width = "100%";
 	this.play.disabled = true;
+    this.play.setAttribute("playstate","ready");
 	this.play.onclick = function(event)
 	{
 		var id = Number(event.currentTarget.value);
 		//audioEngineContext.metric.sliderPlayed(id);
 		audioEngineContext.play(id);
-		$(".track-slider").removeClass('track-slider-playing');
-		$(event.currentTarget.parentElement).addClass('track-slider-playing');
-		var outsideReference = document.getElementById('outside-reference');
-		if (outsideReference != null) {
-			$(outsideReference).removeClass('track-slider-playing');
-		}
+		if (event.currentTarget.getAttribute("playstate") == "ready")
+        {audioEngineContext.play(id);}
+        else if (event.currentTarget.getAttribute("playstate") == "playing")
+        {audioEngineContext.stop();}
 	};
 	
 	this.enable = function() {
@@ -297,6 +296,7 @@ function sliderObject(audioObject,label)
     this.startPlayback = function()
     {
         // Called when playback has begun
+        this.play.setAttribute("playstate","playing");
         $(".track-slider").removeClass('track-slider-playing');
 		$(this.holder).addClass('track-slider-playing');
 		var outsideReference = document.getElementById('outside-reference');
@@ -307,6 +307,7 @@ function sliderObject(audioObject,label)
     this.stopPlayback = function()
     {
         // Called when playback has stopped. This gets called even if playback never started!
+        this.play.setAttribute("playstate","ready");
         $(this.holder).removeClass('track-slider-playing');
     };
 	this.getValue = function() {
