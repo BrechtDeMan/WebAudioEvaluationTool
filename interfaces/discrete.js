@@ -275,11 +275,15 @@ function discreteObject(audioObject,label,interfaceScales)
 	this.play.textContent = "Loading...";
 	this.play.value = audioObject.id;
 	this.play.disabled = true;
+    this.play.setAttribute("playstate","ready");
 	this.play.onclick = function(event)
 	{
 		var id = Number(event.currentTarget.value);
 		//audioEngineContext.metric.sliderPlayed(id);
-		audioEngineContext.play(id);
+        if (event.currentTarget.getAttribute("playstate") == "ready")
+            audioEngineContext.play(id);
+        else if (event.currentTarget.getAttribute("playstate") == "playing")
+            audioEngineContext.stop();
 	};
 	this.resize = function(event)
 	{
@@ -323,6 +327,7 @@ function discreteObject(audioObject,label,interfaceScales)
     this.startPlayback = function()
     {
         // Called by audioObject when playback begins
+        this.play.setAttribute("playstate","playing");
         $(".track-slider").removeClass('track-slider-playing');
 		$(this.holder).addClass('track-slider-playing');
 		var outsideReference = document.getElementById('outside-reference');
@@ -334,6 +339,7 @@ function discreteObject(audioObject,label,interfaceScales)
     this.stopPlayback = function()
     {
         // Called by audioObject when playback stops
+        this.play.setAttribute("playstate","ready");
         $(this.holder).removeClass('track-slider-playing');
         this.play.textContent = "Play";
     }
