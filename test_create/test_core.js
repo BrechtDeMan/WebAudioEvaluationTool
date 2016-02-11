@@ -223,6 +223,7 @@ function buildPage()
                     var parse = new DOMParser();
                     specification.decode(parse.parseFromString(decoded.target.result,'text/xml'));
                     popupObject.hide();
+                    popupObject.popupContent.innerHTML = null;
                     convert.convert(document.getElementById('content'));
                 }
                 reader.readAsText(files);
@@ -575,6 +576,7 @@ function buildPage()
             this.dynamic = document.createElement("div");
             this.option = null;
             this.parent = null;
+            this.optionLists = [];
             var select = document.createElement("select");
             select.setAttribute("name","type");
             select.addEventListener("change",this,false);
@@ -610,11 +612,23 @@ function buildPage()
                 statementEntry.setAttribute("name","statement");
                 statementEntry.value = this.option.statement;
                 this.dynamic.appendChild(statement);
+                
+                var id = document.createElement("div");
+                var idText = document.createElement("span");
+                var idEntry = document.createElement("input");
+                id.appendChild(idText);
+                id.appendChild(idEntry);
+                idText.textContent = "ID: ";
+                idEntry.addEventListener("change",this,false);
+                idEntry.setAttribute("name","id");
+                idEntry.value = this.option.id;
+                
                 switch(this.option.type)
                 {
                     case "statement":
                         break;
                     case "question":
+                        this.dynamic.appendChild(id);
                         var boxsizeSelect = document.createElement("select");
                         var optionList = specification.schema.getAllElementsByName("survey")[0].getAllElementsByName("boxsize")[0].getAllElementsByTagName("xs:enumeration");
                         for (var i=0; i<optionList.length; i++)
@@ -649,10 +663,112 @@ function buildPage()
                         if (this.option.mandatory) {mandatoryInput.checked = true;} else {mandatoryInput.checked = false;}
                         mandatoryInput.setAttribute("name","mandatory");
                         mandatoryInput.addEventListener("change",this,false);
-                        mandatory.appendChild(mandatoryText);
-                        mandatory.appendChild(mandatoryInput);
                         this.dynamic.appendChild(mandatory);
                         break;
+                    case "number":
+                        this.dynamic.appendChild(id);
+                        
+                        var mandatory = document.createElement("div");
+                        var mandatoryInput = document.createElement("input");
+                        var mandatoryText = document.createElement("span");
+                        mandatoryText.textContent = "Mandatory: ";
+                        mandatory.appendChild(mandatoryText);
+                        mandatory.appendChild(mandatoryInput);
+                        mandatoryInput.type = "checkbox";
+                        if (this.option.mandatory) {mandatoryInput.checked = true;} else {mandatoryInput.checked = false;}
+                        mandatoryInput.setAttribute("name","mandatory");
+                        mandatoryInput.addEventListener("change",this,false);
+                        this.dynamic.appendChild(mandatory);
+                        
+                        var minimum = document.createElement("div");
+                        var minimumEntry = document.createElement("input");
+                        var minimumText = document.createElement("span");
+                        minimumText.textContent = "Minimum: ";
+                        minimum.appendChild(minimumText);
+                        minimum.appendChild(minimumEntry);
+                        minimumEntry.type = "number";
+                        minimumEntry.setAttribute("name","min");
+                        minimumEntry.addEventListener("change",this,false);
+                        minimumEntry.value = this.option.min;
+                        this.dynamic.appendChild(minimum);
+                        
+                        var maximum = document.createElement("div");
+                        var maximumEntry = document.createElement("input");
+                        var maximumText = document.createElement("span");
+                        maximumText.textContent = "Maximum: ";
+                        maximum.appendChild(maximumText);
+                        maximum.appendChild(maximumEntry);
+                        maximumEntry.type = "number";
+                        maximumEntry.setAttribute("name","max");
+                        maximumEntry.addEventListener("change",this,false);
+                        maximumEntry.value = this.option.max;
+                        this.dynamic.appendChild(maximum);
+                        break;
+                    case "checkbox":
+                    case "radio":
+                        this.dynamic.appendChild(id);
+                        var optionHolder = document.createElement("div");
+                        optionHolder.className = 'node';
+                        optionHolder.id = 'popup-option-holder';
+                        var optionObject = function(parent,option) {
+                            this.rootDOM = document.createElement("div");
+                            this.rootDOM.className = "popup-option-entry";
+                            this.inputName = document.createElement("input");
+                            this.inputName.setAttribute("name","name");
+                            this.inputLabel = document.createElement("input");
+                            this.inputLabel.setAttribute("name","text");
+                            this.specification = option;
+                            this.parent = parent;
+                            this.handleEvent = function()
+                            {
+                                var target = event.currentTarget.getAttribute("name");
+                                eval("this.specification."+target+" = event.currentTarget.value");
+                            };
+                            
+                            var nameText = document.createElement("span");
+                            nameText.textContent = "Name: ";
+                            var labelText = document.createElement("span");
+                            labelText.textContent = "Label: ";
+                            this.rootDOM.appendChild(nameText);
+                            this.rootDOM.appendChild(this.inputName);
+                            this.rootDOM.appendChild(labelText);
+                            this.rootDOM.appendChild(this.inputLabel);
+                            this.inputName.addEventListener("change",this,false);
+                            this.inputLabel.addEventListener("change",this,false);
+                            this.inputName.value = this.specification.name;
+                            this.inputLabel.value = this.specification.text;
+                            
+                            this.deleteEntry = {
+                                root: document.createElement("button"),
+                                parent: this,
+                                handleEvent: function() {
+                                    document.getElementById("popup-option-holder").removeChild(this.parent.rootDOM);
+                                    var index = this.parent.parent.option.options.findIndex(function(element,index,array){
+                                        if (element == this.parent.specification)
+                                            return true;
+                                        else
+                                            return false;
+                                    },this);
+                                    var optionList = this.parent.parent.option.options;
+                                    if (index == optionList.length-1) {
+                                        optionList = optionList.slice(0,index);
+                                    } else {
+                                        optionList = optionList.slice(0,index).concat(optionList.slice(index+1));
+                                    }
+                                    this.parent.parent.option.options = optionList;
+                                }
+                            };
+                            this.deleteEntry.root.textContent = "Delete Option";
+                            this.deleteEntry.root.addEventListener("click",this.deleteEntry,false);
+                            this.rootDOM.appendChild(this.deleteEntry.root);
+                        }
+                        for (var i=0; i<this.option.options.length; i++)
+                        {
+                            var obj = new optionObject(this,this.option.options[i]);
+                            this.optionLists.push(obj);
+                            optionHolder.appendChild(obj.rootDOM);
+                        }
+                        this.dynamic.appendChild(optionHolder);
                 }
             }
             this.handleEvent = function()
@@ -680,9 +796,14 @@ function buildPage()
             }
             this.continue = function()
             {
-                var newNode = new this.parent.surveyEntryNode(this.parent,this.option);
-                this.parent.children.push(newNode);
-                this.parent.childrenDOM.appendChild(newNode.rootDOM);
+                if (this.parent.type == "surveyNode")
+                {
+                    var newNode = new this.parent.surveyEntryNode(this.parent,this.option);
+                    this.parent.children.push(newNode);
+                    this.parent.childrenDOM.appendChild(newNode.rootDOM);
+                } else if (this.parent.type == "surveyEntryNode") {
+                    this.parent.build();
+                }
                 popupObject.hide();
             }
         }
@@ -702,6 +823,7 @@ function SpecificationToHTML()
     // Self-contained generators
     this.createGeneralNodeDOM = function(name,id,parent)
     {
+        this.type = name;
         var root = document.createElement('div');
         root.id = id;
         root.className = "node";
@@ -1007,6 +1129,7 @@ function SpecificationToHTML()
     
     this.interfaceNode = function(parent,rootObject)
     {
+        this.type = "interfaceNode";
         this.rootDOM;
         this.titleDOM;
         this.attributeDOM;
@@ -1206,6 +1329,7 @@ function SpecificationToHTML()
     
     this.surveyNode = function(parent,rootObject,location)
     {
+        this.type = "surveyNode";
         this.rootDOM = document.createElement("div");
         this.titleDOM = document.createElement("span");
         this.attributeDOM = document.createElement("div");
@@ -1242,6 +1366,7 @@ function SpecificationToHTML()
         
         this.surveyEntryNode = function(parent,rootObject)
         {
+            this.type = "surveyEntryNode";
             this.rootDOM = document.createElement("div");
             this.titleDOM = document.createElement("span");
             this.attributeDOM = document.createElement("div");
@@ -1253,7 +1378,6 @@ function SpecificationToHTML()
             this.specification = rootObject;
             this.schema = specification.schema.getAllElementsByName("surveyentry")[1];
 
-            this.rootDOM.id = id;
             this.rootDOM.className = "node";
             this.rootDOM.style.minWidth = "50%";
 
@@ -1271,50 +1395,61 @@ function SpecificationToHTML()
             this.rootDOM.appendChild(this.childrenDOM);
             this.rootDOM.appendChild(this.buttonDOM);
             
-            var statement = {};
-            statement.rootDOM = document.createElement("div");
-            statement.titleDOM = document.createElement("span");
-            statement.titleDOM.textContent = "Statement/Question";
-            statement.input = document.createElement("textarea");
-            statement.input.value = this.specification.statement;
-            statement.specification = this.specification;
-            statement.handleEvent = function() {
-                this.specification.statement = this.input.value;
-            }
-            statement.input.addEventListener("change",statement,false);
-            statement.rootDOM.appendChild(statement.titleDOM);
-            statement.rootDOM.appendChild(statement.input);
-            this.children.push(statement);
-            this.childrenDOM.appendChild(statement.rootDOM);
-            switch(this.specification.type)
+            this.build = function()
             {
-                case "statement":
-                    this.titleDOM.textContent = "Statement";
-                    this.rootDOM.removeChild(this.attributeDOM);
-                    break;
-                case "question":
-                    this.titleDOM.textContent = "Question";
-                    var id = convert.convertAttributeToDOM(this.specification.id,specification.schema.getAllElementsByName("id")[0]);
-                    var mandatory = convert.convertAttributeToDOM(this.specification.mandatory,specification.schema.getAllElementsByName("mandatory")[0]);
-                    var boxsize = convert.convertAttributeToDOM(this.specification.mandatory,specification.schema.getAllElementsByName("boxsize")[0]);
-                    this.attributeDOM.appendChild(id.holder);
-                    this.attributes.push(id);
-                    this.attributeDOM.appendChild(mandatory.holder);
-                    this.attributes.push(mandatory);
-                    this.attributeDOM.appendChild(boxsize.holder);
-                    this.attributes.push(boxsize);
-                    break;
-                case "checkbox":
-                    this.titleDOM.textContent = "Checkbox";
-                    var id = convert.convertAttributeToDOM(this.specification.id,specification.schema.getAllElementsByName("id")[0]);
-                    this.attributeDOM.appendChild(id.holder);
-                    this.attributes.push(id);
-                case "radio":
-                    this.titleDOM.textContent = "Radio";
-                    var id = convert.convertAttributeToDOM(this.specification.id,specification.schema.getAllElementsByName("id")[0]);
-                    this.attributeDOM.appendChild(id.holder);
-                    this.attributes.push(id);
+                this.attributeDOM.innerHTML = null;
+                this.childrenDOM.innerHTML = null;
+                var statementRoot = document.createElement("div");
+                var statement = document.createElement("span");
+                statement.textContent = "Statement / Question: "+this.specification.statement;
+                statementRoot.appendChild(statement);
+                this.children.push(statementRoot);
+                this.childrenDOM.appendChild(statementRoot);
+                switch(this.specification.type)
+                {
+                    case "statement":
+                        this.titleDOM.textContent = "Statement";
+                        break;
+                    case "question":
+                        this.titleDOM.textContent = "Question";
+                        var id = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("id")[0]);
+                        var mandatory = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("mandatory")[0]);
+                        var boxsize = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("boxsize")[0]);
+                        this.attributeDOM.appendChild(id.holder);
+                        this.attributes.push(id);
+                        this.attributeDOM.appendChild(mandatory.holder);
+                        this.attributes.push(mandatory);
+                        this.attributeDOM.appendChild(boxsize.holder);
+                        this.attributes.push(boxsize);
+                        break;
+                    case "number":
+                        this.titleDOM.textContent = "Number";
+                        var id = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("id")[0]);
+                        var mandatory = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("mandatory")[0]);
+                        var min = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("min")[0]);
+                        var max = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("max")[0]);
+                        this.attributeDOM.appendChild(id.holder);
+                        this.attributes.push(id);
+                        this.attributeDOM.appendChild(min.holder);
+                        this.attributes.push(min);
+                        this.attributeDOM.appendChild(max.holder);
+                        this.attributes.push(max);
+                        break;
+                    case "checkbox":
+                        this.titleDOM.textContent = "Checkbox";
+                        var id = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("id")[0]);
+                        this.attributeDOM.appendChild(id.holder);
+                        this.attributes.push(id);
+                        break;
+                    case "radio":
+                        this.titleDOM.textContent = "Radio";
+                        var id = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("id")[0]);
+                        this.attributeDOM.appendChild(id.holder);
+                        this.attributes.push(id);
+                        break;
+                }
             }
+            this.build();
             
             this.editNode = {
                 root: document.createElement("button"),
@@ -1322,7 +1457,7 @@ function SpecificationToHTML()
                 handleEvent: function()
                 {
                     popupObject.show();
-                    popupStateNodes.state[5].generate(this,this.parent);
+                    popupStateNodes.state[5].generate(this.parent.specification,this.parent);
                     popupObject.postNode(popupStateNodes.state[5]);
                 }
             }
@@ -1388,6 +1523,7 @@ function SpecificationToHTML()
     
     this.pageNode = function(parent,rootObject)
     {
+        this.type = "pageNode";
         this.rootDOM = document.createElement("div");
         this.titleDOM = document.createElement("span");
         this.attributeDOM = document.createElement("div");
@@ -1465,6 +1601,7 @@ function SpecificationToHTML()
         
         this.audioElementNode = function(parent,rootObject)
         {
+            this.type = "audioElementNode";
             this.rootDOM = document.createElement("div");
             this.titleDOM = document.createElement("span");
             this.attributeDOM = document.createElement("div");
@@ -1546,6 +1683,7 @@ function SpecificationToHTML()
         
         this.commentQuestionNode = function(parent,rootObject)
         {
+            this.type = "commentQuestionNode";
             this.rootDOM = document.createElement("div");
             this.titleDOM = document.createElement("span");
             this.attributeDOM = document.createElement("div");

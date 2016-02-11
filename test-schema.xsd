@@ -80,8 +80,8 @@
               </xs:simpleType>
             </xs:attribute>
             <xs:attribute ref="name" use="required"/>
-            <xs:attribute name="min" use="optional"/>
-            <xs:attribute name="max" use="optional"/>
+            <xs:attribute name="min" type="xs:decimal" use="optional"/>
+            <xs:attribute name="max" type="xs:decimal" use="optional"/>
           </xs:complexType>
         </xs:element>
         <xs:element name="scales" minOccurs="0" maxOccurs="1">
