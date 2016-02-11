@@ -440,66 +440,27 @@ function interfacePopup() {
 	this.createPopup = function(){
 		// Create popup window interface
 		var insertPoint = document.getElementById("topLevelBody");
-		var blank = document.createElement('div');
-		blank.className = 'testHalt';
 		
-		this.popup = document.createElement('div');
-		this.popup.id = 'popupHolder';
-		this.popup.className = 'popupHolder';
-		this.popup.style.position = 'absolute';
+		this.popup = document.getElementById('popupHolder');
 		this.popup.style.left = (window.innerWidth/2)-250 + 'px';
 		this.popup.style.top = (window.innerHeight/2)-125 + 'px';
 		
-		this.popupContent = document.createElement('div');
-		this.popupContent.id = 'popupContent';
-		this.popupContent.style.marginTop = '20px';
-		this.popupContent.style.marginBottom = '5px';
-		this.popup.appendChild(this.popupContent);
+		this.popupContent = document.getElementById('popupContent');
 		
-		var titleHolder = document.createElement('div');
-		titleHolder.id = 'popupTitleHolder';
-		titleHolder.align = 'center';
-		titleHolder.style.width = 'inherit';
-		titleHolder.style.minHeight = '25px';
-		titleHolder.style.maxHeight = '250px';
-		titleHolder.style.overflow = 'auto';
-		titleHolder.style.marginBottom = '5px';
+		this.popupTitle = document.getElementById('popupTitle');
 		
-		this.popupTitle = document.createElement('span');
-		this.popupTitle.id = 'popupTitle';
-		titleHolder.appendChild(this.popupTitle);
-		this.popupContent.appendChild(titleHolder);
+		this.popupResponse = document.getElementById('popupResponse');
 		
-		this.popupResponse = document.createElement('div');
-		this.popupResponse.id = 'popupResponse';
-		this.popupResponse.align = 'center';
-		this.popupResponse.style.width = 'inherit';
-		this.popupResponse.style.minHeight = '50px';
-		this.popupResponse.style.maxHeight = '320px';
-		this.popupResponse.style.overflow = 'auto';
-		this.popupContent.appendChild(this.popupResponse);
-		
-		this.buttonProceed = document.createElement('button');
-        this.buttonProceed.id = "popup-proceed";
-		this.buttonProceed.className = 'popupButton';
-		this.buttonProceed.innerHTML = 'Next';
+		this.buttonProceed = document.getElementById('popup-proceed');
 		this.buttonProceed.onclick = function(){popup.proceedClicked();};
 		
-		this.buttonPrevious = document.createElement('button');
-        this.buttonPrevious.id = "popup-previous";
-		this.buttonPrevious.className = 'popupButton';
-		this.buttonPrevious.innerHTML = 'Back';
+		this.buttonPrevious = document.getElementById('popup-previous');
 		this.buttonPrevious.onclick = function(){popup.previousClick();};
 		
-		this.popup.appendChild(this.buttonPrevious);
-		this.popup.appendChild(this.buttonProceed);
-		
+        this.hidePopup();
+        
 		this.popup.style.zIndex = -1;
 		this.popup.style.visibility = 'hidden';
-		blank.style.zIndex = -2;
-		blank.style.visibility = 'hidden';
-		insertPoint.appendChild(this.popup);
-		insertPoint.appendChild(blank);
 	};
 	
 	this.showPopup = function(){
