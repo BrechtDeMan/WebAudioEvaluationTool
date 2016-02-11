@@ -42,6 +42,27 @@ div.popupHolder {
 	border-radius: 10px;
 	box-shadow: 0px 0px 50px #000;
 	z-index: 2;
+    position: absolute;
+}
+
+div#popupContent {
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+div#popupTitle {
+    width: inherit;
+    min-height: 25px;
+    max-height: 250px;
+    overflow: auto;
+    margin-bottom: 5px;
+}
+
+div#popupResponse {
+    width: inherit;
+    min-height: 50px;
+    max-height: 320px;
+    overflow: auto;
 }
 
 button.popupButton {

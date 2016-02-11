@@ -49,25 +49,17 @@
 		<!-- Load up the default page interface allowing for project setting loads, even if hard-coded-->
 		<!-- Actual test interface design should be contained in the .js for ease of dynamic content-->
 		<div id='topLevelBody'>
-			<h1>Web Audio Evaluation Tool</h1>
-			<h2>Start menu </h2>
-			<ul>
-				<li><a href="index.html?url=example_eval/project.xml" target="_blank">APE interface test example</a></li>
-				<li><a href="index.html?url=example_eval/mushra_example.xml" target="_blank">MUSHRA interface test example</a></li>
-				<li><a href="index.html?url=example_eval/AB_example.xml" target="_blank">AB interface test example</a></li>
-				<li><a href="test_create/test_create.html" target="_blank">Test creator</a></li>
-				<li><a href="analyse.html" target="_blank">Analysis and diagnostics of results</a></li>
-			</ul>
-
-			<br>
-
-			<ul>
-				<li><a href="LICENSE.txt" target="_blank">License</a></li>
-				<li><a href="CITING.txt" target="_blank">Citing</a></li>
-				<li><a href="docs/Instructions/Instructions.pdf" target="_blank">Instructions</a></li>
-			</ul>
-
-
 		</div>
+        <div id="popupHolder" class="popupHolder">
+            <div id="popupContent">
+                <div id="popupTitleHolder" align="center">
+                    <span id="popupTitle"></span>
+                </div>
+                <div id="popupResponse" align="center"></div>
+            </div>
+            <button id="popup-proceed" class="popupButton">Next</button>
+            <button id="popup-previous" class="popupButton">Back</button>
+        </div>
+        <div class="testHalt" style="visibility: hidden; z-index: -2"></div>
 	</body>
 </html>
