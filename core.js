@@ -738,7 +738,12 @@ function stateMachine()
 		var pageHolder = [];
 		for (var page of specification.pages)
 		{
-			pageHolder.push(page);
+            var repeat = page.repeatCount;
+            while(repeat >= 0)
+            {
+                pageHolder.push(page);
+                repeat--;
+            }
 		}
 		if (specification.randomiseOrder)
 		{
