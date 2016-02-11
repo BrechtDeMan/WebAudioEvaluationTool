@@ -52,6 +52,7 @@ div.comparitor-selector {
 	border: black 1px solid;
 	position: relative;
 	background-color: #FF0000;
+    border-radius: 20px;
 }
 
 div.disabled {

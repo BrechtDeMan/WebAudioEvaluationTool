@@ -1097,7 +1097,7 @@ function AudioEngine(specification) {
 	};
 	
 	this.stop = function() {
-		// Send stop and reset command to all playback buffers and set audioEngine state to stopped (1)
+		// Send stop and reset command to all playback buffers
 		if (this.status == 1) {
             var setTime = audioContext.currentTime+0.1;
 			for (var i=0; i<this.audioObjects.length; i++)
@@ -1105,7 +1105,6 @@ function AudioEngine(specification) {
 				this.audioObjects[i].stop(setTime);
 			}
 			interfaceContext.playhead.stop();
-			this.status = 0;
 		}
 	};
 	
