@@ -199,7 +199,7 @@ function buildPage()
             this.dragArea.id = "project-drop";
             this.content.appendChild(this.dragArea);
             
-            this.dragArea.addEventListener('dragenter',function(e){
+            this.dragArea.addEventListener('dragover',function(e){
                 e.stopPropagation();
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'copy';
@@ -218,7 +218,14 @@ function buildPage()
                 e.preventDefault();
                 e.currentTarget.className = "drag-area drag-dropped";
                 var files = e.dataTransfer.files[0];
-                
+                var reader = new FileReader();
+                reader.onload = function(decoded) {
+                    var parse = new DOMParser();
+                    specification.decode(parse.parseFromString(decoded.target.result,'text/xml'));
+                    popupObject.hide();
+                    convert.convert(document.getElementById('content'));
+                }
+                reader.readAsText(files);
             });
             
 
@@ -988,6 +995,14 @@ function SpecificationToHTML()
         this.addPage.root.textContent = "Add Page";
         this.addPage.root.addEventListener("click",this.addPage,false);
         this.injectDOM.appendChild(this.addPage.root);
+        
+        // Build each page
+        for (var page of specification.pages)
+        {
+            var newPage = new this.pageNode(this,page);
+            this.injectDOM.appendChild(newPage.rootDOM);
+            this.pages.push(newPage);
+        }
     }
     
     this.interfaceNode = function(parent,rootObject)
@@ -1278,10 +1293,27 @@ function SpecificationToHTML()
                     this.rootDOM.removeChild(this.attributeDOM);
                     break;
                 case "question":
+                    this.titleDOM.textContent = "Question";
                     var id = convert.convertAttributeToDOM(this.specification.id,specification.schema.getAllElementsByName("id")[0]);
-                    var mandatory = convert.convertAttributeToDOM(this.specification.mandatory,specification.schema.getAllElementsByName("id")[0]);
+                    var mandatory = convert.convertAttributeToDOM(this.specification.mandatory,specification.schema.getAllElementsByName("mandatory")[0]);
                     var boxsize = convert.convertAttributeToDOM(this.specification.mandatory,specification.schema.getAllElementsByName("boxsize")[0]);
+                    this.attributeDOM.appendChild(id.holder);
+                    this.attributes.push(id);
+                    this.attributeDOM.appendChild(mandatory.holder);
+                    this.attributes.push(mandatory);
+                    this.attributeDOM.appendChild(boxsize.holder);
+                    this.attributes.push(boxsize);
                     break;
+                case "checkbox":
+                    this.titleDOM.textContent = "Checkbox";
+                    var id = convert.convertAttributeToDOM(this.specification.id,specification.schema.getAllElementsByName("id")[0]);
+                    this.attributeDOM.appendChild(id.holder);
+                    this.attributes.push(id);
+                case "radio":
+                    this.titleDOM.textContent = "Radio";
+                    var id = convert.convertAttributeToDOM(this.specification.id,specification.schema.getAllElementsByName("id")[0]);
+                    this.attributeDOM.appendChild(id.holder);
+                    this.attributes.push(id);
             }
             
             this.editNode = {
@@ -1541,6 +1573,14 @@ function SpecificationToHTML()
             this.rootDOM.appendChild(this.childrenDOM);
             this.rootDOM.appendChild(this.buttonDOM);
             
+        }
+        
+        // Build the components
+        for (var elements of this.specification.audioElements)
+        {
+            var audioElementDOM = new this.audioElementNode(this,elements);
+            this.children.push(audioElementDOM);
+            this.childrenDOM.appendChild(audioElementDOM.rootDOM);
         }
         
         this.addInterface = {
