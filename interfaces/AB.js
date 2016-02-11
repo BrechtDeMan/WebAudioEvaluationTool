@@ -218,10 +218,17 @@ function Comparitor(audioHolderObject)
 			}
 			console.log("Selected "+id+' ('+time+')');
 		};
+        this.playback.setAttribute("playstate","ready");
 		this.playback.onclick = function(event)
 		{
 			var id = event.currentTarget.parentElement.getAttribute('track-id');
-			audioEngineContext.play(id);
+            if (event.currentTarget.getAttribute("playstate") == "ready")
+            {
+                audioEngineContext.play(id);
+            } else if (event.currentTarget.getAttribute("playstate") == "playing") {
+                audioEngineContext.stop();
+            }
+			
 		};
 		
 		this.enable = function()
@@ -240,17 +247,19 @@ function Comparitor(audioHolderObject)
 				progress = progress.split('.')[0];
 				this.playback.textContent = progress+'%';
 			} else {
-				this.playback.textContent = "Listen";
+				this.playback.textContent = "Play";
 			}
 		};
         this.startPlayback = function()
         {
             $('.comparitor-button').text('Listen');
-            $(this.playback).text('Playing');
+            $(this.playback).text('Stop');
+            this.playback.setAttribute("playstate","playing");
         };
         this.stopPlayback = function()
         {
             $(this.playback).text('Listen');
+            this.playback.setAttribute("playstate","ready");
         };
 		this.exportXMLDOM = function(audioObject)
 		{
