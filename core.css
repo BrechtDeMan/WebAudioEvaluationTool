@@ -63,6 +63,7 @@ div#popupResponse {
     min-height: 50px;
     max-height: 320px;
     overflow: auto;
+    position: relative;
 }
 
 button.popupButton {
