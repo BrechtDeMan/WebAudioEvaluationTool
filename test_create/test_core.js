@@ -1266,9 +1266,11 @@ function SpecificationToHTML()
                 }
                 if (parent.id != "setup") {
                     var node = convert.interfaceDOM.children[0].attributes.find(obj.findNode,obj);
-                    if (node.input.checked) {
-                        obj.input.checked = false;
-                        obj.input.disable = true;
+                    if (node != undefined) {
+                        if (node.input.checked) {
+                            obj.input.checked = false;
+                            obj.input.disabled = true;
+                        }
                     }
                 }
                 var text = document.createElement('span');
@@ -1299,9 +1301,11 @@ function SpecificationToHTML()
                 }
                 if (parent.id != "setup") {
                     var node = convert.interfaceDOM.children[0].attributes.find(obj.findNode,obj);
-                    if (node.input.checked) {
-                        obj.input.checked = false;
-                        obj.input.disable = true;
+                    if (node != undefined) {
+                        if (node.input.checked) {
+                            obj.input.checked = false;
+                            obj.input.disabled = true;
+                        }
                     }
                 }
                 var text = document.createElement('span');
@@ -1714,6 +1718,14 @@ function SpecificationToHTML()
         }
         
         // Build the components
+        for (var interfaceObj of this.specification.interfaces)
+        {
+            var newInterface = new this.parent.interfaceNode(this.parent,interfaceObj);
+            newInterface.build("Interface",""+this.specification.id+"-interface",this.childrenDOM);
+            this.children.push(newInterface);
+            this.interfaces.push(newInterface);
+        }
+        
         for (var elements of this.specification.audioElements)
         {
             var audioElementDOM = new this.audioElementNode(this,elements);
