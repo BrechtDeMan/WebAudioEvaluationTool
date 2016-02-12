@@ -515,11 +515,14 @@ function interfacePopup() {
             }
 			this.popupResponse.appendChild(textArea);
 			textArea.focus();
+            this.popupResponse.style.textAlign="center";
+            this.popupResponse.style.left="0%";
 		} else if (node.specification.type == 'checkbox') {
             if (node.response == undefined) {
                 node.response = Array(node.specification.options.length);
             }
             var index = 0;
+            var max_w = 0;
 			for (var option of node.specification.options) {
 				var input = document.createElement('input');
 				input.id = option.name;
@@ -537,13 +540,21 @@ function interfacePopup() {
                         input.checked = "true";
                     }
                 }
+                var w = $(span).width();
+                if (w > max_w)
+                    max_w = w;
                 index++;
 			}
+            max_w += 12;
+            this.popupResponse.style.textAlign="";
+            var leftP = ((max_w/500)/2)*100;
+            this.popupResponse.style.left=leftP+"%";
 		} else if (node.specification.type == 'radio') {
             if (node.response == undefined) {
                 node.response = {name: "", text: ""};
             }
             var index = 0;
+            var max_w = 0;
 			for (var option of node.specification.options) {
 				var input = document.createElement('input');
 				input.id = option.name;
@@ -560,7 +571,14 @@ function interfacePopup() {
                 if (input.id == node.response.name) {
                     input.checked = "true";
                 }
+                var w = $(span).width();
+                if (w > max_w)
+                    max_w = w;
 			}
+            max_w += 12;
+            this.popupResponse.style.textAlign="";
+            var leftP = ((max_w/500)/2)*100;
+            this.popupResponse.style.left=leftP+"%";
 		} else if (node.specification.type == 'number') {
 			var input = document.createElement('input');
 			input.type = 'textarea';
@@ -571,6 +589,8 @@ function interfacePopup() {
                 input.value = node.response;
             }
 			this.popupResponse.appendChild(input);
+            this.popupResponse.style.textAlign="center";
+            this.popupResponse.style.left="0%";
 		}
 		if(this.currentIndex+1 == this.popupOptions.length) {
 			if (this.node.location == "pre") {
