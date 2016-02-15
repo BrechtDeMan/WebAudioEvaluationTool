@@ -274,7 +274,6 @@ function sliderObject(audioObject,label)
 	{
 		var id = Number(event.currentTarget.value);
 		//audioEngineContext.metric.sliderPlayed(id);
-		audioEngineContext.play(id);
 		if (event.currentTarget.getAttribute("playstate") == "ready")
         {audioEngineContext.play(id);}
         else if (event.currentTarget.getAttribute("playstate") == "playing")
@@ -303,12 +302,14 @@ function sliderObject(audioObject,label)
 		if (outsideReference != null) {
 			$(outsideReference).removeClass('track-slider-playing');
 		}
+        this.play.textContent = "Stop";
     };
     this.stopPlayback = function()
     {
         // Called when playback has stopped. This gets called even if playback never started!
         this.play.setAttribute("playstate","ready");
         $(this.holder).removeClass('track-slider-playing');
+        this.play.textContent = "Play";
     };
 	this.getValue = function() {
 		return this.slider.value;
