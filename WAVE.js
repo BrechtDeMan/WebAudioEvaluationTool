@@ -19,6 +19,23 @@ find_subarray = function(arr,subarr) {
     return -1;
 };
 
+function convertToInteger(arr) {
+    var value = 0;
+    for (var i=0; i<arr.length; i++)
+    {
+        value += arr[i]<<(i*8);
+    }
+    return value;
+}
+function convertToString(arr) {
+    var str = "";
+    for (var i=0; i<arr.length; i++)
+    {
+        str = str.concat(String.fromCharCode(arr[i]));
+    }
+    return str;
+}
+
 function WAVE()
 {
     // The WAVE file object
@@ -44,43 +61,28 @@ function WAVE()
     this.open = function(IOArrayBuffer)
     {
         var IOView8 = new Uint8Array(IOArrayBuffer);
-        IOView8.subarray(0,4).forEach(function(i){
-            var char = String.fromCharCode(i);
-            this.RIFF = this.RIFF.concat(char);
-        },this);
+        this.RIFF = convertToString(IOView8.subarray(0,4));
         if (this.RIFF != 'RIFF')
         {
             console.log('WAVE ERR - Not a RIFF file');
             return 1;
         }
-        this.size = 0;
-        IOView8.subarray(4,8).forEach(function(i,a){this.size += Number(i)<<(8*a);},this);
-        this.FT_Header = String();
-        IOView8.subarray(8,12).forEach(function(i){this.FT_Header = this.FT_Header.concat(String.fromCharCode(i));},this);
-        this.fmt_marker = String();
-        IOView8.subarray(12,16).forEach(function(i){this.fmt_marker = this.fmt_marker.concat(String.fromCharCode(i));},this);
-        this.formatDataLength = 0;
-        IOView8.subarray(16,20).forEach(function(i,a){this.formatDataLength += Number(i)<<(8*a);},this);
-        this.type = 0;
-        IOView8.subarray(20,22).forEach(function(i,a){this.type += Number(i)<<(8*a);},this);
-        this.num_channels = 0;
-        IOView8.subarray(22,24).forEach(function(i,a){this.num_channels += Number(i)<<(8*a);},this);
-        this.sample_rate = 0;
-        IOView8.subarray(24,28).forEach(function(i,a){this.sample_rate += Number(i)<<(8*a);},this);
-        this.byte_rate = 0;
-        IOView8.subarray(28,32).forEach(function(i,a){this.byte_rate += Number(i)<<(8*a);},this);
-        this.block_align = 0;
-        IOView8.subarray(32,34).forEach(function(i,a){this.block_align += Number(i)<<(8*a);},this);
-        this.bits_per_sample = 0;
-        IOView8.subarray(34,36).forEach(function(i,a){this.bits_per_sample += Number(i)<<(8*a);},this);
+        this.size = convertToInteger(IOView8.subarray(4,8));
+        this.FT_Header = convertToString(IOView8.subarray(8,12));
+        this.fmt_marker = convertToString(IOView8.subarray(12,16));
+        this.formatDataLength = convertToInteger(IOView8.subarray(16,20));
+        this.type = convertToInteger(IOView8.subarray(20,22));
+        this.num_channels = convertToInteger(IOView8.subarray(22,24));
+        this.sample_rate = convertToInteger(IOView8.subarray(24,28));
+        this.byte_rate = convertToInteger(IOView8.subarray(28,32));
+        this.block_align = convertToInteger(IOView8.subarray(32,34));
+        this.bits_per_sample = convertToInteger(IOView8.subarray(34,36));
         
         // Find the data header first
         var data_start = find_subarray(IOView8,[100, 97, 116, 97]);
         
-        this.data_header = String();
-        IOView8.subarray(data_start,data_start+4).forEach(function(i){this.data_header = this.data_header.concat(String.fromCharCode(i));},this);
-        this.data_size = 0;
-        IOView8.subarray(data_start+4,data_start+8).forEach(function(i,a){this.data_size += Number(i)<<(8*a);},this);
+        this.data_header = convertToString(IOView8.subarray(data_start,data_start+4));
+        this.data_size = convertToInteger(IOView8.subarray(data_start+4,data_start+8));
         
         this.num_samples = this.data_size / this.block_align;
         
@@ -145,9 +147,8 @@ function integerConvert(srcView,dstView,srcBytes)
     }
     for (var n=0; n<number; n++)
     {
-        var intData;
         var srcIndex = n*srcBytes;
-        srcView.subarray(srcIndex,srcIndex+srcBytes).forEach(function(i,a){intData += Number(i)<<(8*a);},this);
+        var intData = convertToInteger(srcView.subarray(srcIndex,srcIndex+srcBytes));
         intData = (intData << (endShift));
         dstView[n] = intData / 2147483648;
     }
