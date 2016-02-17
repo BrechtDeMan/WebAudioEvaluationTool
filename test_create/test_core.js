@@ -807,6 +807,113 @@ function buildPage()
                 popupObject.hide();
             }
         }
+        this.state[6] = new function() {
+            this.title = "Edit Scale Markers";
+            this.content = document.createElement("div");
+            this.content.id = "state-6";
+            var spnH = document.createElement('div');
+            var span = document.createElement("span");
+            span.textContent = "You can edit your scale markers here for the selected interface.";
+            spnH.appendChild(span);
+            this.scaleRoot;
+            this.parent;
+            this.markerNodes =[];
+            this.preset = {
+                input: document.createElement("select"),
+                parent: this,
+                handleEvent: function(event) {
+                    this.parent.scaleRoot.scales = [];
+                    var protoScale = interfaceSpecs.getAllElementsByTagName('scaledefinitions')[0].getAllElementsByName(event.currentTarget.value)[0];
+                    var protoMarkers = protoScale.children;
+                    for (var i=0; i<protoMarkers.length; i++)
+                    {
+                        var marker = {
+                            position: protoMarkers[i].getAttribute("position"),
+                            text: protoMarkers[i].textContent
+                        }
+                        this.parent.scaleRoot.scales.push(marker);
+                    }
+                    this.parent.buildMarkerList();
+                }
+            }
+            this.preset.input.addEventListener("change",this.preset);
+            this.content.appendChild(this.preset.input);
+            var optionHolder = document.createElement("div");
+            optionHolder.className = 'node';
+            optionHolder.id = 'popup-option-holder';
+            this.content.appendChild(optionHolder);
+            this.generate = function(scaleRoot,parent)
+            {
+                this.scaleRoot = scaleRoot;
+                this.parent = parent;
+                
+                // Generate Pre-Set dropdown
+                var protoScales = interfaceSpecs.getAllElementsByTagName('scaledefinitions')[0].children;
+                this.preset.input.innerHTML = "";
+                
+                for (var i=0; i<protoScales.length; i++)
+                {
+                    var selectOption = document.createElement("option");
+                    var scaleName = protoScales[i].getAttribute("name");
+                    selectOption.setAttribute("name",scaleName);
+                    selectOption.textContent = scaleName;
+                    this.preset.input.appendChild(selectOption);
+                }
+                
+                // Create Marker List
+                this.buildMarkerList();
+            }
+            this.buildMarkerList = function() {
+                var markerInject = document.getElementById("popup-option-holder");
+                markerInject.innerHTML = "";
+                this.markerNodes = [];
+                for (var i=0; i<this.scaleRoot.scales.length; i++)
+                {
+                    var markerNode = {};
+                    markerNode.root = document.createElement("div");
+                    markerNode.root.className = "popup-option-entry";
+                    markerNode.positionInput = document.createElement("input");
+                    markerNode.positionInput.min = 0;
+                    markerNode.positionInput.max = 100;
+                    markerNode.positionInput.value = this.scaleRoot.scales[i].position;
+                    markerNode.positionInput.setAttribute("name","position");
+                    markerNode.textInput = document.createElement("input");
+                    markerNode.textInput.setAttribute("name","text");
+                    markerNode.textInput.value = this.scaleRoot.scales[i].text;
+                    markerNode.specification = this.scaleRoot.scales[i];
+                    markerNode.parent = this;
+                    markerNode.handleEvent = function(event) {
+                        switch(event.currentTarget.getAttribute("name"))
+                        {
+                            case "position":
+                                this.specification.position = Number(event.currentTarget.value);
+                                break;
+                            case "text":
+                                this.specification.text = event.currentTarget.value;
+                                break;
+                        }
+                    }
+                    markerNode.positionInput.addEventListener("change",markerNode,false);
+                    markerNode.textInput.addEventListener("change",markerNode,false);
+                    
+                    var posText = document.createElement("span");
+                    posText.textContent = "Position: ";
+                    var textText = document.createElement("span");
+                    textText.textContent = "Text: ";
+                    markerNode.root.appendChild(posText);
+                    markerNode.root.appendChild(markerNode.positionInput);
+                    markerNode.root.appendChild(textText);
+                    markerNode.root.appendChild(markerNode.textInput);
+                    markerInject.appendChild(markerNode.root);
+                    this.markerNodes.push(markerNode);
+                    
+                }
+            }
+            this.continue = function()
+            {
+                popupObject.hide();
+            }
+        }
     }
 }
 
@@ -1323,11 +1430,58 @@ function SpecificationToHTML()
                 var nameAttr = this.parent.convertAttributeToDOM(this,specification.schema.getAllElementsByName("name")[0]);
                 this.attributeDOM.appendChild(nameAttr.holder);
                 this.attributes.push(nameAttr);
+                var scales = new this.scalesNode(this,this.specification);
+                this.children.push(scales);
+                this.childrenDOM.appendChild(scales.rootDOM);
             }
             if (parent != undefined)
             {
                 parent.appendChild(this.rootDOM);
             }
+        }
+        
+        this.scalesNode = function(parent,rootObject)
+        {
+            this.type = "scalesNode";
+            this.rootDOM = document.createElement("div");
+            this.titleDOM = document.createElement("span");
+            this.attributeDOM = document.createElement("div");
+            this.attributes = [];
+            this.childrenDOM = document.createElement("div");
+            this.children = [];
+            this.buttonDOM = document.createElement("div");
+            this.parent = parent;
+            this.specification = rootObject;
+            this.schema = specification.schema.getAllElementsByName("page")[0];
+            this.rootDOM.className = "node";
+
+            var titleDiv = document.createElement('div');
+            titleDiv.className = "node-title";
+            this.titleDOM.className = "node-title";
+            this.titleDOM.textContent = "Interface Scales";
+            titleDiv.appendChild(this.titleDOM);
+
+            this.attributeDOM.className = "node-attributes";
+            this.childrenDOM.className = "node-children";
+            this.buttonDOM.className = "node-buttons";
+
+            this.rootDOM.appendChild(titleDiv);
+            this.rootDOM.appendChild(this.attributeDOM);
+            this.rootDOM.appendChild(this.childrenDOM);
+            this.rootDOM.appendChild(this.buttonDOM);
+            
+            this.editButton = {
+                button: document.createElement("button"),
+                parent: this,
+                handleEvent: function(event) {
+                    popupObject.show();
+                    popupObject.postNode(popupStateNodes.state[6]);
+                    popupStateNodes.state[6].generate(this.parent.specification,this.parent);
+                }
+            };
+            this.editButton.button.textContent = "Edit Scales/Markers";
+            this.editButton.button.addEventListener("click",this.editButton,false);
+            this.buttonDOM.appendChild(this.editButton.button);
         }
     }
     
