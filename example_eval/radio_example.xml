@@ -30,5 +30,6 @@
 		</interface>
 		<audioelement url="0.wav" id="track-1"/>
 		<audioelement url="1.wav" id="track-2"/>
+        <audioelement url="2.wav" id="track-3" type="outside-reference"/>
 	</page>
 </waet>
