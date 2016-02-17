@@ -2394,15 +2394,13 @@ function Interface(specificationObject) {
 		
 		this.exportXMLDOM = function() {
 			var root = document.createElement('comment');
-			if (this.audioObject.specification.parent.elementComments) {
-				var question = document.createElement('question');
-				question.textContent = this.trackString.textContent;
-				var response = document.createElement('response');
-				response.textContent = this.trackCommentBox.value;
-				console.log("Comment frag-"+this.id+": "+response.textContent);
-				root.appendChild(question);
-				root.appendChild(response);
-			}
+            var question = document.createElement('question');
+            question.textContent = this.trackString.textContent;
+            var response = document.createElement('response');
+            response.textContent = this.trackCommentBox.value;
+            console.log("Comment frag-"+this.id+": "+response.textContent);
+            root.appendChild(question);
+            root.appendChild(response);
 			return root;
 		};
 		this.resize = function()
@@ -2443,13 +2441,19 @@ function Interface(specificationObject) {
 		this.holder.appendChild(br);
 		this.holder.appendChild(this.textArea);
 		
-		this.exportXMLDOM = function() {
-			var root = document.createElement('comment');
+		this.exportXMLDOM = function(storePoint) {
+			var root = storePoint.parent.document.createElement('comment');
 			root.id = this.specification.id;
 			root.setAttribute('type',this.specification.type);
-			root.textContent = this.textArea.value;
 			console.log("Question: "+this.string.textContent);
 			console.log("Response: "+root.textContent);
+            var question = storePoint.parent.document.createElement('question');
+            question.textContent = this.string.textContent;
+            var response = storePoint.parent.document.createElement('response');
+            response.textContent = this.textArea.value;
+            root.appendChild(question);
+            root.appendChild(response);
+            storePoint.XMLDOM.appendChild(root);
 			return root;
 		};
 		this.resize = function()
@@ -2519,8 +2523,8 @@ function Interface(specificationObject) {
 		this.holder.appendChild(this.span);
 		this.holder.appendChild(this.inputs);
 		
-		this.exportXMLDOM = function() {
-			var root = document.createElement('comment');
+		this.exportXMLDOM = function(storePoint) {
+			var root = storePoint.parent.document.createElement('comment');
 			root.id = this.specification.id;
 			root.setAttribute('type',this.specification.type);
 			var question = document.createElement('question');
@@ -2543,6 +2547,7 @@ function Interface(specificationObject) {
 			console.log('Response: '+response.textContent);
 			root.appendChild(question);
 			root.appendChild(response);
+            storePoint.XMLDOM.appendChild(root);
 			return root;
 		};
 		this.resize = function()
@@ -2630,8 +2635,8 @@ function Interface(specificationObject) {
 		this.holder.appendChild(this.span);
 		this.holder.appendChild(this.inputs);
 		
-		this.exportXMLDOM = function() {
-			var root = document.createElement('comment');
+		this.exportXMLDOM = function(storePoint) {
+			var root = storePoint.parent.document.createElement('comment');
 			root.id = this.specification.id;
 			root.setAttribute('type',this.specification.type);
 			var question = document.createElement('question');
@@ -2645,6 +2650,7 @@ function Interface(specificationObject) {
 				root.appendChild(response);
 				console.log('Response '+response.getAttribute('name') +': '+response.textContent);
 			}
+            storePoint.XMLDOM.appendChild(root);
 			return root;
 		};
 		this.resize = function()
@@ -3138,20 +3144,6 @@ function Storage()
 			var ae_metric = this.parent.document.createElement('metric');
 			aeNode.appendChild(ae_metric); 
 			this.XMLDOM.appendChild(aeNode);
-		}
-		
-		// Add any commentQuestions
-		for (var element of this.specification.commentQuestions)
-		{
-			var cqNode = this.parent.document.createElement('commentquestion');
-			cqNode.id = element.id;
-			cqNode.setAttribute('type',element.type);
-			var statement = this.parent.document.createElement('statement');
-			statement.textContent = cqNode.statement;
-			cqNode.appendChild(statement);
-			var response = this.parent.document.createElement('response');
-			cqNode.appendChild(response);
-			this.XMLDOM.appendChild(cqNode);
 		}
 		
 		this.parent.root.appendChild(this.XMLDOM);
