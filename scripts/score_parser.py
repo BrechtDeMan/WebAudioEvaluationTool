@@ -34,20 +34,20 @@ elif not os.access(os.path.dirname(folder_name), os.W_OK):
 file_history = []
 
 # get every XML file in folder
-for file in os.listdir(folder_name):
-    if file.endswith(".xml"):
-        tree = ET.parse(folder_name + '/' + file)
+for file_name in os.listdir(folder_name):
+    if file_name.endswith(".xml"):
+        tree = ET.parse(folder_name + '/' + file_name)
         root = tree.getroot()
 
         # get subject ID from XML file
-        subject_id = file[:-4] # file name (without extension) as subject ID
+        subject_id = file_name[:-4] # file name (without extension) as subject ID
 
         # get list of all pages this subject evaluated
         for audioholder in root.findall("./audioholder"):    # iterate over pages
             page_name = audioholder.get('id') # get page name
                        
             if page_name is None: # ignore 'empty' audio_holders
-                print "WARNING: " + file + " contains empty audio holder. (score_parser.py)"
+                print "WARNING: " + file_name + " contains empty audio holder. (score_parser.py)"
                 break
 
             file_name = folder_name+'/ratings/'+page_name+'-ratings.csv' # score file name
@@ -68,7 +68,8 @@ for file in os.listdir(folder_name):
             for audioelement in audiolist: # iterate over all audioelements
                 fragmentnamelist.append(audioelement.get('id')) # add to list
 
-            # if file exists, get header and add 'new' fragments
+
+            # if file exists, get header and add any 'new' fragments not yet in the header
             if os.path.isfile(file_name):
                 with open(file_name, 'r') as readfile:
                     filereader = csv.reader(readfile, delimiter=',')
@@ -82,7 +83,7 @@ for file in os.listdir(folder_name):
                         filewriter.writerow(headerrow)
                     file_history.append(file_name)
 
-                # Which of the fragmentes are in fragmentnamelist but not in headerrow?
+                # Which of the fragments are in fragmentnamelist but not in headerrow?
                 newfragments = list(set(fragmentnamelist)-set(headerrow))
                 newfragments = sorted(newfragments) # new fragments in alphabetical order
                 # If not empty, read file and rewrite adding extra columns
@@ -98,7 +99,8 @@ for file in os.listdir(folder_name):
                     os.rename('temp.csv', file_name) # replace old file with temp file
                     headerrow = headerrow + newfragments
                     
-            # if not, create file and make header
+
+            # if file does not exist yet, create file and make header
             else:
                 headerrow = sorted(fragmentnamelist) # sort alphabetically
                 headerrow.insert(0,'')
@@ -106,6 +108,7 @@ for file in os.listdir(folder_name):
                 with open(file_name, 'w') as writefile:
                     filewriter = csv.writer(writefile, delimiter=',')
                     filewriter.writerow(headerrow)
+                file_history.append(file_name)
 
             # open file to write for this page
             writefile = open(file_name, 'a')
