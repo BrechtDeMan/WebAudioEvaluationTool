@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import BaseHTTPServer
 from os import walk
 from os import path
