@@ -1057,10 +1057,10 @@ function AudioEngine(specification) {
 				interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
 			}
 			if (this.loopPlayback) {
-                var setTime = audioContext.currentTime+2;
+                var setTime = audioContext.currentTime;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
-					this.audioObjects[i].play(setTime-2);
+					this.audioObjects[i].play(setTime);
 					if (id == i) {
 						this.audioObjects[i].loopStart(setTime);
 					} else {
