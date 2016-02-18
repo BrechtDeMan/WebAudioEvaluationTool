@@ -43,7 +43,7 @@ for file_name in os.listdir(folder_name):
         subject_id = file_name[:-4] # file name (without extension) as subject ID
 
         # get list of all pages this subject evaluated
-        for audioholder in root.findall("./audioholder"):    # iterate over pages
+        for audioholder in root.findall("./page"):    # iterate over pages
             page_name = audioholder.get('id') # get page name
                        
             if page_name is None: # ignore 'empty' audio_holders
