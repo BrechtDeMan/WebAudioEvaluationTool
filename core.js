@@ -2263,7 +2263,7 @@ function Specification() {
 			this.id = null;
 			this.parent = null;
 			this.type = null;
-			this.marker = false;
+			this.marker = null;
 			this.enforce = false;
 			this.gain = 1.0;
 			this.schema = specification.schema.getAllElementsByName('audioelement')[0];;
