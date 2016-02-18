@@ -1872,6 +1872,9 @@ function SpecificationToHTML()
         }
         
         // Build the components
+        if (this.specification.interfaces.length == 0) {
+            this.specification.interfaces.push(new specification.interfaceNode());
+        }
         for (var interfaceObj of this.specification.interfaces)
         {
             var newInterface = new this.parent.interfaceNode(this.parent,interfaceObj);

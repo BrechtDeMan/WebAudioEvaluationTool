@@ -168,7 +168,7 @@
   <xs:element name="survey">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="surveyentry" maxOccurs="unbounded">
+        <xs:element name="surveyentry" minOccurs="0" maxOccurs="unbounded">
           <xs:complexType>
             <xs:sequence>
               <xs:element ref="statement" minOccurs="1" maxOccurs="1"/>
