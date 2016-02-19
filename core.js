@@ -21,6 +21,8 @@ var projectReturn; // Hold the URL for the return
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
+// Add a prototype to the bufferSourceNode to hold when the object was given a play command
+AudioBufferSourceNode.prototype.playbackStartTime = undefined;
 // Add a prototype to the bufferNode to hold the desired LINEAR gain
 AudioBuffer.prototype.playbackGain = undefined;
 // Add a prototype to the bufferNode to hold the computed LUFS loudness
@@ -1319,6 +1321,7 @@ function audioObject(id) {
                  this.outputGain.gain.setValueAtTime(0.0,startTime);
             }
 			this.bufferNode.start(startTime);
+            this.bufferNode.playbackStartTime = startTime;
 		}
 	};
 	
@@ -1337,19 +1340,7 @@ function audioObject(id) {
 	this.getCurrentPosition = function() {
 		var time = audioEngineContext.timer.getTestTime();
 		if (this.bufferNode != undefined) {
-			if (this.bufferNode.loop == true) {
-				if (audioEngineContext.status  == 1) {
-					return (time-this.metric.listenStart)%this.buffer.buffer.duration;
-				} else {
-					return 0;
-				}
-			} else {
-				if (this.metric.listenHold) {
-					return time - this.metric.listenStart;
-				} else {
-					return 0;
-				}
-			}
+            return (time - this.bufferNode.playbackStartTime)%this.buffer.buffer.duration;
 		} else {
 			return 0;
 		}
@@ -2809,6 +2800,7 @@ function Interface(specificationObject) {
 		this.stop = function() {
 			clearInterval(this.interval);
 			this.interval = undefined;
+            this.scrubberHead.style.left = '0px';
 			if (this.maxTime < 60) {
 				this.curTimeSpan.textContent = '0.00';
 			} else {
