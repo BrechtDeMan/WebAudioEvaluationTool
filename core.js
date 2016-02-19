@@ -2846,12 +2846,12 @@ function Interface(specificationObject) {
         }
         this.slider.onmouseup = function(event)
         {
-            var storePoint = testState.currentStore.XMLDOM.children[0].getAllElementsByName('volumeTracker');
+            var storePoint = testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].getAllElementsByName('volumeTracker');
             if (storePoint.length == 0)
             {
                 storePoint = storage.document.createElement('metricresult');
                 storePoint.setAttribute('name','volumeTracker');
-                testState.currentStore.XMLDOM.children[0].appendChild(storePoint);
+                testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].appendChild(storePoint);
             }
             else {
                 storePoint = storePoint[0];
