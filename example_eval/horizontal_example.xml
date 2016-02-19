@@ -26,7 +26,7 @@
 				<scalelabel position="100">50</scalelabel>
 			</scales>
 		</interface>
-		<audioelement url="1.wav" id="track-1"/>
+		<audioelement url="0.wav" id="track-1"/>
 		<audioelement url="1.wav" id="track-2"/>
 	</page>
 </waet>
