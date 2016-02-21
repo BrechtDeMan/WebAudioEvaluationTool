@@ -1,0 +1,23 @@
+{
+    "id": "ID",
+    "mandatory": "Mandatory",
+    "name": "Name",
+    "interface": "Interface Module",
+    "projectReturn": "Results Return URL",
+    "randomiseOrder": "Randomise Order",
+    "testPages": "Test Pages",
+    "loudness": "Target Loudess (LUFS)",
+    "sampleRate": "Required Sample Rate",
+    "hostURL": "Element URL Prefix",
+    "repeatCount": "Repeat Count",
+    "loop": "Synchronous Loop",
+    "showElementComments": "Show Comment Boxes",
+    "type": "Type",
+    "min": "Minimum",
+    "max": "Maximum",
+    "position": "Position",
+    "url": "URL",
+    "gain": "Gain (dB)",
+    "marker": "Marker",
+    "boxsize": "Box Size"
+}
