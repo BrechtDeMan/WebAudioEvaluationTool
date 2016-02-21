@@ -240,7 +240,7 @@ The tool is available in its entirety including source code on \url{https://code
 	\subsection{AB}
 	    Performs a pairwise comparison, but supports ABX and n-way comparison (in the example we demonstrate it performing a 7-way comparison).
 	    
-	\subsection{discrete/Likert}
+	\subsection{Discrete/Likert}
 	    Each audio element is given a discrete set of values based on the number of slider options specified. For instance, Likert specifies 5 values and therefore each audio element must be one of those 5 values.
 	    
 	\subsection{ACR/CCR/DCR/horizontal}
@@ -278,7 +278,7 @@ The tool is available in its entirety including source code on \url{https://code
         The first child node, \texttt{<setup>} specifies any one time and global parameters. It takes the following attributes:
         \begin{itemize}
             \item \texttt{interface}: String, mandatory, specifies the interface to load
-            \item \texttt{projectReturn}: URL, mandatory, specifies the return point. Can be a 3rd party server or the local server. Set to null to disable automatic saving. Specifying "save.php" will trigger the return if either the PHP or python servers are used. On error, it will always default to presenting the save on page.
+            \item \texttt{projectReturn}: URL, mandatory, specifies the return point. Can be a 3rd party server or the local server. Set to null to disable automatic saving. Specifying ``save.php'' will trigger the return if either the PHP or python servers are used. On error, it will always default to presenting the save on page.
             \item \texttt{randomiseOrder}: Boolean, optional, if true it will randomise the order of the test pages. Default is false.
             \item \texttt{testPages}: non-negative integer, optional. Specifies the number of test pages to actually test with. Combined with randomiseOrder being true will give a random set of test pages per participant from the given pool of \texttt{<page>} nodes. Specifying 0 disables this option, default is 0.
             \item \texttt{loudness}: non-positive integer, optional. Set the default LUFS target value. See \ref{sec:loudness} for more.
@@ -297,7 +297,7 @@ The tool is available in its entirety including source code on \url{https://code
         The only other first level child nodes, these specify the test pages. It takes the following attributes:
         \begin{itemize}
             \item \texttt{id}: ID, mandatory. A string which must be unique across the entire XML. It is used to identify the page on test completion as pages are returned in the results in the order they appeared, not specified.
-            \item \texttt{hostURL}: URL, mandatory. Used in conjuction with the \texttt{<audioelement>} url to specify where the audio files are located. For instance if all your files are in the directory \texttt{./test/} you can set this attribute to "/test/" and the \texttt{<audioelement>} url attribute only needs to file name. Set to "" if no hostURL prefix desired.
+            \item \texttt{hostURL}: URL, mandatory. Used in conjuction with the \texttt{<audioelement>} url to specify where the audio files are located. For instance if all your files are in the directory \texttt{./test/} you can set this attribute to ``/test/'' and the \texttt{<audioelement>} url attribute only needs to file name. Set to ``'' if no hostURL prefix desired.
             \item \texttt{randomiseOrder}: Boolean, optional. If true the audio fragments are presented randomly rather than the order specified. See \ref{sec:randomisation}. Default is false.
             \item \texttt{repeatCount}: non-negative integer, optional. Specify the number of times to repeat the test page (re-present). Each presentation will appear as an individual page in the results. Default is 0.
             \item \texttt{loop}: Boolean, optional. If true, the audio elements will loop synchronously with each other. See \ref{sec:looping}. Default is false.
@@ -371,16 +371,17 @@ The tool is available in its entirety including source code on \url{https://code
 	\subsection{Interface options}
 	    The interface node has children of interface options which are used to specify modifications to the test environment. These are divided into two catagories: check and show. Check are used to specify conditions which must be met before a page can be completed, these include checking all fragments have been played or checking all fragments have a comment and so on. Show is used to show an optional on page element or control, such as the playhead or master volume.
 	    
-	    Check items have the attribute "type" set to "check". The following list gives the string to give the "name" attribute along with a description of the check.
+	    Check items have the attribute ``type'' set to ``check''. The following list gives the string to give the ``name'' attribute along with a description of the check.
 	    \begin{itemize}
 	    \item \texttt{fragmentPlayed}: Checks that all fragments have been at least partially played
 	    \item \texttt{fragmentFullPlayback}: Checks that all fragments have been fully played. \emph{NOTE:} This will always clear if the page is looping as it is not possible to know every sample has been played.
 	    \item \texttt{fragmentMoved}: Checks that all fragments have been moved. This is interface dependent, for instance on AB this will always clear as there is no movement.
 	    \item \texttt{fragmentComments}: Cheks that all fragments have a comment. Will clear if there are no on page comments but with a console warning.
-	    \item \texttt{scalerange}: Has two extra attributes "min" and "max". Checks that at least one element is below the min value and one element is above the max value.
+	    \item \texttt{scalerange}: Has two extra attributes ``min'' and ``max''. Checks that at least one element is below the min value and one element is above the max value.
 	    \end{itemize}
+	    % QUANTISATION OF THE SCALE: to be implemented?
 
-        Show items have the attribute "type" set to "show". The following list gives the string to give the "name" attribute along with a description.
+        Show items have the attribute ``type'' set to ``show''. The following list gives the string to give the ``name'' attribute along with a description.
         \begin{itemize}
             \item \texttt{playhead}: Shows the playhead to the end user indicating where in the file they are currently listening
             \item \texttt{page-count}: Shows the current test page number and the total number of test pages.
@@ -422,7 +423,7 @@ The tool is available in its entirety including source code on \url{https://code
 	\subsection{Looping}
 	\label{sec:looping}
 	    Looping enables the fragments to loop until stopped by the user. Looping is synchronous so all fragments start at the same time on each loop.
-		Individual test pages can have their playback looped by the \texttt{<page>} attribute \texttt{loop} with a value of "true" or "false".
+		Individual test pages can have their playback looped by the \texttt{<page>} attribute \texttt{loop} with a value of ``true'' or ``false''.
 		If the fragments are not of equal length initially, they are padded with zeros so that they are equal length, to enable looping without the fragments going out of sync relative to each other. 
 
 		Note that fragments cannot be played until all page fragments are loaded when in looped mode, as the engine needs to know the length of each fragment to calculate the padding.
@@ -478,11 +479,11 @@ The tool is available in its entirety including source code on \url{https://code
 	\label{sec:referencesandanchors}
 	    The audio elements, \texttt{<audioelement>} have the attribute \texttt{type}, which defaults to normal. Setting this to one of the following will have the following effects.
 		\subsubsection{Outside Reference}
-		    Set type to 'outside-reference'. This will place the object in a separate playback element clearly labelled as an outside reference. This is exempt of any movement checks but will still be included in any listening checks.
+		    Set type to `outside-reference'. This will place the object in a separate playback element clearly labelled as an outside reference. This is exempt of any movement checks but will still be included in any listening checks.
 		\subsubsection{Hidden reference} 
-		    Set type to 'reference'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the 'reference' type in the results to quickly find it. The reference can be forced to be below a value before completing the test page by setting the attribute 'marker' to be a value between 0 and 100 representing the integer value position it must be equal to or above.
+		    Set type to `reference'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the `reference' type in the results to quickly find it. The reference can be forced to be below a value before completing the test page by setting the attribute `marker' to be a value between 0 and 100 representing the integer value position it must be equal to or above.
 		\subsubsection{Hidden anchor}
-		    Set type to 'anchor'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the 'anchor' type in the results to quickly find it. The anchor can be forced to be below a value before completing the test page by setting the attribute 'marker' to be a value between 0 and 100 representing the integer value position it must be equal to or below.
+		    Set type to `anchor'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the `anchor' type in the results to quickly find it. The anchor can be forced to be below a value before completing the test page by setting the attribute `marker' to be a value between 0 and 100 representing the integer value position it must be equal to or below.
 
 	\subsection{Checks}
 		\label{sec:checks}
@@ -554,7 +555,7 @@ The tool is available in its entirety including source code on \url{https://code
 		
 	\subsection{Comment Boxes}
 	\label{sec:commentboxes}
-	    There are two types of comment boxes which can be presented, those linked to the audio fragments on the page and those which pose a general question. The audio fragment boxes are shown by setting the attribute \texttt{showElementComments} to true of the page in question. This will then show a comment box below the main interface for every fragment on the page. There is some customisation around the text that accompanies the box, by default the text will read "Comment on fragment " followed by the fragment identifier (the number / letter shown by the interface). This 'prefix' can be modified using the page node \texttt{<commentboxprefix>}, see \ref{sec:page} for where to place this node in the document. The comment box prefix node takes no attribute and the text contained by the node represents to the prefix. For instance if we have a node \texttt{<commentboxprefix> Describe fragment </commentboxprefix>}, then the interface will show "Describe fragment " followed by the identifier.
+	    There are two types of comment boxes which can be presented, those linked to the audio fragments on the page and those which pose a general question. The audio fragment boxes are shown by setting the attribute \texttt{showElementComments} to true of the page in question. This will then show a comment box below the main interface for every fragment on the page. There is some customisation around the text that accompanies the box, by default the text will read ``Comment on fragment'' followed by the fragment identifier (the number / letter shown by the interface). This `prefix' can be modified using the page node \texttt{<commentboxprefix>}, see \ref{sec:page} for where to place this node in the document. The comment box prefix node takes no attribute and the text contained by the node represents to the prefix. For instance if we have a node \texttt{<commentboxprefix> Describe fragment </commentboxprefix>}, then the interface will show ``Describe fragment'' followed by the identifier.
 	    
 	    The second type of comment box is slightly more complex because it can handle different types of response data. These are called comment questions because they are located in the comment section of the test but pose a specific question.
 
