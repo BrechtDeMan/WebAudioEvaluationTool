@@ -136,6 +136,7 @@ function buildPage()
         
         this.proceedButton = document.createElement("button");
         this.proceedButton.id = "popup-proceed";
+        this.proceedButton.className = "popup-button";
         this.proceedButton.textContent = "Next";
         this.proceedButton.onclick = function()
         {
@@ -143,6 +144,17 @@ function buildPage()
             popupObject.shownObject.continue();
         };
         this.object.appendChild(this.proceedButton);
+        
+        this.backButton = document.createElement("button");
+        this.backButton.id = "popup-back";
+        this.backButton.className = "popup-button";
+        this.backButton.textContent = "Back";
+        this.backButton.onclick = function()
+        {
+            popupObject.popupContent.innerHTML = null;
+            popupObject.shownObject.back();
+        };
+        this.object.appendChild(this.backButton);
         
         this.shownObject;
 
@@ -158,17 +170,22 @@ function buildPage()
         {
             this.object.style.visibility = "visible";
             this.blanket.style.visibility = "visible";
+            if (typeof this.shownObject.back == "function") {
+                this.backButton.style.visibility = "visible";
+            } else {
+                this.backButton.style.visibility = "hidden";
+            }
         }
 
         this.hide = function()
         {
             this.object.style.visibility = "hidden";
             this.blanket.style.visibility = "hidden";
+            this.backButton.style.visibility = "hidden";
         }
 
         this.postNode = function(postObject)
         {
-            this.show();
             //Passed object must have the following:
             // Title: text to show in the title
             // Content: HTML DOM to show on the page
@@ -176,6 +193,12 @@ function buildPage()
             this.titleDOM.textContent = postObject.title;
             this.popupContent.appendChild(postObject.content);
             this.shownObject = postObject;
+            if (typeof this.shownObject.back == "function") {
+                this.backButton.style.visibility = "visible";
+            } else {
+                this.backButton.style.visibility = "hidden";
+            }
+            this.show();
         }
 
         this.resize();
@@ -259,8 +282,18 @@ function buildPage()
             {
                 var testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(this.select.value)[0];
                 specification.interface = testXML.getAttribute("interface");
+                if (specification.interfaces == null)
+                {
+                    specification.interfaces = new specification.interfaceNode();
+                }
+                if (specification.metrics == null)  {
+                    specification.metrics = new specification.metricNode();
+                }
                 popupStateNodes.state[2].generate();
                 popupObject.postNode(popupStateNodes.state[2]);
+            }
+            this.back = function() {
+                popupObject.postNode(popupStateNodes.state[0]);
             }
         }
         this.state[2] = new function()
@@ -277,8 +310,12 @@ function buildPage()
             this.options = [];
             this.testXML = null;
             this.interfaceXML = null;
+            this.dynamicContent = document.createElement("div");
+            this.content.appendChild(this.dynamicContent);
             this.generate = function()
             {
+                this.options = [];
+                this.dynamicContent.innerHTML = null;
                 var interfaceName = popupStateNodes.state[1].select.value;
                 this.checkText = interfaceSpecs.getElementsByTagName("global")[0].getAllElementsByTagName("checks")[0];
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
@@ -297,72 +334,92 @@ function buildPage()
                     } else {
                         testNode = undefined;
                     }
-                    var optH = document.createElement('div');
-                    optH.className = "popup-checkbox";
-                    var checkbox = document.createElement('input');
-                    checkbox.type = "checkbox";
-                    var text = document.createElement('span');
-                    checkbox.setAttribute('name',checkName);
-                    if (interfaceNode.getAttribute('default') == 'on')
-                    {
-                        checkbox.checked = true;
+                    var obj = {
+                        root: document.createElement("div"),
+                        text: document.createElement("span"),
+                        input: document.createElement("input"),
+                        parent: this,
+                        name: checkName,
+                        handleEvent: function(event) {
+                            if (this.input.checked) {
+                                // Add to specification.interfaces.option
+                                var included = specification.interfaces.options.find(function(element,index,array){
+                                    if (element.name == this.name) {return true;} else {return false;}
+                                },this);
+                                if (included == null) {
+                                    specification.interfaces.options.push({type:"check",name:this.name});
+                                }
+                            } else {
+                                // Remove from specification.interfaces.option
+                                var position = specification.interfaces.options.findIndex(function(element,index,array){
+                                    if (element.name == this.name) {return true;} else {return false;}
+                                },this);
+                                if (position >= 0) {
+                                    specification.interfaces.options.splice(position,1);
+                                }
+                            }
+                        }
                     }
-                    if (interfaceNode.getAttribute('support') == "none")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = false;
-                        optH.className = "popup-checkbox disabled";
-                    } else if (interfaceNode.getAttribute('support') == "mandatory")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = true;
-                        optH.className = "popup-checkbox disabled";
-                    }
+                    
+                    obj.input.addEventListener("click",obj);
+                    obj.root.className = "popup-checkbox";
+                    obj.input.type = "checkbox";
+                    obj.input.setAttribute('name',checkName);
+                    obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
+                    obj.root.appendChild(obj.input);
+                    obj.root.appendChild(obj.text);
                     if(testNode != undefined)
                     {
-                        if (interfaceNode.getAttribute('default') == 'on')
+                        if (testNode.getAttribute('default') == 'on')
                         {
-                            checkbox.checked = true;
+                            obj.input.checked = true;
                         }
                         if (testNode.getAttribute('support') == "none")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = false;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
                         }else if (interfaceNode.getAttribute('support') == "mandatory")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = true;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
+                        }
+                    } else {
+                        if (interfaceNode.getAttribute('default') == 'on')
+                        {
+                            obj.input.checked = true;
+                        }
+                        if (interfaceNode.getAttribute('support') == "none")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
+                        } else if (interfaceNode.getAttribute('support') == "mandatory")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
                         }
                     }
-                    text.textContent = popupStateNodes.state[2].checkText.getAllElementsByName(checkName)[0].textContent;
-                    optH.appendChild(checkbox);
-                    optH.appendChild(text);
-                    this.options.push(optH);
-                    this.content.appendChild(optH);
+                    var included = specification.interfaces.options.find(function(element,index,array){
+                        if (element.name == this.name) {return true;} else {return false;}
+                    },obj);
+                    if (included != undefined) {
+                        obj.input.checked = true;
+                    }
+                    obj.handleEvent();
+                    this.options.push(obj);
+                    this.dynamicContent.appendChild(obj.root);
                 }
             }
             this.continue = function()
             {
-                if (specification.interfaces == null)
-                {
-                    specification.interfaces = new specification.interfaceNode();
-                }
-                for (var object of this.options)
-                {
-                    var checkbox = object.children[0];
-                    if (checkbox.checked)
-                    {
-                        var option = {
-                            type: "check",
-                            name: checkbox.getAttribute('name')
-                        };
-                        specification.interfaces.options.push(option);
-                    }
-                }
                 popupStateNodes.state[3].generate();
                 popupObject.postNode(popupStateNodes.state[3]);
+            }
+            this.back = function() {
+                popupObject.postNode(popupStateNodes.state[1]);
             }
         }
         this.state[3] = new function()
@@ -379,8 +436,12 @@ function buildPage()
             this.checkText;
             this.testXML;
             this.interfaceXML;
+            this.dynamicContent = document.createElement("div");
+            this.content.appendChild(this.dynamicContent);
             this.generate = function()
             {
+                this.options = [];
+                this.dynamicContent.innerHTML = null;
                 var interfaceName = popupStateNodes.state[1].select.value;
                 this.checkText = interfaceSpecs.getElementsByTagName("global")[0].getAllElementsByTagName("metrics")[0];
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
@@ -399,67 +460,92 @@ function buildPage()
                     } else {
                         testNode = undefined;
                     }
-                    var optH = document.createElement('div');
-                    optH.className = "popup-checkbox";
-                    var checkbox = document.createElement('input');
-                    checkbox.type = "checkbox";
-                    var text = document.createElement('span');
-                    checkbox.setAttribute('name',checkName);
-                    if (interfaceNode.getAttribute('default') == 'on')
-                    {
-                        checkbox.checked = true;
+                    var obj = {
+                        root: document.createElement("div"),
+                        text: document.createElement("span"),
+                        input: document.createElement("input"),
+                        parent: this,
+                        name: checkName,
+                        handleEvent: function(event) {
+                            if (this.input.checked) {
+                                // Add to specification.interfaces.option
+                                var included = specification.metrics.enabled.find(function(element,index,array){
+                                    if (element == this.name) {return true;} else {return false;}
+                                },this);
+                                if (included == null) {
+                                    specification.metrics.enabled.push(this.name);
+                                }
+                            } else {
+                                // Remove from specification.interfaces.option
+                                var position = specification.metrics.enabled.findIndex(function(element,index,array){
+                                    if (element == this.name) {return true;} else {return false;}
+                                },this);
+                                if (position >= 0) {
+                                    specification.metrics.enabled.splice(position,1);
+                                }
+                            }
+                        }
                     }
-                    if (interfaceNode.getAttribute('support') == "none")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = false;
-                        optH.className = "popup-checkbox disabled";
-                    } else if (interfaceNode.getAttribute('support') == "mandatory")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = true;
-                        optH.className = "popup-checkbox disabled";
-                    }
+                    
+                    obj.input.addEventListener("click",obj);
+                    obj.root.className = "popup-checkbox";
+                    obj.input.type = "checkbox";
+                    obj.input.setAttribute('name',checkName);
+                    obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
+                    obj.root.appendChild(obj.input);
+                    obj.root.appendChild(obj.text);
                     if(testNode != undefined)
                     {
-                        if (interfaceNode.getAttribute('default') == 'on')
+                        if (testNode.getAttribute('default') == 'on')
                         {
-                            checkbox.checked = true;
+                            obj.input.checked = true;
                         }
                         if (testNode.getAttribute('support') == "none")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = false;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
                         }else if (interfaceNode.getAttribute('support') == "mandatory")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = true;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
+                        }
+                    } else {
+                        if (interfaceNode.getAttribute('default') == 'on')
+                        {
+                            obj.input.checked = true;
+                        }
+                        if (interfaceNode.getAttribute('support') == "none")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
+                        } else if (interfaceNode.getAttribute('support') == "mandatory")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
                         }
                     }
-                    text.textContent = popupStateNodes.state[3].checkText.getAllElementsByName(checkName)[0].textContent;
-                    optH.appendChild(checkbox);
-                    optH.appendChild(text);
-                    this.options.push(optH);
-                    this.content.appendChild(optH);
+                    var included = specification.metrics.enabled.find(function(element,index,array){
+                        if (element == this.name) {return true;} else {return false;}
+                    },obj);
+                    obj.handleEvent();
+                    if (included != undefined) {
+                        obj.input.checked = true;
+                    }
+                    this.options.push(obj);
+                    this.dynamicContent.appendChild(obj.root);
                 }
             }
             this.continue = function()
             {
-                if (specification.metrics == null)  {
-                    specification.metrics = new specification.metricNode();
-                }
-                for (var object of this.options)
-                {
-                    var checkbox = object.children[0];
-                    if (checkbox.checked)
-                    {
-                        specification.metrics.enabled.push(checkbox.getAttribute('name'));
-                    }
-                }
                 popupStateNodes.state[4].generate();
                 popupObject.postNode(popupStateNodes.state[4]);
+            }
+            this.back = function() {
+                popupObject.postNode(popupStateNodes.state[2]);
             }
         }
         this.state[4] = new function()
@@ -476,13 +562,17 @@ function buildPage()
             this.checkText;
             this.testXML;
             this.interfaceXML;
+            this.dynamicContent = document.createElement("div");
+            this.content.appendChild(this.dynamicContent);
             this.generate = function()
             {
+                this.options = [];
+                this.dynamicContent.innerHTML = null;
                 var interfaceName = popupStateNodes.state[1].select.value;
                 this.checkText = interfaceSpecs.getElementsByTagName("global")[0].getAllElementsByTagName("show")[0];
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
                 this.interfaceXML = interfaceSpecs.getAllElementsByTagName("interfaces")[0].getAllElementsByName(this.testXML.getAttribute("interface"))[0].getAllElementsByTagName("show")[0];
-                this.testXML = this.testXML.getAllElementsByTagName("metrics");
+                this.testXML = this.testXML.getAllElementsByTagName("show");
                 for (var i=0; i<this.interfaceXML.children.length; i++)
                 {
                     var interfaceNode = this.interfaceXML.children[i];
@@ -496,72 +586,92 @@ function buildPage()
                     } else {
                         testNode = undefined;
                     }
-                    var optH = document.createElement('div');
-                    optH.className = "popup-checkbox";
-                    var checkbox = document.createElement('input');
-                    checkbox.type = "checkbox";
-                    var text = document.createElement('span');
-                    checkbox.setAttribute('name',checkName);
-                    if (interfaceNode.getAttribute('default') == 'on')
-                    {
-                        checkbox.checked = true;
+                    var obj = {
+                        root: document.createElement("div"),
+                        text: document.createElement("span"),
+                        input: document.createElement("input"),
+                        parent: this,
+                        name: checkName,
+                        handleEvent: function(event) {
+                            if (this.input.checked) {
+                                // Add to specification.interfaces.option
+                                var included = specification.interfaces.options.find(function(element,index,array){
+                                    if (element.name == this.name) {return true;} else {return false;}
+                                },this);
+                                if (included == null) {
+                                    specification.interfaces.options.push({type:"show",name:this.name});
+                                }
+                            } else {
+                                // Remove from specification.interfaces.option
+                                var position = specification.interfaces.options.findIndex(function(element,index,array){
+                                    if (element.name == this.name) {return true;} else {return false;}
+                                },this);
+                                if (position >= 0) {
+                                    specification.interfaces.options.splice(position,1);
+                                }
+                            }
+                        }
                     }
-                    if (interfaceNode.getAttribute('support') == "none")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = false;
-                        optH.className = "popup-checkbox disabled";
-                    } else if (interfaceNode.getAttribute('support') == "mandatory")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = true;
-                        optH.className = "popup-checkbox disabled";
-                    }
+                    
+                    obj.input.addEventListener("click",obj);
+                    obj.root.className = "popup-checkbox";
+                    obj.input.type = "checkbox";
+                    obj.input.setAttribute('name',checkName);
+                    obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
+                    obj.root.appendChild(obj.input);
+                    obj.root.appendChild(obj.text);
                     if(testNode != undefined)
                     {
-                        if (interfaceNode.getAttribute('default') == 'on')
+                        if (testNode.getAttribute('default') == 'on')
                         {
-                            checkbox.checked = true;
+                            obj.input.checked = true;
                         }
                         if (testNode.getAttribute('support') == "none")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = false;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
                         }else if (interfaceNode.getAttribute('support') == "mandatory")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = true;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
+                        }
+                    } else {
+                        if (interfaceNode.getAttribute('default') == 'on')
+                        {
+                            obj.input.checked = true;
+                        }
+                        if (interfaceNode.getAttribute('support') == "none")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
+                        } else if (interfaceNode.getAttribute('support') == "mandatory")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
                         }
                     }
-                    text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
-                    optH.appendChild(checkbox);
-                    optH.appendChild(text);
-                    this.options.push(optH);
-                    this.content.appendChild(optH);
+                    var included = specification.interfaces.options.find(function(element,index,array){
+                        if (element.name == this.name) {return true;} else {return false;}
+                    },obj);
+                    if (included != undefined) {
+                        obj.input.checked = true;
+                    }
+                    obj.handleEvent();
+                    this.options.push(obj);
+                    this.dynamicContent.appendChild(obj.root);
                 }
             }
             this.continue = function()
             {
-                if (specification.interfaces == null)
-                {
-                    specification.interfaces = new specification.interfaceNode();
-                }
-                for (var object of this.options)
-                {
-                    var checkbox = object.children[0];
-                    if (checkbox.checked)
-                    {
-                        var option = {
-                            type: "show",
-                            name: checkbox.getAttribute('name')
-                        };
-                        specification.interfaces.options.push(option);
-                    }
-                }
                 popupObject.hide();
                 convert.convert(document.getElementById('content'));
+            }
+            this.back = function() {
+                popupObject.postNode(popupStateNodes.state[3]);
             }
         }
         this.state[5] = new function() {
