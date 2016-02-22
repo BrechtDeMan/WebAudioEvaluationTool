@@ -1935,7 +1935,7 @@ function Specification() {
 			
 			this.exportXML = function(doc)
 			{
-				var node = doc.createElement('surveyelement');
+				var node = doc.createElement('surveyentry');
 				node.setAttribute('type',this.type);
 				var statement = doc.createElement('statement');
 				statement.textContent = this.statement;
@@ -1945,17 +1945,16 @@ function Specification() {
 				case "statement":
 					break;
 				case "question":
-					node.id = this.id;
-					node.setAttribute("mandatory",this.mandatory);
-					node.setAttribute("boxsize",this.boxsize);
-					break;
-				case "number":
-					node.id = this.id;
-					node.setAttribute("mandatory",this.mandatory);
-					node.setAttribute("min", this.min);
-					node.setAttribute("max", this.max);
-					node.setAttribute("step", this.step);
-					break;
+                    node.id = this.id;
+                    if (this.mandatory != undefined) { node.setAttribute("mandatory",this.mandatory);}
+                    if (this.boxsize != undefined) {node.setAttribute("boxsize",this.boxsize);}
+                    break;
+                case "number":
+                    node.id = this.id;
+                    if (this.mandatory != undefined) { node.setAttribute("mandatory",this.mandatory);}
+                    if (this.min != undefined) {node.setAttribute("min", this.min);}
+                    if (this.max != undefined) {node.setAttribute("max", this.max);}
+                    break;
 				case "checkbox":
 				case "radio":
 					node.id = this.id;
