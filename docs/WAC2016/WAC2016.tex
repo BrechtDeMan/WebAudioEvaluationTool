@@ -63,7 +63,7 @@
 % the body of your article BEFORE References or any Appendices.
 
 % FIVE authors instead of four, to leave space between first two authors.
-\numberofauthors{5} %  in this sample file, there are a *total*
+\numberofauthors{6} %  in this sample file, there are a *total*
 % of EIGHT authors. SIX appear on the 'first-page' (for formatting
 % reasons) and the remaining two appear in the \additionalauthors section.
 %
@@ -79,25 +79,32 @@
 % e-mail address with \email.
 %
 % 1st. author
-\alignauthor Nicholas Jillings\\
-       \email{n.g.r.jillings@se14.qmul.ac.uk}
- % dummy author for nicer spacing
- \alignauthor 
+\alignauthor Nicholas Jillings\textsuperscript{2}\\
+       \email{nicholas.jillings@mail.bcu.ac.uk}
 % 2nd. author
-\alignauthor Brecht De Man\\
+\alignauthor
+\alignauthor Brecht De Man\textsuperscript{1}\\
        \email{b.deman@qmul.ac.uk}
-\and  % use '\and' if you need 'another row' of author names
+\and
+% use '\and' if you need 'another row' of author names
 % 3rd. author
-\alignauthor David Moffat\\
+\alignauthor David Moffat\textsuperscript{1}\\
        \email{d.j.moffat@qmul.ac.uk}
 % 4th. author
-\alignauthor Joshua D. Reiss\\
+\alignauthor Joshua D. Reiss\textsuperscript{1}\\
 \email{joshua.reiss@qmul.ac.uk}
+\alignauthor Ryan Stables\textsuperscript{2}\\
+       \email{ryan.stables@bcu.ac.uk}
 \and % new line for address
-       \affaddr{Centre for Digital Music, School of Electronic Engineering and Computer Science}\\
+       \affaddr{Centre for Digital Music, School of Electronic Engineering and Computer Science\textsuperscript{1}}\\
        \affaddr{Queen Mary University of London}\\
        \affaddr{Mile End Road,}
        \affaddr{London E1 4NS}\\
+       \affaddr{United Kingdom}\\
+\and
+       \affaddr{Digital Media Technology Lab\textsuperscript{2}}\\
+       \affaddr{Birmingham City University}\\
+       \affaddr{Birmingham B4 7XG}\\
        \affaddr{United Kingdom}\\
 }
 %Centre for Digital Music, School of Electronic Engineering and Computer Science, Queen Mary University of London
@@ -373,7 +380,7 @@ To provide users with a flexible system, a large range of `standard' listening t
 \label{sec:analysis}
 	% don't mention Python scripts
 	There are several benefits to providing basic analysis tools in the browser: they allow diagnosing problems, with the interface or with the test subject; they may be sufficient for many researchers' purposes; and test subjects may enjoy seeing an overview of their own results and/or results thus far at the end of their tests. 
-	\begin{figure}[bhf]
+	\begin{figure}[bh]
 		\centering
 		\includegraphics[width=.5\textwidth]{boxplot.png}
 		%\caption{This timeline of a single subject's listening test shows playback of fragments (red segments) and marker movements on the rating axis in function of time. }
