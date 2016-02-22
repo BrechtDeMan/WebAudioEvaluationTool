@@ -201,22 +201,31 @@ function comparator(audioHolderObject)
 				alert("Please listen to the samples before making a selection");
 				console.log("Please listen to the samples before making a selection");
 				return;
-			}
-			$(".comparator-selector").removeClass('selected');
+            }
 			var id = event.currentTarget.parentElement.getAttribute('track-id');
 			interfaceContext.comparator.selected = id;
-			$(event.currentTarget).addClass('selected');
-			for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
-			{
-				var obj = interfaceContext.comparator.comparators[i];
-				if (i == id) {
-					obj.value = 1;
-				} else {
-					obj.value = 0;
-				}
-				obj.parent.metric.moved(time,obj.value);
-			}
-			console.log("Selected "+id+' ('+time+')');
+            if ($(event.currentTarget).hasClass("selected")) {
+                $(".comparator-selector").removeClass('selected');
+                for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
+                {
+                     var obj = interfaceContext.comparator.comparators[i];
+                    obj.parent.metric.moved(time,0);
+                }
+            } else {
+                $(".comparator-selector").removeClass('selected');
+                $(event.currentTarget).addClass('selected');
+                for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
+                {
+                    var obj = interfaceContext.comparator.comparators[i];
+                    if (i == id) {
+                        obj.value = 1;
+                    } else {
+                        obj.value = 0;
+                    }
+                    obj.parent.metric.moved(time,obj.value);
+                }
+                console.log("Selected "+id+' ('+time+')');
+            }
 		};
         this.playback.setAttribute("playstate","ready");
 		this.playback.onclick = function(event)
