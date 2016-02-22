@@ -342,11 +342,13 @@ function createProjectSave(destURL) {
 			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
 				createProjectSave(null);
 			} else {
-				if (xmlhttp.responseXML == null)
+				var parser = new DOMParser();
+				var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
+				if (xmlDoc == null)
 				{
 					createProjectSave('null');
 				}
-				var response = xmlhttp.responseXML.childNodes[0];
+				var response = xmlDoc.childNodes[0];
 				if (response.getAttribute('state') == "OK")
 				{
 					var file = response.getElementsByTagName('file')[0];

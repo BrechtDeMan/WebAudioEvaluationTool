@@ -2,7 +2,9 @@
 <head>
     <!-- This defines the test creator tool for the Web Audio Evaluation Toolbox -->
     <link rel='stylesheet' type="text/css" href="style.css"/>
+    <link rel='stylesheet' type="text/css" href="custom.css"/>
     <script type="text/javascript">
+        window.onbeforeunload = function (e) {var message = 'If you leave the page now, any unsaved changes will be lost', e = e || window.event; if (e) { e.returnValue = message;}return message;};
         // Copy of Specifiation node from Core.js
         function Specification() {
             // Handles the decoding of the project specification XML into a simple JavaScript Object.
