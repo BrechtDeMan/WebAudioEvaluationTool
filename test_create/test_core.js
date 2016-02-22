@@ -1182,9 +1182,9 @@ function SpecificationToHTML()
             obj.text.textContent = checkText.children[i].textContent;
             metric.children.push(obj);
             metric.childrenDOM.appendChild(obj.root);
-            for (var i=0; i<specification.metrics.enabled.length; i++)
+            for (var j=0; j<specification.metrics.enabled.length; j++)
             {
-                if (specification.metrics.enabled[i] == obj.name)
+                if (specification.metrics.enabled[j] == obj.name)
                 {
                     obj.input.checked = true;
                     break;
