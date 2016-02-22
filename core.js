@@ -982,6 +982,7 @@ function AudioEngine(specification) {
 			// Create callback to decode the data asynchronously
 			this.xmlRequest.onloadend = function() {
                 // Use inbuilt WAVE decoder first
+                if (this.status == -1) {return;}
                 var waveObj = new WAVE();
                 if (waveObj.open(bufferObj.xmlRequest.response) == 0)
                 {
@@ -1011,7 +1012,7 @@ function AudioEngine(specification) {
                                 console.log('URL: '+audioObj.url);
                                 errorSessionDump('Fragment '+audioObj.id+' 404 error');
                             }
-                            this.status = -1;
+                            this.parent.status = -1;
                         }
                     });
                 }
@@ -1021,6 +1022,20 @@ function AudioEngine(specification) {
                     calculateLoudness(bufferObj,"I");
                 }
 			};
+            
+            // Create callback for any error in loading
+            this.xmlRequest.onerror = function() {
+                this.parent.status = -1;
+                for (var i=0; i<this.parent.users.length; i++)
+                {
+                    this.parent.users[i].state = -1;
+                    if (this.parent.users[i].interfaceDOM != null)
+                    {
+                        this.parent.users[i].bufferLoaded(this);
+                    }
+                }
+            }
+            
 			this.progress = 0;
 			this.progressCallback = function(event){
 				if (event.lengthComputable)
@@ -1052,7 +1067,7 @@ function AudioEngine(specification) {
                 if (audioObject.id == objects.id){return 0;}
             }
             this.users.push(audioObject);
-            if (this.status == 3)
+            if (this.status == 3 || this.status == -1)
             {
                 // The buffer is already ready, trigger bufferLoaded
                 audioObject.bufferLoaded(this);
@@ -1267,6 +1282,13 @@ function audioObject(id) {
 	{
 		// Called by the associated buffer when it has finished loading, will then 'bind' the buffer to the
 		// audioObject and trigger the interfaceDOM.enable() function for user feedback
+        if (callee.status == -1) {
+            // ERROR
+            this.state = -1;
+            if (this.interfaceDOM != null) {this.interfaceDOM.error();}
+            this.buffer = callee;
+            return;
+        }
 		if (audioEngineContext.loopPlayback){
 			// First copy the buffer into this.buffer
 			this.buffer = new audioEngineContext.bufferObj();
@@ -1308,7 +1330,11 @@ function audioObject(id) {
 		if (this.state == 1)
 		{
 			this.interfaceDOM.enable();
-		}
+		} else if (this.state == -1) {
+            // ERROR
+            this.interfaceDOM.error();
+            return;
+        }
 		this.storeDOM.setAttribute('presentedId',interfaceObject.getPresentedId());
 	};
     

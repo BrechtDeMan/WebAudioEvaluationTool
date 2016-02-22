@@ -259,6 +259,11 @@ function comparator(audioHolderObject)
 				this.playback.textContent = "Play";
 			}
 		};
+        this.error = function() {
+            // audioObject has an error!!
+            this.playback.textContent = "Error";
+            $(this.playback).addClass("error-colour");
+        }
         this.startPlayback = function()
         {
             $('.comparator-button').text('Listen');

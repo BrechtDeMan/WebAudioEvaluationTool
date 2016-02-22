@@ -57,6 +57,9 @@ function interfaceObject()
 		// Use storage.document.createElement('value'); to generate the XML node.
 		
 	};
+    this.error = function() {
+        // If there is an error with the audioObject, this will be called to indicate a failure
+    }
 };
 
 function resizeWindow(event)
