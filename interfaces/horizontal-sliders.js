@@ -331,6 +331,11 @@ function sliderObject(audioObject,label)
         node.textContent = this.slider.value;
         return node;
 	};
+    this.error = function() {
+            // audioObject has an error!!
+        this.playback.textContent = "Error";
+        $(this.playback).addClass("error-colour");
+    }
 };
 
 function outsideReferenceDOM(audioObject,index,inject)
@@ -394,6 +399,11 @@ function outsideReferenceDOM(audioObject,index,inject)
 	{
 		return false;
 	};
+    this.error = function() {
+            // audioObject has an error!!
+        this.outsideReferenceHolder.textContent = "Error";
+        $(this.outsideReferenceHolder).addClass("error-colour");
+    }
 }
 
 function resizeWindow(event)
