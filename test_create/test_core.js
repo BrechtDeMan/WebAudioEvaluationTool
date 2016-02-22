@@ -982,6 +982,24 @@ function buildPage()
                     this.preset.input.appendChild(selectOption);
                 }
                 
+                this.addMarker = {
+                    root: document.createElement("button"),
+                    parent: this,
+                    handleEvent: function() {
+                        var marker = {
+                            position: 0,
+                            text: "text"
+                        };
+                        this.parent.scaleRoot.scales.push(marker);
+                        var markerNode = new this.parent.buildMarkerNode(this.parent,marker);
+                        document.getElementById("popup-option-holder").appendChild(markerNode.root);
+                        this.parent.markerNodes.push(markerNode);
+                    }
+                };
+                this.addMarker.root.textContent = "Add Marker";
+                this.addMarker.root.addEventListener("click",this.addMarker);
+                this.content.appendChild(this.addMarker.root);
+                
                 // Create Marker List
                 this.buildMarkerList();
             }
@@ -991,45 +1009,65 @@ function buildPage()
                 this.markerNodes = [];
                 for (var i=0; i<this.scaleRoot.scales.length; i++)
                 {
-                    var markerNode = {};
-                    markerNode.root = document.createElement("div");
-                    markerNode.root.className = "popup-option-entry";
-                    markerNode.positionInput = document.createElement("input");
-                    markerNode.positionInput.min = 0;
-                    markerNode.positionInput.max = 100;
-                    markerNode.positionInput.value = this.scaleRoot.scales[i].position;
-                    markerNode.positionInput.setAttribute("name","position");
-                    markerNode.textInput = document.createElement("input");
-                    markerNode.textInput.setAttribute("name","text");
-                    markerNode.textInput.value = this.scaleRoot.scales[i].text;
-                    markerNode.specification = this.scaleRoot.scales[i];
-                    markerNode.parent = this;
-                    markerNode.handleEvent = function(event) {
-                        switch(event.currentTarget.getAttribute("name"))
-                        {
-                            case "position":
-                                this.specification.position = Number(event.currentTarget.value);
-                                break;
-                            case "text":
-                                this.specification.text = event.currentTarget.value;
-                                break;
-                        }
-                    }
-                    markerNode.positionInput.addEventListener("change",markerNode,false);
-                    markerNode.textInput.addEventListener("change",markerNode,false);
-                    
-                    var posText = document.createElement("span");
-                    posText.textContent = "Position: ";
-                    var textText = document.createElement("span");
-                    textText.textContent = "Text: ";
-                    markerNode.root.appendChild(posText);
-                    markerNode.root.appendChild(markerNode.positionInput);
-                    markerNode.root.appendChild(textText);
-                    markerNode.root.appendChild(markerNode.textInput);
+                    var markerNode = new this.buildMarkerNode(this,this.scaleRoot.scales[i]);
                     markerInject.appendChild(markerNode.root);
                     this.markerNodes.push(markerNode);
                     
                 }
+            }
+            
+            this.buildMarkerNode = function(parent,specification) {
+                this.root = document.createElement("div");
+                this.root.className = "popup-option-entry";
+                this.positionInput = document.createElement("input");
+                this.positionInput.min = 0;
+                this.positionInput.max = 100;
+                this.positionInput.value = specification.position;
+                this.positionInput.setAttribute("name","position");
+                this.textInput = document.createElement("input");
+                this.textInput.setAttribute("name","text");
+                this.textInput.value = specification.text;
+                this.specification = specification;
+                this.parent = parent;
+                this.handleEvent = function(event) {
+                    switch(event.currentTarget.getAttribute("name"))
+                    {
+                        case "position":
+                            this.specification.position = Number(event.currentTarget.value);
+                            break;
+                        case "text":
+                            this.specification.text = event.currentTarget.value;
+                            break;
+                    }
+                }
+                this.positionInput.addEventListener("change",this,false);
+                this.textInput.addEventListener("change",this,false);
+
+                var posText = document.createElement("span");
+                posText.textContent = "Position: ";
+                var textText = document.createElement("span");
+                textText.textContent = "Text: ";
+                this.root.appendChild(posText);
+                this.root.appendChild(this.positionInput);
+                this.root.appendChild(textText);
+                this.root.appendChild(this.textInput);
+
+                this.deleteMarker = {
+                    root: document.createElement("button"),
+                    parent: this,
+                    handleEvent: function() {
+                        var index = this.parent.parent.scaleRoot.scales.findIndex(function(element,index,array){
+                            if (element == this) {return true;} else {return false;}
+                        },this.parent.specification)
+                        if (index >= 0) {
+                            this.parent.parent.scaleRoot.scales.splice(index,1);
+                        }
+                        document.getElementById("popup-option-holder").removeChild(this.parent.root);
+                    }
+                }
+                this.deleteMarker.root.addEventListener("click",this.deleteMarker);
+                this.deleteMarker.root.textContent = "Delete Marker"
+                this.root.appendChild(this.deleteMarker.root);
             }
         }
     }
