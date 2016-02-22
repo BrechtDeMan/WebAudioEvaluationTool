@@ -336,7 +336,7 @@ function buildPage()
                     }
                     var obj = {
                         root: document.createElement("div"),
-                        text: document.createElement("span"),
+                        text: document.createElement("label"),
                         input: document.createElement("input"),
                         parent: this,
                         name: checkName,
@@ -364,7 +364,8 @@ function buildPage()
                     obj.input.addEventListener("click",obj);
                     obj.root.className = "popup-checkbox";
                     obj.input.type = "checkbox";
-                    obj.input.setAttribute('name',checkName);
+                    obj.input.setAttribute('id',checkName);
+                    obj.text.setAttribute("for",checkName);
                     obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
                     obj.root.appendChild(obj.input);
                     obj.root.appendChild(obj.text);
@@ -462,7 +463,7 @@ function buildPage()
                     }
                     var obj = {
                         root: document.createElement("div"),
-                        text: document.createElement("span"),
+                        text: document.createElement("label"),
                         input: document.createElement("input"),
                         parent: this,
                         name: checkName,
@@ -490,7 +491,8 @@ function buildPage()
                     obj.input.addEventListener("click",obj);
                     obj.root.className = "popup-checkbox";
                     obj.input.type = "checkbox";
-                    obj.input.setAttribute('name',checkName);
+                    obj.input.setAttribute('id',checkName);
+                    obj.text.setAttribute("for",checkName);
                     obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
                     obj.root.appendChild(obj.input);
                     obj.root.appendChild(obj.text);
@@ -588,7 +590,7 @@ function buildPage()
                     }
                     var obj = {
                         root: document.createElement("div"),
-                        text: document.createElement("span"),
+                        text: document.createElement("label"),
                         input: document.createElement("input"),
                         parent: this,
                         name: checkName,
@@ -616,7 +618,8 @@ function buildPage()
                     obj.input.addEventListener("click",obj);
                     obj.root.className = "popup-checkbox";
                     obj.input.type = "checkbox";
-                    obj.input.setAttribute('name',checkName);
+                    obj.input.setAttribute('id',checkName);
+                    obj.text.setAttribute("for",checkName);
                     obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
                     obj.root.appendChild(obj.input);
                     obj.root.appendChild(obj.text);
