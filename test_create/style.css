@@ -70,6 +70,16 @@ div.disabled{
     color: rgb(100,100,100);
 }
 
+
+div#content > div.node{
+    background-color: rgb(200,228,151);
+}
+
+div#content > div#setup{
+    background-color: coral;
+}
+
+
 div.node {
     float: left;
     padding: 10px;
@@ -87,7 +97,7 @@ div.node-title {
 }
 div.node-attributes {
     min-width: 92%;
-    float: left;
+    float: none;
     padding: 10px;
 }
 div.attribute {
@@ -103,9 +113,16 @@ div.node-buttons {
     min-width: 92%;
 }
 div.attribute input {
-    max-width: 100px;
+    max-width: 100%;
+    width: 300px;
     margin-right: 10px;
 }
 div.attribute input[type=number] {
     width: 80px;
+}
+div.attribute input[type=radio], div.attribute input[type=checkbox]{
+    width: 10px;
+}
+input:disabled+span{
+    text-decoration: line-through;
 }
