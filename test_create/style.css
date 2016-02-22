@@ -25,13 +25,20 @@ div#popup-title-holder {
     font-size: 2em;
 }
 
-button#popup-proceed {
+button.popup-button {
     width: 60px;
     height: 27px;
     padding: 5px;
     position: absolute;
-    right: 10px;
     bottom: 10px;
+}
+
+button#popup-proceed {
+    right: 10px;
+}
+
+button#popup-back {
+    left: 10px;
 }
 
 div.drag-area {
