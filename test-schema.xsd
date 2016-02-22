@@ -47,7 +47,7 @@
         <xs:element ref="survey" minOccurs="0" maxOccurs="2"/>
       </xs:sequence>
       <xs:attribute ref="id" use="required"/>
-      <xs:attribute name="hostURL" type="xs:anyURI"/>
+      <xs:attribute name="hostURL" type="xs:anyURI" default=""/>
       <xs:attribute name="randomiseOrder" type="xs:boolean" default="false"/>
       <xs:attribute name="repeatCount" type="xs:nonNegativeInteger" default="0"/>
       <xs:attribute name="loop" type="xs:boolean" default="false"/>
