@@ -182,11 +182,6 @@ function loadTest(audioHolderObject)
 	currentTestHolder.id = audioHolderObject.id;
 	currentTestHolder.repeatCount = audioHolderObject.repeatCount;
 	
-	$(audioHolderObject.commentQuestions).each(function(index,element) {
-		var node = interfaceContext.createCommentQuestion(element);
-		feedbackHolder.appendChild(node.holder);
-	});
-	
 	// Find all the audioElements from the audioHolder
 	var label = 0;
 	$(audioHolderObject.audioElements).each(function(index,element){
@@ -217,6 +212,15 @@ function loadTest(audioHolderObject)
 			label += 1;
 		}
         
+	});
+    
+    if (audioHolderObject.showElementComments) {
+		interfaceContext.showCommentBoxes(feedbackHolder,true);
+	}
+	
+	$(audioHolderObject.commentQuestions).each(function(index,element) {
+		var node = interfaceContext.createCommentQuestion(element);
+		feedbackHolder.appendChild(node.holder);
 	});
 	
 	// Auto-align
