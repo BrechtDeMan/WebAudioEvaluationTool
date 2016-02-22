@@ -21,6 +21,8 @@ var projectReturn; // Hold the URL for the return
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
+// Add a prototype to the bufferSourceNode to hold when the object was given a play command
+AudioBufferSourceNode.prototype.playbackStartTime = undefined;
 // Add a prototype to the bufferNode to hold the desired LINEAR gain
 AudioBuffer.prototype.playbackGain = undefined;
 // Add a prototype to the bufferNode to hold the computed LUFS loudness
@@ -1059,10 +1061,10 @@ function AudioEngine(specification) {
 				interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
 			}
 			if (this.loopPlayback) {
-                var setTime = audioContext.currentTime+2;
+                var setTime = audioContext.currentTime;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
-					this.audioObjects[i].play(setTime-2);
+					this.audioObjects[i].play(setTime);
 					if (id == i) {
 						this.audioObjects[i].loopStart(setTime);
 					} else {
@@ -1321,6 +1323,7 @@ function audioObject(id) {
                  this.outputGain.gain.setValueAtTime(0.0,startTime);
             }
 			this.bufferNode.start(startTime);
+            this.bufferNode.playbackStartTime = startTime;
 		}
 	};
 	
@@ -1339,19 +1342,7 @@ function audioObject(id) {
 	this.getCurrentPosition = function() {
 		var time = audioEngineContext.timer.getTestTime();
 		if (this.bufferNode != undefined) {
-			if (this.bufferNode.loop == true) {
-				if (audioEngineContext.status  == 1) {
-					return (time-this.metric.listenStart)%this.buffer.buffer.duration;
-				} else {
-					return 0;
-				}
-			} else {
-				if (this.metric.listenHold) {
-					return time - this.metric.listenStart;
-				} else {
-					return 0;
-				}
-			}
+            return (time - this.bufferNode.playbackStartTime)%this.buffer.buffer.duration;
 		} else {
 			return 0;
 		}
@@ -2396,15 +2387,13 @@ function Interface(specificationObject) {
 		
 		this.exportXMLDOM = function() {
 			var root = document.createElement('comment');
-			if (this.audioObject.specification.parent.elementComments) {
-				var question = document.createElement('question');
-				question.textContent = this.trackString.textContent;
-				var response = document.createElement('response');
-				response.textContent = this.trackCommentBox.value;
-				console.log("Comment frag-"+this.id+": "+response.textContent);
-				root.appendChild(question);
-				root.appendChild(response);
-			}
+            var question = document.createElement('question');
+            question.textContent = this.trackString.textContent;
+            var response = document.createElement('response');
+            response.textContent = this.trackCommentBox.value;
+            console.log("Comment frag-"+this.id+": "+response.textContent);
+            root.appendChild(question);
+            root.appendChild(response);
 			return root;
 		};
 		this.resize = function()
@@ -2445,13 +2434,19 @@ function Interface(specificationObject) {
 		this.holder.appendChild(br);
 		this.holder.appendChild(this.textArea);
 		
-		this.exportXMLDOM = function() {
-			var root = document.createElement('comment');
+		this.exportXMLDOM = function(storePoint) {
+			var root = storePoint.parent.document.createElement('comment');
 			root.id = this.specification.id;
 			root.setAttribute('type',this.specification.type);
-			root.textContent = this.textArea.value;
 			console.log("Question: "+this.string.textContent);
 			console.log("Response: "+root.textContent);
+            var question = storePoint.parent.document.createElement('question');
+            question.textContent = this.string.textContent;
+            var response = storePoint.parent.document.createElement('response');
+            response.textContent = this.textArea.value;
+            root.appendChild(question);
+            root.appendChild(response);
+            storePoint.XMLDOM.appendChild(root);
 			return root;
 		};
 		this.resize = function()
@@ -2521,8 +2516,8 @@ function Interface(specificationObject) {
 		this.holder.appendChild(this.span);
 		this.holder.appendChild(this.inputs);
 		
-		this.exportXMLDOM = function() {
-			var root = document.createElement('comment');
+		this.exportXMLDOM = function(storePoint) {
+			var root = storePoint.parent.document.createElement('comment');
 			root.id = this.specification.id;
 			root.setAttribute('type',this.specification.type);
 			var question = document.createElement('question');
@@ -2545,6 +2540,7 @@ function Interface(specificationObject) {
 			console.log('Response: '+response.textContent);
 			root.appendChild(question);
 			root.appendChild(response);
+            storePoint.XMLDOM.appendChild(root);
 			return root;
 		};
 		this.resize = function()
@@ -2632,8 +2628,8 @@ function Interface(specificationObject) {
 		this.holder.appendChild(this.span);
 		this.holder.appendChild(this.inputs);
 		
-		this.exportXMLDOM = function() {
-			var root = document.createElement('comment');
+		this.exportXMLDOM = function(storePoint) {
+			var root = storePoint.parent.document.createElement('comment');
 			root.id = this.specification.id;
 			root.setAttribute('type',this.specification.type);
 			var question = document.createElement('question');
@@ -2647,6 +2643,7 @@ function Interface(specificationObject) {
 				root.appendChild(response);
 				console.log('Response '+response.getAttribute('name') +': '+response.textContent);
 			}
+            storePoint.XMLDOM.appendChild(root);
 			return root;
 		};
 		this.resize = function()
@@ -2805,6 +2802,7 @@ function Interface(specificationObject) {
 		this.stop = function() {
 			clearInterval(this.interval);
 			this.interval = undefined;
+            this.scrubberHead.style.left = '0px';
 			if (this.maxTime < 60) {
 				this.curTimeSpan.textContent = '0.00';
 			} else {
@@ -2842,12 +2840,12 @@ function Interface(specificationObject) {
         }
         this.slider.onmouseup = function(event)
         {
-            var storePoint = testState.currentStore.XMLDOM.children[0].getAllElementsByName('volumeTracker');
+            var storePoint = testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].getAllElementsByName('volumeTracker');
             if (storePoint.length == 0)
             {
                 storePoint = storage.document.createElement('metricresult');
                 storePoint.setAttribute('name','volumeTracker');
-                testState.currentStore.XMLDOM.children[0].appendChild(storePoint);
+                testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].appendChild(storePoint);
             }
             else {
                 storePoint = storePoint[0];
@@ -3140,20 +3138,6 @@ function Storage()
 			var ae_metric = this.parent.document.createElement('metric');
 			aeNode.appendChild(ae_metric); 
 			this.XMLDOM.appendChild(aeNode);
-		}
-		
-		// Add any commentQuestions
-		for (var element of this.specification.commentQuestions)
-		{
-			var cqNode = this.parent.document.createElement('commentquestion');
-			cqNode.id = element.id;
-			cqNode.setAttribute('type',element.type);
-			var statement = this.parent.document.createElement('statement');
-			statement.textContent = cqNode.statement;
-			cqNode.appendChild(statement);
-			var response = this.parent.document.createElement('response');
-			cqNode.appendChild(response);
-			this.XMLDOM.appendChild(cqNode);
 		}
 		
 		this.parent.root.appendChild(this.XMLDOM);
