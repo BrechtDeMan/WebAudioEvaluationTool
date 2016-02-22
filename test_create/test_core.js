@@ -141,7 +141,11 @@ function buildPage()
         this.proceedButton.onclick = function()
         {
             popupObject.popupContent.innerHTML = null;
-            popupObject.shownObject.continue();
+            if(typeof popupObject.shownObject.continue == "function") {
+                popupObject.shownObject.continue();
+            } else {
+                popupObject.hide();
+            }
         };
         this.object.appendChild(this.proceedButton);
         
@@ -197,6 +201,11 @@ function buildPage()
                 this.backButton.style.visibility = "visible";
             } else {
                 this.backButton.style.visibility = "hidden";
+            }
+            if (typeof this.shownObject.continue == "function") {
+                this.proceedButton.textContent = "Next";
+            } else {
+                this.proceedButton.textContent = "Finish";
             }
             this.show();
         }
