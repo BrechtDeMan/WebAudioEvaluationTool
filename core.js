@@ -147,6 +147,15 @@ function loadProjectSpec(url) {
 		r.onload = function() {
 			loadProjectSpecCallback(r.response);
 		};
+        r.onerror = function() {
+            document.getElementsByTagName('body')[0].innerHTML = null;
+            var msg = document.createElement("h3");
+            msg.textContent = "FATAL ERROR";
+            var span = document.createElement("p");
+            span.textContent = "There was an error when loading your XML file. Please check your path in the URL. After the path to this page, there should be '?url=path/to/your/file.xml'. Check the spelling of your filename as well. If you are still having issues, check the log of the python server or your webserver distribution for 404 codes for your file.";
+            document.getElementsByTagName('body')[0].appendChild(msg);
+            document.getElementsByTagName('body')[0].appendChild(span);
+        }
 		r.send();
 	};
 	xmlhttp.send();
