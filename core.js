@@ -368,6 +368,8 @@ function createProjectSave(destURL) {
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
 		popup.popupContent.textContent = "Submitting. Please Wait";
+        popup.hideNextButton();
+        popup.hidePreviousButton();
 	}
 }
 
@@ -738,6 +740,18 @@ function interfacePopup() {
 			blank.style.height = window.innerHeight;
 		}
 	};
+    this.hideNextButton = function() {
+        this.buttonProceed.style.visibility = "hidden";
+    }
+    this.hidePreviousButton = function() {
+        this.buttonPrevious.style.visibility = "hidden";
+    }
+    this.showNextButton = function() {
+        this.buttonProceed.style.visibility = "visible";
+    }
+    this.showPreviousButton = function() {
+        this.buttonPrevious.style.visibility = "visible";
+    }
 }
 
 function advanceState()
