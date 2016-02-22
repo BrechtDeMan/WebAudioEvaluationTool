@@ -1031,10 +1031,6 @@ function buildPage()
                     
                 }
             }
-            this.continue = function()
-            {
-                popupObject.hide();
-            }
         }
     }
 }
@@ -1239,7 +1235,7 @@ function SpecificationToHTML()
         
         // First perform the setupNode;
         var setupSchema = specification.schema.getAllElementsByName('setup')[0];
-        this.setupDOM = new this.createGeneralNodeDOM('setup','setup',null);
+        this.setupDOM = new this.createGeneralNodeDOM('Global Configuration','setup',null);
         this.injectDOM.appendChild(this.setupDOM.rootDOM);
         var setupAttributes = setupSchema.getAllElementsByTagName('xs:attribute');
         for (var i=0; i<setupAttributes.length; i++)
@@ -1255,7 +1251,7 @@ function SpecificationToHTML()
         this.interfaceDOM.build("Interface","setup-interface",this.setupDOM.rootDOM);
         
         // Now build the Metrics selection node
-        var metric = this.createGeneralNodeDOM("metrics","setup-metric",this.setupDOM);
+        var metric = this.createGeneralNodeDOM("Session Metrics","setup-metric",this.setupDOM);
         metric.rootDOM.removeChild(metric.attributeDOM);
         this.setupDOM.children.push(metric);
         this.setupDOM.childrenDOM.appendChild(metric.rootDOM);
