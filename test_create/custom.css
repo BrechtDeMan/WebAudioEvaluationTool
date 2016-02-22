@@ -1,0 +1,23 @@
+
+div#content > div.node{
+    background-color: rgb(200,228,151);
+}
+
+div#content > div#setup{
+    background-color: coral;
+}
+
+input:disabled+span{
+    text-decoration: line-through;
+}
+
+div.attribute{
+    float: none;
+}
+div.attribute input{
+    max-width: 100%;
+    width: 300px;
+}
+div.attribute input[type=radio], div.attribute input[type=checkbox]{
+    width: 10px;
+}

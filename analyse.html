@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>Analysis</title>
+		<meta name="description" content="Show results from subjective evaluation">
+		<meta name="author" content="Brecht De Man">
+		
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+			// To aid 'one-page set-up' all scripts and CSS must be included directly in this file!
+			
+			google.load("visualization", "1", {packages:["corechart"]});
+			
+			/*************
+			*	SETUP   *
+			*************/
+			// folder where to find the XML files
+			xmlFileFolder = "saves";
+			// array of XML files
+			// THIS IS WHERE YOU SPECIFY RESULT XML FILES TO ANALYSE
+			var xmlFiles = ['test-2.xml']; 
+							
+
+			//TODO: make retrieval of file names automatic / drag files on here
+			
+			/****************
+			*	VARIABLES  *
+			****************/
+			
+			// Counters
+			// How many files, audioholders, audioelementes and statements annotated (don't count current one)
+			var numberOfFiles = -1;
+			var numberOfaudioholders = -1;
+			var numberOfaudioelementes = -1;
+			var numberOfStatements = -1;
+			var numberOfSkippedComments = 0;
+			
+			// Object arrays
+			var fileNameArray = [];
+			var subjectArray = [];
+			var audioholderArray = [];
+			var audioelementArray = [];
+			
+			// End of (file, audioholder, audioelement) flags
+			var newFile = true;
+			var newAudioHolder = true;
+			var newAudioElement = true;
+			
+			var fileCounter = 0;		// file index
+			var audioholderCounter=0;	// audioholder index (current XML file)
+			var audioelementCounter=0;	// audioelement index (current audioholder)
+			var statementNumber=0; 		// total number of statements
+			
+			var root;					// root of XML file
+			var commentInFull = '';		// full comment
+			
+			var playAudio = true;		// whether corresponding audio should be played back
+			
+			// // Measuring time
+			// var lastTimeMeasured = -1;	//
+			// var durationLastAnnotation = -1;	// duration of last annotation
+			// var timeArray = [];
+			// var MIN_TIME = 1.0;	// minimum time counted as significant
+			// var measurementPaused = false; // whether time measurement is paused
+			// var timeInBuffer = 0; // 
+			
+			var topLevel;
+			window.onload = function() {
+				// Initialise page
+				topLevel = document.getElementById('topLevelBody');
+				var setup = document.createElement('div');
+				setup.id = 'setupTagDiv';
+				loadAllFiles();
+				makePlots();
+				printSurveyData() 
+				// measure time at this point: 
+				lastTimeMeasured = new Date().getTime(); // in milliseconds
+			};
+			
+			// Assert function
+			function assert(condition, message) {
+				if (!condition) {
+					message = message || "Assertion failed";
+					if (typeof Error !== "undefined") {
+						throw new Error(message);
+					}
+					throw message; // Fallback
+				}
+			}
+
+			function median(values) { // TODO: replace code by '50th percentile' - should be the same?
+				values.sort( function(a,b) {return a - b;} );
+				var half = Math.floor(values.length/2);
+				if(values.length % 2)
+				return values[half];
+				else
+				return (values[half-1] + values[half]) / 2.0;
+			}
+
+			function percentile(values, n) {
+				values.sort( function(a,b) {return a - b;} );
+				// get ordinal rank
+				var rank = Math.min(Math.floor(values.length*n/100), values.length-1);
+				return values[rank];
+			}
+			
+			/***********************
+			*	TIME MEASUREMENT  *
+			************************/
+			
+			// measure time since last time this function was called
+			function timeSinceLastCall() {
+				// current time
+				var currentTime = new Date().getTime();
+				// calculate time difference
+				var timeDifference = currentTime - lastTimeMeasured + timeInBuffer;
+				// clear buffer (for pausing)
+				timeInBuffer = 0;
+				// remember last measured time
+				lastTimeMeasured = currentTime; 
+				return timeDifference;
+			}
+			
+			// pause time measurement
+			function pauseTimeMeasurement() {
+				// UN-PAUSE
+				if (measurementPaused) { // already paused
+					// button shows 'pause' again
+					document.getElementById('pauseButton').innerHTML = 'Pause';
+					// toggle state
+					measurementPaused = false;
+					// resume time measurement
+					lastTimeMeasured = new Date().getTime(); // reset time, discard time while paused
+				} else { // PAUSE
+					// button shows 'resume'
+					document.getElementById('pauseButton').innerHTML = 'Resume';
+					// toggle state
+					measurementPaused = true;
+					// pause time measurement
+					timeInBuffer = timeSinceLastCall();
+				}
+			}
+			
+			// show elapsed time on interface
+			function showTimeElapsedInSeconds() {
+				// if paused: un-pause
+				if (measurementPaused) {
+					pauseTimeMeasurement();
+				}
+			
+				// time of last annotation
+				var lastAnnotationTime = timeSinceLastCall()/1000;
+				document.getElementById('timeDisplay').innerHTML = lastAnnotationTime.toFixed(2); 
+				// average time over last ... annotations
+				var avgAnnotationTime;
+				var numberOfElementsToAverage = 
+						document.getElementById('numberOfTimeAverages').value; 
+				if (isPositiveInteger(numberOfElementsToAverage)) {
+					avgAnnotationTime = 
+						calculateAverageTime(lastAnnotationTime, 
+											 Number(numberOfElementsToAverage));
+				} else {
+					// change text field content to 'ALL'
+					document.getElementById('numberOfTimeAverages').value = 'ALL'; 
+					avgAnnotationTime = calculateAverageTime(lastAnnotationTime, -1);
+				}
+				document.getElementById('timeAverageDisplay').innerHTML = avgAnnotationTime.toFixed(2);
+			}
+			
+			// auxiliary function: is string a positive integer?
+			// http://stackoverflow.com/questions/10834796/...
+			// validate-that-a-string-is-a-positive-integer
+			function isPositiveInteger(str) {
+				var n = ~~Number(str);
+				return String(n) === str && n >= 0;
+			}
+			
+			// calculate average time
+			function calculateAverageTime(newTimeMeasurementInSeconds,numberOfPoints) {
+				// append last measurement time to time array, if significant
+				if (newTimeMeasurementInSeconds > MIN_TIME) {
+					timeArray.push(newTimeMeasurementInSeconds); 
+				}
+				// average over last N elements of this array
+				if (numberOfPoints < 0 || numberOfPoints>=timeArray.length) { // calculate average over all
+					var sum = 0;
+					for (var i = 0; i < timeArray.length; i++) { 
+						sum += timeArray[i];
+					}
+					averageOfTimes = sum/timeArray.length;
+				} else { // calculate average over specified number of times measured last
+					var sum = 0;
+					for (var i = timeArray.length-numberOfPoints; i < timeArray.length; i++) { 
+						sum += timeArray[i];
+					}
+					averageOfTimes = sum/numberOfPoints;
+				}
+				return averageOfTimes;
+			}
+			
+			
+			/********************************
+			*	   PLAYBACK OF AUDIO	   *
+			********************************/
+			
+			//PLAYaudioelement
+			// Keep track of whether audio should be played
+			function playFlagChanged(){
+				playAudio = playFlag.checked; // global variable
+				
+				if (!playAudio){ // if audio needs to stop
+					audio.pause(); // stop audio - if anything is playing
+					currently_playing = ''; // back to empty string so playaudioelement knows nothing's playing
+				}
+			}
+			
+			// audioholder that's currently playing
+			var currently_playing_audioholder = ''; // at first: empty string
+			var currently_playing_audioelement  = '';
+			var audio;
+			
+			// Play audioelement of audioholder if available, from start or from same position
+			function playaudioelement(audioholderName, audioelementerName){
+				if (playAudio) { // if enabled
+					// get corresponding file from folder
+					var file_location = 'audio/'+audioholderName + '/' + audioelementerName + '.mp3'; // fixed path and file name format
+					
+					// if not available, show error/warning message
+					//TODO ...
+				
+					// if nothing playing yet, start playing
+					if (currently_playing_audioholder == ''){ // signal that nothing is playing
+						//playSound(audioBuffer);
+						audio = new Audio(file_location);
+						audio.loop = true; // loop when end is reached
+						audio.play();
+						currently_playing_audioholder = audioholderName;
+						currently_playing_audioelement  = audioelementerName;
+					} else if (currently_playing_audioholder != audioholderName) {
+					// if different audioholder playing, stop that and start playing
+						audio.pause(); // stop audio
+						audio = new Audio(file_location); // load new file
+						audio.loop = true; // loop when end is reached
+						audio.play(); // play audio from the start
+						currently_playing_audioholder = audioholderName;
+						currently_playing_audioelement  = audioelementerName;
+					} else if (currently_playing_audioelement != audioelementerName) {
+					// if same audioholder playing, start playing from where it left off
+						skipTime = audio.currentTime; // time to skip to
+						audio.pause(); // stop audio
+						audio = new Audio(file_location);
+						audio.addEventListener('loadedmetadata', function() {
+							this.currentTime = skipTime;
+							console.log('Loaded '+audioholderName+'-'+audioelementerName+', playing from '+skipTime);
+						}, false); // skip to same time when audio is loaded! 
+						audio.loop = true; // loop when end is reached
+						audio.play(); // play from that time
+						audio.currentTime = skipTime;
+						currently_playing_audioholder = audioholderName;
+						currently_playing_audioelement  = audioelementerName;
+					} 
+					// if same audioelement playing: keep on playing (i.e. do nothing)
+				}
+			}
+			
+			/********************
+			*	READING FILES  *
+			********************/
+			
+			// Read necessary data from XML file
+			function readXML(xmlFileName){
+				if (window.XMLHttpRequest)
+				  {// code for IE7+, Firefox, Chrome, Opera, Safari
+				  xmlhttp=new XMLHttpRequest();
+				  }
+				else
+				  {// code for IE6, IE5
+				  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+				  }
+				xmlhttp.open("GET",xmlFileName,false);
+				xmlhttp.overrideMimeType('text/xml');
+				xmlhttp.send();
+				return xmlhttp.responseXML; 
+			}
+			
+			// go over all files and compute relevant statistics
+			function loadAllFiles() {
+				// retrieve information from XMLs
+				
+				for (fileIndex = 0; fileIndex < xmlFiles.length; fileIndex++) {
+					xmlFileName = xmlFileFolder+"/"+xmlFiles[fileIndex];
+					xml = readXML(xmlFileName); 
+					if (xml != null) { // if file exists
+						// append file name to array of file names
+						fileNameArray.push(xmlFiles[fileIndex]);
+						
+						// get root of XML file
+						root = xml.getElementsByTagName('waetresult')[0];
+						
+						// get subject ID, add to array if not already there
+						pretestSurveyResult = root.getElementsByTagName('surveyresult')[0];
+						subjectID = pretestSurveyResult.getElementsByTagName('comment')[0];
+						if (subjectID){
+							if (subjectID.getAttribute('id')!='sessionId') { // warning in console when not available
+								console.log(xmlFiles[fileIndex]+': no SessionID available');
+							}
+							if (subjectArray.indexOf(subjectID.textContent) == -1) { // if not already in array
+								subjectArray.push(subjectID.textContent); // append to array
+							}
+						}
+						
+						// go over all audioholders, add to array if not already there
+						audioholderNodes = root.getElementsByTagName('audioholder');
+						// go over audioholderNodes and append audioholder name when not present yet
+						for (audioholderIndex = 0; audioholderIndex < audioholderNodes.length; audioholderIndex++) { 
+							audioholderName = audioholderNodes[audioholderIndex].getAttribute('id');
+							if (audioholderArray.indexOf(audioholderName) == -1) { // if not already in array
+								audioholderArray.push(audioholderName); // append to array
+							}
+							// within each audioholder, go over all audioelement IDs, add to array if not already there
+							audioelementNodes = audioholderNodes[audioholderIndex].getElementsByTagName('audioelement');
+							for (audioelementIndex = 0; audioelementIndex < audioelementNodes.length; audioelementIndex++) { 
+								audioelementName = audioelementNodes[audioelementIndex].getAttribute('id');
+								if (audioelementArray.indexOf(audioelementName) == -1) { // if not already in array
+									audioelementArray.push(audioelementName); // append to array
+								}
+							}
+						}
+						// count occurrences of each audioholder
+						// ...
+					}
+					else {
+						console.log('XML file '+xmlFileName+' not found.');
+					}
+				}
+
+				// sort alphabetically
+				fileNameArray.sort();
+				subjectArray.sort();
+				audioholderArray.sort();
+				audioelementArray.sort();
+				
+				// display all information in HTML
+				// show XML file folder
+				document.getElementById('xmlFileFolder_span').innerHTML = "\""+xmlFileFolder+"/\"";
+				// show number of files
+				document.getElementById('numberOfFiles_span').innerHTML = fileNameArray.length;
+				// show list of subject names
+				document.getElementById('subjectArray_span').innerHTML = subjectArray.toString();
+				// show list of audioholders
+				document.getElementById('audioholderArray_span').innerHTML = audioholderArray.toString();
+				// show list of audioelementes
+				document.getElementById('audioelementArray_span').innerHTML = audioelementArray.toString();
+			}
+
+			function printSurveyData() { 
+				// print some fields from the survey for different people
+
+				// go over all XML files
+				for (fileIndex = 0; fileIndex < xmlFiles.length; fileIndex++) {
+					xmlFileName = xmlFileFolder+"/"+xmlFiles[fileIndex];
+					xml = readXML(xmlFileName); 
+					// make a div
+					var div = document.createElement('div');
+					document.body.appendChild(div);
+					div.id = 'div_survey_'+xmlFileName;
+					div.style.width = '1100px'; 
+					//div.style.height = '350px'; 
+
+					// title for that div (subject id)
+					document.getElementById('div_survey_'+xmlFileName).innerHTML = '<h2>'+xmlFileName+'</h2>';
+
+					// which songs did they do
+					if (xml != null) { // if file exists
+						// get root of XML file
+						root = xml.getElementsByTagName('waetresult')[0];
+						// go over all audioholders
+						// document.getElementById('div_survey_'+xmlFileName).innerHTML += '<strong>Audioholders: </strong>';
+						// audioholderNodes = root.getElementsByTagName('audioholder');
+						// for (audioholderIndex = 0; audioholderIndex < audioholderNodes.length-1; audioholderIndex++) {
+						// 	document.getElementById('div_survey_'+xmlFileName).innerHTML += audioholderNodes[audioholderIndex].getAttribute('id')+', ';
+						// }
+						// document.getElementById('div_survey_'+xmlFileName).innerHTML += audioholderNodes[audioholderNodes.length-1].getAttribute('id');
+
+						// survey responses (each if available)
+						// get posttest node for total test
+						childNodes = root.childNodes;
+						posttestnode = null;
+						for (idx = 0; idx < childNodes.length; idx++){
+							if (childNodes[childNodes.length-idx-1].tagName == 'posttest') {
+								posttestnode = childNodes[childNodes.length-idx-1];
+								break;
+							}
+						}
+
+						// post-test info
+						if (posttestnode) {
+							posttestcomments = posttestnode.getElementsByTagName('comment');
+							for (idx=0; idx < posttestcomments.length; idx++){
+								commentsToPrint = ['age', 'location']; // CHANGE WHAT TO PRINT
+								idAttribute = posttestcomments[idx].getAttribute('id');
+								if (commentsToPrint.indexOf(idAttribute) >= 0) { // if exists? 
+									document.getElementById('div_survey_'+xmlFileName).innerHTML += '<br><strong>'+idAttribute+': </strong>'+posttestcomments[idx].textContent;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			function makePlots() { //TODO: split into different functions
+				// TEMPORARY
+				makeTimeline(xmlFileFolder+"/"+xmlFiles[0]);
+
+				// create value array
+				var ratings = [];  // 3D matrix of ratings (audioholder, audioelement, subject)
+				for (audioholderIndex = 0; audioholderIndex < audioholderArray.length; audioholderIndex++) { 
+					ratings.push([]);
+					for (audioelementIndex = 0; audioelementIndex < audioelementArray.length; audioelementIndex++) { 
+						ratings[audioholderIndex].push([]);
+					}
+				}
+
+				// go over all XML files
+				for (fileIndex = 0; fileIndex < xmlFiles.length; fileIndex++) {
+					xmlFileName = xmlFileFolder+"/"+xmlFiles[fileIndex];
+					xml = readXML(xmlFileName); 
+					if (xml != null) { // if file exists
+						// get root of XML file
+						root = xml.getElementsByTagName('waetresult')[0];
+						// go over all audioholders
+						audioholderNodes = root.getElementsByTagName('audioholder');
+						for (audioholderIndex = 0; audioholderIndex < audioholderNodes.length; audioholderIndex++) { 
+							audioholderName = audioholderNodes[audioholderIndex].getAttribute('id');
+							audioelementNodes = audioholderNodes[audioholderIndex].getElementsByTagName('audioelement');
+							// go over all audioelements
+							for (audioelementIndex = 0; audioelementIndex < audioelementNodes.length; audioelementIndex++) { 
+								audioelementName = audioelementNodes[audioelementIndex].getAttribute('id');
+								// get value
+								var value = audioelementNodes[audioelementIndex].getElementsByTagName("value")[0].textContent;
+								if (value) { // if not empty, null, undefined...
+									ratingValue = parseFloat(value);
+									// add to matrix at proper position
+									aHidx = audioholderArray.indexOf(audioholderName);
+									aEidx = audioelementArray.indexOf(audioelementName);
+									ratings[aHidx][aEidx].push(ratingValue);
+								}
+							}
+						}
+
+						// go over all audioholders
+
+						// go over all audioelements within audioholder, see if present in idMatrix, add if not
+						// add corresponding rating to 'ratings', at position corresponding with position in idMatrix
+					}
+				}
+
+				for (audioholderIndex = 0; audioholderIndex < audioholderArray.length; audioholderIndex++) {
+					audioholderName = audioholderArray[audioholderIndex]; // for this song
+					tickArray = []
+
+					raw_data = [['SubjectID', 'Rating']];
+					audioElIdx = 0;
+					for (audioelementIndex = 0; audioelementIndex<ratings[audioholderIndex].length; audioelementIndex++){
+						if (ratings[audioholderIndex][audioelementIndex].length>0) {
+							audioElIdx++; // increase if not empty
+							// make tick label
+							tickArray.push({v:audioElIdx, f: audioelementArray[audioelementIndex]});
+						}
+						for (subject = 0; subject<ratings[audioholderIndex][audioelementIndex].length; subject++){
+							// add subject-value pair for each subject
+							raw_data.push([audioElIdx, ratings[audioholderIndex][audioelementIndex][subject]]); 
+						}
+					}
+
+					// create plot (one per song)
+					var data = google.visualization.arrayToDataTable(raw_data);
+
+					var options = {
+						title: audioholderName,
+						hAxis: {title: 'audioelement ID', minValue: 0, maxValue: audioElIdx+1,
+								ticks: tickArray},
+						vAxis: {title: 'Rating', minValue: 0, maxValue: 1},
+						seriesType: 'scatter',
+						legend: 'none'
+					};
+					var div = document.createElement('div');
+					document.body.appendChild(div);
+					div.id = 'div_'+audioholderName;
+					div.style.width = '1100px'; 
+					div.style.height = '350px'; 
+					var chart = new google.visualization.ComboChart(document.getElementById('div_'+audioholderName));
+					chart.draw(data, options);
+
+					// box plots
+					var div = document.createElement('div');
+					document.body.appendChild(div);
+					div.id = 'div_box_'+audioholderName;
+					div.style.width = '1100px'; 
+					div.style.height = '350px'; 
+					// Get median, percentiles, maximum and minimum; outliers.
+					pctl25 = [];
+					pctl75 = [];
+					med = [];
+					min = [];
+					max = [];
+					outlierArray = [];
+					max_n_outliers = 0; // maximum number of outliers for one audioelement
+					for (audioelementIndex = 0; audioelementIndex<ratings[audioholderIndex].length; audioelementIndex++){
+						med.push(median(ratings[audioholderIndex][audioelementIndex])); // median
+						pctl25.push(percentile(ratings[audioholderIndex][audioelementIndex], 25)); // 25th percentile
+						pctl75.push(percentile(ratings[audioholderIndex][audioelementIndex], 75)); // 75th percentile
+						IQR = pctl75[pctl75.length-1]-pctl25[pctl25.length-1];
+						// outliers: range of values which is above pctl75+1.5*IQR or below pctl25-1.5*IQR
+						outliers = [];
+						rest = [];
+						for (idx = 0; idx<ratings[audioholderIndex][audioelementIndex].length; idx++){
+							if (ratings[audioholderIndex][audioelementIndex][idx] > pctl75[pctl75.length-1]+1.5*IQR ||
+								ratings[audioholderIndex][audioelementIndex][idx] < pctl25[pctl25.length-1]-1.5*IQR){
+								outliers.push(ratings[audioholderIndex][audioelementIndex][idx]);
+							}
+							else {
+								rest.push(ratings[audioholderIndex][audioelementIndex][idx]);
+							}
+						}
+						outlierArray.push(outliers);
+						max_n_outliers = Math.max(max_n_outliers, outliers.length); // update max mber
+						// max: maximum value which is not outlier
+						max.push(Math.max.apply(null, rest));
+						// min: minimum value which is not outlier
+						min.push(Math.min.apply(null, rest));
+					}
+
+					// Build data array
+					boxplot_data = [['ID', 'Span', '', '', '', 'Median']];
+					for (idx = 0; idx < max_n_outliers; idx++) {
+						boxplot_data[0].push('Outlier');
+					}
+					for (audioelementIndex = 0; audioelementIndex<ratings[audioholderIndex].length; audioelementIndex++){
+						if (ratings[audioholderIndex][audioelementIndex].length>0) { // if rating array not empty for this audioelement
+							data_array = [
+									audioelementArray[audioelementIndex], // name
+									min[audioelementIndex], // minimum
+									pctl75[audioelementIndex],
+									pctl25[audioelementIndex],
+									max[audioelementIndex], // maximum
+									med[audioelementIndex]
+									];
+							for (idx = 0; idx < max_n_outliers; idx++) {
+								if (idx<outlierArray[audioelementIndex].length){
+									data_array.push(outlierArray[audioelementIndex][idx]);
+								}
+								else {
+									data_array.push(null);
+								}
+							}
+							boxplot_data.push(data_array);
+						}
+					}
+
+					// Create and populate the data table.
+					var data = google.visualization.arrayToDataTable(boxplot_data);
+					  // Create and draw the visualization.
+					var ac = new google.visualization.ComboChart(document.getElementById('div_box_'+audioholderName));
+					ac.draw(data, {
+						title : audioholderName,
+						//width: 600,
+						//height: 400,
+						vAxis: {title: "Rating"},
+						hAxis: {title: "audioelement ID"},
+						seriesType: "line",
+						pointSize: 5, 
+						lineWidth: 0,
+						colors: ['black'], 
+						series: { 0: {type: "candlesticks", color: 'blue'}, // box plot shape
+								  1: {type: "line", pointSize: 10, lineWidth: 0, color: 'red' } }, // median
+						legend: 'none'
+					});
+				}
+			}
+
+			function makeTimeline(xmlFileName){ // WIP
+				// Based on the XML file name, take time data and plot playback and marker movements
+
+				// read XML file and check if exists
+				xml = readXML(xmlFileName); 
+				if (!xml) { // if file does not exist
+					console.log('XML file '+xml+'does not exist. ('+xmlFileName+')')
+					return; // do nothing; exit function
+				}
+				// get root of XML file
+				root = xml.getElementsByTagName('waetresult')[0];
+
+				audioholder_time = 0; 
+				previous_audioholder_time = 0; // time spent before current audioholder
+				time_offset = 0; // test starts at zero
+
+				// go over all audioholders
+				audioholderNodes = root.getElementsByTagName('audioholder');
+				for (audioholderIndex = 0; audioholderIndex < audioholderNodes.length; audioholderIndex++) { 
+					audioholderName = audioholderNodes[audioholderIndex].getAttribute('id');
+					if (!audioholderName) {
+						console.log('audioholder name is empty; go to next one. ('+xmlFileName+')');
+						break;
+					}
+
+					// subtract total audioholder length from subsequent audioholder event times
+					audioholder_children = audioholderNodes[audioholderIndex].childNodes; 
+					foundIt = false;
+					console.log(audioholder_children[2].getElementsByTagName("metricResult")) // not working! 
+					for (idx = 0; idx<audioholder_children.length; idx++) { // go over children
+
+						if (audioholder_children[idx].getElementsByTagName('metricResult').length) {
+							console.log(audioholder_children[idx].getElementsByTagName('metricResult')[0]);
+							if (audioholder_children[idx].getElementsByTagName('metricResult')[0].getAttribute('id') == "testTime"){
+								audioholder_time = parseFloat(audioholder_children[idx].getElementsByTagName('metricResult')[0].textContent);
+								console.log(audioholder_time); 
+								foundIt = true;
+							}
+						}
+					}
+					if (!foundIt) {
+						console.log("Skipping audioholder without total time specified from "+xmlFileName+"."); // always hitting this
+						break;
+					}
+
+					audioelementNodes = audioholderNodes[audioholderIndex].getElementsByTagName('audioelement');
+					
+					// make div
+
+					// draw chart
+
+					// legend with audioelement names	
+				}
+			}
+			
+		</script>
+
+
+
+		<style>
+			div {
+				padding: 2px;
+				margin-top: 2px;
+				margin-bottom: 2px;
+			}
+			div.head{
+				margin-left: 10px;
+				border: black;
+				border-width: 2px;
+				border-style: solid;
+			}
+			div.attrib{
+				margin-left:25px;
+				border: black;
+				border-width: 2px;
+				border-style: dashed;
+				margin-bottom: 10px;
+			}
+			div#headerMatter{
+				background-color: #FFFFCC;
+			}
+			div#currentStatement{
+				font-size:3.0em;
+				font-weight: bold;
+				
+			}
+			div#debugDisplay {
+				color: #CCCCCC;
+				font-size:0.3em;
+			}
+			span#scoreDisplay {
+				font-weight: bold;
+			}
+			div#wrapper {
+				width: 780px;
+				border: 1px solid black;
+				overflow: hidden; /* add this to contain floated children */
+			}
+			div#instrumentSection {
+				width: 250px;
+				border: 1px solid red;
+				display: inline-block;
+			}
+			div#featureSection {
+				width: 250px;
+				border: 1px solid green;
+				display: inline-block;
+			}
+			div#valenceSection {
+				width: 250px;
+				border: 1px solid blue;
+				display: inline-block;
+			}
+			button#previousComment{
+				width: 120px;
+				height: 150px;
+				font-size:1.5em;
+			}
+			button#nextComment{
+				width: 666px;
+				height: 150px;
+				font-size:1.5em;
+			}
+			ul
+			{
+				list-style-type: none; /* no bullet points */
+				margin-left: -20px; /* less indent */
+				margin-top: 0px;
+  				margin-bottom: 5px;
+			}
+		</style>
+		
+	</head>
+
+	<body>
+		<h1>Subjective evaluation results</h1>
+		
+		<div id="debugDisplay">
+		XML file folder: <span id="xmlFileFolder_span"></span>
+		</div>
+
+		<div id="headerMatter">
+			<div>
+				<strong>Result XML files:</strong> <span id="numberOfFiles_span"></span>
+			</div>
+			<div>
+				<strong>Audioholders in dataset:</strong> <span id="audioholderArray_span"></span>
+			</div>
+			<div>
+				<strong>Subjects in dataset:</strong> <span id="subjectArray_span"></span>
+			</div>
+			<div>
+				<strong>Audioelements in dataset:</strong> <span id="audioelementArray_span"></span>
+			</div>
+			<br>
+		</div>
+		<br>
+
+		<!-- Show time elapsed 
+		The last annotation took <strong><span id="timeDisplay">(N/A)</span></strong> seconds.
+		<br>-->
+		
+	</body>
+</html>
