@@ -1180,7 +1180,7 @@ function AudioEngine(specification) {
 	
 	this.newTestPage = function(audioHolderObject,store) {
 		this.pageStore = store;
-		this.state = 0;
+		this.status = 0;
 		this.audioObjectsReady = false;
 		this.metric.reset();
 		for (var i=0; i < this.buffers.length; i++)
