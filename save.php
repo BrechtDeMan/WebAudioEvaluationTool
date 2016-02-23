@@ -1,5 +1,10 @@
 <?php
-    date_default_timezone_set("Europe/London");
+    try{
+        date_default_timezone_get();
+    }
+    catch(Exception $e){
+        date_default_timezone_set('UTC'); // Sets to UTC if not specified anywhere in .ini
+    }
 	header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
 	error_reporting(0);
