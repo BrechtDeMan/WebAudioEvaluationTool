@@ -17,6 +17,7 @@ re:^docs/ExperimentVariableControl\.synctex\.gz$
 *.log
 *.blg
 *.DS_Store
+*._*
 re:^RealismEval/
 re:^SynthReal/
 re:^SynthRealismTest\.html$
@@ -49,3 +50,4 @@ Makefile
 re:^docs/DMRN+10/img/\._TestCreate\.png$
 re:^docs/DMRN+10/img/\._APE\.png$
 re:^docs/DMRN+10/img/\._MUSHRA\.png$
+re:^docs/AESPosterComp/AESposter\.pdf$
