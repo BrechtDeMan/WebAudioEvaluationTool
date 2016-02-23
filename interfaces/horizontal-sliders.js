@@ -210,14 +210,14 @@ function loadTest(page)
 			}
 			sliderBox.appendChild(sliderObj.holder);
 			audioObject.bindInterface(sliderObj);
-            interfaceContext.createCommentBox(audioObject);
+            interfaceContext.commentBoxes.createCommentBox(audioObject);
 			label += 1;
 		}
         
 	});
 	if (page.showElementComments)
     {
-        interfaceContext.showCommentBoxes(feedbackHolder,true);
+        interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
     }
 	// Auto-align
 	resizeWindow(null);
