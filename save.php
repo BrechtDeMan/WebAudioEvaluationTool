@@ -1,4 +1,5 @@
 <?php
+    date_default_timezone_set("Europe/London");
 	header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
 	error_reporting(0);
