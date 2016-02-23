@@ -3094,7 +3094,7 @@ function Storage()
 	this.globalPostTest = null;
 	this.testPages = [];
 	this.document = document.implementation.createDocument(null,"waetresult");
-	this.root = this.document.children[0];
+	this.root = this.document.childNodes[0];
 	this.state = 0;
 	
 	this.initialise = function()
