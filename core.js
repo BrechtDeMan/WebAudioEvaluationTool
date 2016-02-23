@@ -802,10 +802,10 @@ function stateMachine()
 		}
 		for (var i=0; i<specification.pages.length; i++)
 		{
-			if (specification.testPages < i && specification.testPages != 0) {break;}
+			if (specification.testPages <= i && specification.testPages != 0) {break;}
 			this.stateMap.push(pageHolder[i]);
-			
 		}
+        
 		if (specification.preTest != null) {this.preTestSurvey = specification.preTest;}
 		if (specification.postTest != null) {this.postTestSurvey = specification.postTest;}
 		
