@@ -174,9 +174,9 @@ if (is_array($saves))
                 foreach($page->nest as $axis) {
                     foreach($axis->nest as $element) {
                         foreach($element->nest as $value) {
-                            $doc_string = $doc_string.$page->id;
-                            $doc_string = $doc_string.$axis->id;
-                            $doc_string = $doc_string.$element->id;
+                            $doc_string = $doc_string.$page->id.',';
+                            $doc_string = $doc_string.$axis->id.',';
+                            $doc_string = $doc_string.$element->id.',';
                             $doc_string = $doc_string.$value;
                             $doc_string = $doc_string."\r\n";
                         }
