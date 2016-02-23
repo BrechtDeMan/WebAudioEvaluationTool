@@ -201,7 +201,7 @@ function loadTest(page)
 			var sliderObj = new discreteObject(audioObject,label,interfaceScales);
 			sliderBox.appendChild(sliderObj.holder);
 			audioObject.bindInterface(sliderObj);
-            interfaceContext.createCommentBox(audioObject);
+            interfaceContext.commentBoxes.createCommentBox(audioObject);
 			label += 1;
 		}
         
@@ -209,7 +209,7 @@ function loadTest(page)
 	
     if (page.showElementComments)
     {
-        interfaceContext.showCommentBoxes(feedbackHolder,true);
+        interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
     }
     
 	// Auto-align

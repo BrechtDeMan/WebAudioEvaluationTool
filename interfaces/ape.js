@@ -356,7 +356,7 @@ function loadTest(audioHolderObject)
 			// Create a slider per track
 			var sliderNode = new sliderObject(audioObject,interfaceObj);
 			audioObject.bindInterface(sliderNode);
-            interfaceContext.createCommentBox(audioObject);
+            interfaceContext.commentBoxes.createCommentBox(audioObject);
 		}
 	});
 	
@@ -433,7 +433,7 @@ function loadTest(audioHolderObject)
 	
 	
 	if (audioHolderObject.showElementComments) {
-		interfaceContext.showCommentBoxes(feedbackHolder,true);
+		interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
 	}
 	
 	$(audioHolderObject.commentQuestions).each(function(index,element) {

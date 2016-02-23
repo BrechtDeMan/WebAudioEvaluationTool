@@ -2360,7 +2360,7 @@ function Interface(specificationObject) {
 	this.newPage = function(audioHolderObject,store)
 	{
 		audioEngineContext.newTestPage(audioHolderObject,store);
-		interfaceContext.deleteCommentBoxes();
+		interfaceContext.commentBoxes.deleteCommentBoxes();
 		interfaceContext.deleteCommentQuestions();
 		loadTest(audioHolderObject,store);
 	};
@@ -2408,58 +2408,88 @@ function Interface(specificationObject) {
 		return node;
 	};
 	
-	this.commentBoxes = [];
-	this.elementCommentBox = function(audioObject) {
-		var element = audioObject.specification;
-		this.audioObject = audioObject;
-		this.id = audioObject.id;
-		var audioHolderObject = audioObject.specification.parent;
-		// Create document objects to hold the comment boxes
-		this.trackComment = document.createElement('div');
-		this.trackComment.className = 'comment-div';
-		this.trackComment.id = 'comment-div-'+audioObject.id;
-		// Create a string next to each comment asking for a comment
-		this.trackString = document.createElement('span');
-		this.trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.interfaceDOM.getPresentedId();
-		// Create the HTML5 comment box 'textarea'
-		this.trackCommentBox = document.createElement('textarea');
-		this.trackCommentBox.rows = '4';
-		this.trackCommentBox.cols = '100';
-		this.trackCommentBox.name = 'trackComment'+audioObject.id;
-		this.trackCommentBox.className = 'trackComment';
-		var br = document.createElement('br');
-		// Add to the holder.
-		this.trackComment.appendChild(this.trackString);
-		this.trackComment.appendChild(br);
-		this.trackComment.appendChild(this.trackCommentBox);
-		
-		this.exportXMLDOM = function() {
-			var root = document.createElement('comment');
-            var question = document.createElement('question');
-            question.textContent = this.trackString.textContent;
-            var response = document.createElement('response');
-            response.textContent = this.trackCommentBox.value;
-            console.log("Comment frag-"+this.id+": "+response.textContent);
-            root.appendChild(question);
-            root.appendChild(response);
-			return root;
-		};
-		this.resize = function()
-		{
-			var boxwidth = (window.innerWidth-100)/2;
-			if (boxwidth >= 600)
-			{
-				boxwidth = 600;
-			}
-			else if (boxwidth < 400)
-			{
-				boxwidth = 400;
-			}
-			this.trackComment.style.width = boxwidth+"px";
-			this.trackCommentBox.style.width = boxwidth-6+"px";
-		};
-		this.resize();
-	};
+	this.commentBoxes = new function() {
+        this.boxes = [];
+        this.injectPoint = null;
+        this.elementCommentBox = function(audioObject) {
+            var element = audioObject.specification;
+            this.audioObject = audioObject;
+            this.id = audioObject.id;
+            var audioHolderObject = audioObject.specification.parent;
+            // Create document objects to hold the comment boxes
+            this.trackComment = document.createElement('div');
+            this.trackComment.className = 'comment-div';
+            this.trackComment.id = 'comment-div-'+audioObject.id;
+            // Create a string next to each comment asking for a comment
+            this.trackString = document.createElement('span');
+            this.trackString.innerHTML = audioHolderObject.commentBoxPrefix+' '+audioObject.interfaceDOM.getPresentedId();
+            // Create the HTML5 comment box 'textarea'
+            this.trackCommentBox = document.createElement('textarea');
+            this.trackCommentBox.rows = '4';
+            this.trackCommentBox.cols = '100';
+            this.trackCommentBox.name = 'trackComment'+audioObject.id;
+            this.trackCommentBox.className = 'trackComment';
+            var br = document.createElement('br');
+            // Add to the holder.
+            this.trackComment.appendChild(this.trackString);
+            this.trackComment.appendChild(br);
+            this.trackComment.appendChild(this.trackCommentBox);
+
+            this.exportXMLDOM = function() {
+                var root = document.createElement('comment');
+                var question = document.createElement('question');
+                question.textContent = this.trackString.textContent;
+                var response = document.createElement('response');
+                response.textContent = this.trackCommentBox.value;
+                console.log("Comment frag-"+this.id+": "+response.textContent);
+                root.appendChild(question);
+                root.appendChild(response);
+                return root;
+            };
+            this.resize = function()
+            {
+                var boxwidth = (window.innerWidth-100)/2;
+                if (boxwidth >= 600)
+                {
+                    boxwidth = 600;
+                }
+                else if (boxwidth < 400)
+                {
+                    boxwidth = 400;
+                }
+                this.trackComment.style.width = boxwidth+"px";
+                this.trackCommentBox.style.width = boxwidth-6+"px";
+            };
+            this.resize();
+        };
+        this.createCommentBox = function(audioObject) {
+            var node = new this.elementCommentBox(audioObject);
+            this.boxes.push(node);
+            audioObject.commentDOM = node;
+            return node;
+        };
+        this.sortCommentBoxes = function() {
+            this.boxes.sort(function(a,b){return a.id - b.id;});
+        };
+
+        this.showCommentBoxes = function(inject, sort) {
+            this.injectPoint = inject;
+            if (sort) {this.sortCommentBoxes();}
+            for (var box of this.boxes) {
+                inject.appendChild(box.trackComment);
+            }
+        };
+
+        this.deleteCommentBoxes = function() {
+            if (this.injectPoint != null) {
+                for (var box of this.boxes) {
+                    this.injectPoint.removeChild(box.trackComment);
+                }
+                this.injectPoint = null;
+            }
+            this.boxes = [];
+        };
+    }
 	
 	this.commentQuestions = [];
 	
@@ -2727,28 +2757,6 @@ function Interface(specificationObject) {
 			}
 		};
 		this.resize();
-	};
-
-	this.createCommentBox = function(audioObject) {
-		var node = new this.elementCommentBox(audioObject);
-		this.commentBoxes.push(node);
-		audioObject.commentDOM = node;
-		return node;
-	};
-	
-	this.sortCommentBoxes = function() {
-		this.commentBoxes.sort(function(a,b){return a.id - b.id;});
-	};
-	
-	this.showCommentBoxes = function(inject, sort) {
-		if (sort) {interfaceContext.sortCommentBoxes();}
-		for (var box of interfaceContext.commentBoxes) {
-			inject.appendChild(box.trackComment);
-		}
-	};
-	
-	this.deleteCommentBoxes = function() {
-		this.commentBoxes = [];
 	};
 	
 	this.createCommentQuestion = function(element) {

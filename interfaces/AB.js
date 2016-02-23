@@ -158,9 +158,9 @@ function loadTest(audioHolderObject)
         // Generate one comment box per presented page
         for (var element of audioEngineContext.audioObjects)
         {
-            interfaceContext.createCommentBox(element);
+            interfaceContext.commentBoxes.createCommentBox(element);
         }
-        interfaceContext.showCommentBoxes(commentHolder,true);
+        interfaceContext.commentBoxes.showCommentBoxes(commentHolder,true);
     }
 	resizeWindow(null);
 }
