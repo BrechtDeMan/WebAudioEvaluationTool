@@ -72,7 +72,12 @@ if (is_array($saves))
                 
                 // Iterate over each $element node
                 foreach($pageInstance->audioelement as $element) {
-                    
+                    // Find our specific element tag
+                    $elementId = $element['id'];
+                    $element_nest = $page_nest->findChild($elementId);
+                    if ($element_nest == null) {
+                        $element_nest = $page_nest->addNewChild($elementId);
+                    }
                     // Now get the <value> tags
                     foreach($element->value as $value) {
                         $axis_nest = null;
@@ -83,19 +88,12 @@ if (is_array($saves))
                             $axisName = $value['interface-name'];
                         }
                         
-                        $axis_nest = $page_nest->findChild($axisName);
+                        $axis_nest = $element_nest->findChild($axisName);
                         if ($axis_nest == null) {
-                            $axis_nest = $page_nest->addNewChild($axisName);
-                        }
-                        
-                        // Find our specific element tag
-                        $elementId = $element['id'];
-                        $element_nest = $axis_nest->findChild($elementId);
-                        if ($element_nest == null) {
-                            $element_nest = $axis_nest->addNewChild($elementId);
+                            $axis_nest = $element_nest->addNewChild($axisName);
                         }
                         // Now push our value
-                        $element_nest->addValue($value);
+                        $axis_nest->addValue($value);
                     }
                 }
             }
@@ -109,14 +107,14 @@ if (is_array($saves))
             foreach($root->nest as $page) {
                 $doc_page = $doc_root->addChild("page");
                 $doc_page->addAttribute("id",$page->id);
-                foreach($page->nest as $axis) {
-                    $doc_axis = $doc_page->addChild("interface");
-                    $doc_axis->addAttribute("name",$axis->id);
-                    foreach($axis->nest as $element) {
-                        $doc_element = $doc_axis->addChild("audioelement");
-                        $doc_element->addAttribute("id",$element->id);
-                        foreach($element->nest as $value) {
-                            $doc_value = $doc_element->addChild("value",$value);
+                foreach($page->nest as $element) {
+                    $doc_element = $doc_page->addChild("audioelement");
+                    $doc_element->addAttribute("id",$element->id);
+                    foreach($element->nest as $axis) {
+                        $doc_axis = $doc_element->addChild("interface");
+                        $doc_axis->addAttribute("name",$axis->id);
+                        foreach($axis->nest as $value) {
+                            $doc_axis->addChild("value",$value);
                         }
                     }
                 }
@@ -129,33 +127,33 @@ if (is_array($saves))
             for ($pageIndex = 0; $pageIndex < $root->num; $pageIndex++)
             {
                 $page = $root->nest[$pageIndex];
-                $doc_page = '{ "id": "'.$page->id.'", "axis": [';
-                for($axisIndex = 0; $axisIndex < $page->num; $axisIndex++)
+                $doc_page = '{ "id": "'.$page->id.'", "elements": [';
+                for($elementIndex = 0; $elementIndex < $page->num; $elementIndex++)
                 {
-                    $axis = $page->nest[$axisIndex];
-                    $doc_axis = '{ "name": "'.$axis->id.'", "elements": [';
-                    for($elementIndex = 0; $elementIndex < $axis->num; $elementIndex++)
+                    $element = $page->nest[$elementIndex];
+                    $doc_element = '{ "id": "'.$element->id.'", "axis": [';
+                    for($axisIndex = 0; $axisIndex < $element->num; $axisIndex++)
                     {
-                        $element = $axis->nest[$elementIndex];
-                        $doc_element = '{ "id": "'.$element->id.'", "values": [';
-                        for ($valueIndex = 0; $valueIndex < $element->num; $valueIndex++)
+                        $axis = $element->nest[$axisIndex];
+                        $doc_axis = '{ "name": "'.$axis->id.'", "values": [';
+                        for ($valueIndex = 0; $valueIndex < $axis->num; $valueIndex++)
                         {
-                            $doc_element = $doc_element."".strval($element->nest[$valueIndex]);
-                            if ($valueIndex < $element->num-1) {
-                                $doc_element = $doc_element.', ';
+                            $doc_axis = $doc_axis."".strval($axis->nest[$valueIndex]);
+                            if ($valueIndex < $axis->num-1) {
+                                $doc_axis = $doc_axis.', ';
                             }
                         }
-                        $doc_element = $doc_element.']}';
-                        if ($elementIndex < $axis->num-1) {
-                            $doc_element = $doc_element.', ';
+                        $doc_axis = $doc_axis.']}';
+                        if ($axisIndex < $element->num-1) {
+                            $doc_axis = $doc_axis.', ';
                         }
-                        $doc_axis = $doc_axis.$doc_element;
+                        $doc_element = $doc_element.$doc_axis;
                     }
-                    $doc_axis = $doc_axis.']}';
-                    if ($axisIndex < $page->num-1) {
-                        $doc_axis = $doc_axis.', ';
+                    $doc_element = $doc_element.']}';
+                    if ($elementIndex < $page->num-1) {
+                        $doc_element = $doc_element.', ';
                     }
-                    $doc_page = $doc_page.$doc_axis;
+                    $doc_page = $doc_page.$doc_element;
                 }
                 $doc_page = $doc_page.']}';
                 if ($pageIndex < $root->num-1) {
@@ -169,14 +167,14 @@ if (is_array($saves))
         case "CSV":
             // Convert to CSV
             // CSV Columts: page, axis, element, value
-            $doc_string = "page,axis,element,value"."\r\n";
+            $doc_string = "page,element,axis,value"."\r\n";
             foreach($root->nest as $page){
-                foreach($page->nest as $axis) {
-                    foreach($axis->nest as $element) {
-                        foreach($element->nest as $value) {
+                foreach($page->nest as $element) {
+                    foreach($element->nest as $axis) {
+                        foreach($axis->nest as $value) {
                             $doc_string = $doc_string.$page->id.',';
-                            $doc_string = $doc_string.$axis->id.',';
                             $doc_string = $doc_string.$element->id.',';
+                            $doc_string = $doc_string.$axis->id.',';
                             $doc_string = $doc_string.$value;
                             $doc_string = $doc_string."\r\n";
                         }
