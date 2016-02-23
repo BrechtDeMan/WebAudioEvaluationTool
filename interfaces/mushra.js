@@ -149,7 +149,7 @@ function loadTest(audioHolderObject)
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
                     }
-                    pagecountHolder.innerHTML = '<span>Page '+(audioHolderObject.presentedId+1)+' of '+specification.pages.length+'</span>';
+                    pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
                     var inject = document.getElementById('interface-buttons');
                     inject.appendChild(pagecountHolder);
                     break;
