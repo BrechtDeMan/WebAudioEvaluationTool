@@ -67,7 +67,7 @@ for file in os.listdir(folder_name):
         # ONE TIMELINE PER PAGE - make new plot per page
 
         # get list of all page names
-        for audioholder in root.findall("./audioholder"):   # iterate over pages
+        for audioholder in root.findall("./page"):   # iterate over pages
             page_name = audioholder.get('id')               # get page name
             plot_empty = True                               # check if any data is plotted
             
