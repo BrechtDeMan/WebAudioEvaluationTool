@@ -7,6 +7,13 @@
 	$datetime = date('ymdHis');
 	$xmlfile = "save".$datetime."-".$sha1_hash.".xml";
 	$fileHandle = fopen("saves/".$xmlfile, 'w');
+	if (sizeof($postText) <= 1)
+	{
+		// Filehandle failed
+		$xml = '<response state="error"><message>Input file empty</message></response>';
+		echo $xml;
+		return;
+	}
 	if ($fileHandle == FALSE)
 	{
 		// Filehandle failed
