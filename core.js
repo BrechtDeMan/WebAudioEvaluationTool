@@ -1393,7 +1393,9 @@ function audioObject(id) {
 	this.getCurrentPosition = function() {
 		var time = audioEngineContext.timer.getTestTime();
 		if (this.bufferNode != undefined) {
-            return (time - this.bufferNode.playbackStartTime)%this.buffer.buffer.duration;
+            var position = (time - this.bufferNode.playbackStartTime)%this.buffer.buffer.duration;
+            if (isNaN(position)){return 0;}
+            return position;
 		} else {
 			return 0;
 		}
@@ -1616,14 +1618,9 @@ function metricTracker(caller)
 			elementTrackerFull.setAttribute('name','elementTrackerFull');
 			for (var k=0; k<this.movementTracker.length; k++)
 			{
-				var timePos = storage.document.createElement('timePos');
-				timePos.id = k;
-				var time = storage.document.createElement('time');
-				time.textContent = this.movementTracker[k][0];
-				var position = document.createElement('position');
-				position.textContent = this.movementTracker[k][1];
-				timePos.appendChild(time);
-				timePos.appendChild(position);
+				var timePos = storage.document.createElement('movement');
+                timePos.setAttribute("time",this.movementTracker[k][0]);
+                timePos.setAttribute("value",this.movementTracker[k][1]);
 				elementTrackerFull.appendChild(timePos);
 			}
 			storeDOM.push(elementTrackerFull);
