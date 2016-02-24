@@ -130,6 +130,6 @@ div.attribute input[type=number] {
 div.attribute input[type=radio], div.attribute input[type=checkbox]{
     width: 10px;
 }
-input:disabled+span{
+input:disabled+label{
     text-decoration: line-through;
 }
