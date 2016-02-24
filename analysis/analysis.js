@@ -115,16 +115,89 @@ function Chart() {
         this.data = new google.visualization.DataTable();
         this.options = {};
         this.print = document.createElement("button");
+        this.sortDataButton = document.createElement("button");
+        this.sortDataButton.textContent = "Sort by Data";
+        this.sortDataButton.addEventListener("click",this);
+        this.sortDataButton.setAttribute("name","sort-data");
+        this.sortNameButton = document.createElement("button");
+        this.sortNameButton.textContent = "Sort by Name";
+        this.sortNameButton.addEventListener("click",this);
+        this.sortNameButton.setAttribute("name","sort-name");
+        this.draw = function() {
+            if (this.chart == undefined) {return;}
+            this.tableDOM.innerHTML = null;
+            this.latexDOM.innerHTML = null;
+            this.buildTable();
+            this.writeLatex();
+            this.chart.draw(this.data,this.options);
+        }
+        this.sortData = function() {
+            
+            var map = this.data.Jf.map(function(el,i){
+                return {index: i, value: el.c[1].v};
+            });
+            
+            map.sort(function(a,b){
+                if (a.value > b.value) {return -1;}
+                if (a.value < b.value) {return 1;}
+                return 0;
+            })
+            
+            var Jf = [];
+            var cc = [];
+            for (var i=0; i<map.length; i++) {
+                Jf.push(this.data.Jf[map[i].index]);
+                cc.push(this.data.cc[map[i].index]);
+            }
+            this.data.Jf = Jf;
+            this.data.cc = cc;
+        }
+        this.sortName = function() {
+            var map = this.data.Jf.map(function(el,i){
+                return {index: i, value: el.c[0].v};
+            });
+            
+            map.sort(function(a,b){
+                if (a.value < b.value) {return -1;}
+                if (a.value > b.value) {return 1;}
+                return 0;
+            })
+            
+            var Jf = [];
+            var cc = [];
+            for (var i=0; i<map.length; i++) {
+                Jf.push(this.data.Jf[map[i].index]);
+                cc.push(this.data.cc[map[i].index]);
+            }
+            this.data.Jf = Jf;
+            this.data.cc = cc;
+        }
         this.handleEvent = function() {
             // Only used to handle the chart.event.addListener(this,'ready') callback
-            this.downloadDOM.innerHTML = '<a href="' + this.chart.getImageURI() + '">Download</a>';
+            switch(event.currentTarget.getAttribute("name"))
+            {
+                case "download":
+                    window.open(this.chart.getImageURI());
+                    break;
+                case "sort-data":
+                    this.sortData();
+                    this.draw();
+                    break;
+                case "sort-name":
+                    this.sortName();
+                    this.draw();
+                    break;
+            }
         }
         
         this.root.appendChild(this.chartDOM);
         this.root.appendChild(this.tableDOM);
         this.root.appendChild(this.latexDOM);
+        this.root.appendChild(this.sortDataButton);
+        this.root.appendChild(this.sortNameButton);
         this.root.appendChild(this.print);
         this.print.textContent = "Download";
+        this.print.setAttribute("name","download");
         this.print.addEventListener("click",this);
         this.root.appendChild(this.downloadDOM);
         this.buildTable = function() {
@@ -155,6 +228,7 @@ function Chart() {
             for (var i=0; i<this.data.cc.length; i++) {
                 start.textContent = start.textContent+"c|";
             }
+            start.textContent = start.textContent.concat("}");
             // Now write the rows:
             for (var rIndex=0; rIndex<this.data.If.length; rIndex++) {
                 var row = document.createElement("p");
