@@ -1,4 +1,5 @@
 <?php
+	error_reporting(0);
     try{
         date_default_timezone_get();
     }
@@ -7,7 +8,6 @@
     }
 	header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
-	error_reporting(0);
 	$postText = file_get_contents('php://input');
 	$sha1_hash = sha1($postText);
 	$datetime = date('ymdHis');
