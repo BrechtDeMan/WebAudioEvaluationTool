@@ -367,6 +367,7 @@ function createProjectSave(destURL) {
 					popup.showPopup();
 					popup.popupContent.innerHTML = null;
 					popup.popupContent.textContent = "Thank you!";
+					window.onbeforeunload=null;
 				} else {
 					var message = response.getElementsByTagName('message')[0];
 					errorSessionDump(message.textContent);
