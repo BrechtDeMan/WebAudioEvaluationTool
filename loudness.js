@@ -53,7 +53,6 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 	processSource.connect(KFilter);
 	KFilter.connect(HPFilter);
 	HPFilter.connect(offlineContext.destination);
-	processSource.start();
 	offlineContext.oncomplete = function(renderedBuffer) {
 		// Have the renderedBuffer information, now continue processing
 		if (typeof renderedBuffer.renderedBuffer == 'object') {
@@ -77,6 +76,7 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 		}
         buffer.ready();
 	};
+    processSource.start(0);
 	offlineContext.startRendering();
 }
 

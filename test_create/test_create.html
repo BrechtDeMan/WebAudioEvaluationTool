@@ -2,7 +2,9 @@
 <head>
     <!-- This defines the test creator tool for the Web Audio Evaluation Toolbox -->
     <link rel='stylesheet' type="text/css" href="style.css"/>
+    <link rel='stylesheet' type="text/css" href="custom.css"/>
     <script type="text/javascript">
+        window.onbeforeunload = function (e) {var message = 'If you leave the page now, any unsaved changes will be lost', e = e || window.event; if (e) { e.returnValue = message;}return message;};
         // Copy of Specifiation node from Core.js
         function Specification() {
             // Handles the decoding of the project specification XML into a simple JavaScript Object.
@@ -228,7 +230,7 @@
 
                     this.exportXML = function(doc)
                     {
-                        var node = doc.createElement('surveyelement');
+                        var node = doc.createElement('surveyentry');
                         node.setAttribute('type',this.type);
                         var statement = doc.createElement('statement');
                         statement.textContent = this.statement;
@@ -239,15 +241,14 @@
                             break;
                         case "question":
                             node.id = this.id;
-                            node.setAttribute("mandatory",this.mandatory);
-                            node.setAttribute("boxsize",this.boxsize);
+                            if (this.mandatory != undefined) { node.setAttribute("mandatory",this.mandatory);}
+                            if (this.boxsize != undefined) {node.setAttribute("boxsize",this.boxsize);}
                             break;
                         case "number":
                             node.id = this.id;
-                            node.setAttribute("mandatory",this.mandatory);
-                            node.setAttribute("min", this.min);
-                            node.setAttribute("max", this.max);
-                            node.setAttribute("step", this.step);
+                            if (this.mandatory != undefined) { node.setAttribute("mandatory",this.mandatory);}
+                            if (this.min != undefined) {node.setAttribute("min", this.min);}
+                            if (this.max != undefined) {node.setAttribute("max", this.max);}
                             break;
                         case "checkbox":
                         case "radio":
@@ -572,9 +573,9 @@
                     this.id = null;
                     this.parent = null;
                     this.type = null;
-                    this.marker = false;
+                    this.marker = null;
                     this.enforce = false;
-                    this.gain = 1.0;
+                    this.gain = 0.0;
                     this.schema = specification.schema.getAllElementsByName('audioelement')[0];;
                     this.parent = null;
                     this.decode = function(parent,xml)

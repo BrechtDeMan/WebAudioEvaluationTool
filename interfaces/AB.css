@@ -37,7 +37,7 @@ button.big-button {
 	font-size: 1.2em;
 }
 
-div.comparitor-holder {
+div.comparator-holder {
 	width: 260px;
 	height: 300px;
 	border:  black 1px solid;
@@ -46,7 +46,7 @@ div.comparitor-holder {
     margin: 25px;
 }
 
-div.comparitor-selector {
+div.comparator-selector {
 	width: 248px;
 	height: 250px;
 	border: black 1px solid;
@@ -63,11 +63,11 @@ div.selected {
 	background-color: #008000;
 }
 
-div.comparitor-selector span {
+div.comparator-selector span {
 	font-size: 4em;
 }
 
-button.comparitor-button {
+button.comparator-button {
 	width: 250px;
 	height: 38px;
 	position: relative;

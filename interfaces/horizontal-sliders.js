@@ -150,7 +150,7 @@ function loadTest(page)
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
                     }
-                    pagecountHolder.innerHTML = '<span>Page '+(page.presentedId+1)+' of '+specification.pages.length+'</span>';
+                    pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
                     var inject = document.getElementById('interface-buttons');
                     inject.appendChild(pagecountHolder);
                     break;
@@ -210,14 +210,14 @@ function loadTest(page)
 			}
 			sliderBox.appendChild(sliderObj.holder);
 			audioObject.bindInterface(sliderObj);
-            interfaceContext.createCommentBox(audioObject);
+            interfaceContext.commentBoxes.createCommentBox(audioObject);
 			label += 1;
 		}
         
 	});
 	if (page.showElementComments)
     {
-        interfaceContext.showCommentBoxes(feedbackHolder,true);
+        interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
     }
 	// Auto-align
 	resizeWindow(null);
@@ -331,6 +331,11 @@ function sliderObject(audioObject,label)
         node.textContent = this.slider.value;
         return node;
 	};
+    this.error = function() {
+            // audioObject has an error!!
+        this.playback.textContent = "Error";
+        $(this.playback).addClass("error-colour");
+    }
 };
 
 function outsideReferenceDOM(audioObject,index,inject)
@@ -394,6 +399,11 @@ function outsideReferenceDOM(audioObject,index,inject)
 	{
 		return false;
 	};
+    this.error = function() {
+            // audioObject has an error!!
+        this.outsideReferenceHolder.textContent = "Error";
+        $(this.outsideReferenceHolder).addClass("error-colour");
+    }
 }
 
 function resizeWindow(event)

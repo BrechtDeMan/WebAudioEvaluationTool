@@ -7,8 +7,8 @@ function loadInterface() {
 	var height = window.innerHeight;
 	interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
 	
-	// Custom Comparitor Object
-	Interface.prototype.comparitor = null;
+	// Custom comparator Object
+	Interface.prototype.comparator = null;
 	
 	// The injection point into the HTML page
 	interfaceContext.insertPoint = document.getElementById("topLevelBody");
@@ -134,7 +134,7 @@ function loadTest(audioHolderObject)
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
                     }
-                    pagecountHolder.innerHTML = '<span>Page '+(audioHolderObject.presentedId+1)+' of '+specification.pages.length+'</span>';
+                    pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
                     var inject = document.getElementById('interface-buttons');
                     inject.appendChild(pagecountHolder);
                     break;
@@ -148,8 +148,8 @@ function loadTest(audioHolderObject)
         }
     }
 	
-	// Populate the comparitor object
-	interfaceContext.comparitor = new Comparitor(audioHolderObject);
+	// Populate the comparator object
+	interfaceContext.comparator = new comparator(audioHolderObject);
     if (audioHolderObject.showElementComments)
     {
         var commentHolder = document.createElement('div');
@@ -158,32 +158,32 @@ function loadTest(audioHolderObject)
         // Generate one comment box per presented page
         for (var element of audioEngineContext.audioObjects)
         {
-            interfaceContext.createCommentBox(element);
+            interfaceContext.commentBoxes.createCommentBox(element);
         }
-        interfaceContext.showCommentBoxes(commentHolder,true);
+        interfaceContext.commentBoxes.showCommentBoxes(commentHolder,true);
     }
 	resizeWindow(null);
 }
 
-function Comparitor(audioHolderObject)
+function comparator(audioHolderObject)
 {	
-	this.comparitorBox = function(audioElement,id,text)
+	this.comparatorBox = function(audioElement,id,text)
 	{
 		this.parent = audioElement;
 		this.id = id;
 		this.value = 0;
 		this.disabled = true;
 		this.box = document.createElement('div');
-		this.box.className = 'comparitor-holder';
+		this.box.className = 'comparator-holder';
 		this.box.setAttribute('track-id',audioElement.id);
-		this.box.id = 'comparitor-'+text;
+		this.box.id = 'comparator-'+text;
 		this.selector = document.createElement('div');
-		this.selector.className = 'comparitor-selector disabled';
+		this.selector.className = 'comparator-selector disabled';
 		var selectorText = document.createElement('span');
 		selectorText.textContent = text;
 		this.selector.appendChild(selectorText);
 		this.playback = document.createElement('button');
-		this.playback.className = 'comparitor-button';
+		this.playback.className = 'comparator-button';
 		this.playback.disabled = true;
 		this.playback.textContent = "Listen";
 		this.box.appendChild(this.selector);
@@ -201,22 +201,31 @@ function Comparitor(audioHolderObject)
 				alert("Please listen to the samples before making a selection");
 				console.log("Please listen to the samples before making a selection");
 				return;
-			}
-			$(".comparitor-selector").removeClass('selected');
+            }
 			var id = event.currentTarget.parentElement.getAttribute('track-id');
-			interfaceContext.comparitor.selected = id;
-			$(event.currentTarget).addClass('selected');
-			for (var i=0; i<interfaceContext.comparitor.comparitors.length; i++)
-			{
-				var obj = interfaceContext.comparitor.comparitors[i];
-				if (i == id) {
-					obj.value = 1;
-				} else {
-					obj.value = 0;
-				}
-				obj.parent.metric.moved(time,obj.value);
-			}
-			console.log("Selected "+id+' ('+time+')');
+			interfaceContext.comparator.selected = id;
+            if ($(event.currentTarget).hasClass("selected")) {
+                $(".comparator-selector").removeClass('selected');
+                for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
+                {
+                     var obj = interfaceContext.comparator.comparators[i];
+                    obj.parent.metric.moved(time,0);
+                }
+            } else {
+                $(".comparator-selector").removeClass('selected');
+                $(event.currentTarget).addClass('selected');
+                for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
+                {
+                    var obj = interfaceContext.comparator.comparators[i];
+                    if (i == id) {
+                        obj.value = 1;
+                    } else {
+                        obj.value = 0;
+                    }
+                    obj.parent.metric.moved(time,obj.value);
+                }
+                console.log("Selected "+id+' ('+time+')');
+            }
 		};
         this.playback.setAttribute("playstate","ready");
 		this.playback.onclick = function(event)
@@ -250,9 +259,14 @@ function Comparitor(audioHolderObject)
 				this.playback.textContent = "Play";
 			}
 		};
+        this.error = function() {
+            // audioObject has an error!!
+            this.playback.textContent = "Error";
+            $(this.playback).addClass("error-colour");
+        }
         this.startPlayback = function()
         {
-            $('.comparitor-button').text('Listen');
+            $('.comparator-button').text('Listen');
             $(this.playback).text('Stop');
             this.playback.setAttribute("playstate","playing");
         };
@@ -282,7 +296,7 @@ function Comparitor(audioHolderObject)
 	
 	this.boxHolders = document.getElementById('box-holders');
 	this.boxHolders.innerHTML = null;
-	this.comparitors = [];
+	this.comparators = [];
 	this.selected = null;
 	
 	// First generate the Audio Objects for the Audio Engine
@@ -294,9 +308,9 @@ function Comparitor(audioHolderObject)
 			console.log("WARNING - AB cannot have fixed reference");
 		}
 		var audioObject = audioEngineContext.newTrack(element);
-		var node = new this.comparitorBox(audioObject,index,String.fromCharCode(65 + index));
+		var node = new this.comparatorBox(audioObject,index,String.fromCharCode(65 + index));
 		audioObject.bindInterface(node);
-		this.comparitors.push(node);
+		this.comparators.push(node);
 		this.boxHolders.appendChild(node.box);
 	}
 	return this;
@@ -305,7 +319,7 @@ function Comparitor(audioHolderObject)
 function resizeWindow(event)
 {
 	document.getElementById('submit').style.left = (window.innerWidth-250)/2 + 'px';
-	var numObj = interfaceContext.comparitor.comparitors.length;
+	var numObj = interfaceContext.comparator.comparators.length;
 	var boxW = numObj*312;
     var diff = window.innerWidth - boxW;
     while (diff < 0)

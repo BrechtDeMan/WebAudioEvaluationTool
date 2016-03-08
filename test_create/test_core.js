@@ -136,13 +136,29 @@ function buildPage()
         
         this.proceedButton = document.createElement("button");
         this.proceedButton.id = "popup-proceed";
+        this.proceedButton.className = "popup-button";
         this.proceedButton.textContent = "Next";
         this.proceedButton.onclick = function()
         {
             popupObject.popupContent.innerHTML = null;
-            popupObject.shownObject.continue();
+            if(typeof popupObject.shownObject.continue == "function") {
+                popupObject.shownObject.continue();
+            } else {
+                popupObject.hide();
+            }
         };
         this.object.appendChild(this.proceedButton);
+        
+        this.backButton = document.createElement("button");
+        this.backButton.id = "popup-back";
+        this.backButton.className = "popup-button";
+        this.backButton.textContent = "Back";
+        this.backButton.onclick = function()
+        {
+            popupObject.popupContent.innerHTML = null;
+            popupObject.shownObject.back();
+        };
+        this.object.appendChild(this.backButton);
         
         this.shownObject;
 
@@ -158,17 +174,22 @@ function buildPage()
         {
             this.object.style.visibility = "visible";
             this.blanket.style.visibility = "visible";
+            if (typeof this.shownObject.back == "function") {
+                this.backButton.style.visibility = "visible";
+            } else {
+                this.backButton.style.visibility = "hidden";
+            }
         }
 
         this.hide = function()
         {
             this.object.style.visibility = "hidden";
             this.blanket.style.visibility = "hidden";
+            this.backButton.style.visibility = "hidden";
         }
 
         this.postNode = function(postObject)
         {
-            this.show();
             //Passed object must have the following:
             // Title: text to show in the title
             // Content: HTML DOM to show on the page
@@ -176,6 +197,17 @@ function buildPage()
             this.titleDOM.textContent = postObject.title;
             this.popupContent.appendChild(postObject.content);
             this.shownObject = postObject;
+            if (typeof this.shownObject.back == "function") {
+                this.backButton.style.visibility = "visible";
+            } else {
+                this.backButton.style.visibility = "hidden";
+            }
+            if (typeof this.shownObject.continue == "function") {
+                this.proceedButton.textContent = "Next";
+            } else {
+                this.proceedButton.textContent = "Finish";
+            }
+            this.show();
         }
 
         this.resize();
@@ -259,8 +291,18 @@ function buildPage()
             {
                 var testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(this.select.value)[0];
                 specification.interface = testXML.getAttribute("interface");
+                if (specification.interfaces == null)
+                {
+                    specification.interfaces = new specification.interfaceNode();
+                }
+                if (specification.metrics == null)  {
+                    specification.metrics = new specification.metricNode();
+                }
                 popupStateNodes.state[2].generate();
                 popupObject.postNode(popupStateNodes.state[2]);
+            }
+            this.back = function() {
+                popupObject.postNode(popupStateNodes.state[0]);
             }
         }
         this.state[2] = new function()
@@ -277,8 +319,12 @@ function buildPage()
             this.options = [];
             this.testXML = null;
             this.interfaceXML = null;
+            this.dynamicContent = document.createElement("div");
+            this.content.appendChild(this.dynamicContent);
             this.generate = function()
             {
+                this.options = [];
+                this.dynamicContent.innerHTML = null;
                 var interfaceName = popupStateNodes.state[1].select.value;
                 this.checkText = interfaceSpecs.getElementsByTagName("global")[0].getAllElementsByTagName("checks")[0];
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
@@ -297,72 +343,93 @@ function buildPage()
                     } else {
                         testNode = undefined;
                     }
-                    var optH = document.createElement('div');
-                    optH.className = "popup-checkbox";
-                    var checkbox = document.createElement('input');
-                    checkbox.type = "checkbox";
-                    var text = document.createElement('span');
-                    checkbox.setAttribute('name',checkName);
-                    if (interfaceNode.getAttribute('default') == 'on')
-                    {
-                        checkbox.checked = true;
+                    var obj = {
+                        root: document.createElement("div"),
+                        text: document.createElement("label"),
+                        input: document.createElement("input"),
+                        parent: this,
+                        name: checkName,
+                        handleEvent: function(event) {
+                            if (this.input.checked) {
+                                // Add to specification.interfaces.option
+                                var included = specification.interfaces.options.find(function(element,index,array){
+                                    if (element.name == this.name) {return true;} else {return false;}
+                                },this);
+                                if (included == null) {
+                                    specification.interfaces.options.push({type:"check",name:this.name});
+                                }
+                            } else {
+                                // Remove from specification.interfaces.option
+                                var position = specification.interfaces.options.findIndex(function(element,index,array){
+                                    if (element.name == this.name) {return true;} else {return false;}
+                                },this);
+                                if (position >= 0) {
+                                    specification.interfaces.options.splice(position,1);
+                                }
+                            }
+                        }
                     }
-                    if (interfaceNode.getAttribute('support') == "none")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = false;
-                        optH.className = "popup-checkbox disabled";
-                    } else if (interfaceNode.getAttribute('support') == "mandatory")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = true;
-                        optH.className = "popup-checkbox disabled";
-                    }
+                    
+                    obj.input.addEventListener("click",obj);
+                    obj.root.className = "popup-checkbox";
+                    obj.input.type = "checkbox";
+                    obj.input.setAttribute('id',checkName);
+                    obj.text.setAttribute("for",checkName);
+                    obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
+                    obj.root.appendChild(obj.input);
+                    obj.root.appendChild(obj.text);
                     if(testNode != undefined)
                     {
-                        if (interfaceNode.getAttribute('default') == 'on')
+                        if (testNode.getAttribute('default') == 'on')
                         {
-                            checkbox.checked = true;
+                            obj.input.checked = true;
                         }
                         if (testNode.getAttribute('support') == "none")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = false;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
                         }else if (interfaceNode.getAttribute('support') == "mandatory")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = true;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
+                        }
+                    } else {
+                        if (interfaceNode.getAttribute('default') == 'on')
+                        {
+                            obj.input.checked = true;
+                        }
+                        if (interfaceNode.getAttribute('support') == "none")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
+                        } else if (interfaceNode.getAttribute('support') == "mandatory")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
                         }
                     }
-                    text.textContent = popupStateNodes.state[2].checkText.getAllElementsByName(checkName)[0].textContent;
-                    optH.appendChild(checkbox);
-                    optH.appendChild(text);
-                    this.options.push(optH);
-                    this.content.appendChild(optH);
+                    var included = specification.interfaces.options.find(function(element,index,array){
+                        if (element.name == this.name) {return true;} else {return false;}
+                    },obj);
+                    if (included != undefined) {
+                        obj.input.checked = true;
+                    }
+                    obj.handleEvent();
+                    this.options.push(obj);
+                    this.dynamicContent.appendChild(obj.root);
                 }
             }
             this.continue = function()
             {
-                if (specification.interfaces == null)
-                {
-                    specification.interfaces = new specification.interfaceNode();
-                }
-                for (var object of this.options)
-                {
-                    var checkbox = object.children[0];
-                    if (checkbox.checked)
-                    {
-                        var option = {
-                            type: "check",
-                            name: checkbox.getAttribute('name')
-                        };
-                        specification.interfaces.options.push(option);
-                    }
-                }
                 popupStateNodes.state[3].generate();
                 popupObject.postNode(popupStateNodes.state[3]);
+            }
+            this.back = function() {
+                popupObject.postNode(popupStateNodes.state[1]);
             }
         }
         this.state[3] = new function()
@@ -379,8 +446,12 @@ function buildPage()
             this.checkText;
             this.testXML;
             this.interfaceXML;
+            this.dynamicContent = document.createElement("div");
+            this.content.appendChild(this.dynamicContent);
             this.generate = function()
             {
+                this.options = [];
+                this.dynamicContent.innerHTML = null;
                 var interfaceName = popupStateNodes.state[1].select.value;
                 this.checkText = interfaceSpecs.getElementsByTagName("global")[0].getAllElementsByTagName("metrics")[0];
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
@@ -399,67 +470,93 @@ function buildPage()
                     } else {
                         testNode = undefined;
                     }
-                    var optH = document.createElement('div');
-                    optH.className = "popup-checkbox";
-                    var checkbox = document.createElement('input');
-                    checkbox.type = "checkbox";
-                    var text = document.createElement('span');
-                    checkbox.setAttribute('name',checkName);
-                    if (interfaceNode.getAttribute('default') == 'on')
-                    {
-                        checkbox.checked = true;
+                    var obj = {
+                        root: document.createElement("div"),
+                        text: document.createElement("label"),
+                        input: document.createElement("input"),
+                        parent: this,
+                        name: checkName,
+                        handleEvent: function(event) {
+                            if (this.input.checked) {
+                                // Add to specification.interfaces.option
+                                var included = specification.metrics.enabled.find(function(element,index,array){
+                                    if (element == this.name) {return true;} else {return false;}
+                                },this);
+                                if (included == null) {
+                                    specification.metrics.enabled.push(this.name);
+                                }
+                            } else {
+                                // Remove from specification.interfaces.option
+                                var position = specification.metrics.enabled.findIndex(function(element,index,array){
+                                    if (element == this.name) {return true;} else {return false;}
+                                },this);
+                                if (position >= 0) {
+                                    specification.metrics.enabled.splice(position,1);
+                                }
+                            }
+                        }
                     }
-                    if (interfaceNode.getAttribute('support') == "none")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = false;
-                        optH.className = "popup-checkbox disabled";
-                    } else if (interfaceNode.getAttribute('support') == "mandatory")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = true;
-                        optH.className = "popup-checkbox disabled";
-                    }
+                    
+                    obj.input.addEventListener("click",obj);
+                    obj.root.className = "popup-checkbox";
+                    obj.input.type = "checkbox";
+                    obj.input.setAttribute('id',checkName);
+                    obj.text.setAttribute("for",checkName);
+                    obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
+                    obj.root.appendChild(obj.input);
+                    obj.root.appendChild(obj.text);
                     if(testNode != undefined)
                     {
-                        if (interfaceNode.getAttribute('default') == 'on')
+                        if (testNode.getAttribute('default') == 'on')
                         {
-                            checkbox.checked = true;
+                            obj.input.checked = true;
                         }
                         if (testNode.getAttribute('support') == "none")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = false;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
                         }else if (interfaceNode.getAttribute('support') == "mandatory")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = true;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
+                        }
+                    } else {
+                        if (interfaceNode.getAttribute('default') == 'on')
+                        {
+                            obj.input.checked = true;
+                        }
+                        if (interfaceNode.getAttribute('support') == "none")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
+                        } else if (interfaceNode.getAttribute('support') == "mandatory")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
                         }
                     }
-                    text.textContent = popupStateNodes.state[3].checkText.getAllElementsByName(checkName)[0].textContent;
-                    optH.appendChild(checkbox);
-                    optH.appendChild(text);
-                    this.options.push(optH);
-                    this.content.appendChild(optH);
+                    var included = specification.metrics.enabled.find(function(element,index,array){
+                        if (element == this.name) {return true;} else {return false;}
+                    },obj);
+                    obj.handleEvent();
+                    if (included != undefined) {
+                        obj.input.checked = true;
+                    }
+                    this.options.push(obj);
+                    this.dynamicContent.appendChild(obj.root);
                 }
             }
             this.continue = function()
             {
-                if (specification.metrics == null)  {
-                    specification.metrics = new specification.metricNode();
-                }
-                for (var object of this.options)
-                {
-                    var checkbox = object.children[0];
-                    if (checkbox.checked)
-                    {
-                        specification.metrics.enabled.push(checkbox.getAttribute('name'));
-                    }
-                }
                 popupStateNodes.state[4].generate();
                 popupObject.postNode(popupStateNodes.state[4]);
+            }
+            this.back = function() {
+                popupObject.postNode(popupStateNodes.state[2]);
             }
         }
         this.state[4] = new function()
@@ -476,13 +573,17 @@ function buildPage()
             this.checkText;
             this.testXML;
             this.interfaceXML;
+            this.dynamicContent = document.createElement("div");
+            this.content.appendChild(this.dynamicContent);
             this.generate = function()
             {
+                this.options = [];
+                this.dynamicContent.innerHTML = null;
                 var interfaceName = popupStateNodes.state[1].select.value;
                 this.checkText = interfaceSpecs.getElementsByTagName("global")[0].getAllElementsByTagName("show")[0];
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
                 this.interfaceXML = interfaceSpecs.getAllElementsByTagName("interfaces")[0].getAllElementsByName(this.testXML.getAttribute("interface"))[0].getAllElementsByTagName("show")[0];
-                this.testXML = this.testXML.getAllElementsByTagName("metrics");
+                this.testXML = this.testXML.getAllElementsByTagName("show");
                 for (var i=0; i<this.interfaceXML.children.length; i++)
                 {
                     var interfaceNode = this.interfaceXML.children[i];
@@ -496,72 +597,93 @@ function buildPage()
                     } else {
                         testNode = undefined;
                     }
-                    var optH = document.createElement('div');
-                    optH.className = "popup-checkbox";
-                    var checkbox = document.createElement('input');
-                    checkbox.type = "checkbox";
-                    var text = document.createElement('span');
-                    checkbox.setAttribute('name',checkName);
-                    if (interfaceNode.getAttribute('default') == 'on')
-                    {
-                        checkbox.checked = true;
+                    var obj = {
+                        root: document.createElement("div"),
+                        text: document.createElement("label"),
+                        input: document.createElement("input"),
+                        parent: this,
+                        name: checkName,
+                        handleEvent: function(event) {
+                            if (this.input.checked) {
+                                // Add to specification.interfaces.option
+                                var included = specification.interfaces.options.find(function(element,index,array){
+                                    if (element.name == this.name) {return true;} else {return false;}
+                                },this);
+                                if (included == null) {
+                                    specification.interfaces.options.push({type:"show",name:this.name});
+                                }
+                            } else {
+                                // Remove from specification.interfaces.option
+                                var position = specification.interfaces.options.findIndex(function(element,index,array){
+                                    if (element.name == this.name) {return true;} else {return false;}
+                                },this);
+                                if (position >= 0) {
+                                    specification.interfaces.options.splice(position,1);
+                                }
+                            }
+                        }
                     }
-                    if (interfaceNode.getAttribute('support') == "none")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = false;
-                        optH.className = "popup-checkbox disabled";
-                    } else if (interfaceNode.getAttribute('support') == "mandatory")
-                    {
-                        checkbox.disabled = true;
-                        checkbox.checked = true;
-                        optH.className = "popup-checkbox disabled";
-                    }
+                    
+                    obj.input.addEventListener("click",obj);
+                    obj.root.className = "popup-checkbox";
+                    obj.input.type = "checkbox";
+                    obj.input.setAttribute('id',checkName);
+                    obj.text.setAttribute("for",checkName);
+                    obj.text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
+                    obj.root.appendChild(obj.input);
+                    obj.root.appendChild(obj.text);
                     if(testNode != undefined)
                     {
-                        if (interfaceNode.getAttribute('default') == 'on')
+                        if (testNode.getAttribute('default') == 'on')
                         {
-                            checkbox.checked = true;
+                            obj.input.checked = true;
                         }
                         if (testNode.getAttribute('support') == "none")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = false;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
                         }else if (interfaceNode.getAttribute('support') == "mandatory")
                         {
-                            checkbox.disabled = true;
-                            checkbox.checked = true;
-                            optH.className = "popup-checkbox disabled";
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
+                        }
+                    } else {
+                        if (interfaceNode.getAttribute('default') == 'on')
+                        {
+                            obj.input.checked = true;
+                        }
+                        if (interfaceNode.getAttribute('support') == "none")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = false;
+                            obj.root.className = "popup-checkbox disabled";
+                        } else if (interfaceNode.getAttribute('support') == "mandatory")
+                        {
+                            obj.input.disabled = true;
+                            obj.input.checked = true;
+                            obj.root.className = "popup-checkbox disabled";
                         }
                     }
-                    text.textContent = this.checkText.getAllElementsByName(checkName)[0].textContent;
-                    optH.appendChild(checkbox);
-                    optH.appendChild(text);
-                    this.options.push(optH);
-                    this.content.appendChild(optH);
+                    var included = specification.interfaces.options.find(function(element,index,array){
+                        if (element.name == this.name) {return true;} else {return false;}
+                    },obj);
+                    if (included != undefined) {
+                        obj.input.checked = true;
+                    }
+                    obj.handleEvent();
+                    this.options.push(obj);
+                    this.dynamicContent.appendChild(obj.root);
                 }
             }
             this.continue = function()
             {
-                if (specification.interfaces == null)
-                {
-                    specification.interfaces = new specification.interfaceNode();
-                }
-                for (var object of this.options)
-                {
-                    var checkbox = object.children[0];
-                    if (checkbox.checked)
-                    {
-                        var option = {
-                            type: "show",
-                            name: checkbox.getAttribute('name')
-                        };
-                        specification.interfaces.options.push(option);
-                    }
-                }
                 popupObject.hide();
                 convert.convert(document.getElementById('content'));
+            }
+            this.back = function() {
+                popupObject.postNode(popupStateNodes.state[3]);
             }
         }
         this.state[5] = new function() {
@@ -860,6 +982,24 @@ function buildPage()
                     this.preset.input.appendChild(selectOption);
                 }
                 
+                this.addMarker = {
+                    root: document.createElement("button"),
+                    parent: this,
+                    handleEvent: function() {
+                        var marker = {
+                            position: 0,
+                            text: "text"
+                        };
+                        this.parent.scaleRoot.scales.push(marker);
+                        var markerNode = new this.parent.buildMarkerNode(this.parent,marker);
+                        document.getElementById("popup-option-holder").appendChild(markerNode.root);
+                        this.parent.markerNodes.push(markerNode);
+                    }
+                };
+                this.addMarker.root.textContent = "Add Marker";
+                this.addMarker.root.addEventListener("click",this.addMarker);
+                this.content.appendChild(this.addMarker.root);
+                
                 // Create Marker List
                 this.buildMarkerList();
             }
@@ -869,49 +1009,65 @@ function buildPage()
                 this.markerNodes = [];
                 for (var i=0; i<this.scaleRoot.scales.length; i++)
                 {
-                    var markerNode = {};
-                    markerNode.root = document.createElement("div");
-                    markerNode.root.className = "popup-option-entry";
-                    markerNode.positionInput = document.createElement("input");
-                    markerNode.positionInput.min = 0;
-                    markerNode.positionInput.max = 100;
-                    markerNode.positionInput.value = this.scaleRoot.scales[i].position;
-                    markerNode.positionInput.setAttribute("name","position");
-                    markerNode.textInput = document.createElement("input");
-                    markerNode.textInput.setAttribute("name","text");
-                    markerNode.textInput.value = this.scaleRoot.scales[i].text;
-                    markerNode.specification = this.scaleRoot.scales[i];
-                    markerNode.parent = this;
-                    markerNode.handleEvent = function(event) {
-                        switch(event.currentTarget.getAttribute("name"))
-                        {
-                            case "position":
-                                this.specification.position = Number(event.currentTarget.value);
-                                break;
-                            case "text":
-                                this.specification.text = event.currentTarget.value;
-                                break;
-                        }
-                    }
-                    markerNode.positionInput.addEventListener("change",markerNode,false);
-                    markerNode.textInput.addEventListener("change",markerNode,false);
-                    
-                    var posText = document.createElement("span");
-                    posText.textContent = "Position: ";
-                    var textText = document.createElement("span");
-                    textText.textContent = "Text: ";
-                    markerNode.root.appendChild(posText);
-                    markerNode.root.appendChild(markerNode.positionInput);
-                    markerNode.root.appendChild(textText);
-                    markerNode.root.appendChild(markerNode.textInput);
+                    var markerNode = new this.buildMarkerNode(this,this.scaleRoot.scales[i]);
                     markerInject.appendChild(markerNode.root);
                     this.markerNodes.push(markerNode);
                     
                 }
             }
-            this.continue = function()
-            {
-                popupObject.hide();
+            
+            this.buildMarkerNode = function(parent,specification) {
+                this.root = document.createElement("div");
+                this.root.className = "popup-option-entry";
+                this.positionInput = document.createElement("input");
+                this.positionInput.min = 0;
+                this.positionInput.max = 100;
+                this.positionInput.value = specification.position;
+                this.positionInput.setAttribute("name","position");
+                this.textInput = document.createElement("input");
+                this.textInput.setAttribute("name","text");
+                this.textInput.value = specification.text;
+                this.specification = specification;
+                this.parent = parent;
+                this.handleEvent = function(event) {
+                    switch(event.currentTarget.getAttribute("name"))
+                    {
+                        case "position":
+                            this.specification.position = Number(event.currentTarget.value);
+                            break;
+                        case "text":
+                            this.specification.text = event.currentTarget.value;
+                            break;
+                    }
+                }
+                this.positionInput.addEventListener("change",this,false);
+                this.textInput.addEventListener("change",this,false);
+
+                var posText = document.createElement("span");
+                posText.textContent = "Position: ";
+                var textText = document.createElement("span");
+                textText.textContent = "Text: ";
+                this.root.appendChild(posText);
+                this.root.appendChild(this.positionInput);
+                this.root.appendChild(textText);
+                this.root.appendChild(this.textInput);
+
+                this.deleteMarker = {
+                    root: document.createElement("button"),
+                    parent: this,
+                    handleEvent: function() {
+                        var index = this.parent.parent.scaleRoot.scales.findIndex(function(element,index,array){
+                            if (element == this) {return true;} else {return false;}
+                        },this.parent.specification)
+                        if (index >= 0) {
+                            this.parent.parent.scaleRoot.scales.splice(index,1);
+                        }
+                        document.getElementById("popup-option-holder").removeChild(this.parent.root);
+                    }
+                }
+                this.deleteMarker.root.addEventListener("click",this.deleteMarker);
+                this.deleteMarker.root.textContent = "Delete Marker"
+                this.root.appendChild(this.deleteMarker.root);
             }
         }
     }
@@ -1117,7 +1273,7 @@ function SpecificationToHTML()
         
         // First perform the setupNode;
         var setupSchema = specification.schema.getAllElementsByName('setup')[0];
-        this.setupDOM = new this.createGeneralNodeDOM('setup','setup',null);
+        this.setupDOM = new this.createGeneralNodeDOM('Global Configuration','setup',null);
         this.injectDOM.appendChild(this.setupDOM.rootDOM);
         var setupAttributes = setupSchema.getAllElementsByTagName('xs:attribute');
         for (var i=0; i<setupAttributes.length; i++)
@@ -1133,7 +1289,7 @@ function SpecificationToHTML()
         this.interfaceDOM.build("Interface","setup-interface",this.setupDOM.rootDOM);
         
         // Now build the Metrics selection node
-        var metric = this.createGeneralNodeDOM("metrics","setup-metric",this.setupDOM);
+        var metric = this.createGeneralNodeDOM("Session Metrics","setup-metric",this.setupDOM);
         metric.rootDOM.removeChild(metric.attributeDOM);
         this.setupDOM.children.push(metric);
         this.setupDOM.childrenDOM.appendChild(metric.rootDOM);
@@ -1182,9 +1338,9 @@ function SpecificationToHTML()
             obj.text.textContent = checkText.children[i].textContent;
             metric.children.push(obj);
             metric.childrenDOM.appendChild(obj.root);
-            for (var i=0; i<specification.metrics.enabled.length; i++)
+            for (var j=0; j<specification.metrics.enabled.length; j++)
             {
-                if (specification.metrics.enabled[i] == obj.name)
+                if (specification.metrics.enabled[j] == obj.name)
                 {
                     obj.input.checked = true;
                     break;
@@ -1872,6 +2028,9 @@ function SpecificationToHTML()
         }
         
         // Build the components
+        if (this.specification.interfaces.length == 0) {
+            this.specification.interfaces.push(new specification.interfaceNode());
+        }
         for (var interfaceObj of this.specification.interfaces)
         {
             var newInterface = new this.parent.interfaceNode(this.parent,interfaceObj);
