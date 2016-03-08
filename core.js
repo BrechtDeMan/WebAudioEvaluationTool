@@ -166,38 +166,10 @@ function loadProjectSpecCallback(response) {
 	//var decode = $.parseXML(response);
 	//projectXML = $(decode);
 	
-	// First perform XML schema validation
-	var Module = {
-		xml: response,
-		schema: schemaXSD,
-		arguments:["--noout", "--schema", 'test-schema.xsd','document.xml']
-	};
-	
-	var xmllint = validateXML(Module);
-	console.log(xmllint);
-	if(xmllint != 'document.xml validates\n')
-	{
-		document.getElementsByTagName('body')[0].innerHTML = null;
-		var msg = document.createElement("h3");
-		msg.textContent = "FATAL ERROR";
-		var span = document.createElement("h4");
-		span.textContent = "The XML validator returned the following errors when decoding your XML file";
-		document.getElementsByTagName('body')[0].appendChild(msg);
-		document.getElementsByTagName('body')[0].appendChild(span);
-		xmllint = xmllint.split('\n');
-		for (var i in xmllint)
-		{
-			document.getElementsByTagName('body')[0].appendChild(document.createElement('br'));
-			var span = document.createElement("span");
-			span.textContent = xmllint[i];
-			document.getElementsByTagName('body')[0].appendChild(span);
-		}
-		return;
-	}
-	
-	var parse = new DOMParser();
-	projectXML = parse.parseFromString(response,'text/xml');
-	var errorNode = projectXML.getElementsByTagName('parsererror');
+    // Check if XML is new or a resumption
+    var parse = new DOMParser();
+	var responseDocument = parse.parseFromString(response,'text/xml');
+    var errorNode = responseDocument.getElementsByTagName('parsererror');
 	if (errorNode.length >= 1)
 	{
 		var msg = document.createElement("h3");
@@ -210,10 +182,51 @@ function loadProjectSpecCallback(response) {
 		document.getElementsByTagName('body')[0].appendChild(errorNode[0]);
 		return;
 	}
+    if (responseDocument.children[0].nodeName == "waet") {
+        // document is a specification
+        
+        // Perform XML schema validation
+        var Module = {
+            xml: response,
+            schema: schemaXSD,
+            arguments:["--noout", "--schema", 'test-schema.xsd','document.xml']
+        };
+            projectXML = responseDocument;
+        var xmllint = validateXML(Module);
+        console.log(xmllint);
+        if(xmllint != 'document.xml validates\n')
+        {
+            document.getElementsByTagName('body')[0].innerHTML = null;
+            var msg = document.createElement("h3");
+            msg.textContent = "FATAL ERROR";
+            var span = document.createElement("h4");
+            span.textContent = "The XML validator returned the following errors when decoding your XML file";
+            document.getElementsByTagName('body')[0].appendChild(msg);
+            document.getElementsByTagName('body')[0].appendChild(span);
+            xmllint = xmllint.split('\n');
+            for (var i in xmllint)
+            {
+                document.getElementsByTagName('body')[0].appendChild(document.createElement('br'));
+                var span = document.createElement("span");
+                span.textContent = xmllint[i];
+                document.getElementsByTagName('body')[0].appendChild(span);
+            }
+            return;
+        }
+        
+        // Generate the session-key
+        storage.initialise();
+        
+    } else if (responseDocument.children[0].nodeName == "waetresult") {
+        // document is a result
+        projectXML = responseDocument.getElementsByTagName('waet')[0];
+        // Use the session-key
+        var sessionKey = responseDocument.children[0].getAttribute(key);
+        storage.initialise(sessionKey);
+    }
 	
 	// Build the specification
 	specification.decode(projectXML);
-	storage.initialise();
 	/// CHECK FOR SAMPLE RATE COMPATIBILITY
 	if (specification.sampleRate != undefined) {
 		if (Number(specification.sampleRate) != audioContext.sampleRate) {
@@ -430,6 +443,10 @@ function linearToDecibel(gain)
 function decibelToLinear(gain)
 {
 	return Math.pow(10,gain/20.0);
+}
+
+function randomString(length) {
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
 }
 
 function interfacePopup() {
@@ -3097,11 +3114,38 @@ function Storage()
 	this.root = this.document.childNodes[0];
 	this.state = 0;
 	
-	this.initialise = function()
+	this.initialise = function(sessionKey)
 	{
 		if (specification.preTest != undefined){this.globalPreTest = new this.surveyNode(this,this.root,specification.preTest);}
 		if (specification.postTest != undefined){this.globalPostTest = new this.surveyNode(this,this.root,specification.postTest);}
+        if (sessionKey == undefined) {
+            // We need to get the sessionKey
+            this.SessionKey.generateKey();
+        } else {
+            this.SessionKey.key = sessionKey;
+        }
 	};
+    
+    this.SessionKey = {
+        key: null,
+        request: new XMLHttpRequest(),
+        parent: this,
+        handleEvent: function() {
+            var parse = new DOMParser();
+            var xml = parse.parseFromString(this.request.response,"text/xml");
+            if (xml.getAllElementsByTagName("state")[0].textContent == "OK") {
+                this.key = xml.getAllElementsByTagName("key")[0].textContent;
+            } else {
+                this.generateKey();
+            }
+        },
+        generateKey: function() {
+            var temp_key = randomString(32);
+            this.request.open("GET","keygen.php?key="+temp_key,true);
+            this.request.addEventListener("load",this);
+            this.request.send();
+        }
+    }
 	
 	this.createTestPageStore = function(specification)
 	{
