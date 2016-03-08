@@ -55,7 +55,7 @@ for file in files_list: # iterate over all files in files_list
         page_number = 0
         
         # get list of all page names
-        for audioholder in root.findall("./audioholder"):   # iterate over pages
+        for audioholder in root.findall("./page"):   # iterate over pages
             page_name = audioholder.get('id')               # get page name
             
             if page_name is None: # ignore 'empty' audio_holders

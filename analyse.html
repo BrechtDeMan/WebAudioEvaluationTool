@@ -24,7 +24,7 @@
 			xmlFileFolder = "saves";
 			// array of XML files
 			// THIS IS WHERE YOU SPECIFY RESULT XML FILES TO ANALYSE
-			var xmlFiles = ['test-0.xml','test-1.xml','test-2.xml','test-3.xml']; 
+			var xmlFiles = ['test-2.xml']; 
 							
 
 			//TODO: make retrieval of file names automatic / drag files on here
@@ -284,6 +284,7 @@
 				  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 				  }
 				xmlhttp.open("GET",xmlFileName,false);
+				xmlhttp.overrideMimeType('text/xml');
 				xmlhttp.send();
 				return xmlhttp.responseXML; 
 			}
@@ -300,11 +301,11 @@
 						fileNameArray.push(xmlFiles[fileIndex]);
 						
 						// get root of XML file
-						root = xml.getElementsByTagName('browserevaluationresult')[0];
+						root = xml.getElementsByTagName('waetresult')[0];
 						
 						// get subject ID, add to array if not already there
-						pretest = root.getElementsByTagName('pretest')[0];
-						subjectID = pretest.getElementsByTagName('comment')[0];
+						pretestSurveyResult = root.getElementsByTagName('surveyresult')[0];
+						subjectID = pretestSurveyResult.getElementsByTagName('comment')[0];
 						if (subjectID){
 							if (subjectID.getAttribute('id')!='sessionId') { // warning in console when not available
 								console.log(xmlFiles[fileIndex]+': no SessionID available');
@@ -378,7 +379,7 @@
 					// which songs did they do
 					if (xml != null) { // if file exists
 						// get root of XML file
-						root = xml.getElementsByTagName('browserevaluationresult')[0];
+						root = xml.getElementsByTagName('waetresult')[0];
 						// go over all audioholders
 						// document.getElementById('div_survey_'+xmlFileName).innerHTML += '<strong>Audioholders: </strong>';
 						// audioholderNodes = root.getElementsByTagName('audioholder');
@@ -415,7 +416,7 @@
 
 			function makePlots() { //TODO: split into different functions
 				// TEMPORARY
-				makeTimeline(xmlFileFolder+"/"+xmlFiles[7]);
+				makeTimeline(xmlFileFolder+"/"+xmlFiles[0]);
 
 				// create value array
 				var ratings = [];  // 3D matrix of ratings (audioholder, audioelement, subject)
@@ -432,7 +433,7 @@
 					xml = readXML(xmlFileName); 
 					if (xml != null) { // if file exists
 						// get root of XML file
-						root = xml.getElementsByTagName('browserevaluationresult')[0];
+						root = xml.getElementsByTagName('waetresult')[0];
 						// go over all audioholders
 						audioholderNodes = root.getElementsByTagName('audioholder');
 						for (audioholderIndex = 0; audioholderIndex < audioholderNodes.length; audioholderIndex++) { 
@@ -594,7 +595,7 @@
 					return; // do nothing; exit function
 				}
 				// get root of XML file
-				root = xml.getElementsByTagName('browserevaluationresult')[0];
+				root = xml.getElementsByTagName('waetresult')[0];
 
 				audioholder_time = 0; 
 				previous_audioholder_time = 0; // time spent before current audioholder

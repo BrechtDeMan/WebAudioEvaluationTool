@@ -149,7 +149,7 @@ function loadTest(audioHolderObject)
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
                     }
-                    pagecountHolder.innerHTML = '<span>Page '+(audioHolderObject.presentedId+1)+' of '+specification.pages.length+'</span>';
+                    pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
                     var inject = document.getElementById('interface-buttons');
                     inject.appendChild(pagecountHolder);
                     break;
@@ -182,11 +182,6 @@ function loadTest(audioHolderObject)
 	currentTestHolder.id = audioHolderObject.id;
 	currentTestHolder.repeatCount = audioHolderObject.repeatCount;
 	
-	$(audioHolderObject.commentQuestions).each(function(index,element) {
-		var node = interfaceContext.createCommentQuestion(element);
-		feedbackHolder.appendChild(node.holder);
-	});
-	
 	// Find all the audioElements from the audioHolder
 	var label = 0;
 	$(audioHolderObject.audioElements).each(function(index,element){
@@ -213,10 +208,19 @@ function loadTest(audioHolderObject)
 			}
 			sliderBox.appendChild(sliderObj.holder);
 			audioObject.bindInterface(sliderObj);
-            interfaceContext.createCommentBox(audioObject);
+            interfaceContext.commentBoxes.createCommentBox(audioObject);
 			label += 1;
 		}
         
+	});
+    
+    if (audioHolderObject.showElementComments) {
+		interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
+	}
+	
+	$(audioHolderObject.commentQuestions).each(function(index,element) {
+		var node = interfaceContext.createCommentQuestion(element);
+		feedbackHolder.appendChild(node.holder);
 	});
 	
 	// Auto-align
@@ -339,6 +343,11 @@ function sliderObject(audioObject,label)
 	{
 		return true;
 	};
+    this.error = function() {
+            // audioObject has an error!!
+        this.playback.textContent = "Error";
+        $(this.playback).addClass("error-colour");
+    }
 }
 
 function outsideReferenceDOM(audioObject,index,inject)
@@ -402,6 +411,11 @@ function outsideReferenceDOM(audioObject,index,inject)
 	{
 		return false;
 	};
+    this.error = function() {
+            // audioObject has an error!!
+        this.outsideReferenceHolder.textContent = "Error";
+        $(this.outsideReferenceHolder).addClass("error-colour");
+    }
 }
 
 function resizeWindow(event)

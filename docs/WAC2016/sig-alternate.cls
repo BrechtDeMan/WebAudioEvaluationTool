@@ -374,7 +374,7 @@
 \newfont{\affaddrit}{phvro8t at 10pt} % GM 2/4/2000
 \newfont{\eaddfnt}{phvr8t at 12pt}
 \newfont{\ixpt}{ptmr8t at 9pt}
-\newfont{\confname}{ptmri8t at 8pt}
+\newfont{\confname}{ptmri8t at 7pt}%\newfont{\confname}{ptmri8t at 8pt}
 \newfont{\crnotice}{ptmr8t at 8pt}
 \newfont{\ninept}{ptmr8t at 9pt}
 % +++++++++++++++++++++++++++++++++++++++++++++
@@ -898,8 +898,8 @@
 \@float{copyrightbox}[b]
 \begin{center}
 \setlength{\unitlength}{1pc}
-\begin{picture}(20,6) %Space for copyright notice
-\put(0,-0.95){\crnotice{\@toappear}}
+\begin{picture}(20,4) %\begin{picture}(20,6) %Space for copyright notice
+\put(0,-0.25){\crnotice{\@toappear}}
 \end{picture}
 \end{center}
 \end@float}
@@ -1512,14 +1512,14 @@
 
 \newtoks\copyrightetc
 \global\copyrightetc{%
-{\noindent\confname\ \the\conf\ \the\confinfo}\par\smallskip
+{\noindent\confname\the\conf\ \the\confinfo}\par\smallskip%{\noindent\confname\ \the\conf\ \the\confinfo}\par\smallskip
   \if@printcopyright
-    \copyright\ \the\copyrtyr\ \@copyrightowner
+    \copyright\ \the\copyrtyr\ \@copyrightowner%\ \copyright\ \the\copyrtyr\ \@copyrightowner
   \fi
   \if@acmowned ISBN \else\ifnum\acm@copyrightmode=2 ISBN \else %\par\smallskip ~ 
 \fi\fi
 % \the\acmcopyr
-\ifx\@acmPrice\@empty.\else\dots\@acmPrice\fi\par%\smallskip
+\ifx\@acmPrice\@empty\else\dots\@acmPrice\fi\par%\smallskip%\ifx\@acmPrice\@empty.\else\dots\@acmPrice\fi\par%\smallskip
 %{DOI: \small\expandafter\printdoi\expandafter{\@doi}%
 } 
 \toappear{\fontsize{7pt}{8pt}\fontfamily{ptm}\selectfont
