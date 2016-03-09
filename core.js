@@ -897,7 +897,6 @@ function stateMachine()
 			case 'post':
 				this.stateIndex++;
 				this.currentStateMap = null;
-                this.currentStore.finish();
 				this.advanceState();
 				break;
 			};
