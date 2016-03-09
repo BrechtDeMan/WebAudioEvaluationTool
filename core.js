@@ -213,20 +213,20 @@ function loadProjectSpecCallback(response) {
             }
             return;
         }
-        
+        // Build the specification
+	   specification.decode(projectXML);
         // Generate the session-key
         storage.initialise();
         
     } else if (responseDocument.children[0].nodeName == "waetresult") {
         // document is a result
         projectXML = responseDocument.getElementsByTagName('waet')[0];
+        // Build the specification
+	    specification.decode(projectXML);
         // Use the session-key
         var sessionKey = responseDocument.children[0].getAttribute(key);
         storage.initialise(sessionKey);
     }
-	
-	// Build the specification
-	specification.decode(projectXML);
 	/// CHECK FOR SAMPLE RATE COMPATIBILITY
 	if (specification.sampleRate != undefined) {
 		if (Number(specification.sampleRate) != audioContext.sampleRate) {
@@ -744,6 +744,7 @@ function interfacePopup() {
 			{
 				this.store.postResult(node);
 			}
+            this.store.finish();
 			advanceState();
 		}
 	};
@@ -822,6 +823,7 @@ function stateMachine()
 		{
 			if (specification.testPages <= i && specification.testPages != 0) {break;}
 			this.stateMap.push(pageHolder[i]);
+            storage.createTestPageStore(pageHolder[i]);
 		}
         
 		if (specification.preTest != null) {this.preTestSurvey = specification.preTest;}
@@ -872,7 +874,7 @@ function stateMachine()
 				{
 					this.currentStateMap.audioElements = randomiseOrder(this.currentStateMap.audioElements);
 				}
-                this.currentStore = storage.createTestPageStore(this.currentStateMap);
+                this.currentStore = storage.testPages[this.stateIndex];
 				if (this.currentStateMap.preTest != null)
 				{
 					this.currentStatePosition = 'pre';
@@ -903,6 +905,7 @@ function stateMachine()
 			case 'post':
 				this.stateIndex++;
 				this.currentStateMap = null;
+                this.currentStore.finish();
 				this.advanceState();
 				break;
 			};
@@ -3144,6 +3147,22 @@ function Storage()
             this.request.open("GET","keygen.php?key="+temp_key,true);
             this.request.addEventListener("load",this);
             this.request.send();
+        },
+        postData: function(nodeName,id,xml) {
+            // nodeName: the node name to find
+            // id: the id of the node (null if location==root)
+            // xml: the XML node to append
+            if (this.key != null) {
+                var postXML = new XMLHttpRequest;
+                postXML.open("POST","intermediate.php?key="+this.key+"&node="+nodeName+"&id="+id);
+                postXML.setRequestHeader('Content-Type','text/xml');
+                postXML.onerror = function() {
+                    console.log("Error posting: "+this.responseText);
+                }
+                var parent = document.createElement("div");
+                parent.appendChild(xml);
+                postXML.send([parent.innerHTML]);
+            }
         }
     }
 	
@@ -3203,6 +3222,12 @@ function Storage()
 				break;
 			}
 		};
+        
+        this.finish = function() {
+            if (this.parent.document != undefined) {
+                this.parent.SessionKey.postData("waetresult",null,this.XMLDOM);
+            }
+        };
 	};
 	
 	this.pageNode = function(parent,specification)
@@ -3241,6 +3266,10 @@ function Storage()
 		}
 		
 		this.parent.root.appendChild(this.XMLDOM);
+        
+        this.finish = function() {
+            this.parent.SessionKey.postData("waetresult",null,this.XMLDOM);
+        }
 	};
 	this.finish = function()
 	{
