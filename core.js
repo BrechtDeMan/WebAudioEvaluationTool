@@ -310,27 +310,6 @@ function loadProjectSpecCallback(response) {
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine(specification);
-	
-	$(specification.pages).each(function(index,elem){
-		$(elem.audioElements).each(function(i,audioElem){
-			var URL = elem.hostURL + audioElem.url;
-			var buffer = null;
-			for (var i=0; i<audioEngineContext.buffers.length; i++)
-			{
-				if (URL == audioEngineContext.buffers[i].url)
-				{
-					buffer = audioEngineContext.buffers[i];
-					break;
-				}
-			}
-			if (buffer == null)
-			{
-				buffer = new audioEngineContext.bufferObj();
-				buffer.getMedia(URL);
-				audioEngineContext.buffers.push(buffer);
-			}
-		});
-	});
 }
 
 function createProjectSave(destURL) {
@@ -815,6 +794,21 @@ function stateMachine()
 			if (specification.testPages <= i && specification.testPages != 0) {break;}
 			this.stateMap.push(pageHolder[i]);
             storage.createTestPageStore(pageHolder[i]);
+            for (var element of pageHolder[i].audioElements) {
+                var URL = pageHolder[i].hostURL + element.url;
+                var buffer = null;
+                for (var buffObj of audioEngineContext.buffers) {
+                    if (URL == buffObj.url) {
+                        buffer = buffObj;
+                        break;
+                    }
+                }
+                if (buffer == null) {
+                    buffer = new audioEngineContext.bufferObj();
+                    buffer.getMedia(URL);
+                    audioEngineContext.buffers.push(buffer);
+                }
+            }
 		}
         
 		if (specification.preTest != null) {this.preTestSurvey = specification.preTest;}
