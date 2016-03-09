@@ -153,8 +153,8 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
-      <xs:attribute ref="id"/>
-      <xs:attribute ref="name" use="required"/>
+      <xs:attribute ref="id" use="optional"/>
+      <xs:attribute ref="name" use="optional"/>
       <xs:attribute name="type" default="question">
         <xs:simpleType>
           <xs:restriction base="xs:string">
