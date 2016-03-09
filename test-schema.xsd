@@ -184,8 +184,8 @@
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
-            <xs:attribute name="id" type="xs:ID" use="optional"/>
-            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute ref="id" use="required"/>
+            <xs:attribute ref="name"/>
             <xs:attribute ref="mandatory"/>
             <xs:attribute name="min" type="xs:decimal"/>
             <xs:attribute name="max" type="xs:decimal"/>
