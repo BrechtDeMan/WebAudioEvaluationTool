@@ -9,10 +9,9 @@
 	header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
 	$postText = file_get_contents('php://input');
-	$sha1_hash = sha1($postText);
-	$datetime = date('ymdHis');
-	$xmlfile = "save".$datetime."-".$sha1_hash.".xml";
-	$fileHandle = fopen("saves/".$xmlfile, 'w');
+    $file_key = $_GET['key'];
+    $filename = "saves/save-".$file_key.".xml";
+	$fileHandle = fopen($filename, 'w');
 	if ($fileHandle == FALSE)
 	{
 		// Filehandle failed

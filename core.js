@@ -341,7 +341,7 @@ function createProjectSave(destURL) {
 	var parent = document.createElement("div");
 	parent.appendChild(xmlDoc);
 	var file = [parent.innerHTML];
-	if (destURL == "null" || destURL == undefined) {
+	if (destURL == "local") {
 		var bb = new Blob(file,{type : 'application/xml'});
 		var dnlk = window.URL.createObjectURL(bb);
 		var a = document.createElement("a");
@@ -361,32 +361,24 @@ function createProjectSave(destURL) {
 			console.log('Error saving file to server! Presenting download locally');
 			createProjectSave(null);
 		};
-		xmlhttp.onreadystatechange  = function() {
-			console.log(xmlhttp.status);
-			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
-				createProjectSave(null);
-			} else {
-				var parser = new DOMParser();
-				var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
-				if (xmlDoc == null)
-				{
-					createProjectSave('null');
-				}
-				var response = xmlDoc.childNodes[0];
-				if (response.getAttribute('state') == "OK")
-				{
-					var file = response.getElementsByTagName('file')[0];
-					console.log('Save OK: Filename '+file.textContent+','+file.getAttribute('bytes')+'B');
-					popup.showPopup();
-					popup.popupContent.innerHTML = null;
-					popup.popupContent.textContent = "Thank you!";
-					window.onbeforeunload=null;
-				} else {
-					var message = response.getElementsByTagName('message')[0];
-					errorSessionDump(message.textContent);
-				}
-			}
-		};
+		xmlhttp.onload = function() {
+            console.log(xmlhttp);
+            if (this.status >= 300) {
+                console.log("WARNING - Could not update at this time");
+            } else {
+                var parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
+                var response = xmlDoc.getElementsByTagName('response')[0];
+                if (response.getAttribute("state") == "OK") {
+                    var file = response.getElementsByTagName("file")[0];
+                    console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
+                } else {
+                    var message = response.getElementsByTagName("message");
+                    console.log("Save: Error! "+message.textContent);
+                    createProjectSave("local");
+                }
+            }
+        };
 		xmlhttp.send(file);
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
@@ -744,7 +736,6 @@ function interfacePopup() {
 			{
 				this.store.postResult(node);
 			}
-            this.store.finish();
 			advanceState();
 		}
 	};
@@ -842,6 +833,7 @@ function stateMachine()
 		if (this.stateIndex == null) {
 			this.initialise();
 		}
+        storage.update();
 		if (this.stateIndex == -1) {
 			this.stateIndex++;
 			console.log('Starting test...');
@@ -3119,14 +3111,19 @@ function Storage()
 	
 	this.initialise = function(sessionKey)
 	{
-		if (specification.preTest != undefined){this.globalPreTest = new this.surveyNode(this,this.root,specification.preTest);}
-		if (specification.postTest != undefined){this.globalPostTest = new this.surveyNode(this,this.root,specification.postTest);}
         if (sessionKey == undefined) {
             // We need to get the sessionKey
             this.SessionKey.generateKey();
+            var projectDocument = specification.projectXML;
+            projectDocument.setAttribute('file-name',url);
+            this.root.appendChild(projectDocument);
+            this.root.appendChild(returnDateNode());
+            this.root.appendChild(interfaceContext.returnNavigator());
         } else {
             this.SessionKey.key = sessionKey;
         }
+        if (specification.preTest != undefined){this.globalPreTest = new this.surveyNode(this,this.root,specification.preTest);}
+		if (specification.postTest != undefined){this.globalPostTest = new this.surveyNode(this,this.root,specification.postTest);}
 	};
     
     this.SessionKey = {
@@ -3138,6 +3135,8 @@ function Storage()
             var xml = parse.parseFromString(this.request.response,"text/xml");
             if (xml.getAllElementsByTagName("state")[0].textContent == "OK") {
                 this.key = xml.getAllElementsByTagName("key")[0].textContent;
+                this.parent.root.setAttribute("key",this.key);
+                this.parent.root.setAttribute("state","empty");
             } else {
                 this.generateKey();
             }
@@ -3148,21 +3147,34 @@ function Storage()
             this.request.addEventListener("load",this);
             this.request.send();
         },
-        postData: function(nodeName,id,xml) {
-            // nodeName: the node name to find
-            // id: the id of the node (null if location==root)
-            // xml: the XML node to append
-            if (this.key != null) {
-                var postXML = new XMLHttpRequest;
-                postXML.open("POST","intermediate.php?key="+this.key+"&node="+nodeName+"&id="+id);
-                postXML.setRequestHeader('Content-Type','text/xml');
-                postXML.onerror = function() {
-                    console.log("Error posting: "+this.responseText);
+        update: function() {
+            this.parent.root.setAttribute("state","update");
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("POST",specification.projectReturn+"?key="+this.key);
+            xmlhttp.setRequestHeader('Content-Type', 'text/xml');
+            xmlhttp.onerror = function(){
+                console.log('Error updating file to server!');
+            };
+            var hold = document.createElement("div");
+            var clone = this.parent.root.cloneNode(true);
+            hold.appendChild(clone);
+            xmlhttp.onload = function() {
+                if (this.status >= 300) {
+                    console.log("WARNING - Could not update at this time");
+                } else {
+                    var parser = new DOMParser();
+                    var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
+                    var response = xmlDoc.getElementsByTagName('response')[0];
+                    if (response.getAttribute("state") == "OK") {
+                        var file = response.getElementsByTagName("file")[0];
+                        console.log("Intermediate save: OK, written "+file.getAttribute("bytes")+"B");
+                    } else {
+                        var message = response.getElementsByTagName("message");
+                        console.log("Intermediate save: Error! "+message.textContent);
+                    }
                 }
-                var parent = document.createElement("div");
-                parent.appendChild(xml);
-                postXML.send([parent.innerHTML]);
             }
+            xmlhttp.send([hold.innerHTML]);
         }
     }
 	
@@ -3222,12 +3234,6 @@ function Storage()
 				break;
 			}
 		};
-        
-        this.finish = function() {
-            if (this.parent.document != undefined) {
-                this.parent.SessionKey.postData("waetresult",null,this.XMLDOM);
-            }
-        };
 	};
 	
 	this.pageNode = function(parent,specification)
@@ -3266,20 +3272,15 @@ function Storage()
 		}
 		
 		this.parent.root.appendChild(this.XMLDOM);
-        
-        this.finish = function() {
-            this.parent.SessionKey.postData("waetresult",null,this.XMLDOM);
-        }
 	};
+    this.update = function() {
+        this.SessionKey.update();
+    }
 	this.finish = function()
 	{
 		if (this.state == 0)
 		{
-			var projectDocument = specification.projectXML;
-			projectDocument.setAttribute('file-name',url);
-			this.root.appendChild(projectDocument);
-			this.root.appendChild(returnDateNode());
-			this.root.appendChild(interfaceContext.returnNavigator());
+            this.update();
 		}
 		this.state = 1;
 		return this.root;
