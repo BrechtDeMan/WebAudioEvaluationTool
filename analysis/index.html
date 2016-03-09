@@ -1,0 +1,26 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel='stylesheet' href="analysis.css" type="text/css"/>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript" src="analysis.js"></script>
+    </head>
+    <body>
+        <h1>Web Audio Evaluation Toolbox: Analysis</h1>
+        <button onclick="chartContext.clear();">Clear Charts</button>
+        <div id="test-charts">
+            <p>Charts per test</p>
+            <button onclick="chartContext.drawTestMean();">Means</button>
+        </div>
+        <div id="page-charts">
+            <p>Charts per test page</p>
+            <button onclick="chartContext.drawPageMean();">Means</button>
+        </div>
+        <div id="element-charts">
+            <p>Charts per element</p>
+            <button onclick="chartContext.drawElementHistogram();">Histogram</button>
+        </div>
+        
+        <div id="test-pages"></div>
+    </body>
+</html>

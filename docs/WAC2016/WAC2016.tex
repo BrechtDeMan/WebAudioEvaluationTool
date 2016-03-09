@@ -1,0 +1,444 @@
+\documentclass{sig-alternate}
+\usepackage{hyperref}	% make links (like references, links to Sections, ...) clickable
+\usepackage{enumitem}	% tighten itemize etc by appending '[noitemsep,nolistsep]'
+\usepackage{cleveref}
+
+\graphicspath{{img/}} % put the images in this folder
+
+\begin{document}
+
+% Copyright
+\setcopyright{waclicense}
+
+\conferenceinfo{Web Audio Conference WAC-2016,}{April 4--6, 2016, Atlanta, USA.}
+\CopyrightYear{2016} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
+
+\newcommand*\rot{\rotatebox{90}}
+
+
+% Make clickable footnote (Brecht)
+\newcommand{\hyperfootnote}[1][]{\def\ArgI{{#1}}\hyperfootnoteRelay}
+  % relay to new command to make extra optional command possible
+\newcommand\hyperfootnoteRelay[2][]{\href{#1#2}{\ArgI}\footnote{\href{#1#2}{#2}}}
+  % the first optional argument is now in \ArgI, the second is in #1
+  
+% Takes at most 3 parameters (see http://www.tex.ac.uk/FAQ-twooptarg.html for info on multiple optional parameters)
+% If first parameter isn't given, it's value is '' (empty string in text before footnote reference)
+% If second parameter isn't given, it's value is '' (string before visible URL, e.g. 'http://')
+% Makes a clickable footnote (alternatively: \url{}) with optional reference in the text as well
+% Use 1: \hyperfootnote{www.mywebsite.com}: creates a footnote consisting of a clickable URL
+% Use 2: \hyperfootnote[My website]{www.mywebsite.com}: creates a clickable piece of text in the text ('My website') plus a footnote consisting of a clickable URL
+% Note: requires the hyperref package.
+% Note: using xspace package to add/absorb spaces when necessary (e.g. to avoid a space between the footnote number and a punctuation mark)
+
+%% DOI
+%\doi{10.475/123_4}
+%
+%% ISBN
+%\isbn{123-4567-24-567/08/06}
+%
+%%Conference
+%\conferenceinfo{PLDI '13}{June 16--19, 2013, Seattle, WA, USA}
+%
+%\acmPrice{\$15.00}
+
+%
+% --- Author Metadata here ---
+\conferenceinfo{Web Audio Conference WAC-2016,}{April 4--6, 2016, Atlanta, USA}
+\CopyrightYear{2016} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
+%\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+% --- End of Author Metadata ---
+
+\title{Web Audio Evaluation Tool: A framework for subjective assessment of audio}
+%\subtitle{[Extended Abstract]
+%\titlenote{A full version of this paper is available as
+%\textit{Author's Guide to Preparing ACM SIG Proceedings Using
+%\LaTeX$2_\epsilon$\ and BibTeX} at
+%\texttt{www.acm.org/eaddress.htm}}}
+%
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+% FIVE authors instead of four, to leave space between first two authors.
+\numberofauthors{6} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor Nicholas Jillings\textsuperscript{2}\\
+       \email{nicholas.jillings@mail.bcu.ac.uk}
+% 2nd. author
+\alignauthor
+\alignauthor Brecht De Man\textsuperscript{1}\\
+       \email{b.deman@qmul.ac.uk}
+\and
+% use '\and' if you need 'another row' of author names
+% 3rd. author
+\alignauthor David Moffat\textsuperscript{1}\\
+       \email{d.j.moffat@qmul.ac.uk}
+% 4th. author
+\alignauthor Joshua D. Reiss\textsuperscript{1}\\
+\email{joshua.reiss@qmul.ac.uk}
+\alignauthor Ryan Stables\textsuperscript{2}\\
+       \email{ryan.stables@bcu.ac.uk}
+\and % new line for address
+       \affaddr{Centre for Digital Music, School of Electronic Engineering and Computer Science\textsuperscript{1}}\\
+       \affaddr{Queen Mary University of London}\\
+       \affaddr{Mile End Road,}
+       \affaddr{London E1 4NS}\\
+       \affaddr{United Kingdom}\\
+\and
+       \affaddr{Digital Media Technology Lab\textsuperscript{2}}\\
+       \affaddr{Birmingham City University}\\
+       \affaddr{Birmingham B4 7XG}\\
+       \affaddr{United Kingdom}\\
+}
+%Centre for Digital Music, School of Electronic Engineering and Computer Science, Queen Mary University of London
+%% 5th. author
+%\alignauthor Sean Fogarty\\
+%       \affaddr{NASA Ames Research Center}\\
+%       \affaddr{Moffett Field}\\
+%       \email{fogartys@amesres.org}
+%% 6th. author
+%\alignauthor Charles Palmer\\
+%       \affaddr{Palmer Research Laboratories}\\
+%       \affaddr{8600 Datapoint Drive}\\
+%       \email{cpalmer@prl.com}
+%}
+% There's nothing stopping you putting the seventh, eighth, etc.
+% author on the opening page (as the 'third row') but we ask,
+% for aesthetic reasons that you place these 'additional authors'
+% in the \additional authors block, viz.
+%\additionalauthors{Additional authors: John Smith (The Th{\o}rv{\"a}ld Group,
+%email: {\texttt{jsmith@affiliation.org}}) and Julius P.~Kumquat
+%(The Kumquat Consortium, email: {\texttt{jpkumquat@consortium.net}}).}
+\date{1 October 2015}
+% Just remember to make sure that the TOTAL number of authors
+% is the number that will appear on the first page PLUS the
+% number that will appear in the \additionalauthors section.
+
+\maketitle
+\begin{abstract}
+Perceptual listening tests are commonplace in audio research and a vital form of evaluation. % ?
+While a large number of tools exist to run such tests, many feature just one test type, are platform dependent, run on proprietary software, or require considerable configuration and programming. Using Web Audio, the Web Audio Evaluation Tool (WAET) addresses these concerns by having one toolbox which can be configured to run many different tests, perform it through a web browser and without needing proprietary software or computer programming knowledge. In this paper the role of the Web Audio API in giving WAET key functionalities are shown. The paper also highlights less common features, available to web based tools, such as easy remote testing environment and in-browser analytics.
+\end{abstract}
+
+
+\section{Introduction}
+
+	% Listening tests/perceptual audio evaluation: what are they, why are they important
+	% As opposed to limited scope of WAC15 paper: also musical features, realism of sound effects / sound synthesis, performance of source separation and other algorithms... 
+	Perceptual evaluation of audio, using listening tests, is a powerful way to assess anything from audio codec quality over realism of sound synthesis to the performance of source separation, automated music production and other auditory evaluations.
+	In less technical areas, the framework of a listening test can be used to measure emotional response to music or test cognitive abilities. 
+	% maybe some references? If there's space.
+
+	% check out http://link.springer.com/article/10.1007/s10055-015-0270-8 - only paper that cited WAC15 paper
+
+	% Why difficult? Challenges? What constitutes a good interface?
+	% Technical, interfaces, user friendliness, reliability 
+	Several applications for performing perceptual listening tests currently exist, see~\Cref{tab:toolboxes}. Many rely on proprietary, third party software such as MATLAB and Max, making them less attractive for many. With the exception of the existing JavaScript-based toolboxes, remote deployment (web-based test hosting and result collection) is not possible. 
+	
+	HULTI-GEN~\cite{hultigen} is an example of a toolbox that presents the user with a large number of different test interfaces and customisation, without requiring knowledge of any programming language. The Web Audio Evaluation Toolbox (WAET), presented here, stands out for the same reasons but in addition does not require proprietary software or a specific platform. It also provides a wide range of interface and test types in one user friendly environment. Furthermore, any test based on the default test types can be configured in the browser as well. Note that the design of an effective listening test further poses many challenges unrelated to interface design, which are beyond the scope of this paper \cite{bech}. 
+
+	% Why in the browser? 
+	The Web Audio API provides important features including sample level manipulation of audio streams \cite{schoeffler2015mushra} and synchronous and flexible playback. Operating in the browser allows leveraging the flexible JavaScript language and native support for web documents, such as the extensible markup language (XML) which is used for configuration and test result files. Using the web also reduces deployment requirements to a basic web server with extra functionality, such as test collection and automatic processing, using PHP. As recruiting participants can be very time-consuming, and as for some tests a large number of participants is needed, browser-based tests can enable participants in multiple locations to perform the test simultaneously \cite{schoeffler2015mushra}.
+
+	Both BeaqleJS \cite{beaqlejs} and \hyperfootnote[mushraJS][https://]{github.com/akaroice/mushraJS} also operate in the browser. However, BeaqleJS does not make use of the Web Audio API and therefore lacks arbitrary manipulation of audio stream samples, and neither offer an adequately wide choice of test designs for them to be useful to many researchers. %requires programming knowledge?... 
+	
+	% only browser-based? 
+	\begin{table*}[ht]
+	 \caption{Table with existing listening test platforms and their features}
+	 \small
+	 \begin{center}
+	    	\begin{tabular}{|*{9}{l|}}
+	    		\hline
+	    		\textbf{Toolbox}    & \rot{\textbf{APE}}   & \rot{\textbf{BeaqleJS}}    &\rot{\textbf{HULTI-GEN}} & \rot{\textbf{mushraJS}}    & \rot{\textbf{MUSHRAM}}    & \rot{\textbf{Scale}}    & \rot{\textbf{WhisPER}}    & \rot{\textbf{WAET}} \\ \hline
+	    		 \textbf{Reference}    & \cite{ape}    & \cite{beaqlejs}    & \cite{hultigen}    &    & \cite{mushram} & \cite{scale}    & \cite{whisper}    & \cite{waet} \\ \hline
+	    		 \textbf{Language} & MATLAB    & JS    & MAX    & JS    & MATLAB    &    MATLAB    & MATLAB    & JS \\ \hline
+	    		 \textbf{Remote} &    & (\checkmark)    &     & \checkmark    &    &    &    & \checkmark \\ \hline \hline
+	    		 MUSHRA (ITU-R BS. 1534) & & \checkmark & \checkmark & \checkmark & \checkmark & & & \checkmark \\ \hline
+	    		 APE & \checkmark & & & & & & & \checkmark \\ \hline
+	    		 Rank Scale & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Likert Scale & & & \checkmark & & & & \checkmark & \checkmark \\ \hline
+	    		 ABC/HR (ITU-R BS. 1116)   & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 -50 to 50 Bipolar with ref. & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Absolute Category Rating Scale & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Degradation Category Rating Scale & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Comparison Category Rating Scale & & & \checkmark & & & & \checkmark & \checkmark \\ \hline
+	    		 9 Point Hedonic Category Rating Scale & & & \checkmark & & & & \checkmark & \checkmark \\ \hline
+	    		 ITU-R 5 Continuous Impairment Scale & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Pairwise / AB Test & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 Multi-attribute ratings & & & \checkmark & & & & & \checkmark \\ \hline
+	    		 ABX Test & & \checkmark & \checkmark & & & & & \checkmark \\ \hline
+	    		 Adaptive psychophysical methods & & & & & & & \checkmark & \\ \hline 
+	    		 Repertory Grid Technique & & & & & & & \checkmark & \\ \hline
+	    		 Semantic Differential  & & & & & & \checkmark & \checkmark &\checkmark \\ \hline
+	    		 n-Alternative Forced Choice & & & & & & \checkmark & & \\ \hline
+	    	\end{tabular}
+	 \end{center}
+	 \vspace{-.5cm}
+	 \label{tab:toolboxes}
+	 \end{table*}
+
+        % 
+        %Selling points: remote tests, visualisaton, create your own test in the browser, many interfaces, few/no dependencies, flexibility
+
+        %[Talking about what we do in the various sections of this paper. Referring to \cite{waet}. ]
+    To meet the need for a cross-platform, versatile and easy-to-use listening test tool, we previously developed the Web Audio Evaluation Tool \cite{waet} which was capable of running a listening test in the browser from an XML configuration file, and storing an XML file as well, with one particular interface. This has now expanded into a tool with which a wide range of listening test types can easily be constructed and set up remotely, without any need for manually altering code or configuration files, and allows visualisation of the collected results in the browser. In this paper, we discuss these different aspects and explore which future improvements would be possible.
+
+    \begin{figure}[tb]
+    	\centering
+    	\includegraphics[width=.5\textwidth]{interface.png}
+    	\caption{A simple example of a multi-stimulus, single attribute, single rating scale test with a reference and comment fields.}
+    	\label{fig:interface}
+    \end{figure}
+
+\begin{comment}
+        % MEETING 8 OCTOBER
+        \subsection{Meeting 8 October}
+        \begin{itemize}
+        	\item Do we manipulate audio?\\
+	        	\begin{itemize}
+	        		\item Add loudness equalisation? (test\_create.html) Tag with gains. 
+	        		\item Add volume slider? 
+	        		\item Cross-fade (in interface node): default 0, number of seconds
+	        		\item Also: we use the playback buffer to present metrics of which portion is listened to
+	        	\end{itemize}
+	        \item Logging system information: whichever are possible (justify others)
+	        \item Input streams as audioelements
+	       	\item Capture microphone to estimate loudness (especially Macbook)
+	       	\item Test page (in-built oscillators): left-right calibration, ramp up test tone until you hear it; optional compensating EQ (future work implementing own filters) --> Highlight issues! 
+	       	\item Record IP address (PHP function, grab and append to XML file)
+	       	\item Expand anchor/reference options
+	       	\item AB / ABX
+        \end{itemize}
+
+        \subsubsection{Issues}
+        \begin{itemize}
+        	\item Filters not consistent (Nick to test across browsers)
+        	\item Playback audiobuffers need to be destroyed and rebuilt each time
+        	\item Can't get channel data, hardware input/output... 
+        \end{itemize}
+\end{comment}
+	
+\section{Architecture}  % title? 'back end'? % NICK
+\label{sec:architecture}
+%A slightly technical overview of the system. Talk about XML, JavaScript, Web Audio API, HTML5. 
+
+    Although WAET uses a sparse subset of the Web Audio API functionality, its performance comes directly from it. Listening tests can convey large amounts of information other than obtaining the perceptual relationship between the audio fragments. With WAET it is possible to track which parts of the audio fragments were listened to and when, at what point in the audio stream the participant switched to a different fragment, and how a fragment's rating was adjusted over time within a session, to name a few. Not only does this allow evaluation of a wealth of perceptual aspects, but it also helps detect poor participants whose results are potentially not representative.
+    
+    One of the key initial design parameters for WAET was to make the tool as open as possible to non-programmers. To this end, all of the user modifiable options are included in a single XML document, referred to as the specification document, that can be written  manually (or modifying an existing document or template) or using the included test creator. The test creator can modify existing specification documents or generate new ones in an intuitive yet powerful HTML GUI. This simplifies the creation of elements by visualising the data structure with explanatory text.
+    
+    %Describe and/or visualise audioholder-audioelement-... structure. 
+    The specification document contains the URL of the audio fragments for each test page. These fragments are downloaded asynchronously in the test and decoded offline by the Web Audio offline decoder. The LUFS integrated loudness of the buffers are calculated \cite{loudness201510} and stored to enable on-the-fly loudness normalisation. If the playback uses synchronous looping, the buffers are zero-padded accordingly. Performing these in the browser removes any need for pre-processing. The resulting buffers are assigned to a custom Audio Objects node which tracks the fragment buffer, the Web Audio \textit{bufferSourceNode}, and other specification attributes including its ID, the interface object(s) associated with the fragment and any metric or data collection objects. The Audio Object is controlled by an over-arching custom Audio Engine node allowing for session wide control of the Audio Objects.
+    
+    The only significant issue with this model is the \textit{bufferNode} in the Web Audio API, implemented in the standard as a `use once' object. Once the node has been played, it must be discarded as it cannot be instructed to play again. Therefore on each play request the \textit{bufferSourceNode} must be created and then linked with the stored \textit{bufferNode}. This is an odd behaviour with no alternative except to use the HTML5 audio element, but they do not have the ability to synchronously start on a given time and therefore not suited.
+    
+    In the test, each buffer node is connected to a gain node configured by the loudness normalisation and any user specified gain. Therefore it is possible to perform a `Method of Adjustment' test where an interface could directly manipulate these gain nodes. These gain nodes are used for cross-fading between samples when operating in synchronous playback. Cross-fading can either be fade-out followed by a fade-in, or a true cross-fade. This is achieved by using the AudioParam controls to provide linear ramping from 0 to the calculated playback level. There is also an optional `Master Volume' slider which can be shown on the test GUI to modify a gain node before the destination. The control's position is tracked providing extra test use validation. This is not indicative of the final volume exiting the speakers, though, not least because the browser cannot read the system volume. Therefore its use should only be considered in a lab environment to ensure results are representative.
+    
+    %Which type of files?  WAV, anything else? Perhaps not exhaustive list, but say something along the lines of 'whatever browser supports'. Compatability?
+    The media files supported depend on the browser level support for the initial decoding of information and is the same as the browser support for the HTML5 audio element. The most widely supported media file is the wave (.WAV) format which is accepted by every browser supporting the Web Audio API. Most browsers support floating point WAV except Firefox. To resolve this, the tool includes its own wave file decoder to extract the samples. The toolbox works in any browser which supports the Web Audio API and HTML 5.
+    
+    All collected session data is returned in an XML document structured similarly to the configuration document, where test pages contain the audio elements with their trace collection, results, comments and any interface-specific data points.
+    
+\section{Remote tests} % with previous? 
+	\label{sec:remote}
+
+	If the experimenter is willing to trade some degree of control for a higher number of participants, the test can be hosted on a public web server. This way, a link can be shared widely in the hope of attracting a large amount of subjects, while listening conditions and subject reliability may be less ideal. However, a sound system calibration page and the range of metrics logged mitigate these problems. In some experiments, it may be preferred that the subject has a `real life', familiar listening set-up, for instance when perceived quality differences on everyday sound systems are investigated. 
+	Furthermore, a fully browser-based test, where the collection of the results is automatic, is more efficient and technically reliable even when the test still takes place under lab conditions.
+
+	The following features allow easy and effective remote testing: 
+	\begin{itemize}[noitemsep,nolistsep] % replaced description list with itemize as it went outside the margins
+		\item \textbf{PHP script to collect result XML files} and store on central server.
+		\item \textbf{Randomly pick a specified number of pages} to ensure an equal and randomised spread of the different pages across participants. 
+		\item \textbf{Calibration of the sound system (and participant)} by a perceptual pre-test to gather information about the frequency response and speaker configuration - this can be supplemented with a survey.
+		% In theory calibration could be applied anywhere??
+		% \item Functionality to participate multiple times
+		% 	\begin{itemize}[noitemsep,nolistsep]
+		% 		\item Possible to log in with unique ID (no password)
+		% 		\item Pick `new user' (generates new, unique ID) or `already participated' (need already available ID)
+		% 		\item Store XML on server with IDs plus which audioholders have already been listened to
+		% 		\item Don't show `post-test' survey after first time
+		% 		\item Pick `new' audioholders if available
+		% 		\item Copy survey information first time to new XMLs
+		% 	\end{itemize}
+		\item \textbf{Intermediate saves} for tests which were interrupted or unfinished.
+		\item \textbf{Collect IP address information} for geographic location, through PHP function which grabs address and appends to XML file. 
+		\item \textbf{Collect browser and display information} to the extent it is available and reliable. 
+	\end{itemize}
+
+	
+\section{Interfaces} % title? 'Front end'? % Dave
+\label{sec:interfaces}
+
+The purpose of this listening test framework is to allow any user the maximum flexibility to design a listening test for their exact application with minimum effort. To this end, a large range of standard listening test interfaces have been implemented, including 
+	\begin{itemize}[noitemsep,nolistsep]
+		\item AB Test~\cite{lipshitz1981great}: Two stimuli presented simultaneously, participant selects a preferred stimulus.
+		\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116} (Mean Opinion Score: MOS): each stimulus has a continuous scale (5-1), labeled as Imperceptible, Perceptible but not annoying, Slightly annoying, Annoying, Very annoying.
+		\item -50 to 50 Bipolar with Ref: each stimulus has a continuous scale -50 to 50 with default values as 0 in middle and a reference.
+		\item Absolute Category Rating (ACR) Scale~\cite{rec1996p}: Likert but labels are Bad, Poor, Fair, Good, Excellent
+		\item ABX Test~\cite{clark1982high}: Two stimuli are presented along with a reference and the participant has to select a preferred stimulus, often the closest to the reference.
+		\item APE \cite{ape}: Multiple stimuli on one or more axes for inter-sample rating.
+		%\item APE style 2D \cite{ape}: Multiple stimuli on a 2D plane for inter-sample rating (e.g. Valence Arousal).
+		\item Comparison Category Rating (CCR) Scale~\cite{rec1996p}: ACR \& DCR but 7 point scale, with reference: Much better, Better, Slightly better, About the same, Slightly worse, Worse, Much worse. 
+		\item Degredation Category Rating (DCR) Scale~\cite{rec1996p}: ABC \& Likert but labels are (5) Inaudible, (4) Audible but not annoying, (3) Slightly annoying, (2) Annoying, (1) Very annoying.
+		\item ITU-R 5 Point Continuous Impairment Scale~\cite{rec1997bs}: Same as ABC/HR but with a reference.
+		\item Likert scale~\cite{likert1932technique}: each stimulus has a five point scale with values: Strongly agree, Agree, Neutral, Disagree and Strongly disagree.
+		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534} 
+		\begin{comment}
+		\begin{itemize}[noitemsep,nolistsep]
+			\item Multiple stimuli are presented and rated on a continuous scale, which includes a reference, hidden reference and hidden anchors.
+		\end{itemize}
+		\end{comment}
+		\item Pairwise Comparison (Better/Worse)~\cite{david1963method}: every stimulus is rated as being either better or worse than the reference.
+		\item Rank Scale~\cite{pascoe1983evaluation}: stimuli ranked on single horizontal scale, where they are ordered in preference order.
+		\item 9 Point Hedonic Category Rating Scale~\cite{peryam1952advanced}: each stimulus has a seven point scale with values: Like extremely, Like very much, Like moderate, Like slightly, Neither like nor dislike, Dislike extremely, Dislike very much, Dislike moderate, Dislike slightly. There is also a provided reference.
+	\end{itemize}
+	
+	It is possible to include any number of references, hidden references, hidden anchors and comment fields into all of these listening test formats.
+	
+	Because of the design to have separate core code and interface modules, it is possible for a third party interface to be built with minimal effort. The repository includes a boilerplate (blank.js) and documentation on which functions must be called and the specific functions they expect your interface to perform. The core includes an `Interface' object which includes object prototypes for the on-page comment boxes (including those with radio or checkbox responses), start and stop buttons and the playhead / transport bars.
+	
+%%%%	\begin{itemize}[noitemsep,nolistsep]
+%%%%		\item (APE style) \cite{ape}
+%%%%		\item Multi attribute ratings
+%%%%		\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}
+%%%%		\item Interval Scale~\cite{zacharov1999round}
+%%%%		\item Rank Scale~\cite{pascoe1983evaluation}
+%%%%		
+%%%%		\item 2D Plane rating - e.g. Valence vs. Arousal~\cite{carroll1969individual}
+%%%%		\item Likert scale~\cite{likert1932technique}
+%%%%		
+%%%%		\item {\bf All the following are the interfaces available in HULTI-GEN~\cite{hultigen} }
+%%%%		\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116}
+%%%%		\begin{itemize}
+%%%%			\item Continuous Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)
+%%%%		\end{itemize}
+%%%%		\item -50 to 50 Bipolar with Ref
+%%%%		\begin{itemize}
+%%%%			\item Scale -50 to 50 on Mushra with default values as 0 in middle and a comparison ``Reference'' to compare to 0 value
+%%%%		\end{itemize}
+%%%%		\item Absolute Category Rating (ACR) Scale~\cite{rec1996p}
+%%%%		\begin{itemize}
+%%%%			\item 5 point Scale - Bad, Poor, Fair, Good, Excellent (Default fair?)
+%%%%		\end{itemize}
+%%%%		\item Degredation Category Rating (DCR) Scale~\cite{rec1996p}
+%%%%		\begin{itemize}
+%%%%			\item 5 point Scale - Inaudible, Audible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?) - {\it Basically just quantised ABC/HR?}
+%%%%		\end{itemize}
+%%%%		\item Comparison Category Rating (CCR) Scale~\cite{rec1996p}
+%%%%		\begin{itemize}
+%%%%			\item 7 point scale: Much Better, Better, Slightly Better, About the same, slightly worse, worse, much worse - Default about the same with reference to compare to
+%%%%		\end{itemize}
+%%%%		\item 9 Point Hedonic Category Rating Scale~\cite{peryam1952advanced}
+%%%%		\begin{itemize}
+%%%%			\item 9 point scale: Like Extremely, Like Very Much, Like Moderate, Like Slightly, Neither Like nor Dislike, dislike Extremely, dislike Very Much, dislike Moderate, dislike Slightly  - Default Neither Like nor Dislike with reference to compare to
+%%%%		\end{itemize}
+%%%%		\item ITU-R 5 Point Continuous Impairment Scale~\cite{rec1997bs}
+%%%%		\begin{itemize}
+%%%%			\item 5 point Scale (5-1) Imperceptible, Perceptible but not annoying, slightly annoying, annoying, very annoying. (default Inaudible?)- {\it Basically just quantised ABC/HR, or Different named DCR}
+%%%%		\end{itemize}
+%%%%		\item Pairwise Comparison (Better/Worse)~\cite{david1963method}
+%%%%		\begin{itemize}
+%%%%			\item 2 point Scale - Better or Worse - (not sure how to default this - they default everything to better, which is an interesting choice)
+%%%%		\end{itemize}
+%%%%	\end{itemize}
+	
+	% Build your own test
+
+\begin{comment}
+{	\bf A screenshot would be nice. 
+
+	Established tests (see below) included as `presets' in the build-your-own-test page. }
+\end{comment}
+
+\section{Analysis and diagnostics}
+\label{sec:analysis}
+	% don't mention Python scripts
+	There are several benefits to providing basic analysis tools in the browser: they allow diagnosing problems, with the interface or with the test subject; they may be sufficient for many researchers' purposes; and test subjects may enjoy seeing an overview of their own results and/or results thus far at the end of their tests. 
+	
+	For this reason, we include a proof-of-concept web page with:
+	\begin{itemize}[noitemsep,nolistsep]
+		\item All page IDs, file names, subject IDs, audio element IDs, ... in the collected XMLs so far
+		\item Selection of subjects and/or test samples to zoom in on a subset of the data %Check/uncheck each of the above for analysis (e.g. zoom in on a certain song, or exclude a subset of subjects)
+		\item Embedded audio to hear corresponding test samples % (follow path in XML setup file, which is also embedded in the XML result file)
+		\item Scatter plot, confidence plot and box plot of rating values (see Figure \ref{fig:boxplot})
+		\item Timeline for a specific subject %(see Figure \ref{fig:timeline})%, perhaps re-playing the experiment in X times realtime. (If actual realtime, you could replay the audio...)
+		\item Distribution plots of any radio button and number questions in pre- and post-test survey %(drop-down menu with `pretest', `posttest', ...; then drop-down menu with question `IDs' like `gender', `age', ...; make pie chart/histogram of these values over selected range of XMLs)
+		\item All `comments' on a specific audioelement
+		\item A `download' function for a CSV of ratings, survey responses and comments% various things (values, survey responses, comments) people might want to use for analysis, e.g. when XML scares them
+		%\item Validation of setup XMLs (easily spot `errors', like duplicate IDs or URLs, missing/dangling tags, ...)
+	\end{itemize}
+
+	\begin{figure}[tbh]
+		\centering
+		\includegraphics[width=.5\textwidth]{boxplot.png}
+		%\caption{This timeline of a single subject's listening test shows playback of fragments (red segments) and marker movements on the rating axis in function of time. }
+		\caption{Box and whisker plot showing the aggregated numerical ratings of six stimuli by a group of subjects.}
+		\label{fig:boxplot}
+	\end{figure}
+
+	%A subset of the above would already be nice for this paper. 
+\section{Concluding remarks}
+\label{sec:conclusion}
+
+	We have developed a browser-based tool for the design and deployment of listening tests, requiring no programming experience or proprietary software. Following the predictions or guidelines in \cite{schoeffler2015mushra}, it supports remote testing, cross-fading between audio streams, collecting information about the system, among others. 
+
+	Whereas many other types of interfaces do exist, we felt that supporting e.g.~a range of `method of adjustment' tests would be beyond the scope of a tool that aims to be versatile enough while not claiming to support any custom experiment one might want to set up. Rather, it supports intuitive creation of non-adaptive listening tests up to multi-stimulus, multi-attribute evaluation including references, anchors, text boxes, radio buttons and/or checkboxes, with arbitrary placement of the various UI elements, and many standard test `presets' already available.
+	
+	The code and documentation can be downloaded from the \hyperfootnote[SoundSoftware repository][https://]{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}.
+		% remote
+		% language support (not explicitly stated)
+		% crossfades
+		% choosing speakers/sound device from within browser? --- NOT POSSIBLE, can only determine channel output counts and its up to the hardware to determine
+		% collect information about software and sound system
+		% buttons, scales, ... UI elements
+		% must be able to load uncompressed PCM
+
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{ieeetr}
+\small
+\bibliography{WAC2016}  % sigproc.bib is the name of the Bibliography in this case
+% You must have a proper ".bib" file
+%  and remember to run:
+% latex bibtex latex latex
+% to resolve all references
+%
+% ACM needs 'a single self-contained file'!
+%
+\end{document}

@@ -1,0 +1,48 @@
+
+\usepackage{colordvi,amsmath,epsfig,float,color,multicol} % times
+
+\pagestyle{empty}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{2ex}
+\setlength{\columnsep}{3cm}
+\addtolength{\textwidth}{2cm}
+\addtolength{\oddsidemargin}{-1.5cm}
+
+\renewcommand{\normalsize}{\Large}
+\def\regularsize{\@setfontsize\normalsize{34pt}{37}}
+
+\renewcommand\refname{}
+\setlength{\fboxrule}{0.1cm}
+
+
+% ----------------------------------------------------------------
+
+
+% PMS287 CMYK=[100% 69% 0% 11.5%] RGB=[38/256 67/256 151/256]
+\definecolor{qmuldarkblue}{rgb}{0.1484375,0.26171875,0.58984375}
+\definecolor{emphasisered}{rgb}{0.4921,0.132812,0.164062}
+
+\definecolor{backgrey}{rgb}{0.93,0.93,0.93}
+\definecolor{backblue}{rgb}{0.93,0.93,1}
+\definecolor{backyellow}{rgb}{1,1,0.88} 
+
+\definecolor{backred}{rgb}{1,0.9,0.9} 
+\definecolor{backgreen}{rgb}{0.9,1,0.9}
+\definecolor{backpink}{rgb}{1,0.9,1} 
+\definecolor{backturquoise}{rgb}{0.9,1,1} 
+
+
+
+
+% ----------------------------------------------------------------
+
+
+\makeatletter
+\renewcommand{\section}{\@startsection
+        {section}                          % the name 
+        {1}                                % the level
+        {0mm}                              % the indent
+        {-0.7\baselineskip}                % the beforeskip
+        {5mm}                              % the afterskip
+        {\center\Huge\color{qmuldarkblue}\bfseries}} % the style
+\makeatother
