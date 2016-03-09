@@ -1,7 +1,7 @@
 <?php
 // This checks the key sent by the JavaScript against the current bunch of saves
 // XML Saves location - assumes it will be saves/
-$saves = glob("../saves/*.xml");
+$saves = glob("saves/*.xml");
 
 $key_requested = $_GET['key'];
 
@@ -26,8 +26,12 @@ if (is_array($saves))
     echo $xml_good;
     // TODO:
     //  Generate the XML Base file and save it
+    $doc_struct = new SimpleXMLElement('<waetresult/>');
+    $doc_struct->addAttribute("key",$key_requested);
     //  Add start time
     //  Add IP Address information
+    //  Save the file
+    $doc_struct->asXML("saves/save-".$key_requested.".xml");
     return;
 } else {
     echo $xml_error;
