@@ -351,6 +351,7 @@ function createProjectSave(destURL) {
                 if (response.getAttribute("state") == "OK") {
                     var file = response.getElementsByTagName("file")[0];
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
+                    popup.popupContent.textContent = "Thank you. Your session has been saved.";
                 } else {
                     var message = response.getElementsByTagName("message");
                     console.log("Save: Error! "+message.textContent);
