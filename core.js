@@ -166,38 +166,10 @@ function loadProjectSpecCallback(response) {
 	//var decode = $.parseXML(response);
 	//projectXML = $(decode);
 	
-	// First perform XML schema validation
-	var Module = {
-		xml: response,
-		schema: schemaXSD,
-		arguments:["--noout", "--schema", 'test-schema.xsd','document.xml']
-	};
-	
-	var xmllint = validateXML(Module);
-	console.log(xmllint);
-	if(xmllint != 'document.xml validates\n')
-	{
-		document.getElementsByTagName('body')[0].innerHTML = null;
-		var msg = document.createElement("h3");
-		msg.textContent = "FATAL ERROR";
-		var span = document.createElement("h4");
-		span.textContent = "The XML validator returned the following errors when decoding your XML file";
-		document.getElementsByTagName('body')[0].appendChild(msg);
-		document.getElementsByTagName('body')[0].appendChild(span);
-		xmllint = xmllint.split('\n');
-		for (var i in xmllint)
-		{
-			document.getElementsByTagName('body')[0].appendChild(document.createElement('br'));
-			var span = document.createElement("span");
-			span.textContent = xmllint[i];
-			document.getElementsByTagName('body')[0].appendChild(span);
-		}
-		return;
-	}
-	
-	var parse = new DOMParser();
-	projectXML = parse.parseFromString(response,'text/xml');
-	var errorNode = projectXML.getElementsByTagName('parsererror');
+    // Check if XML is new or a resumption
+    var parse = new DOMParser();
+	var responseDocument = parse.parseFromString(response,'text/xml');
+    var errorNode = responseDocument.getElementsByTagName('parsererror');
 	if (errorNode.length >= 1)
 	{
 		var msg = document.createElement("h3");
@@ -210,10 +182,51 @@ function loadProjectSpecCallback(response) {
 		document.getElementsByTagName('body')[0].appendChild(errorNode[0]);
 		return;
 	}
-	
-	// Build the specification
-	specification.decode(projectXML);
-	storage.initialise();
+    if (responseDocument.children[0].nodeName == "waet") {
+        // document is a specification
+        
+        // Perform XML schema validation
+        var Module = {
+            xml: response,
+            schema: schemaXSD,
+            arguments:["--noout", "--schema", 'test-schema.xsd','document.xml']
+        };
+            projectXML = responseDocument;
+        var xmllint = validateXML(Module);
+        console.log(xmllint);
+        if(xmllint != 'document.xml validates\n')
+        {
+            document.getElementsByTagName('body')[0].innerHTML = null;
+            var msg = document.createElement("h3");
+            msg.textContent = "FATAL ERROR";
+            var span = document.createElement("h4");
+            span.textContent = "The XML validator returned the following errors when decoding your XML file";
+            document.getElementsByTagName('body')[0].appendChild(msg);
+            document.getElementsByTagName('body')[0].appendChild(span);
+            xmllint = xmllint.split('\n');
+            for (var i in xmllint)
+            {
+                document.getElementsByTagName('body')[0].appendChild(document.createElement('br'));
+                var span = document.createElement("span");
+                span.textContent = xmllint[i];
+                document.getElementsByTagName('body')[0].appendChild(span);
+            }
+            return;
+        }
+        // Build the specification
+	   specification.decode(projectXML);
+        // Generate the session-key
+        storage.initialise();
+        
+    } else if (responseDocument.children[0].nodeName == "waetresult") {
+        // document is a result
+        projectXML = responseDocument.getElementsByTagName('waet')[0];
+        // Build the specification
+	    specification.decode(projectXML);
+        // Use the session-key
+        var sessionKey = responseDocument.children[0].getAttribute(key);
+        storage.initialise(sessionKey);
+    }
 	/// CHECK FOR SAMPLE RATE COMPATIBILITY
 	if (specification.sampleRate != undefined) {
 		if (Number(specification.sampleRate) != audioContext.sampleRate) {
@@ -297,27 +310,6 @@ function loadProjectSpecCallback(response) {
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine(specification);
-	
-	$(specification.pages).each(function(index,elem){
-		$(elem.audioElements).each(function(i,audioElem){
-			var URL = elem.hostURL + audioElem.url;
-			var buffer = null;
-			for (var i=0; i<audioEngineContext.buffers.length; i++)
-			{
-				if (URL == audioEngineContext.buffers[i].url)
-				{
-					buffer = audioEngineContext.buffers[i];
-					break;
-				}
-			}
-			if (buffer == null)
-			{
-				buffer = new audioEngineContext.bufferObj();
-				buffer.getMedia(URL);
-				audioEngineContext.buffers.push(buffer);
-			}
-		});
-	});
 }
 
 function createProjectSave(destURL) {
@@ -328,7 +320,7 @@ function createProjectSave(destURL) {
 	var parent = document.createElement("div");
 	parent.appendChild(xmlDoc);
 	var file = [parent.innerHTML];
-	if (destURL == "null" || destURL == undefined) {
+	if (destURL == "local") {
 		var bb = new Blob(file,{type : 'application/xml'});
 		var dnlk = window.URL.createObjectURL(bb);
 		var a = document.createElement("a");
@@ -348,32 +340,24 @@ function createProjectSave(destURL) {
 			console.log('Error saving file to server! Presenting download locally');
 			createProjectSave(null);
 		};
-		xmlhttp.onreadystatechange  = function() {
-			console.log(xmlhttp.status);
-			if (xmlhttp.status != 200 && xmlhttp.readyState == 4) {
-				createProjectSave(null);
-			} else {
-				var parser = new DOMParser();
-				var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
-				if (xmlDoc == null)
-				{
-					createProjectSave('null');
-				}
-				var response = xmlDoc.childNodes[0];
-				if (response.getAttribute('state') == "OK")
-				{
-					var file = response.getElementsByTagName('file')[0];
-					console.log('Save OK: Filename '+file.textContent+','+file.getAttribute('bytes')+'B');
-					popup.showPopup();
-					popup.popupContent.innerHTML = null;
-					popup.popupContent.textContent = "Thank you!";
-					window.onbeforeunload=null;
-				} else {
-					var message = response.getElementsByTagName('message')[0];
-					errorSessionDump(message.textContent);
-				}
-			}
-		};
+		xmlhttp.onload = function() {
+            console.log(xmlhttp);
+            if (this.status >= 300) {
+                console.log("WARNING - Could not update at this time");
+            } else {
+                var parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
+                var response = xmlDoc.getElementsByTagName('response')[0];
+                if (response.getAttribute("state") == "OK") {
+                    var file = response.getElementsByTagName("file")[0];
+                    console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
+                } else {
+                    var message = response.getElementsByTagName("message");
+                    console.log("Save: Error! "+message.textContent);
+                    createProjectSave("local");
+                }
+            }
+        };
 		xmlhttp.send(file);
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
@@ -430,6 +414,10 @@ function linearToDecibel(gain)
 function decibelToLinear(gain)
 {
 	return Math.pow(10,gain/20.0);
+}
+
+function randomString(length) {
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
 }
 
 function interfacePopup() {
@@ -805,6 +793,22 @@ function stateMachine()
 		{
 			if (specification.testPages <= i && specification.testPages != 0) {break;}
 			this.stateMap.push(pageHolder[i]);
+            storage.createTestPageStore(pageHolder[i]);
+            for (var element of pageHolder[i].audioElements) {
+                var URL = pageHolder[i].hostURL + element.url;
+                var buffer = null;
+                for (var buffObj of audioEngineContext.buffers) {
+                    if (URL == buffObj.url) {
+                        buffer = buffObj;
+                        break;
+                    }
+                }
+                if (buffer == null) {
+                    buffer = new audioEngineContext.bufferObj();
+                    buffer.getMedia(URL);
+                    audioEngineContext.buffers.push(buffer);
+                }
+            }
 		}
         
 		if (specification.preTest != null) {this.preTestSurvey = specification.preTest;}
@@ -823,6 +827,7 @@ function stateMachine()
 		if (this.stateIndex == null) {
 			this.initialise();
 		}
+        storage.update();
 		if (this.stateIndex == -1) {
 			this.stateIndex++;
 			console.log('Starting test...');
@@ -855,7 +860,7 @@ function stateMachine()
 				{
 					this.currentStateMap.audioElements = randomiseOrder(this.currentStateMap.audioElements);
 				}
-                this.currentStore = storage.createTestPageStore(this.currentStateMap);
+                this.currentStore = storage.testPages[this.stateIndex];
 				if (this.currentStateMap.preTest != null)
 				{
 					this.currentStatePosition = 'pre';
@@ -3097,11 +3102,74 @@ function Storage()
 	this.root = this.document.childNodes[0];
 	this.state = 0;
 	
-	this.initialise = function()
+	this.initialise = function(sessionKey)
 	{
-		if (specification.preTest != undefined){this.globalPreTest = new this.surveyNode(this,this.root,specification.preTest);}
+        if (sessionKey == undefined) {
+            // We need to get the sessionKey
+            this.SessionKey.generateKey();
+            var projectDocument = specification.projectXML;
+            projectDocument.setAttribute('file-name',url);
+            this.root.appendChild(projectDocument);
+            this.root.appendChild(returnDateNode());
+            this.root.appendChild(interfaceContext.returnNavigator());
+        } else {
+            this.SessionKey.key = sessionKey;
+        }
+        if (specification.preTest != undefined){this.globalPreTest = new this.surveyNode(this,this.root,specification.preTest);}
 		if (specification.postTest != undefined){this.globalPostTest = new this.surveyNode(this,this.root,specification.postTest);}
 	};
+    
+    this.SessionKey = {
+        key: null,
+        request: new XMLHttpRequest(),
+        parent: this,
+        handleEvent: function() {
+            var parse = new DOMParser();
+            var xml = parse.parseFromString(this.request.response,"text/xml");
+            if (xml.getAllElementsByTagName("state")[0].textContent == "OK") {
+                this.key = xml.getAllElementsByTagName("key")[0].textContent;
+                this.parent.root.setAttribute("key",this.key);
+                this.parent.root.setAttribute("state","empty");
+            } else {
+                this.generateKey();
+            }
+        },
+        generateKey: function() {
+            var temp_key = randomString(32);
+            this.request.open("GET","keygen.php?key="+temp_key,true);
+            this.request.addEventListener("load",this);
+            this.request.send();
+        },
+        update: function() {
+            this.parent.root.setAttribute("state","update");
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("POST",specification.projectReturn+"?key="+this.key);
+            xmlhttp.setRequestHeader('Content-Type', 'text/xml');
+            xmlhttp.onerror = function(){
+                console.log('Error updating file to server!');
+            };
+            var hold = document.createElement("div");
+            var clone = this.parent.root.cloneNode(true);
+            hold.appendChild(clone);
+            xmlhttp.onload = function() {
+                if (this.status >= 300) {
+                    console.log("WARNING - Could not update at this time");
+                } else {
+                    var parser = new DOMParser();
+                    var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
+                    var response = xmlDoc.getElementsByTagName('response')[0];
+                    if (response.getAttribute("state") == "OK") {
+                        var file = response.getElementsByTagName("file")[0];
+                        console.log("Intermediate save: OK, written "+file.getAttribute("bytes")+"B");
+                    } else {
+                        var message = response.getElementsByTagName("message");
+                        console.log("Intermediate save: Error! "+message.textContent);
+                    }
+                }
+            }
+            xmlhttp.send([hold.innerHTML]);
+        }
+    }
 	
 	this.createTestPageStore = function(specification)
 	{
@@ -3198,15 +3266,14 @@ function Storage()
 		
 		this.parent.root.appendChild(this.XMLDOM);
 	};
+    this.update = function() {
+        this.SessionKey.update();
+    }
 	this.finish = function()
 	{
 		if (this.state == 0)
 		{
-			var projectDocument = specification.projectXML;
-			projectDocument.setAttribute('file-name',url);
-			this.root.appendChild(projectDocument);
-			this.root.appendChild(returnDateNode());
-			this.root.appendChild(interfaceContext.returnNavigator());
+            this.update();
 		}
 		this.state = 1;
 		return this.root;
