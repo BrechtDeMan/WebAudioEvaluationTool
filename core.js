@@ -2998,8 +2998,8 @@ function Interface(specificationObject) {
 			if (passed == false)
 			{
 				check_pass = false;
-				console.log("Continue listening to track-"+audioEngineContext.audioObjects.interfaceDOM.getPresentedId());
-				error_obj.push(audioEngineContext.audioObjects.interfaceDOM.getPresentedId());
+				console.log("Continue listening to track-"+object.interfaceDOM.getPresentedId());
+				error_obj.push(object.interfaceDOM.getPresentedId());
 			}
 		}
 		if (check_pass == false)
