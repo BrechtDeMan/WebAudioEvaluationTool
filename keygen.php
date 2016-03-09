@@ -7,7 +7,7 @@ $key_requested = $_GET['key'];
 
 $xml_good = "<response><state>OK</state><key>".$key_requested."</key></response>";
 $xml_bad = "<response><state>NO</state><key>".$key_requested."</key></response>";
-$xml_bad = "<response><state>ERROR</state><key>".$key_requested."</key></response>";
+$xml_error = "<response><state>ERROR</state><key>".$key_requested."</key></response>";
 if (is_array($saves))
 {
     foreach($saves as $filename) {

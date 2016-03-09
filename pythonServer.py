@@ -7,6 +7,7 @@ from os import listdir
 import inspect
 import os
 import urllib2
+import urlparse
 import pickle
 import datetime
 
@@ -58,18 +59,40 @@ def processFile(s):
 	s.end_headers()
 	s.wfile.write(fileDump.read())
 	fileDump.close()
-	
+
+def keygen(s):
+	reply = ""
+	options = s.path.rsplit('?')
+	options = options[1].rsplit('=')
+	key = options[1]
+	print key
+	if os.path.isfile("saves/save-"+key+".xml"):
+		reply = "<response><state>NO</state><key>"+key+"</key></response>"
+	else:
+		reply = "<response><state>OK</state><key>"+key+"</key></response>"
+	s.send_response(200)
+	s.send_header("Content-type", "application/xml")
+	s.end_headers()
+	s.wfile.write(reply)
+	file = open("saves/save-"+key+".xml",'w')
+	file.write("<waetresult key="+key+"/>")
+	file.close();
+
 def saveFile(self):
 	global curFileName
 	global curSaveIndex
+	options = self.path.rsplit('?')
+        options = options[1].rsplit('=')
+        key = options[1]
+        print key
 	varLen = int(self.headers['Content-Length'])
 	postVars = self.rfile.read(varLen)
-	print curFileName
-	file = open('saves/'+curFileName,'w')
+	print "Saving file key "+key
+	file = open('saves/save-'+key+'.xml','w')
 	file.write(postVars)
 	file.close()
 	try:
-		wbytes = os.path.getsize('saves/'+curFileName)
+		wbytes = os.path.getsize('saves/save-'+key+'.xml')
 	except OSError:
 		self.send_response(200)
 		self.send_header("Content-type", "text/xml")
@@ -94,6 +117,8 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		if(request.client_address[0] == "127.0.0.1"):
 			if (request.path == "/favicon.ico"):
 				send404(request)
+			elif (request.path.split('?',1)[0] == "/keygen.php"):
+				keygen(request);
 			else:
 				if (request.path == '/'):
 					request.path = '/index.html'
@@ -108,7 +133,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 	def do_POST(request):
 		if(request.client_address[0] == "127.0.0.1"):
-			if (request.path == "/save" or request.path == "/save.php"):
+			if (request.path.rsplit('?',1)[0] == "/save" or request.path.rsplit('?',1)[0] == "/save.php"):
 				saveFile(request)
 		else:
 			send404(request)
