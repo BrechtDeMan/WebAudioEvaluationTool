@@ -64,6 +64,7 @@ div.track-slider {
 	-moz-user-select: -moz-none;
 	-khtml-user-select: none;
 	-webkit-user-select: none;
+    border: 1px solid black;
 }
 
 div.outside-reference {
