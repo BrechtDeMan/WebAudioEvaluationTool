@@ -86,7 +86,7 @@
 			</surveyentry>
 		</survey>
 	</page>
-	<page id='test-1' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='false' showElementComments='true'>
+	<page id='test-1' hostURL="example_eval/" randomiseOrder='true' repeatCount='0' loop='false' showElementComments='true' label="none">
 		<commentboxprefix>Comment on fragment</commentboxprefix>
 		<interface name="preference">
 			<title>Example Test Question</title>

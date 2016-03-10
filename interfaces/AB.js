@@ -308,7 +308,22 @@ function comparator(audioHolderObject)
 			console.log("WARNING - AB cannot have fixed reference");
 		}
 		var audioObject = audioEngineContext.newTrack(element);
-		var node = new this.comparatorBox(audioObject,index,String.fromCharCode(65 + index));
+        var label;
+        switch(audioObject.specification.parent.label) {
+            case "none":
+                label = "";
+                break;
+            case "number":
+                label = ""+index;
+                break;
+            case "letter":
+                label = String.fromCharCode(97 + index);
+                break;
+            default:
+                label = String.fromCharCode(65 + index);
+                break;
+        }
+		var node = new this.comparatorBox(audioObject,index,label);
 		audioObject.bindInterface(node);
 		this.comparators.push(node);
 		this.boxHolders.appendChild(node.box);
