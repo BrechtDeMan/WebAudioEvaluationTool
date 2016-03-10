@@ -13,7 +13,7 @@
 				<option name="hwdesigner">Designing or building audio hardware</option>
 				<option name="researcher">Research in the field of audio</option>
 			</surveyentry>
-			<surveyentry type="statement">
+			<surveyentry type="statement" id="test-intro">
 				<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
 			</surveyentry>
 		</survey>
@@ -31,7 +31,7 @@
 				<option name="good">Good</option>
 				<option name="great">Great</option>
 			</surveyentry>
-			<surveyentry type="statement">
+			<surveyentry type="statement" id="thankyou">
 				<statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
 			</surveyentry>
 		</survey>
@@ -76,7 +76,7 @@
 		<audioelement url="3.wav" id="track-3"/>
 		<audioelement url="4.wav" id="track-4"/>
 		<survey location="before">
-			<surveyentry type="statement">
+			<surveyentry type="statement" id="test-0-intro">
 				<statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%.</statement>
 			</surveyentry>
 		</survey>
@@ -123,7 +123,7 @@
 			<option name="heavy">Heavy</option>
 		</commentquestion>
 		<survey location="before">
-			<surveyentry type="statement">
+			<surveyentry type="statement" id="test-1-intro">
 				<statement>Example of an 'APE' style interface with hidden anchor 'zero' (which needs to be below 20%), looping of the samples, randomisation of marker labels, mandatory moving of every sample, and a forced scale usage of at least 25%-75%.</statement>
 			</surveyentry>
 		</survey>

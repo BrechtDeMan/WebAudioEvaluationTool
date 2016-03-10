@@ -334,16 +334,17 @@ function createProjectSave(destURL) {
 		popup.popupContent.appendChild(a);
 	} else {
 		var xmlhttp = new XMLHttpRequest;
-		xmlhttp.open("POST",destURL,true);
+		xmlhttp.open("POST","\save.php?key="+storage.SessionKey.key,true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
 		xmlhttp.onerror = function(){
 			console.log('Error saving file to server! Presenting download locally');
-			createProjectSave(null);
+			createProjectSave("local");
 		};
 		xmlhttp.onload = function() {
             console.log(xmlhttp);
             if (this.status >= 300) {
                 console.log("WARNING - Could not update at this time");
+                createProjectSave("local");
             } else {
                 var parser = new DOMParser();
                 var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
