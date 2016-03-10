@@ -9,6 +9,21 @@
   <xs:attribute name="id" type="xs:ID"/>
   <xs:attribute name="mandatory" type="xs:boolean"/>
   <xs:attribute name="name" type="xs:string"/>
+
+  <xs:attribute name="preSilence" default="0">
+      <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+              <xs:minInclusive value="0.0"/>
+          </xs:restriction>
+      </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="postSilence" default="0">
+      <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+              <xs:minInclusive value="0.0"/>
+          </xs:restriction>
+      </xs:simpleType>
+  </xs:attribute>
   
   <!-- define complex elements-->
   <xs:element name="waet">
@@ -35,6 +50,8 @@
       <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional"/>
       <xs:attribute name="sampleRate" type="xs:positiveInteger" use="optional"/>
       <xs:attribute name="calibration" type="xs:boolean" default="false"/>
+      <xs:attribute ref="preSilence"/>
+      <xs:attribute ref="postSilence"/>
     </xs:complexType>
   </xs:element>
 
@@ -67,6 +84,8 @@
               </xs:restriction>
           </xs:simpleType>
       </xs:attribute>
+      <xs:attribute ref="preSilence"/>
+      <xs:attribute ref="postSilence"/>
     </xs:complexType>
   </xs:element>
 
@@ -150,6 +169,8 @@
         </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional"/>
+      <xs:attribute ref="preSilence"/>
+      <xs:attribute ref="postSilence"/>
     </xs:complexType>
   </xs:element>
 
