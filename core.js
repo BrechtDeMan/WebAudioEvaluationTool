@@ -351,6 +351,7 @@ function createProjectSave(destURL) {
                 if (response.getAttribute("state") == "OK") {
                     var file = response.getElementsByTagName("file")[0];
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
+                    popup.popupContent.textContent = "Thank you. Your session has been saved.";
                 } else {
                     var message = response.getElementsByTagName("message");
                     console.log("Save: Error! "+message.textContent);
@@ -1916,6 +1917,7 @@ function Specification() {
 			this.type = undefined;
 			this.schema = specification.schema.getAllElementsByName('surveyentry')[0];
 			this.id = undefined;
+            this.name = undefined;
 			this.mandatory = undefined;
 			this.statement = undefined;
 			this.boxsize = undefined;
@@ -1971,34 +1973,32 @@ function Specification() {
 				var statement = doc.createElement('statement');
 				statement.textContent = this.statement;
 				node.appendChild(statement);
-				switch(this.type)
-				{
-				case "statement":
-					break;
-				case "question":
+                if (this.type != "statement") {
                     node.id = this.id;
+                    if (this.name != undefined) { node.setAttribute("name",this.name);}
                     if (this.mandatory != undefined) { node.setAttribute("mandatory",this.mandatory);}
-                    if (this.boxsize != undefined) {node.setAttribute("boxsize",this.boxsize);}
-                    break;
-                case "number":
-                    node.id = this.id;
-                    if (this.mandatory != undefined) { node.setAttribute("mandatory",this.mandatory);}
-                    if (this.min != undefined) {node.setAttribute("min", this.min);}
-                    if (this.max != undefined) {node.setAttribute("max", this.max);}
-                    break;
-				case "checkbox":
-				case "radio":
-					node.id = this.id;
-					for (var i=0; i<this.options.length; i++)
-					{
-						var option = this.options[i];
-						var optionNode = doc.createElement("option");
-						optionNode.setAttribute("name",option.name);
-						optionNode.textContent = option.text;
-						node.appendChild(optionNode);
-					}
-					break;
-				}
+                    switch(this.type)
+                    {
+                    case "question":
+                        if (this.boxsize != undefined) {node.setAttribute("boxsize",this.boxsize);}
+                        break;
+                    case "number":
+                        if (this.min != undefined) {node.setAttribute("min", this.min);}
+                        if (this.max != undefined) {node.setAttribute("max", this.max);}
+                        break;
+                    case "checkbox":
+                    case "radio":
+                        for (var i=0; i<this.options.length; i++)
+                        {
+                            var option = this.options[i];
+                            var optionNode = doc.createElement("option");
+                            optionNode.setAttribute("name",option.name);
+                            optionNode.textContent = option.text;
+                            node.appendChild(optionNode);
+                        }
+                        break;
+                    }
+                }
 				return node;
 			};
 		};
@@ -2265,6 +2265,7 @@ function Specification() {
 		
 		this.commentQuestionNode = function() {
 			this.id = null;
+            this.name = undefined;
 			this.type = undefined;
 			this.options = [];
 			this.statement = undefined;
@@ -2272,6 +2273,7 @@ function Specification() {
 			this.decode = function(parent,xml)
 			{
 				this.id = xml.id;
+                this.name = xml.getAttribute('name');
 				this.type = xml.getAttribute('type');
 				this.statement = xml.getElementsByTagName('statement')[0].textContent;
 				var optNodes = xml.getElementsByTagName('option');
@@ -2290,6 +2292,7 @@ function Specification() {
 				var node = root.createElement("commentquestion");
                 node.id = this.id;
                 node.setAttribute("type",this.type);
+                if (this.name != undefined){node.setAttribute("name",this.name);}
                 var statement = root.createElement("statement");
                 statement.textContent = this.statement;
                 node.appendChild(statement);
@@ -2307,6 +2310,7 @@ function Specification() {
 		this.audioElementNode = function() {
 			this.url = null;
 			this.id = null;
+            this.name = null;
 			this.parent = null;
 			this.type = null;
 			this.marker = null;
