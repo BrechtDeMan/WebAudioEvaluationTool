@@ -23,6 +23,7 @@
   <xs:element name="setup">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="exitText" type="xs:string" minOccurs="0" maxOccurs="1"/>
         <xs:element ref="survey" minOccurs="0" maxOccurs="2"/>
         <xs:element ref="metric" maxOccurs="1"/>
         <xs:element ref="interface" maxOccurs="1"/>
@@ -33,6 +34,7 @@
       <xs:attribute name="testPages" type="xs:nonNegativeInteger" default="0"/>
       <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional"/>
       <xs:attribute name="sampleRate" type="xs:positiveInteger" use="optional"/>
+      <xs:attribute name="calibration" type="xs:boolean" default="false"/>
     </xs:complexType>
   </xs:element>
 
@@ -51,6 +53,7 @@
       <xs:attribute name="randomiseOrder" type="xs:boolean" default="false"/>
       <xs:attribute name="repeatCount" type="xs:nonNegativeInteger" default="0"/>
       <xs:attribute name="loop" type="xs:boolean" default="false"/>
+      <xs:attribute name="synchronous" type="xs:boolean" default="false"/>
       <xs:attribute name="showElementComments" type="xs:boolean" default="false"/>
       <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional"/>
       <xs:attribute name="label" use="optional" default="default">
