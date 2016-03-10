@@ -2180,6 +2180,7 @@ function Specification() {
 		this.showElementComments = undefined;
 		this.outsideReference = null;
 		this.loudness = null;
+        this.label = null;
 		this.preTest = null;
 		this.postTest = null;
 		this.interfaces = [];

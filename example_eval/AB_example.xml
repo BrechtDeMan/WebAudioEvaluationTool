@@ -13,7 +13,7 @@
 				<option name="hwdesigner">Designing or building audio hardware</option>
 				<option name="researcher">Research in the field of audio</option>
 			</surveyentry>
-			<surveyentry type="statement">
+			<surveyentry type="statement" id="test-intro">
 				<statement>This is an example of an 'AB'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
 			</surveyentry>
 		</survey>
@@ -31,7 +31,7 @@
 				<option name="good">Good</option>
 				<option name="great">Great</option>
 			</surveyentry>
-			<surveyentry type="statement">
+			<surveyentry type="statement" id="test-thank-you">
 				<statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
 			</surveyentry>
 		</survey>
@@ -60,7 +60,7 @@
 		<audioelement url="0.wav" id="track-0"/>
 		<audioelement url="1.wav" id="track-1"/>
 		<survey location="before">
-			<surveyentry type="statement">
+			<surveyentry type="statement" id="test-0-intro">
 				<statement>A two way comparison using randomised element order, automatic loudness and synchronised looping.</statement>
 			</surveyentry>
 		</survey>
@@ -83,7 +83,7 @@
 		<audioelement url="5.wav" id="track-7"/>
 		<audioelement url="6.wav" id="track-8"/>
 		<survey location="before">
-			<surveyentry type="statement">
+			<surveyentry type="statement" id="test-1-intro">
 				<statement>A 7 way comparison using randomised element order and synchronised looping.</statement>
 			</surveyentry>
 		</survey>

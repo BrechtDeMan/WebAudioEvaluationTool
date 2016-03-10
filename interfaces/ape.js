@@ -239,7 +239,7 @@ function loadInterface() {
 	};
 	// Create Submit (save) button
 	var submit = document.createElement("button");
-	submit.innerHTML = 'Submit';
+	submit.innerHTML = 'Next';
 	submit.onclick = buttonSubmitClick;
 	submit.id = 'submit-button';
 	// Append the interface buttons into the interfaceButtons object.
@@ -535,7 +535,22 @@ function interfaceSliderHolder(interfaceObject)
 		this.canvas.appendChild(trackObj);
 		this.sliders.push(trackObj);
 		this.metrics.push(new metricTracker(this));
-		trackObj.innerHTML = '<span>'+(this.metrics.length-1)+'</span>';
+		var label = document.createElement("label");
+        switch(audioObject.specification.parent.label) {
+            case "letter":
+                label.textContent = String.fromCharCode(97 + this.metrics.length-1);
+                break;
+            case "capital":
+                label.textContent = String.fromCharCode(65 + this.metrics.length-1);
+                break;
+            case "none":
+                label.textContent = "";
+                break;
+            default:
+                label.textContent = ""+this.metrics.length;
+                break;
+        }
+        trackObj.appendChild(label);
 		this.metrics[this.metrics.length-1].initialise(convSliderPosToRate(trackObj));
 		return trackObj;
 	};

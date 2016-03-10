@@ -55,7 +55,7 @@ function loadInterface() {
 	};
 	// Create Submit (save) button
 	var submit = document.createElement("button");
-	submit.innerHTML = 'Submit';
+	submit.innerHTML = 'Next';
 	submit.onclick = buttonSubmitClick;
 	submit.id = 'submit-button';
 	submit.style.float = 'left';
@@ -184,7 +184,7 @@ function loadTest(page)
 	});
 	
 	// Find all the audioElements from the audioHolder
-	var label = 0;
+	var index = 0;
 	var interfaceScales = testState.currentStateMap.interfaces[0].scales;
 	$(page.audioElements).each(function(index,element){
 		// Find URL of track
@@ -198,11 +198,25 @@ function loadTest(page)
 			audioObject.bindInterface(orNode);
 		} else {
 			// Create a slider per track
+            switch(audioObject.specification.parent.label) {
+                case "none":
+                    label = "";
+                    break;
+                case "letter":
+                    label = String.fromCharCode(97 + index);
+                    break;
+                case "capital":
+                    label = String.fromCharCode(65 + index);
+                    break;
+                default:
+                    label = ""+index;
+                    break;
+            }
 			var sliderObj = new discreteObject(audioObject,label,interfaceScales);
 			sliderBox.appendChild(sliderObj.holder);
 			audioObject.bindInterface(sliderObj);
             interfaceContext.commentBoxes.createCommentBox(audioObject);
-			label += 1;
+			index += 1;
 		}
         
 	});
