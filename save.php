@@ -1,17 +1,18 @@
 <?php
 	error_reporting(0);
-    try{
-        date_default_timezone_get();
-    }
-    catch(Exception $e){
-        date_default_timezone_set('UTC'); // Sets to UTC if not specified anywhere in .ini
-    }
+	try{
+	    date_default_timezone_get();
+	}
+	catch(Exception $e){
+	    date_default_timezone_set('UTC'); // Sets to UTC if not specified anywhere in .ini
+	}
+	$saveFilenamePrefix = isset($_GET['saveFilenamePrefix']) ? $_GET['saveFilenamePrefix'].'-' : '';
 	header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
 	$postText = file_get_contents('php://input');
 	$sha1_hash = sha1($postText);
 	$datetime = date('ymdHis');
-	$xmlfile = "save".$datetime."-".$sha1_hash.".xml";
+	$xmlfile = $saveFilenamePrefix."save".$datetime."-".$sha1_hash.".xml";
 	$fileHandle = fopen("saves/".$xmlfile, 'w');
 	if ($fileHandle == FALSE)
 	{
