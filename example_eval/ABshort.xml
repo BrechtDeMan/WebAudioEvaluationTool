@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+	<setup interface="AB" projectReturn="save.php" randomiseOrder='true' testPages="1" loudness="-23" sampleRate="44100">
+		<metric>
+			<metricenable>testTimer</metricenable>
+			<metricenable>elementTimer</metricenable>
+			<metricenable>elementInitialPosition</metricenable>
+			<metricenable>elementTracker</metricenable>
+			<metricenable>elementFlagListenedTo</metricenable>
+			<metricenable>elementFlagMoved</metricenable>
+			<metricenable>elementListenTracker</metricenable>
+		</metric>
+		<interface>
+			<interfaceoption type="check" name="fragmentMoved"/>
+			<interfaceoption type="check" name="scalerange" min="25" max="75"/>
+            <interfaceoption type="check" name="fragmentPlayed" />
+			<interfaceoption type="show" name='playhead'/>
+			<interfaceoption type="show" name="page-count"/>
+            <interfaceoption type="show" name='volume'/>
+		</interface>
+	</setup>
+    <page id="test-0" hostURL="example_eval/" randomiseOrder="true" repeatCount="0" loop="false" showElementComments="true" loudness="-12">
+        <commentboxprefix>Comment on fragment</commentboxprefix>
+        <interface>
+            <title>Which of these do you prefer</title>
+        </interface>
+        <audioelement url="3.wav" id="track-0"/>
+        <audioelement url="5.wav" id="track-1"/>
+    </page>
+</waet>

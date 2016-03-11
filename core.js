@@ -15,9 +15,9 @@ var storage;
 var popup; // Hold the interfacePopup object
 var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
-var audioEngineContext; // The custome AudioEngine object
-var projectReturn; // Hold the URL for the return
-
+var audioEngineContext; // The custom AudioEngine object
+var projectReturn; 
+var returnUrl; // Holds the url to be redirected to at the end of the test
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
@@ -338,11 +338,28 @@ function createProjectSave(destURL) {
 		a.textContent = "Save File";
 		
 		popup.showPopup();
-		popup.popupContent.innerHTML = "</span>Please save the file below to give to your test supervisor</span><br>";
+		popup.popupContent.innerHTML = "<span>Please save the file below to give to your test supervisor</span><br>";
 		popup.popupContent.appendChild(a);
 	} else {
 		var xmlhttp = new XMLHttpRequest;
-		xmlhttp.open("POST",destURL,true);
+		destUrlFull = destURL;
+		var saveFilenamePrefix;
+		// parse the querystring of destUrl, get the "id" (if any) and append it to destUrl
+		var qs = returnUrl.split("?");
+		if(qs.length == 2){
+			qs = qs[1];
+			qs = qs.split("&");
+			for(var n = 0; n < qs.length; n++){
+				var pair = qs[n].split("=");
+	      if (pair[0] == "id") {
+	      	saveFilenamePrefix = pair[1];
+	      }
+			}
+		}
+		if(typeof(saveFilenamePrefix) !== "undefined"){
+			destUrlFull+="?saveFilenamePrefix="+saveFilenamePrefix;
+		}
+		xmlhttp.open("POST",destUrlFull,true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
 		xmlhttp.onerror = function(){
 			console.log('Error saving file to server! Presenting download locally');
@@ -368,6 +385,9 @@ function createProjectSave(destURL) {
 					popup.popupContent.innerHTML = null;
 					popup.popupContent.textContent = "Thank you!";
 					window.onbeforeunload=null;
+					if(typeof(returnUrl) !== "undefined"){
+						window.location = returnUrl;
+					}
 				} else {
 					var message = response.getElementsByTagName('message')[0];
 					errorSessionDump(message.textContent);
