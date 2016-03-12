@@ -375,15 +375,17 @@ function createProjectSave(destURL) {
 		destUrlFull = destURL+"?key="+storage.SessionKey.key;
 		var saveFilenamePrefix;
 		// parse the querystring of destUrl, get the "id" (if any) and append it to destUrl
-		var qs = returnUrl.split("?");
-		if(qs.length == 2){
-			qs = qs[1];
-			qs = qs.split("&");
-			for(var n = 0; n < qs.length; n++){
-				var pair = qs[n].split("=");
-	      if (pair[0] == "id") {
-	      	saveFilenamePrefix = pair[1];
-	      }
+		if(typeof(returnUrl) !== "undefined"){
+			var qs = returnUrl.split("?");
+			if(qs.length == 2){
+				qs = qs[1];
+				qs = qs.split("&");
+				for(var n = 0; n < qs.length; n++){
+					var pair = qs[n].split("=");
+					if (pair[0] == "id") {
+						saveFilenamePrefix = pair[1];
+					}
+				}
 			}
 		}
 		if(typeof(saveFilenamePrefix) !== "undefined"){
@@ -408,7 +410,7 @@ function createProjectSave(destURL) {
       					window.onbeforeunload=null;
                 if (response.getAttribute("state") == "OK") {
                     var file = response.getElementsByTagName("file")[0];
-      							if(typeof(returnUrl) !== "undefined"){
+      							if(typeof(returnUrl) !== "undefined"){	
 												window.location = returnUrl;
 										}
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
