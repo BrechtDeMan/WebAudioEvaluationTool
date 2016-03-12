@@ -24,13 +24,7 @@
 			xmlFileFolder = "saves";
 			// array of XML files
 			// THIS IS WHERE YOU SPECIFY RESULT XML FILES TO ANALYSE
-			var xmlFiles = ["3b8692e2f7827594a2cf283ebc7ba79ba4f29149-save-3d3k50w774sw0cgc4800o8o8kwk0gk84.xml",
-"3b8692e2f7827594a2cf283ebc7ba79ba4f29149-save-5t0z46181s0cwoso8480800ockk0wkww.xml",
-"3b8692e2f7827594a2cf283ebc7ba79ba4f29149-save-8veul9kqv40gksgk8soso0wsws48s8o4.xml",
-"3b8692e2f7827594a2cf283ebc7ba79ba4f29149-save-hxvv3zp9jk80wswgckscgc000wskkws4.xml",
-"3b8692e2f7827594a2cf283ebc7ba79ba4f29149-save-i7wn9tydpckg8os48ccocsk40k8s0scc.xml",
-"3b8692e2f7827594a2cf283ebc7ba79ba4f29149-save-qjbkqelkz4ssocgkgc04w8go8o8cww4o.xml",
-"3b8692e2f7827594a2cf283ebc7ba79ba4f29149-save-w6jxem0ow004ks0o84g0kgw4wsw40k0w.xml"]; 
+			var xmlFiles = ['test-2.xml']; 
 							
 
 			//TODO: make retrieval of file names automatic / drag files on here
@@ -310,17 +304,24 @@
 						root = xml.getElementsByTagName('waetresult')[0];
 						
 						// get subject ID, add to array if not already there
-						pretestSurveyResult = root.getElementsByTagName('surveyresult')[0];
-						subjectID = pretestSurveyResult.getElementsByTagName('comment')[0];
-						if (subjectID){
-							if (subjectID.getAttribute('id')!='sessionId') { // warning in console when not available
-								console.log(xmlFiles[fileIndex]+': no SessionID available');
-							}
-							if (subjectArray.indexOf(subjectID.textContent) == -1) { // if not already in array
-								subjectArray.push(subjectID.textContent); // append to array
+						var pretestSurveyResult = root.getElementsByTagName('surveyresult')[0];
+						var subjectIdTextContent = undefined;
+						if(typeof(pretestSurveyResult) !== "undefined"){
+							var subjectID = pretestSurveyResult.getElementsByTagName('comment')[0];
+							if (subjectID){
+								if (subjectID.getAttribute('id')==='sessionId') { // warning in console when not available
+									subjectIdTextContent = subjectID.textContent;
+								}
 							}
 						}
-						
+						if(typeof(subjectIdTextContent) !== "undefined"){
+							if (subjectArray.indexOf(subjectIdTextContent) == -1) { // if not already in array
+								subjectArray.push(subjectIdTextContent); // append to array
+							}
+						} else {
+							console.log(xmlFiles[fileIndex]+': no sessionId available');
+						}
+
 						// go over all audioholders, add to array if not already there
 						audioholderNodes = root.getElementsByTagName('audioholder');
 						// go over audioholderNodes and append audioholder name when not present yet
