@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+	<setup interface="AB" projectReturn="save.php" randomiseOrder='true' testPages="1" loudness="-23" sampleRate="44100">
+		<survey location="before">
+			<surveyentry type="question" id="sessionId" mandatory="true">
+				<statement>Please enter your name.</statement>
+			</surveyentry>
+			<surveyentry type="checkbox" id="checkboxtest" mandatory="true">
+				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
+				<option name="musician">Playing a musical instrument</option>
+				<option name="soundengineer">Recording or mixing audio</option>
+				<option name="developer">Developing audio software</option>
+				<option name="hwdesigner">Designing or building audio hardware</option>
+				<option name="researcher">Research in the field of audio</option>
+			</surveyentry>
+			<surveyentry type="statement">
+				<statement>This is a preliminary test for a study on the Hammond organ. You will be presented with pairs of stimuli. For each pair you will be asked to single out the one note that was produced by a heavier touch.
+                    
+                    Feel free to add any comments on the stimuli in the boxes at the bottom of each page of the test.	</statement>
+			</surveyentry>
+		</survey>
+		<metric>
+			<metricenable>testTimer</metricenable>
+			<metricenable>elementTimer</metricenable>
+			<metricenable>elementInitialPosition</metricenable>
+			<metricenable>elementTracker</metricenable>
+			<metricenable>elementFlagListenedTo</metricenable>
+			<metricenable>elementFlagMoved</metricenable>
+			<metricenable>elementListenTracker</metricenable>
+		</metric>
+		<interface>
+			<interfaceoption type="check" name="fragmentMoved"/>
+			<interfaceoption type="check" name="scalerange" min="25" max="75"/>
+            <interfaceoption type="check" name="fragmentPlayed" />
+			<interfaceoption type="show" name='playhead'/>
+			<interfaceoption type="show" name="page-count"/>
+            <interfaceoption type="show" name='volume'/>
+            <!--interfaceoption type="submit" name="post-submit-dialog">
+                <a href="javascript:document.referrer">Click here to continue with the next test</a>
+            </interfaceoption-->
+		</interface>
+	</setup>
+    <page id="test-0" hostURL="example_eval/" randomiseOrder="true" repeatCount="0" loop="false" showElementComments="true" loudness="-12">
+        <commentboxprefix>Comment on fragment</commentboxprefix>
+        <interface>
+            <title>SKIP OVER THIS, I WANT ZERO PAGES!!!</title>
+        </interface>
+        <audioelement url="1.wav" id="track-0"/>
+        <audioelement url="1.wav" id="track-1"/>
+    </page>
+</waet>

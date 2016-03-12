@@ -32,12 +32,17 @@
 				{
 					// Split each request into
 					searchQueries[i] = searchQueries[i].split('=');
-					if (searchQueries[i][0] == "url")
+					var key = searchQueries[i][0];
+					var string = searchQueries[i][1];
+					if (key === "url")
 					{
-						url = searchQueries[i][1];
+						url = string;
+					}
+					if (key === "returnUrl"){
+						returnUrl = decodeURIComponent(string);
 					}
 				}
-				loadProjectSpec(url);
+				loadProjectSpec(url+"?"+Math.random()); // force resource reload, in case the server is lazy
 				window.onbeforeunload = function() {
 					return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
 				};
@@ -49,7 +54,8 @@
 		<!-- Load up the default page interface allowing for project setting loads, even if hard-coded-->
 		<!-- Actual test interface design should be contained in the .js for ease of dynamic content-->
 		<div id='topLevelBody'>
-            <span>Web Audio Evaluation Toolbox</span>
+            <span>Loading Web Audio Evaluation Toolbox ...</span>
+            <noscript>Javascript must be enabled in your browsers in order to be able to view this website</noscript>
 		</div>
         <div id="popupHolder" class="popupHolder" style="visibility: hidden; z-index: -1">
             <div id="popupContent">

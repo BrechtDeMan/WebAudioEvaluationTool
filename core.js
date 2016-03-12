@@ -15,9 +15,9 @@ var storage;
 var popup; // Hold the interfacePopup object
 var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
-var audioEngineContext; // The custome AudioEngine object
-var projectReturn; // Hold the URL for the return
-
+var audioEngineContext; // The custom AudioEngine object
+var projectReturn; 
+var returnUrl; // Holds the url to be redirected to at the end of the test
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
@@ -369,11 +369,28 @@ function createProjectSave(destURL) {
 		a.textContent = "Save File";
 		
 		popup.showPopup();
-		popup.popupContent.innerHTML = "</span>Please save the file below to give to your test supervisor</span><br>";
+		popup.popupContent.innerHTML = "<span>Please save the file below to give to your test supervisor</span><br>";
 		popup.popupContent.appendChild(a);
 	} else {
+		destUrlFull = destURL+"?key="+storage.SessionKey.key;
+		var saveFilenamePrefix;
+		// parse the querystring of destUrl, get the "id" (if any) and append it to destUrl
+		var qs = returnUrl.split("?");
+		if(qs.length == 2){
+			qs = qs[1];
+			qs = qs.split("&");
+			for(var n = 0; n < qs.length; n++){
+				var pair = qs[n].split("=");
+	      if (pair[0] == "id") {
+	      	saveFilenamePrefix = pair[1];
+	      }
+			}
+		}
+		if(typeof(saveFilenamePrefix) !== "undefined"){
+			destUrlFull+="&saveFilenamePrefix="+saveFilenamePrefix;
+		}
 		var xmlhttp = new XMLHttpRequest;
-		xmlhttp.open("POST","\save.php?key="+storage.SessionKey.key,true);
+		xmlhttp.open("POST",destUrlFull,true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
 		xmlhttp.onerror = function(){
 			console.log('Error saving file to server! Presenting download locally');
@@ -388,11 +405,15 @@ function createProjectSave(destURL) {
                 var parser = new DOMParser();
                 var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
                 var response = xmlDoc.getElementsByTagName('response')[0];
+      					window.onbeforeunload=null;
                 if (response.getAttribute("state") == "OK") {
                     var file = response.getElementsByTagName("file")[0];
+      							if(typeof(returnUrl) !== "undefined"){
+												window.location = returnUrl;
+										}
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
                     popup.popupContent.textContent = "Thank you. Your session has been saved.";
-                } else {
+    	          } else {
                     var message = response.getElementsByTagName("message");
                     console.log("Save: Error! "+message.textContent);
                     createProjectSave("local");
