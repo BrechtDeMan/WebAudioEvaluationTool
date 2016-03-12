@@ -51,3 +51,7 @@ re:^docs/DMRN+10/img/\._TestCreate\.png$
 re:^docs/DMRN+10/img/\._APE\.png$
 re:^docs/DMRN+10/img/\._MUSHRA\.png$
 re:^docs/AESPosterComp/AESposter\.pdf$
+example_eval/samples/*
+.hgrc
+*.orig	
+
