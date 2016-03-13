@@ -75,7 +75,7 @@ function loadInterface() {
 	sliderBox.appendChild(scaleHolder);
 	var scaleText = document.createElement('div');
 	scaleText.id = "scale-text-holder";
-	scaleText.style.height = "25px";
+	scaleText.style.height = "70px";
 	scaleText.style.width = "100%";
 	scaleHolder.appendChild(scaleText);
 	var scaleCanvas = document.createElement('canvas');
@@ -507,6 +507,10 @@ function drawScale()
 	textHolder.innerHTML = null;
 	ctx.fillStyle = "#000000";
 	ctx.setLineDash([1,4]);
+
+  var scaleTextWidthPercent = 100/scales.length - 2;
+  var scaleTextMaxHeight = 0;
+  var scaleTextDivs = [];
 	for (var scale of scales)
 	{
 		var posPercent = scale.position / 100.0;
@@ -524,9 +528,20 @@ function drawScale()
 		text.appendChild(textC);
 		text.className = "scale-text";
 		textHolder.appendChild(text);
-		text.style.width = $(text.children[0]).width()+'px';
+    console.log('here')
+		// text.style.width = $(text.children[0]).width()+'px';
+    text.style.width = scaleTextWidthPercent+"%";
 		text.style.left = (posPix+150-($(text).width()/2)) +'px';
+    scaleTextMaxHeight = text.offsetHeight > scaleTextMaxHeight ? text.offsetHeight : scaleTextMaxHeight;
+    scaleTextDivs[scaleTextDivs.length] = text;
 	}
+  var newHeight = scaleTextMaxHeight+"px";
+  for(var scaleTextDiv of scaleTextDivs){
+    scaleTextDiv.style.height = newHeight;
+  }
+  textHolder.style.height = newHeight;
+  var sliderHolder = document.getElementById("slider-holder");
+  sliderHolder.style.marginTop = newHeight;
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
