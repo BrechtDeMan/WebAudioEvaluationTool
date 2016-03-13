@@ -73,6 +73,7 @@
       <xs:attribute name="synchronous" type="xs:boolean" default="false"/>
       <xs:attribute name="showElementComments" type="xs:boolean" default="false"/>
       <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional"/>
+      <xs:attribute name="hidden" type="xs:boolean" default="false"/>
       <xs:attribute name="label" use="optional" default="default">
           <xs:simpleType>
               <xs:restriction base="xs:string">

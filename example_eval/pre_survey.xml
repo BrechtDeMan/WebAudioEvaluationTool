@@ -13,7 +13,7 @@
 				<option name="hwdesigner">Designing or building audio hardware</option>
 				<option name="researcher">Research in the field of audio</option>
 			</surveyentry>
-			<surveyentry type="statement">
+            <surveyentry type="statement" id="pre-survey">
 				<statement>This is a preliminary test for a study on the Hammond organ. You will be presented with pairs of stimuli. For each pair you will be asked to single out the one note that was produced by a heavier touch.
                     
                     Feel free to add any comments on the stimuli in the boxes at the bottom of each page of the test.	</statement>
@@ -40,12 +40,10 @@
             </interfaceoption-->
 		</interface>
 	</setup>
-    <page id="test-0" hostURL="example_eval/" randomiseOrder="true" repeatCount="0" loop="false" showElementComments="true" loudness="-12">
-        <commentboxprefix>Comment on fragment</commentboxprefix>
+    <page id="test-0" hostURL="example_eval/" hidden="true">
         <interface>
-            <title>SKIP OVER THIS, I WANT ZERO PAGES!!!</title>
+            <title>Pre-test survey</title>
         </interface>
-        <audioelement url="1.wav" id="track-0"/>
         <audioelement url="1.wav" id="track-1"/>
     </page>
 </waet>
