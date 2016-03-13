@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-	<setup interface="AB" projectReturn="save.php" randomiseOrder='true' testPages="1" loudness="-23" sampleRate="44100">
+	<setup interface="AB" projectReturn="save.php" randomiseOrder='true' testPages="2" loudness="-23" sampleRate="44100">
         <survey location="after">
             <surveyentry type="question" id="location" mandatory="true" boxsize="large">
                 <statement>Please enter your location. (example mandatory text question)</statement>
@@ -15,7 +15,7 @@
                 <option name="good">Good</option>
                 <option name="great">Great</option>
             </surveyentry>
-            <surveyentry type="statement">
+            <surveyentry type="statement" id="done">
                 <statement>Thank you for taking this listening test. May God be with you.</statement>
             </surveyentry>
         </survey>
@@ -37,12 +37,13 @@
             </interfaceoption-->
 		</interface>
 	</setup>
-    <page id="test-0" hostURL="example_eval/" randomiseOrder="true" repeatCount="0" loop="false" showElementComments="true" loudness="-12">
+    
+    <page id="test-0" hostURL="example_eval/" showElementComments="false" hidden="true">
         <commentboxprefix>Comment on fragment</commentboxprefix>
         <interface>
-            <title>SKIP THIS PAGE. I WANT 0 PAGES!!!!</title>
+            <title>Post-test survey</title>
         </interface>
-        <audioelement url="2.wav" id="track-0"/>
-        <audioelement url="1.wav" id="track-1"/>
+        <audioelement url="1.wav" id="dummy"/>
     </page>
+
 </waet>

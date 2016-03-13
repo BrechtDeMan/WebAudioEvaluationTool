@@ -1067,7 +1067,7 @@ function AudioEngine(specification) {
                             buffer_ptr[n] = waveObj.decoded_data[c][n];
                         }
                     }
-                    
+
                     delete waveObj;
                 } else {
                     audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
@@ -1475,10 +1475,16 @@ function audioObject(id) {
 	
 	this.exportXMLDOM = function() {
 		var file = storage.document.createElement('file');
-		file.setAttribute('sampleRate',this.buffer.buffer.sampleRate);
-		file.setAttribute('channels',this.buffer.buffer.numberOfChannels);
-		file.setAttribute('sampleCount',this.buffer.buffer.length);
-		file.setAttribute('duration',this.buffer.buffer.duration);
+		var buf;
+		if(typeof(this.buffer) !== "undefined"){
+			buf = this.buffer.buffer;
+		} else {
+			buf = {};
+		}
+		file.setAttribute('sampleRate', buf.sampleRate);
+		file.setAttribute('channels', buf.numberOfChannels);
+		file.setAttribute('sampleCount', buf.length);
+		file.setAttribute('duration', buf.duration);
 		this.storeDOM.appendChild(file);
 		if (this.specification.type != 'outside-reference') {
 			var interfaceXML = this.interfaceDOM.exportXMLDOM(this);
@@ -2438,6 +2444,11 @@ function Interface(specificationObject) {
 		interfaceContext.commentBoxes.deleteCommentBoxes();
 		interfaceContext.deleteCommentQuestions();
 		loadTest(audioHolderObject,store);
+		if(audioHolderObject.hidden === true){ 
+		// work-around to have zero pages: set the attribute hidden=true and 
+		// it will automatically skip over.
+			testState.advanceState();
+		}
 	};
 	
 	// Bounded by interface!!
