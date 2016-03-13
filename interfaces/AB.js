@@ -326,7 +326,6 @@ function comparator(audioHolderObject)
                 label = String.fromCharCode(65 + index);
                 break;
         }
-        console.log('here')
 		var node = new this.comparatorBox(audioObject,index,label);
 		audioObject.bindInterface(node);
 		this.comparators.push(node);
