@@ -699,27 +699,29 @@ function buildPage()
             this.option = null;
             this.parent = null;
             this.optionLists = [];
-            var select = document.createElement("select");
-            select.setAttribute("name","type");
-            select.addEventListener("change",this,false);
-            this.content.appendChild(select);
+            this.select = document.createElement("select");
+            this.select.setAttribute("name","type");
+            this.select.addEventListener("change",this,false);
+            this.content.appendChild(this.select);
             this.content.appendChild(this.dynamic);
             this.generate = function(option, parent)
             {
                 this.option = option;
                 this.parent = parent;
-                var optionList = specification.schema.getAllElementsByName("survey")[0].getAllElementsByName("type")[0].getAllElementsByTagName("xs:enumeration");
-                for (var i=0; i<optionList.length; i++)
-                {
-                    var selectOption = document.createElement("option");
-                    selectOption.value = optionList[i].getAttribute("value");
-                    selectOption.textContent = selectOption.value;
-                    select.appendChild(selectOption);
+                if (this.select.childElementCount == 0) {
+                    var optionList = specification.schema.getAllElementsByName("survey")[0].getAllElementsByName("type")[0].getAllElementsByTagName("xs:enumeration");
+                    for (var i=0; i<optionList.length; i++)
+                    {
+                        var selectOption = document.createElement("option");
+                        selectOption.value = optionList[i].getAttribute("value");
+                        selectOption.textContent = selectOption.value;
+                        this.select.appendChild(selectOption);
+                    }
                 }
                 if (this.option.type != undefined){
-                    select.value = this.option.type
+                    this.select.value = this.option.type
                 } else {
-                    select.value = "statement";
+                    this.select.value = "statement";
                     this.option.type = "statement";
                 }
                 
@@ -745,12 +747,13 @@ function buildPage()
                 idEntry.setAttribute("name","id");
                 idEntry.value = this.option.id;
                 
+                this.dynamic.appendChild(id);
+                
                 switch(this.option.type)
                 {
                     case "statement":
                         break;
                     case "question":
-                        this.dynamic.appendChild(id);
                         var boxsizeSelect = document.createElement("select");
                         var optionList = specification.schema.getAllElementsByName("survey")[0].getAllElementsByName("boxsize")[0].getAllElementsByTagName("xs:enumeration");
                         for (var i=0; i<optionList.length; i++)
@@ -884,6 +887,21 @@ function buildPage()
                             this.deleteEntry.root.addEventListener("click",this.deleteEntry,false);
                             this.rootDOM.appendChild(this.deleteEntry.root);
                         }
+                        this.addEntry = {
+                            parent: this,
+                            root: document.createElement("button"),
+                            handleEvent: function() {
+                                var node = {name: "name", text: "text"};
+                                var optionsList = this.parent.option.options;
+                                optionsList.push(node);
+                                var obj = new optionObject(this.parent,optionsList[optionsList.length-1]);
+                                this.parent.optionLists.push(obj);
+                                document.getElementById("popup-option-holder").appendChild(obj.rootDOM);
+                            }
+                        }
+                        this.addEntry.root.textContent = "Add Option";
+                        this.addEntry.root.addEventListener("click",this.addEntry);
+                        this.dynamic.appendChild(this.addEntry.root);
                         for (var i=0; i<this.option.options.length; i++)
                         {
                             var obj = new optionObject(this,this.option.options[i]);
@@ -1142,6 +1160,13 @@ function SpecificationToHTML()
             this.name = schema.getAttribute('name');
             this.default = schema.getAttribute('default');
             this.dataType = schema.getAttribute('type');
+            if (this.dataType == undefined) {
+                if (schema.childElementCount > 0) {
+                    if (schema.children[0].nodeName == "xs:simpleType") {
+                        this.dataType = schema.getAllElementsByTagName("xs:restriction")[0].getAttribute("base");
+                    }
+                }
+            }
             if (typeof this.dataType == "string") { this.dataType = this.dataType.substr(3);}
             else {this.dataType = "string";}
             var minVar = undefined;
