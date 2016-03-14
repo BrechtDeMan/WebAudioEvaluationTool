@@ -19,5 +19,6 @@
     "url": "URL",
     "gain": "Gain (dB)",
     "marker": "Marker",
-    "boxsize": "Box Size"
+    "boxsize": "Box Size",
+    "label": "Label"
 }
