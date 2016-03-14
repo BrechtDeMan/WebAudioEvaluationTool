@@ -3,7 +3,7 @@
     "mandatory": "Mandatory",
     "name": "Name",
     "interface": "Interface Module",
-    "projectReturn": "Results Return URL",
+    "projectReturn": "Save URL",
     "randomiseOrder": "Randomise Order",
     "testPages": "Test Pages",
     "loudness": "Target Loudness (LUFS)",
@@ -19,5 +19,9 @@
     "url": "URL",
     "gain": "Gain (dB)",
     "marker": "Marker",
-    "boxsize": "Box Size"
+    "boxsize": "Box Size",
+    "label": "Label",
+    "calibration": "Perform Calibration",
+    "preSilence": "Pre Silence",
+    "postSilence": "Post Silence"
 }
