@@ -728,10 +728,12 @@ function buildPage()
                 this.dynamic.innerHTML = null;
                 var statement = document.createElement("div");
                 var statementText = document.createElement("span");
-                var statementEntry = document.createElement("textarea");
+                var statementEntry = document.createElement("input");
                 statement.appendChild(statementText);
                 statement.appendChild(statementEntry);
+                statement.className = "survey-entry-attribute";
                 statementText.textContent = "Statement/Question";
+                statementEntry.style.width = "500px";
                 statementEntry.addEventListener("change",this,false);
                 statementEntry.setAttribute("name","statement");
                 statementEntry.value = this.option.statement;
@@ -742,6 +744,7 @@ function buildPage()
                 var idEntry = document.createElement("input");
                 id.appendChild(idText);
                 id.appendChild(idEntry);
+                id.className = "survey-entry-attribute";
                 idText.textContent = "ID: ";
                 idEntry.addEventListener("change",this,false);
                 idEntry.setAttribute("name","id");
@@ -776,6 +779,7 @@ function buildPage()
                         boxsizeText.textContent = "Entry Size: ";
                         boxsize.appendChild(boxsizeText);
                         boxsize.appendChild(boxsizeSelect);
+                        boxsize.className = "survey-entry-attribute";
                         this.dynamic.appendChild(boxsize);
                         
                         var mandatory = document.createElement("div");
@@ -784,6 +788,7 @@ function buildPage()
                         mandatoryText.textContent = "Mandatory: ";
                         mandatory.appendChild(mandatoryText);
                         mandatory.appendChild(mandatoryInput);
+                        mandatory.className = "survey-entry-attribute";
                         mandatoryInput.type = "checkbox";
                         if (this.option.mandatory) {mandatoryInput.checked = true;} else {mandatoryInput.checked = false;}
                         mandatoryInput.setAttribute("name","mandatory");
@@ -799,6 +804,7 @@ function buildPage()
                         mandatoryText.textContent = "Mandatory: ";
                         mandatory.appendChild(mandatoryText);
                         mandatory.appendChild(mandatoryInput);
+                        mandatory.className = "survey-entry-attribute";
                         mandatoryInput.type = "checkbox";
                         if (this.option.mandatory) {mandatoryInput.checked = true;} else {mandatoryInput.checked = false;}
                         mandatoryInput.setAttribute("name","mandatory");
@@ -811,6 +817,7 @@ function buildPage()
                         minimumText.textContent = "Minimum: ";
                         minimum.appendChild(minimumText);
                         minimum.appendChild(minimumEntry);
+                        minimum.className = "survey-entry-attribute";
                         minimumEntry.type = "number";
                         minimumEntry.setAttribute("name","min");
                         minimumEntry.addEventListener("change",this,false);
@@ -823,6 +830,7 @@ function buildPage()
                         maximumText.textContent = "Maximum: ";
                         maximum.appendChild(maximumText);
                         maximum.appendChild(maximumEntry);
+                        maximum.className = "survey-entry-attribute";
                         maximumEntry.type = "number";
                         maximumEntry.setAttribute("name","max");
                         maximumEntry.addEventListener("change",this,false);
@@ -914,23 +922,23 @@ function buildPage()
             this.handleEvent = function()
             {
                 var name = event.currentTarget.getAttribute("name");
+                var nodeName = event.currentTarget.nodeName;
+                if (name == "type" && nodeName == "SELECT") {
+                    // If type has changed, we may need to rebuild the entire state node
+                    if (event.currentTarget.value != this.option.name)
+                    {
+                        this.option.type = event.currentTarget.value;
+                        this.generate(this.option,this.parent);
+                    }
+                    return;
+                }
+                var type = event.currentTarget.getAttribute("type");
                 switch(name) {
-                    case "type":
-                        // If type has changed, we may need to rebuild the entire state node
-                        if (event.currentTarget.value != this.option.name)
-                        {
-                            this.option.type = event.currentTarget.value;
-                            this.generate(this.option,this.parent);
-                        }
+                    case "checkbox":
+                        eval("this.option."+name+" = event.currentTarget.checked");
                         break;
-                    case "mandatory":
-                        this.option.mandatory = event.currentTarget.checked;
-                        break;
-                    case "boxsize":
-                        this.option.boxsize = event.currentTarget.value;
-                        break;
-                    case "statement":
-                        this.option.statement = event.currentTarget.value;
+                    default:
+                        eval("this.option."+name+" = event.currentTarget.value");
                         break;
                 }
             }

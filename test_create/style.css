@@ -133,3 +133,16 @@ div.attribute input[type=radio], div.attribute input[type=checkbox]{
 input:disabled+label{
     text-decoration: line-through;
 }
+
+div.survey-entry-attribute {
+    margin: 10px 0px;
+    border: 1px gray solid;
+    border-radius: 5px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0px 10px;
+}
+
+div.survey-entry-attribute span{
+    margin-right: 10px;
+}
