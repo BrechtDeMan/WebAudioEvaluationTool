@@ -43,12 +43,16 @@ for file_name in os.listdir(folder_name):
         subject_id = file_name[:-4] # file name (without extension) as subject ID
 
         # get list of all pages this subject evaluated
-        for audioholder in root.findall("./page"):    # iterate over pages
-            page_name = audioholder.get('id') # get page name
+        for page in root.findall("./page"):    # iterate over pages
+            page_name = page.get('ref') # get page reference ID
                        
             if page_name is None: # ignore 'empty' audio_holders
                 print "WARNING: " + file_name + " contains empty audio holder. (score_parser.py)"
                 break
+                
+            if page.get('state') != "complete":
+                print "WARNING:" + file_name + " contains incomplete page " +page_name+ ". (score_parser.py)"
+                break;
 
             file_name = folder_name+'/ratings/'+page_name+'-ratings.csv' # score file name
 
@@ -60,13 +64,13 @@ for file_name in os.listdir(folder_name):
             # go to fragment column, or create new column if it doesn't exist yet
 
             # get array of audio elements and number of audio elements
-            audiolist = audioholder.findall("./audioelement")
+            audiolist = page.findall("./audioelement")
             n_fragments = len(audiolist)
 
             # get alphabetical array of fragment IDs from this subject's XML
             fragmentnamelist = []    # make empty list
             for audioelement in audiolist: # iterate over all audioelements
-                fragmentnamelist.append(audioelement.get('id')) # add to list
+                fragmentnamelist.append(audioelement.get('ref')) # add to list
 
 
             # if file exists, get header and add any 'new' fragments not yet in the header
@@ -119,7 +123,7 @@ for file_name in os.listdir(folder_name):
 
             # get scores related to fragment [id]
             for fragmentname in headerrow[1:]: # iterate over fragments in header (skip first empty column)
-                elementvalue = audioholder.find("./audioelement/[@id='"
+                elementvalue = page.find("./audioelement/[@ref='"
                                        + fragmentname
                                        + "']/value")
                 if hasattr(elementvalue, 'text'): # if rating for this fragment exists
