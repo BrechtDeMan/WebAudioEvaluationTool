@@ -236,19 +236,13 @@
                         var statement = doc.createElement('statement');
                         statement.textContent = this.statement;
                         node.appendChild(statement);
-                        if (this.type != "statement") {
-                            node.id = this.id;
-                            if (this.name != undefined) { node.setAttribute("name",this.name);}
-                            if (this.mandatory != undefined) { node.setAttribute("mandatory",this.mandatory);}
-                            switch(this.type)
-                            {
-                            case "question":
-                                if (this.boxsize != undefined) {node.setAttribute("boxsize",this.boxsize);}
-                                break;
-                            case "number":
-                                if (this.min != undefined) {node.setAttribute("min", this.min);}
-                                if (this.max != undefined) {node.setAttribute("max", this.max);}
-                                break;
+                        node.id = this.id;
+                        if (this.name != undefined) { node.setAttribute("name",this.name);}
+                        if (this.mandatory != undefined) { node.setAttribute("mandatory",this.mandatory);}
+                        node.id = this.id;
+                        if (this.name != undefined) {node.setAttribute("name",this.name);}
+                        switch(this.type)
+                        {
                             case "checkbox":
                             case "radio":
                                 for (var i=0; i<this.options.length; i++)
@@ -259,8 +253,14 @@
                                     optionNode.textContent = option.text;
                                     node.appendChild(optionNode);
                                 }
+                            case "number":
+                                if (this.min != undefined) {node.setAttribute("min", this.min);}
+                                if (this.max != undefined) {node.setAttribute("max", this.max);}
+                            case "question":
+                                if (this.boxsize != undefined) {node.setAttribute("boxsize",this.boxsize);}
+                                if (this.mandatory != undefined) {node.setAttribute("mandatory",this.mandatory);}
+                            default:
                                 break;
-                            }
                         }
                         return node;
                     };
