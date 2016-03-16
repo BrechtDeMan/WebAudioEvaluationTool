@@ -281,69 +281,82 @@ function loadProjectSpecCallback(response) {
 	switch(specification.interface)
 	{
 		case "APE":
-		interfaceJS.setAttribute("src","interfaces/ape.js");
-		
-		// APE comes with a css file
-		var css = document.createElement('link');
-		css.rel = 'stylesheet';
-		css.type = 'text/css';
-		css.href = 'interfaces/ape.css';
-		
-		document.getElementsByTagName("head")[0].appendChild(css);
-		break;
-		
+            interfaceJS.setAttribute("src","interfaces/ape.js");
+
+            // APE comes with a css file
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.type = 'text/css';
+            css.href = 'interfaces/ape.css';
+
+            document.getElementsByTagName("head")[0].appendChild(css);
+            break;
+
 		case "MUSHRA":
-		interfaceJS.setAttribute("src","interfaces/mushra.js");
-		
-		// MUSHRA comes with a css file
-		var css = document.createElement('link');
-		css.rel = 'stylesheet';
-		css.type = 'text/css';
-		css.href = 'interfaces/mushra.css';
-		
-		document.getElementsByTagName("head")[0].appendChild(css);
-		break;
+            interfaceJS.setAttribute("src","interfaces/mushra.js");
+
+            // MUSHRA comes with a css file
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.type = 'text/css';
+            css.href = 'interfaces/mushra.css';
+
+            document.getElementsByTagName("head")[0].appendChild(css);
+            break;
 		
 		case "AB":
-		interfaceJS.setAttribute("src","interfaces/AB.js");
-		
-		// AB comes with a css file
-		var css = document.createElement('link');
-		css.rel = 'stylesheet';
-		css.type = 'text/css';
-		css.href = 'interfaces/AB.css';
-		
-		document.getElementsByTagName("head")[0].appendChild(css);
-		break;
+            interfaceJS.setAttribute("src","interfaces/AB.js");
+
+            // AB comes with a css file
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.type = 'text/css';
+            css.href = 'interfaces/AB.css';
+
+            document.getElementsByTagName("head")[0].appendChild(css);
+            break;
+            
+        case "ABX":
+            interfaceJS.setAttribute("src","interfaces/ABX.js");
+
+            // AB comes with a css file
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.type = 'text/css';
+            css.href = 'interfaces/ABX.css';
+
+            document.getElementsByTagName("head")[0].appendChild(css);
+            break;
+        
 		case "Bipolar":
 		case "ACR":
 		case "DCR":
 		case "CCR":
 		case "ABC":
-		// Above enumerate to horizontal sliders
-		interfaceJS.setAttribute("src","interfaces/horizontal-sliders.js");
-		
-		// horizontal-sliders comes with a css file
-		var css = document.createElement('link');
-		css.rel = 'stylesheet';
-		css.type = 'text/css';
-		css.href = 'interfaces/horizontal-sliders.css';
-		
-		document.getElementsByTagName("head")[0].appendChild(css);
-		break;
+            // Above enumerate to horizontal sliders
+            interfaceJS.setAttribute("src","interfaces/horizontal-sliders.js");
+
+            // horizontal-sliders comes with a css file
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.type = 'text/css';
+            css.href = 'interfaces/horizontal-sliders.css';
+
+            document.getElementsByTagName("head")[0].appendChild(css);
+            break;
 		case "discrete":
 		case "likert":
-		// Above enumerate to horizontal discrete radios
-		interfaceJS.setAttribute("src","interfaces/discrete.js");
-		
-		// horizontal-sliders comes with a css file
-		var css = document.createElement('link');
-		css.rel = 'stylesheet';
-		css.type = 'text/css';
-		css.href = 'interfaces/discrete.css';
-		
-		document.getElementsByTagName("head")[0].appendChild(css);
-		break;
+            // Above enumerate to horizontal discrete radios
+            interfaceJS.setAttribute("src","interfaces/discrete.js");
+
+            // horizontal-sliders comes with a css file
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.type = 'text/css';
+            css.href = 'interfaces/discrete.css';
+
+            document.getElementsByTagName("head")[0].appendChild(css);
+            break;
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
 	
