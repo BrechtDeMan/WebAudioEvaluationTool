@@ -10,6 +10,8 @@ function loadInterface() {
 	// Use this to do any one-time page / element construction. For instance, placing any stationary text objects,
 	// holding div's, or setting up any nodes which are present for the entire test sequence
     
+    interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
+    
     // Custom comparator Object
 	Interface.prototype.comparator = null;
     
@@ -100,7 +102,61 @@ function loadInterface() {
 function loadTest(page)
 {
 	// Called each time a new test page is to be build. The page specification node is the only item passed in
+    document.getElementById('box-holders').innerHTML = null;
+    
+    var interfaceObj = page.interfaces;
+	if (interfaceObj.length > 1)
+	{
+		console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
+	}
+	interfaceObj = interfaceObj[0];
+	
+	if(interfaceObj.title != null)
+	{
+		document.getElementById("pageTitle").textContent = interfaceObj.title;
+	}
+    
+    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    for (var option of interfaceOptions)
+    {
+        if (option.type == "show")
+        {
+            switch(option.name) {
+                case "playhead":
+                    var playbackHolder = document.getElementById('playback-holder');
+                    if (playbackHolder == null)
+                    {
+                        playbackHolder = document.createElement('div');
+                        playbackHolder.style.width = "100%";
+                        playbackHolder.style.float = "left";
+                        playbackHolder.align = 'center';
+                        playbackHolder.appendChild(interfaceContext.playhead.object);
+                        feedbackHolder.appendChild(playbackHolder);
+                    }
+                    break;
+                case "page-count":
+                    var pagecountHolder = document.getElementById('page-count');
+                    if (pagecountHolder == null)
+                    {
+                        pagecountHolder = document.createElement('div');
+                        pagecountHolder.id = 'page-count';
+                    }
+                    pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
+                    var inject = document.getElementById('interface-buttons');
+                    inject.appendChild(pagecountHolder);
+                    break;
+                case "volume":
+                    if (document.getElementById('master-volume-holder') == null)
+                    {
+                        feedbackHolder.appendChild(interfaceContext.volume.object);
+                    }
+                    break;
+            }
+        }
+    }
+    
     interfaceContext.comparator = new comparator(page);
+    resizeWindow(null);
 }
 
 function comparator(page)
@@ -326,12 +382,76 @@ function comparator(page)
 
 function resizeWindow(event)
 {
-	// Called on every window resize event, use this to scale your page properly
+	document.getElementById('submit').style.left = (window.innerWidth-250)/2 + 'px';
+	var numObj = 3;
+	var boxW = numObj*312;
+    var diff = window.innerWidth - boxW;
+    while (diff < 0)
+    {
+        numObj = Math.ceil(numObj/2);
+        boxW = numObj*312;
+        diff = window.innerWidth - boxW;
+    }
+    document.getElementById('box-holders').style.marginLeft = diff/2 + 'px';
+    document.getElementById('box-holders').style.marginRight = diff/2 + 'px';
+    document.getElementById('box-holders').style.width = boxW + 'px';
 }
 
 function buttonSubmitClick()
 {
-    testState.advanceState();
+	var checks = [];
+	checks = checks.concat(testState.currentStateMap.interfaces[0].options);
+	checks = checks.concat(specification.interfaces.options);
+	var canContinue = true;
+	
+	for (var i=0; i<checks.length; i++) {
+		if (checks[i].type == 'check')
+		{
+			switch(checks[i].name) {
+			case 'fragmentPlayed':
+				// Check if all fragments have been played
+				var checkState = interfaceContext.checkAllPlayed();
+				if (checkState == false) {canContinue = false;}
+				break;
+			case  'fragmentFullPlayback':
+				// Check all fragments have been played to their full length
+				var checkState = interfaceContext.checkFragmentsFullyPlayed();
+				if (checkState == false) {canContinue = false;}
+				break;
+			case 'fragmentMoved':
+				// Check all fragment sliders have been moved.
+				var checkState = interfaceContext.checkAllMoved();
+				if (checkState == false) {canContinue = false;}
+				break;
+			case 'fragmentComments':
+				// Check all fragment sliders have been moved.
+				var checkState = interfaceContext.checkAllCommented();
+				if (checkState == false) {canContinue = false;}
+				break;
+			default:
+				console.log("WARNING - Check option "+checks[i].check+" is not supported on this interface");
+				break;
+			}
+
+		}
+		if (!canContinue) {break;}
+	}
+	if (canContinue)
+	{
+	    if (audioEngineContext.status == 1) {
+	        var playback = document.getElementById('playback-button');
+	        playback.click();
+	    // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
+	    } else
+	    {
+	        if (audioEngineContext.timer.testStarted == false)
+	        {
+	            alert('You have not started the test! Please press start to begin the test!');
+	            return;
+	        }
+	    }
+	    testState.advanceState();
+	}
 }
 
 function pageXMLSave(store, pageSpecification)
