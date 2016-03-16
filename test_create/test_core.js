@@ -932,8 +932,7 @@ function buildPage()
                     }
                     return;
                 }
-                var type = event.currentTarget.getAttribute("type");
-                switch(name) {
+                switch(event.currentTarget.getAttribute("type")) {
                     case "checkbox":
                         eval("this.option."+name+" = event.currentTarget.checked");
                         break;

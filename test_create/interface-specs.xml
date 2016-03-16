@@ -175,6 +175,36 @@
                 <outsidereference min="0" max="1"/>
             </elements>
         </interface>
+        <interface name="ABX">
+            <metrics>
+                <entry name="testTimer" support="optional" default="on"/>
+                <entry name="elementTimer" support="optional" default="on"/>
+                <entry name="elementInitialPosition" support="none"/>
+                <entry name="elementTracker" support="optional" default="on"/>
+                <entry name="elementFlagListenedTo" support="optional" default="on"/>
+                <entry name="elementFlagMoved" support="none"/>
+                <entry name="elementListenTracker" support="optional" default="on"/>
+            </metrics>
+            <checks>
+                <entry name="fragmentMoved" support="none"/>
+                <entry name="fragmentPlayed" support="optional" default="off"/>
+                <entry name="fragmentFullPlayback" support="optional" default="off"/>
+                <entry name="fragmentComments" support="optional" default="off"/>
+                <entry name="scalerange" support="none"/>
+            </checks>
+            <show>
+                <entry name="volume" support="optional" default="off"/>
+                <entry name="page-count" support="optional" default="off"/>
+                <entry name="playhead" support="optional" default="off"/>
+                <entry name="comments" support="optional" default="off"/>
+            </show>
+            <elements>
+                <number min="2" max="2"/>
+                <anchor min="0" max="0"/>
+                <reference min="0" max="0"/>
+                <outsidereference min="0" max="0"/>
+            </elements>
+        </interface>
     </interfaces>
     <scaledefinitions>
         <scale name="Likert">
@@ -413,25 +443,7 @@
                 <number min="2" max="2"/>
                 <outsidereference min="0" max="0"/>
             </elements>
-            <scale name="ABC"/>
         </test>
-        <test name="ABX" interface="AB">
-            <checks>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <elements>
-                <number min="2" max="2"/>
-                <outsidereference min="1" max="1"/>
-            </elements>
-            <scale name="ABC"/>
-        </test>
+        <test name="ABX" interface="ABX"/>
     </tests>
 </root>
