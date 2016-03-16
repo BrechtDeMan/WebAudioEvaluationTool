@@ -37,14 +37,14 @@ if (is_array($saves))
                 $page_struct = null;
                 foreach($comment_struct as $comment_struct_page)
                 {
-                    if ($pageInstance['id'] == $comment_struct_page->id)
+                    if ($pageInstance['ref'] == $comment_struct_page->id)
                     {
                         $page_struct = $comment_struct_page;
                         break;
                     }
                 }
                 if ($page_struct == null) {
-                    array_push($comment_struct,new testPage($pageInstance['id']));
+                    array_push($comment_struct,new testPage($pageInstance['ref']));
                     $page_struct = $comment_struct[count($comment_struct)-1];
                 }
                 // Get the audioelements of the page
@@ -54,14 +54,14 @@ if (is_array($saves))
                     $element_struct = null;
                     foreach($page_struct->elements as $page_struct_element)
                     {
-                        if ($fragment['id'] == $page_struct_element->id)
+                        if ($fragment['name'] == $page_struct_element->id)
                         {
                             $element_struct = $page_struct_element;
                             break;
                         }
                     }
                     if ($element_struct == null) {
-                        array_push($page_struct->elements,new audioElement($fragment['id']));
+                        array_push($page_struct->elements,new audioElement($fragment['name']));
                         $element_struct = $page_struct->elements[count($page_struct->elements)-1];
                     }
                     $element_struct->addComment($fragment->comment->response);

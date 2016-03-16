@@ -64,7 +64,7 @@ if (is_array($saves))
             foreach($xml_object->page as $pageInstance)
             {
                 // Find in the nest
-                $pageInstanceId = $pageInstance['id'];
+                $pageInstanceId = $pageInstance['ref'];
                 $page_nest = $root->findChild($pageInstanceId);
                 if ($page_nest == null) {
                     $page_nest = $root->addNewChild($pageInstanceId);
@@ -73,7 +73,7 @@ if (is_array($saves))
                 // Iterate over each $element node
                 foreach($pageInstance->audioelement as $element) {
                     // Find our specific element tag
-                    $elementId = $element['id'];
+                    $elementId = $element['name'];
                     $element_nest = $page_nest->findChild($elementId);
                     if ($element_nest == null) {
                         $element_nest = $page_nest->addNewChild($elementId);
