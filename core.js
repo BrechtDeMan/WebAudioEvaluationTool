@@ -1812,13 +1812,13 @@ function Specification() {
 	this.errors = [];
 	this.schema = null;
 	
-	this.processAttribute = function(attribute,schema)
+	this.processAttribute = function(attribute,schema,schemaRoot)
 	{
 		// attribute is the string returned from getAttribute on the XML
 		// schema is the <xs:attribute> node
 		if (schema.getAttribute('name') == undefined && schema.getAttribute('ref') != undefined)
 		{
-			schema = this.schema.getAllElementsByName(schema.getAttribute('ref'))[0];
+			schema = schemaRoot.getAllElementsByName(schema.getAttribute('ref'))[0];
 		}
 		var defaultOpt = schema.getAttribute('default');
 		if (attribute == null) {
@@ -1864,9 +1864,9 @@ function Specification() {
 		for (var i in attributes)
 		{
 			if (isNaN(Number(i)) == true){break;}
-			var attributeName = attributes[i].getAttribute('name');
+			var attributeName = attributes[i].getAttribute('name') || attributes[i].getAttribute('ref');
 			var projectAttr = setupNode.getAttribute(attributeName);
-			projectAttr = this.processAttribute(projectAttr,attributes[i]);
+			projectAttr = this.processAttribute(projectAttr,attributes[i],this.schema);
 			switch(typeof projectAttr)
 			{
 			case "number":
@@ -1966,6 +1966,7 @@ function Specification() {
 	this.surveyNode = function() {
 		this.location = null;
 		this.options = [];
+        this.parent = null;
 		this.schema = specification.schema.getAllElementsByName('survey')[0];
 		
 		this.OptionNode = function() {
@@ -1988,7 +1989,7 @@ function Specification() {
 					if(isNaN(Number(i)) == true){break;}
 					var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
 					var projectAttr = child.getAttribute(attributeName);
-					projectAttr = parent.processAttribute(projectAttr,attributeMap[i]);
+					projectAttr = parent.processAttribute(projectAttr,attributeMap[i],parent.schema);
 					switch(typeof projectAttr)
 					{
 					case "number":
@@ -2058,6 +2059,7 @@ function Specification() {
 			};
 		};
 		this.decode = function(parent,xml) {
+            this.parent = parent;
 			this.location = xml.getAttribute('location');
 			if (this.location == 'before'){this.location = 'pre';}
 			else if (this.location == 'after'){this.location = 'post';}
@@ -2107,7 +2109,11 @@ function Specification() {
 				{
 					var attributeName = attributeMap[j].getAttribute('name') || attributeMap[j].getAttribute('ref');
 					var projectAttr = ioNode.getAttribute(attributeName);
-					projectAttr = parent.processAttribute(projectAttr,attributeMap[j]);
+                    if(parent.processAttribute) {
+                        parent.processAttribute(projectAttr, attributeMap[j], parent.schema)
+                    } else {
+                        parent.parent.processAttribute(projectAttr, attributeMap[j], parent.parent.schema)
+                    }
 					switch(typeof projectAttr)
 					{
 					case "number":
@@ -2201,15 +2207,17 @@ function Specification() {
 		this.audioElements = [];
 		this.commentQuestions = [];
 		this.schema = specification.schema.getAllElementsByName("page")[0];
+        this.parent = null;
 		
 		this.decode = function(parent,xml)
 		{
+            this.parent = parent;
 			var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
 			for (var i=0; i<attributeMap.length; i++)
 			{
 				var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
 				var projectAttr = xml.getAttribute(attributeName);
-				projectAttr = parent.processAttribute(projectAttr,attributeMap[i]);
+				projectAttr = parent.processAttribute(projectAttr,attributeMap[i],parent.schema);
 				switch(typeof projectAttr)
 				{
 				case "number":
@@ -2382,7 +2390,7 @@ function Specification() {
 				{
 					var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
 					var projectAttr = xml.getAttribute(attributeName);
-					projectAttr = specification.processAttribute(projectAttr,attributeMap[i]);
+					projectAttr = parent.parent.processAttribute(projectAttr,attributeMap[i],parent.parent.schema);
 					switch(typeof projectAttr)
 					{
 					case "number":
