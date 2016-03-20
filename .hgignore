@@ -6,7 +6,6 @@ docs/SMC15/smc2015template.aux
 docs/SMC15/smc2015template.blg
 docs/SMC15/smc2015template.log
 docs/SMC15/smc2015template.out
-docs/SMC15/smc2015template.pdf
 docs/SMC15/smc2015template.synctex.gz
 re:^docs/ExperimentVariableControl\.aux$
 re:^docs/ExperimentVariableControl\.log$
@@ -36,7 +35,6 @@ saves/ratings/*.pdf
 saves/timelines_movement/*.pdf
 saves
 re:^docs/WAC2016/\._WAC2016\.bib$
-re:^docs/WAC2016/\._WAC2016\.pdf$
 re:^docs/WAC2016/\._WAC2016\.tex$
 *.out
 *.fdb_latexmk
@@ -50,4 +48,3 @@ Makefile
 re:^docs/DMRN+10/img/\._TestCreate\.png$
 re:^docs/DMRN+10/img/\._APE\.png$
 re:^docs/DMRN+10/img/\._MUSHRA\.png$
-re:^docs/AESPosterComp/AESposter\.pdf$
