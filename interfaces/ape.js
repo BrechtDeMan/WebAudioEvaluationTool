@@ -354,7 +354,7 @@ function loadTest(audioHolderObject)
 			audioObject.bindInterface(orNode);
 		} else {
 			// Create a slider per track
-			var sliderNode = new sliderObject(audioObject,interfaceObj);
+			var sliderNode = new sliderObject(audioObject,interfaceObj,index);
 			audioObject.bindInterface(sliderNode);
             interfaceContext.commentBoxes.createCommentBox(audioObject);
 		}
@@ -514,7 +514,7 @@ function interfaceSliderHolder(interfaceObject)
 		scaleDOM.style.left = Math.floor((pixelPosition-($(scaleDOM).width()/2)))+'px';
 	}
 	
-	this.createSliderObject = function(audioObject)
+	this.createSliderObject = function(audioObject,label)
 	{
 		var trackObj = document.createElement('div');
         trackObj.align = "center";
@@ -535,22 +535,9 @@ function interfaceSliderHolder(interfaceObject)
 		this.canvas.appendChild(trackObj);
 		this.sliders.push(trackObj);
 		this.metrics.push(new metricTracker(this));
-		var label = document.createElement("label");
-        switch(audioObject.specification.parent.label) {
-            case "letter":
-                label.textContent = String.fromCharCode(97 + this.metrics.length-1);
-                break;
-            case "capital":
-                label.textContent = String.fromCharCode(65 + this.metrics.length-1);
-                break;
-            case "none":
-                label.textContent = "";
-                break;
-            default:
-                label.textContent = ""+this.metrics.length;
-                break;
-        }
-        trackObj.appendChild(label);
+		var labelHolder = document.createElement("span");
+        labelHolder.textContent = label;
+        trackObj.appendChild(labelHolder);
 		this.metrics[this.metrics.length-1].initialise(convSliderPosToRate(trackObj));
 		return trackObj;
 	};
@@ -588,13 +575,28 @@ function interfaceSliderHolder(interfaceObject)
 	};
 }
 
-function sliderObject(audioObject,interfaceObjects) {
+function sliderObject(audioObject,interfaceObjects,index) {
 	// Create a new slider object;
 	this.parent = audioObject;
 	this.trackSliderObjects = [];
+    this.label = null;
+    switch(audioObject.specification.parent.label) {
+        case "letter":
+            this.label = String.fromCharCode(97 + index);
+            break;
+        case "capital":
+            this.label = String.fromCharCode(65 + index);
+            break;
+        case "none":
+            this.label = "";
+            break;
+        default:
+            this.label = ""+(index+1);
+            break;
+    }
 	for (var i=0; i<interfaceContext.interfaceSliders.length; i++)
 	{
-		var trackObj = interfaceContext.interfaceSliders[i].createSliderObject(audioObject);
+		var trackObj = interfaceContext.interfaceSliders[i].createSliderObject(audioObject,this.label);
 		this.trackSliderObjects.push(trackObj);
 	}
 
@@ -653,7 +655,7 @@ function sliderObject(audioObject,interfaceObjects) {
 	};
 	this.getPresentedId = function()
 	{
-		return this.trackSliderObjects[0].children[0].textContent;
+		return this.label;
 	};
 	this.canMove = function()
 	{
