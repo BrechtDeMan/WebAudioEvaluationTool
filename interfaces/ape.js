@@ -618,7 +618,7 @@ function sliderObject(audioObject,interfaceObjects,index) {
 			progress = progress.split('.')[0];
 			this.trackSliderObjects[0].children[0].textContent = progress+'%';
 		} else {
-			this.trackSliderObjects[0].children[0].textContent = this.parent.id;
+			this.trackSliderObjects[0].children[0].textContent = this.label;
 		}
 	};
     this.startPlayback = function()
