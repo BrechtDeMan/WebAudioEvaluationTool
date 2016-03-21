@@ -365,6 +365,8 @@ function loadProjectSpecCallback(response) {
 }
 
 function createProjectSave(destURL) {
+    // Clear the window.onbeforeunload
+    window.onbeforeunload = null;
 	// Save the data from interface into XML and send to destURL
 	// If destURL is null then download XML in client
 	// Now time to render file locally
