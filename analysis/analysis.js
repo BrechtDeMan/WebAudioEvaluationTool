@@ -203,21 +203,32 @@ function Chart() {
         this.buildTable = function() {
             var table = document.createElement("table");
             table.border = "1";
-            for (var rowIndex=0; rowIndex<this.data.If.length; rowIndex++) {
-                var row = document.createElement("tr");
-                table.appendChild(row);
-                var rowTitle = document.createElement("td");
-                rowTitle.textContent = this.data.If[rowIndex].label;
-                row.appendChild(rowTitle);
-                for (var cIndex=0; cIndex<this.data.cc.length; cIndex++) {
-                    var column = document.createElement("td");
-                    column.textContent = this.data.cc[cIndex][rowIndex].tf;
-                    row.appendChild(column);
+            var numRows = this.data.getNumberOfRows();
+            var numColumns = this.data.getNumberOfColumns();
+            for (var columnIndex=0; columnIndex<numColumns; columnIndex++)
+            {
+                var table_row = document.createElement('tr');
+                table.appendChild(table_row);
+                var row_title = document.createElement('td');
+                table_row.appendChild(row_title);
+                row_title.textContent = this.data.getColumnLabel(columnIndex);
+                for (var rowIndex=0; rowIndex<numRows; rowIndex++)
+                {
+                    var row_entry = document.createElement('td');
+                    table_row.appendChild(row_entry);
+                    var entry = this.data.getValue(rowIndex,columnIndex);
+                    if (isFinite(Number(entry)))
+                    {
+                        entry = String(Number(entry).toFixed(4));
+                    }
+                    row_entry.textContent = entry;
                 }
             }
             this.tableDOM.appendChild(table);
         };
         this.writeLatex = function() {
+            var numRows = this.data.getNumberOfRows();
+            var numColumns = this.data.getNumberOfColumns();
             var root = document.createElement("div");
             root.className = "code";
             var holder = document.createElement("pre");
@@ -225,17 +236,22 @@ function Chart() {
             var start = document.createElement("p");
             start.textContent = "\\" + "begin{tabular}{|l|";
             holder.appendChild(start);
-            for (var i=0; i<this.data.cc.length; i++) {
+            for (var i=0; i<numRows; i++) {
                 start.textContent = start.textContent+"c|";
             }
             start.textContent = start.textContent.concat("}");
             // Now write the rows:
-            for (var rIndex=0; rIndex<this.data.If.length; rIndex++) {
+            for (var rIndex=0; rIndex<numColumns; rIndex++) {
                 var row = document.createElement("p");
-                row.textContent = this.data.If[rIndex].label.concat(" & ");
-                for (var cIndex=0; cIndex<this.data.cc.length; cIndex++) {
-                    row.textContent = row.textContent.concat(this.data.cc[cIndex][rIndex].tf);
-                    if (cIndex < this.data.cc.length-1) {
+                row.textContent = this.data.getColumnLabel(rIndex).concat(" & ");
+                for (var cIndex=0; cIndex<numRows; cIndex++) {
+                    var entry = this.data.getValue(cIndex,rIndex);
+                    if (isFinite(Number(entry)))
+                    {
+                        entry = String(Number(entry).toFixed(4));
+                    }
+                    row.textContent = row.textContent.concat(entry);
+                    if (cIndex < numRows-1) {
                         row.textContent = row.textContent.concat(" & ");
                     }
                 }
