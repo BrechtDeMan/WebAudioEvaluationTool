@@ -132,45 +132,10 @@ function Chart() {
             this.chart.draw(this.data,this.options);
         }
         this.sortData = function() {
-            
-            var map = this.data.Jf.map(function(el,i){
-                return {index: i, value: el.c[1].v};
-            });
-            
-            map.sort(function(a,b){
-                if (a.value > b.value) {return -1;}
-                if (a.value < b.value) {return 1;}
-                return 0;
-            })
-            
-            var Jf = [];
-            var cc = [];
-            for (var i=0; i<map.length; i++) {
-                Jf.push(this.data.Jf[map[i].index]);
-                cc.push(this.data.cc[map[i].index]);
-            }
-            this.data.Jf = Jf;
-            this.data.cc = cc;
+            this.data.sort(1);
         }
         this.sortName = function() {
-            var map = this.data.Jf.map(function(el,i){
-                return {index: i, value: el.c[0].v};
-            });
-            
-            map.sort(function(a,b){
-                if (a.value < b.value) {return -1;}
-                if (a.value > b.value) {return 1;}
-                return 0;
-            })
-            
-            var Jf = [];
-            var cc = [];
-            for (var i=0; i<map.length; i++) {
-                Jf.push(this.data.Jf[map[i].index]);
-                cc.push(this.data.cc[map[i].index]);
-            }
-            this.data.Jf = Jf;
-            this.data.cc = cc;
+            this.data.sort(0);
         }
         this.handleEvent = function() {
             // Only used to handle the chart.event.addListener(this,'ready') callback
