@@ -182,6 +182,16 @@ function loadProjectSpecCallback(response) {
 		document.getElementsByTagName('body')[0].appendChild(errorNode[0]);
 		return;
 	}
+    if (responseDocument == undefined) {
+        var msg = document.createElement("h3");
+		msg.textContent = "FATAL ERROR";
+		var span = document.createElement("span");
+		span.textContent = "The project XML was not decoded properly, try refreshing your browser and clearing caches. If the problem persists, contact the test creator.";
+		document.getElementsByTagName('body')[0].innerHTML = null;
+		document.getElementsByTagName('body')[0].appendChild(msg);
+		document.getElementsByTagName('body')[0].appendChild(span);
+		return;
+    }
     if (responseDocument.children[0].nodeName == "waet") {
         // document is a specification
         
@@ -844,11 +854,8 @@ function stateMachine()
 		}
 		for (var i=0; i<pageHolder.length; i++)
 		{
-			pageHolder[i].presentedId = i;
-		}
-		for (var i=0; i<specification.pages.length; i++)
-		{
 			if (specification.testPages <= i && specification.testPages != 0) {break;}
+            pageHolder[i].presentedId = i;
 			this.stateMap.push(pageHolder[i]);
             storage.createTestPageStore(pageHolder[i]);
             for (var element of pageHolder[i].audioElements) {
