@@ -1336,6 +1336,29 @@ function SpecificationToHTML()
             this.setupDOM.attributes.push(attrObject);
         }
         
+        // Build the exit Text node
+        var exitText = new this.createGeneralNodeDOM("Exit Text","exit-test",this.setupDOM);
+        exitText.rootDOM.removeChild(exitText.attributeDOM);
+        this.setupDOM.children.push(exitText);
+        this.setupDOM.childrenDOM.appendChild(exitText.rootDOM);
+        var obj = {
+            rootDOM: document.createElement("div"),
+            labelDOM: document.createElement("label"),
+            inputDOM: document.createElement("textarea"),
+            parent: exitText,
+            specification: specification,
+            handleEvent: function(event) {
+                this.specification.exitText = this.inputDOM.value;
+            }
+        }
+        obj.rootDOM.appendChild(obj.labelDOM);
+        obj.rootDOM.appendChild(obj.inputDOM);
+        obj.labelDOM.textContent = "Text: ";
+        obj.inputDOM.value = obj.specification.exitText;
+        obj.inputDOM.addEventListener("change",obj);
+        exitText.children.push(obj);
+        exitText.childrenDOM.appendChild(obj.rootDOM);
+        
         // Now we must build the interface Node
         this.interfaceDOM = new this.interfaceNode(this,specification.interfaces);
         this.interfaceDOM.build("Interface","setup-interface",this.setupDOM.rootDOM);

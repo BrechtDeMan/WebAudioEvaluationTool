@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
 	<setup interface="MUSHRA" projectReturn="save.php" randomiseOrder='true' testPages="2" loudness="-23" sampleRate="44100">
+        <exitText>Thank you for looking at WAET. You can modify the successful completion text as well!</exitText>
 		<survey location="before">
 			<surveyentry type="question" id="sessionId" mandatory="true">
 				<statement>Please enter your name.</statement>
