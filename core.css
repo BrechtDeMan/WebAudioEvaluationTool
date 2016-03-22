@@ -79,6 +79,19 @@ button.popupButton {
 	background-color: #fff;
 }
 
+div.popup-option-checbox {
+    /* Popup window checkbox */
+    padding: 5px;
+    width: fit-content;
+    width: -moz-fit-content;
+    width: -webkit-fit-content;
+}
+
+div.popup-option-checbox input{
+    /* Popup window checkbox */
+    margin-right: 15px;
+}
+
 button#popup-proceed {
     bottom: 10px;
     right: 10px;

@@ -601,7 +601,7 @@ function interfacePopup() {
 				span.textContent = option.text;
 				var hold = document.createElement('div');
 				hold.setAttribute('name','option');
-				hold.style.padding = '4px';
+                hold.className = "popup-option-checbox";
 				hold.appendChild(input);
 				hold.appendChild(span);
 				this.popupResponse.appendChild(hold);
@@ -610,14 +610,13 @@ function interfacePopup() {
                         input.checked = "true";
                     }
                 }
-                var w = $(span).width();
+                var w = $(hold).width();
                 if (w > max_w)
                     max_w = w;
                 index++;
 			}
-            max_w += 12;
             this.popupResponse.style.textAlign="";
-            var leftP = ((max_w/500)/2)*100;
+            var leftP = 50-(((max_w/$('#popupContent').width())/2)*100);
             this.popupResponse.style.left=leftP+"%";
 		} else if (node.specification.type == 'radio') {
             if (node.response == undefined) {
@@ -634,20 +633,19 @@ function interfacePopup() {
 				span.textContent = option.text;
 				var hold = document.createElement('div');
 				hold.setAttribute('name','option');
-				hold.style.padding = '4px';
+				hold.className = "popup-option-checbox";
 				hold.appendChild(input);
 				hold.appendChild(span);
 				this.popupResponse.appendChild(hold);
                 if (input.id == node.response.name) {
                     input.checked = "true";
                 }
-                var w = $(span).width();
+                var w = $(hold).width();
                 if (w > max_w)
                     max_w = w;
 			}
-            max_w += 12;
             this.popupResponse.style.textAlign="";
-            var leftP = ((max_w/500)/2)*100;
+            var leftP = 50-(((max_w/$('#popupContent').width())/2)*100);
             this.popupResponse.style.left=leftP+"%";
 		} else if (node.specification.type == 'number') {
 			var input = document.createElement('input');
