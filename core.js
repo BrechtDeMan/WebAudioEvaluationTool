@@ -416,7 +416,7 @@ function createProjectSave(destURL) {
                 if (response.getAttribute("state") == "OK") {
                     var file = response.getElementsByTagName("file")[0];
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
-                    popup.popupContent.textContent = "Thank you. Your session has been saved.";
+                    popup.popupContent.textContent = specification.exitText;
                 } else {
                     var message = response.getElementsByTagName("message");
                     console.log("Save: Error! "+message.textContent);
@@ -1776,6 +1776,7 @@ function Specification() {
 	this.loudness = null;
 	this.errors = [];
 	this.schema = null;
+    this.exitText = "Thank you.";
 	
 	this.processAttribute = function(attribute,schema,schemaRoot)
 	{
@@ -1844,6 +1845,11 @@ function Specification() {
 			}
 			
 		}
+        
+        var exitTextNode = setupNode.getElementsByTagName('exitText');
+        if (exitTextNode.length == 1) {
+            this.exitText = exitTextNode[0].textContent;
+        }
 		
 		this.metrics = new this.metricNode();
 		
@@ -1917,6 +1923,11 @@ function Specification() {
         }
         root.appendChild(setup);
         // Survey node
+        if (this.exitText != null) {
+            var exitTextNode = RootDocument.createElement('exitText');
+            exitTextNode.textContent = this.exitText;
+            setup.appendChild(exitTextNode);
+        }
         setup.appendChild(this.preTest.encode(RootDocument));
         setup.appendChild(this.postTest.encode(RootDocument));
         setup.appendChild(this.metrics.encode(RootDocument));

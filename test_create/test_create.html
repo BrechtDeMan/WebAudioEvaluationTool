@@ -19,6 +19,7 @@
             this.loudness = null;
             this.errors = [];
             this.schema = null;
+            this.exitText = "Thank you.";
 
             this.processAttribute = function(attribute,schema,schemaRoot)
             {
@@ -86,6 +87,11 @@
                         break;
                     }
 
+                }
+
+                var exitTextNode = setupNode.getElementsByTagName('exitText');
+                if (exitTextNode.length == 1) {
+                    this.exitText = exitTextNode[0].textContent;
                 }
 
                 this.metrics = new this.metricNode();
@@ -160,6 +166,11 @@
                 }
                 root.appendChild(setup);
                 // Survey node
+                if (this.exitText != null) {
+                    var exitTextNode = RootDocument.createElement('exitText');
+                    exitTextNode.textContent = this.exitText;
+                    setup.appendChild(exitTextNode);
+                }
                 setup.appendChild(this.preTest.encode(RootDocument));
                 setup.appendChild(this.postTest.encode(RootDocument));
                 setup.appendChild(this.metrics.encode(RootDocument));
