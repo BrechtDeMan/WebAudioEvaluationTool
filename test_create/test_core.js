@@ -870,6 +870,7 @@ function buildPage()
                             this.inputLabel.addEventListener("change",this,false);
                             this.inputName.value = this.specification.name;
                             this.inputLabel.value = this.specification.text;
+                            this.inputLabel.style.width = "350px";
                             
                             this.deleteEntry = {
                                 root: document.createElement("button"),
@@ -1051,6 +1052,7 @@ function buildPage()
                 this.positionInput.setAttribute("name","position");
                 this.textInput = document.createElement("input");
                 this.textInput.setAttribute("name","text");
+                this.textInput.style.width = "300px";
                 this.textInput.value = specification.text;
                 this.specification = specification;
                 this.parent = parent;
