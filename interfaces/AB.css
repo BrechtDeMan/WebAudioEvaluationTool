@@ -6,7 +6,7 @@ body {
 div.pageTitle {
 	width: auto;
 	height: 20px;
-	margin-top: 20px;
+	margin: 10px 0px;
 }
 
 div.pageTitle span{
@@ -35,6 +35,17 @@ button.big-button {
 	width: 250px;
 	height: 40px;
 	font-size: 1.2em;
+}
+
+div.interface-buttons {
+    height: 40px;
+}
+
+button.outside-reference {
+	width:120px;
+	height:40px;
+	margin-bottom:5px;
+	position: absolute;
 }
 
 div.comparator-holder {
