@@ -303,30 +303,32 @@ function comparator(audioHolderObject)
 	for (var index=0; index<audioHolderObject.audioElements.length; index++)
 	{
 		var element = audioHolderObject.audioElements[index];
+        var audioObject = audioEngineContext.newTrack(element);
 		if (index == audioHolderObject.outsideReference || element.type == 'outside-reference')
 		{
-			console.log("WARNING - AB cannot have fixed reference");
-		}
-		var audioObject = audioEngineContext.newTrack(element);
-        var label;
-        switch(audioObject.specification.parent.label) {
-            case "none":
-                label = "";
-                break;
-            case "number":
-                label = ""+index;
-                break;
-            case "letter":
-                label = String.fromCharCode(97 + index);
-                break;
-            default:
-                label = String.fromCharCode(65 + index);
-                break;
+            var orNode = new interfaceContext.outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
+			audioObject.bindInterface(orNode);
+        } else {
+            var label;
+            switch(audioObject.specification.parent.label) {
+                case "none":
+                    label = "";
+                    break;
+                case "number":
+                    label = ""+index;
+                    break;
+                case "letter":
+                    label = String.fromCharCode(97 + index);
+                    break;
+                default:
+                    label = String.fromCharCode(65 + index);
+                    break;
+            }
+            var node = new this.comparatorBox(audioObject,index,label);
+            audioObject.bindInterface(node);
+            this.comparators.push(node);
+            this.boxHolders.appendChild(node.box);
         }
-		var node = new this.comparatorBox(audioObject,index,label);
-		audioObject.bindInterface(node);
-		this.comparators.push(node);
-		this.boxHolders.appendChild(node.box);
 	}
 	return this;
 }
@@ -346,6 +348,12 @@ function resizeWindow(event)
     document.getElementById('box-holders').style.marginLeft = diff/2 + 'px';
     document.getElementById('box-holders').style.marginRight = diff/2 + 'px';
     document.getElementById('box-holders').style.width = boxW + 'px';
+    
+    var outsideRef = document.getElementById('outside-reference');
+	if(outsideRef != null)
+	{
+		outsideRef.style.left = (window.innerWidth-120)/2 + 'px';
+	}
 }
 
 function buttonSubmitClick()
