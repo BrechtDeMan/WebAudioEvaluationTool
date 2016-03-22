@@ -2464,7 +2464,7 @@ function Interface(specificationObject) {
         date.setAttribute('month',dateTime.getMonth()+1);
         date.setAttribute('day',dateTime.getDate());
         time.setAttribute('hour',dateTime.getHours());
-        time.setAttribute('minute',dateTime.getMinutes);
+        time.setAttribute('minute',dateTime.getMinutes());
         time.setAttribute('secs',dateTime.getSeconds());
         
         hold.appendChild(date);
