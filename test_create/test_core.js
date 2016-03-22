@@ -1203,52 +1203,72 @@ function SpecificationToHTML()
                 default:
                     break;
             }
-
-            this.input = document.createElement('input');
-            switch(this.dataType)
-            {
-                case "boolean":
-                    this.input.type = "checkbox";
-                    break;
-                case "negativeInteger":
-                case "positiveInteger":
-                case "nonNegativeInteger":
-                case "nonPositiveInteger":
-                case "integer":
-                case "short":
-                case "byte":
-                    this.input.step = 1;
-                case "decimal":
-                    this.input.type = "number";
-                    this.input.min = minVar;
-                    this.input.max = maxVar;
-                    break;
-                default:
-                    break;
+            
+            this.enumeration = schema.getAllElementsByTagName("xs:enumeration");
+            if (this.enumeration.length == 0) {
+                this.input = document.createElement('input');
+                switch(this.dataType)
+                {
+                    case "boolean":
+                        this.input.type = "checkbox";
+                        break;
+                    case "negativeInteger":
+                    case "positiveInteger":
+                    case "nonNegativeInteger":
+                    case "nonPositiveInteger":
+                    case "integer":
+                    case "short":
+                    case "byte":
+                        this.input.step = 1;
+                    case "decimal":
+                        this.input.type = "number";
+                        this.input.min = minVar;
+                        this.input.max = maxVar;
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                this.input = document.createElement("select");
+                for (var i=0; i<this.enumeration.length; i++)
+                {
+                    var option = document.createElement("option");
+                    var value = this.enumeration[i].getAttribute("value");
+                    option.setAttribute("value",value);
+                    option.textContent = value;
+                    this.input.appendChild(option);
+                }
             }
             var value;
             eval("value = node."+this.name)
-            if (value != undefined)
+            if (this.default != undefined && value == undefined)
             {
+                value = this.default;
+            }
+            if (this.input.type == "checkbox") {
+                this.input.checked = value;
+            } else {
                 this.input.value = value;
-            } else if (this.default != undefined)
-            {
-                this.input.value = this.default;
             }
             this.handleEvent = function(event)
             {
                 var value;
-                switch(this.input.type)
+                if (this.input.nodeName == "INPUT")
                 {
-                    case "checkbox":
-                        value = event.currentTarget.checked;
-                        break;
-                    case "number":
-                        value = Number(event.currentTarget.value);
-                        break;
-                    default:
-                        value = event.currentTarget.value;
-                        break;                    
+                    switch(this.input.type)
+                    {
+                        case "checkbox":
+                            value = event.currentTarget.checked;
+                            break;
+                        case "number":
+                            value = Number(event.currentTarget.value);
+                            break;
+                        default:
+                            value = event.currentTarget.value;
+                            break;                    
+                    }
+                } else if (this.input.nodeName == "SELECT") {
+                    value = event.currentTarget.value;
                 }
                 eval("this.owner."+this.name+" = value");
             }
