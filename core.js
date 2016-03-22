@@ -2841,6 +2841,74 @@ function Interface(specificationObject) {
 	{
 		this.commentQuestions = [];
 	};
+    
+    this.outsideReferenceDOM = function(audioObject,index,inject)
+    {
+        this.parent = audioObject;
+        this.outsideReferenceHolder = document.createElement('button');
+        this.outsideReferenceHolder.id = 'outside-reference';
+        this.outsideReferenceHolder.className = 'outside-reference';
+        this.outsideReferenceHolder.setAttribute('track-id',index);
+        this.outsideReferenceHolder.textContent = "Play Reference";
+        this.outsideReferenceHolder.disabled = true;
+
+        this.outsideReferenceHolder.onclick = function(event)
+        {
+            audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
+        };
+        inject.appendChild(this.outsideReferenceHolder);
+        this.enable = function()
+        {
+            if (this.parent.state == 1)
+            {
+                this.outsideReferenceHolder.disabled = false;
+            }
+        };
+        this.updateLoading = function(progress)
+        {
+            if (progress != 100)
+            {
+                progress = String(progress);
+                progress = progress.split('.')[0];
+                this.outsideReferenceHolder.textContent = progress+'%';
+            } else {
+                this.outsideReferenceHolder.textContent = "Play Reference";
+            }
+        };
+        this.startPlayback = function()
+        {
+            // Called when playback has begun
+            $('.track-slider').removeClass('track-slider-playing');
+            $('.comment-div').removeClass('comment-box-playing');
+            this.outsideReferenceHolder.style.backgroundColor = "#FDD";
+        };
+        this.stopPlayback = function()
+        {
+            // Called when playback has stopped. This gets called even if playback never started!
+            this.outsideReferenceHolder.style.backgroundColor = "";
+        };
+        this.exportXMLDOM = function(audioObject)
+        {
+            return null;
+        };
+        this.getValue = function()
+        {
+            return 0;
+        };
+        this.getPresentedId = function()
+        {
+            return 'Reference';
+        };
+        this.canMove = function()
+        {
+            return false;
+        };
+        this.error = function() {
+                // audioObject has an error!!
+            this.outsideReferenceHolder.textContent = "Error";
+            this.outsideReferenceHolder.style.backgroundColor = "#F00";
+        }
+    }
 	
 	this.playhead = new function()
 	{
