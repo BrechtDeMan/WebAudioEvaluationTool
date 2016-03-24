@@ -18,11 +18,19 @@ function arrayMean(values) {
     return mean;
 }
 
-function percentile(values, n) {
+function percentile(values, p) {
+    //http://web.stanford.edu/class/archive/anthsci/anthsci192/anthsci192.1064/handouts/calculating%20percentiles.pdf
     values.sort( function(a,b) {return a - b;} );
     // get ordinal rank
-    var rank = Math.min(Math.floor(values.length*n/100), values.length-1);
-    return values[rank];
+    var index = values.length*p/100;
+    var k = Math.floor(index);
+    if (k == index) {
+        return values[k];
+    } else {
+        var f = index-k;
+        var x_int = (1-f)*values[k]+f*values[k+1];
+        return x_int;
+    }
 }
 
 function arrayMin(array) {
@@ -50,7 +58,7 @@ function arrayMax(array) {
 function boxplotRow(array) {
     // Take an array of element values and return array of computed intervals
     var result = {
-        median : percentile(array,50),
+        median : arrayMean(array),
         pct25 : percentile(array,25),
         pct75 : percentile(array,75),
         IQR : null,
