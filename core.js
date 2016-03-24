@@ -3065,6 +3065,44 @@ function Interface(specificationObject) {
         this.object.appendChild(this.slider);
         this.object.appendChild(this.valueText);
     }
+    
+    this.calibrationModule = function() {
+        // This creates an on-page calibration module
+        this.storeDOM = storage.document.createElement("calibration");
+        storage.root.children[0].appendChild(this.storeDOM);
+        // The calibration is a fixed state module
+        this.calibrationNodes = [];
+        var f0 = 62.5;
+        while(f0 < 20000) {
+            var obj = {
+                root: document.createElement("div"),
+                input: document.createElement("input"),
+                oscillator: audioContext.createOscillator(),
+                gain: audioContext.createGain(),
+                parent: this,
+                handleEvent: function(event) {
+                    gain.gain.value = Math.pow(10,input.value/20);
+                },
+                disconnect: function() {
+                    this.gain.disconnect();
+                }
+            }
+            obj.root.appendChild(obj.input);
+            obj.oscillator.connect(obj.gain);
+            obj.gain.connect(audioContext.destination);
+            obj.gain.gain.value = Math.random()*2;
+            obj.input.value = obj.gain.gain.value;
+            obj.input.type = "range";
+            obj.input.min = -60;
+            obj.input.max = 12;
+            obj.input.step = 0.25;
+            obj.oscillator.frequency.value = f0;
+             this.calibrationNodes.push(obj);
+            f0 *= 2;
+        }
+    }
+    
+    
 	// Global Checkers
 	// These functions will help enforce the checkers
 	this.checkHiddenAnchor = function()
