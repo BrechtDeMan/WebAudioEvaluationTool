@@ -47,6 +47,36 @@ function arrayMax(array) {
     return max;
 }
 
+function boxplotRow(array) {
+    // Take an array of element values and return array of computed intervals
+    var result = {
+        median : percentile(array,50),
+        pct25 : percentile(array,25),
+        pct75 : percentile(array,75),
+        IQR : null,
+        min: null,
+        max: null,
+        outliers: new Array()
+    }
+    result.IQR = result.pct75-result.pct25;
+    var rest = [];
+    var pct75_IQR = result.pct75+1.5*result.IQR;
+    var pct25_IQR = result.pct25-1.5*result.IQR;
+    for (var i=0; i<array.length; i++) {
+        //outliers, ranger above pct75+1.5*IQR or below pct25-1.5*IQR
+        var point = array[i];
+        if (point > pct75_IQR || point < pct25_IQR) {
+            result.outliers.push(point);
+        } else {
+            rest.push(point);
+        }
+    }
+    result.max = arrayMax(rest);
+    result.min = arrayMin(rest);
+    return result;
+    
+}
+
 function arrayHistogram(values,steps,min,max) {
     if (steps == undefined) {
         steps = 0.25;
@@ -172,21 +202,24 @@ function Chart() {
             var numColumns = this.data.getNumberOfColumns();
             for (var columnIndex=0; columnIndex<numColumns; columnIndex++)
             {
-                var table_row = document.createElement('tr');
-                table.appendChild(table_row);
-                var row_title = document.createElement('td');
-                table_row.appendChild(row_title);
-                row_title.textContent = this.data.getColumnLabel(columnIndex);
-                for (var rowIndex=0; rowIndex<numRows; rowIndex++)
-                {
-                    var row_entry = document.createElement('td');
-                    table_row.appendChild(row_entry);
-                    var entry = this.data.getValue(rowIndex,columnIndex);
-                    if (isFinite(Number(entry)))
+                var tableTitle = this.data.getColumnLabel(columnIndex);
+                if (tableTitle != "") {
+                    var table_row = document.createElement('tr');
+                    table.appendChild(table_row);
+                    var row_title = document.createElement('td');
+                    table_row.appendChild(row_title);
+                    row_title.textContent = tableTitle;
+                    for (var rowIndex=0; rowIndex<numRows; rowIndex++)
                     {
-                        entry = String(Number(entry).toFixed(4));
+                        var row_entry = document.createElement('td');
+                        table_row.appendChild(row_entry);
+                        var entry = this.data.getValue(rowIndex,columnIndex);
+                        if (isFinite(Number(entry)))
+                        {
+                            entry = String(Number(entry).toFixed(4));
+                        }
+                        row_entry.textContent = entry;
                     }
-                    row_entry.textContent = entry;
                 }
             }
             this.tableDOM.appendChild(table);
@@ -207,20 +240,26 @@ function Chart() {
             start.textContent = start.textContent.concat("}");
             // Now write the rows:
             for (var rIndex=0; rIndex<numColumns; rIndex++) {
-                var row = document.createElement("p");
-                row.textContent = this.data.getColumnLabel(rIndex).concat(" & ");
-                for (var cIndex=0; cIndex<numRows; cIndex++) {
-                    var entry = this.data.getValue(cIndex,rIndex);
-                    if (isFinite(Number(entry)))
-                    {
-                        entry = String(Number(entry).toFixed(4));
+                var tableTitle = this.data.getColumnLabel(rIndex);
+                if(tableTitle != "")
+                {
+                    var row = document.createElement("p");
+                    row.textContent = tableTitle.concat(" & ");
+                    for (var cIndex=0; cIndex<numRows; cIndex++) {
+                        var entry = this.data.getValue(cIndex,rIndex);
+                        if (isFinite(Number(entry)))
+                        {
+                            entry = String(Number(entry).toFixed(4));
+                        }
+                        row.textContent = row.textContent.concat(entry);
+                        if (cIndex < numRows-1) {
+                            row.textContent = row.textContent.concat(" & ");
+                        } else {
+                            row.textContent = row.textContent.concat(" \\\\ \\hline");
+                        }
                     }
-                    row.textContent = row.textContent.concat(entry);
-                    if (cIndex < numRows-1) {
-                        row.textContent = row.textContent.concat(" & ");
-                    }
+                    holder.appendChild(row);
                 }
-                holder.appendChild(row);
             }
             // Table end
             var end = document.createElement("p");
@@ -254,9 +293,9 @@ function Chart() {
                     // Find the axis
                     var axisChart = chartList.find(function(element,index,array){
                         if (element.name == this) {return true;} else {return false;}
-                    },"mean-test-"+axis.id);
+                    },"mean-test-"+axis.name);
                     if (axisChart == null) {
-                        axisChart = new this.chartObject("mean-test-"+axis.id);
+                        axisChart = new this.chartObject("mean-test-"+axis.name);
                         axisChart.options = {
                             'title':'Mean of axis: '+axis.name,
                             'width':window.innerWidth*0.9,
@@ -276,6 +315,77 @@ function Chart() {
         // Build and push charts
         for (var chart of chartList) {
             chart.chart = new google.visualization.ColumnChart(chart.chartDOM);
+            chart.chart.draw(chart.data,chart.options);
+            chart.buildTable();
+            chart.writeLatex();
+            this.charts.push(chart);
+        }
+    }
+    
+    this.drawTestBoxplot = function() {
+        if (this.valueData == null) {
+            console.log("Error - Data not loaded");
+            return;
+        }
+        var chartList = [];
+        
+        // Creates one chart per axis
+        
+        // Create the data table
+        for (var page of this.valueData.pages) {
+            for (var element of page.elements) {
+                for (var axis of element.axis) {
+                    // Find the axis
+                    var axisChart = chartList.find(function(element,index,array){
+                        if (element.name == this) {return true;} else {return false;}
+                    },"boxplot-test-"+axis.name);
+                    if (axisChart == null) {
+                        // Axis chart doesn't exist
+                        axisChart = new this.chartObject("boxplot-test-"+axis.name);
+                        axisChart.options = {
+                            'title':'Boxplot of axis '+axis.name,
+                            'width':window.innerWidth*0.9,
+                            'height':(window.innerWidth*0.9)/1.77,
+                            legend: {position: 'none'},
+                            lineWidth: 0,
+                            series: [{'color': '#D3362D'}],
+                            intervals: {
+                                barWidth: 1,
+                                boxWidth: 1,
+                                lineWidth: 2,
+                                style: 'boxes'
+                            },
+                            interval: {
+                                max: {
+                                    style: 'bars',
+                                    fillOpacity: 1,
+                                    color: '#777'
+                                },
+                                min: {
+                                    style: 'bars',
+                                    fillOpacity: 1,
+                                    color: '#777'
+                                }
+                            }
+                        };
+                        axisChart.data.addColumn('string','id');
+                        axisChart.data.addColumn('number','median');
+                        axisChart.data.addColumn({id:'max',type:'number',role:'interval'});
+                        axisChart.data.addColumn({id:'min',type:'number',role:'interval'});
+                        axisChart.data.addColumn({id:'firstQuartile',type:'number',role:'interval'});
+                        axisChart.data.addColumn({id:'median',type:'number',role:'interval'});
+                        axisChart.data.addColumn({id:'thirdQuartile',type:'number',role:'interval'});
+                        chartList.push(axisChart);
+                        document.getElementById("test-pages").appendChild(axisChart.root);
+                    }
+                    var result = boxplotRow(axis.values);
+                    axisChart.data.addRow([element.id,result.median,result.max,result.min,result.pct25,result.median,result.pct75]);
+                }
+            }
+        }
+        // Build and push charts
+        for (var chart of chartList) {
+            chart.chart = new google.visualization.LineChart(chart.chartDOM);
             chart.chart.draw(chart.data,chart.options);
             chart.buildTable();
             chart.writeLatex();
