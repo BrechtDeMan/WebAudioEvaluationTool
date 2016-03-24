@@ -73,7 +73,12 @@ if (is_array($saves))
                 // Iterate over each $element node
                 foreach($pageInstance->audioelement as $element) {
                     // Find our specific element tag
-                    $elementId = $element['name'];
+                    $elementId = null;
+                    if (isset($element['name'])) {
+                        $elementId = $element['name'];
+                    } else {
+                        $elementId = $element['ref'];
+                    }
                     $element_nest = $page_nest->findChild($elementId);
                     if ($element_nest == null) {
                         $element_nest = $page_nest->addNewChild($elementId);
