@@ -180,3 +180,26 @@ button.error-colour {
     background-color: #FF8F8F;
     color: black;
 }
+
+div.calibration-holder {
+    text-align: center;
+    align-content: center;
+    height: auto;
+}
+
+div.calibration-slider {
+    width: 50px;
+    margin: 2px;
+    text-align: center;
+    align-content: center;
+    float: left;
+}
+
+div.calibration-slider input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 8px;
+    padding: 0 5px;
+    color: rgb(255, 144, 144);
+}
