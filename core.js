@@ -3107,7 +3107,13 @@ function Interface(specificationObject) {
                     f: f0,
                     parent: this,
                     handleEvent: function(event) {
-                        this.gain.gain.value = Math.pow(10,this.input.value/20);
+                        var value = Math.pow(10,this.input.value/20);
+                        if (this.f == 1000) {
+                            audioEngineContext.outputGain.gain.value = value;
+                            interfaceContext.volume.slider.value = this.input.value;
+                        } else {
+                            this.gain.gain.value = value
+                        }
                         switch(event.type) {
                             case "mouseenter":
                                 this.oscillator.start(0);
@@ -3127,7 +3133,7 @@ function Interface(specificationObject) {
                 obj.root.className = "calibration-slider";
                 obj.root.appendChild(obj.input);
                 obj.oscillator.connect(obj.gain);
-                obj.gain.connect(audioContext.destination);
+                obj.gain.connect(audioEngineContext.outputGain);
                 obj.gain.gain.value = Math.random()*2;
                 obj.input.value = obj.gain.gain.value;
                 obj.input.setAttribute('orient','vertical');
@@ -3158,7 +3164,6 @@ function Interface(specificationObject) {
                 node.setAttribute("frequency",obj.f);
                 node.setAttribute("range-min",obj.input.min);
                 node.setAttribute("range-max",obj.input.max);
-                node.setAttribute("gain-db",20*Math.log10(obj.gain.gain.value));
                 node.setAttribute("gain-lin",obj.gain.gain.value);
                 this.storeDOM.appendChild(node);
             }
