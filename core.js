@@ -542,6 +542,7 @@ function interfacePopup() {
 		var blank = document.getElementsByClassName('testHalt')[0];
 		blank.style.zIndex = 2;
 		blank.style.visibility = 'visible';
+        this.popupResponse.style.left="0%";
 	};
 	
 	this.hidePopup = function(){
@@ -699,6 +700,11 @@ function interfacePopup() {
 	
 	this.proceedClicked = function() {
 		// Each time the popup button is clicked!
+        if (testState.stateIndex == 0 && specification.calibration) {
+            interfaceContext.calibrationModuleObject.collect();
+            advanceState();
+            return;
+        }
 		var node = this.popupOptions[this.currentIndex];
 		if (node.specification.type == 'question') {
 			// Must extract the question data
@@ -880,7 +886,8 @@ function stateMachine()
 			if(this.stateIndex != null) {
 				console.log('NOTE - State already initialise');
 			}
-			this.stateIndex = -1;
+			this.stateIndex = -2;
+            console.log('Starting test...');
 		} else {
 			console.log('FATAL - StateMap not correctly constructed. EMPTY_STATE_MAP');
 		}
@@ -890,16 +897,27 @@ function stateMachine()
 			this.initialise();
 		}
         storage.update();
-		if (this.stateIndex == -1) {
-			this.stateIndex++;
-			console.log('Starting test...');
+		if (this.stateIndex == -2) {
+            this.stateIndex++;
 			if (this.preTestSurvey != null)
 			{
 				popup.initState(this.preTestSurvey,storage.globalPreTest);
 			} else {
 				this.advanceState();
 			}
-		} else if (this.stateIndex == this.stateMap.length)
+		} else if (this.stateIndex == -1) {
+            this.stateIndex++;
+            if (specification.calibration) {
+                popup.showPopup();
+                popup.popupTitle.textContent = "Calibration. Set the levels so all tones are of equal amplitude. Move your mouse over the sliders to hear the tones. The red slider is the reference tone";
+                interfaceContext.calibrationModuleObject = new interfaceContext.calibrationModule();
+                interfaceContext.calibrationModuleObject.build(popup.popupResponse);
+                popup.hidePreviousButton();
+            } else {
+                this.advanceState();
+            }
+        } 
+        else if (this.stateIndex == this.stateMap.length)
 		{
 			// All test pages complete, post test
 			console.log('Ending test ...');
@@ -915,6 +933,7 @@ function stateMachine()
 		}
 		else
 		{
+            popup.hidePopup();
 			if (this.currentStateMap == null)
 			{
 				this.currentStateMap = this.stateMap[this.stateIndex];
@@ -3066,39 +3085,83 @@ function Interface(specificationObject) {
         this.object.appendChild(this.valueText);
     }
     
+    this.calibrationModuleObject = null;
     this.calibrationModule = function() {
         // This creates an on-page calibration module
         this.storeDOM = storage.document.createElement("calibration");
-        storage.root.children[0].appendChild(this.storeDOM);
+        storage.root.appendChild(this.storeDOM);
         // The calibration is a fixed state module
         this.calibrationNodes = [];
-        var f0 = 62.5;
-        while(f0 < 20000) {
-            var obj = {
-                root: document.createElement("div"),
-                input: document.createElement("input"),
-                oscillator: audioContext.createOscillator(),
-                gain: audioContext.createGain(),
-                parent: this,
-                handleEvent: function(event) {
-                    gain.gain.value = Math.pow(10,input.value/20);
-                },
-                disconnect: function() {
-                    this.gain.disconnect();
+        this.holder = null;
+        this.build = function(inject) {
+            var f0 = 62.5;
+            this.holder = document.createElement("div");
+            this.holder.className = "calibration-holder";
+            this.calibrationNodes = [];
+            while(f0 < 20000) {
+                var obj = {
+                    root: document.createElement("div"),
+                    input: document.createElement("input"),
+                    oscillator: audioContext.createOscillator(),
+                    gain: audioContext.createGain(),
+                    f: f0,
+                    parent: this,
+                    handleEvent: function(event) {
+                        this.gain.gain.value = Math.pow(10,this.input.value/20);
+                        switch(event.type) {
+                            case "mouseenter":
+                                this.oscillator.start(0);
+                                break;
+                            case "mouseleave":
+                                this.oscillator.stop(0);
+                                this.oscillator = audioContext.createOscillator();
+                                this.oscillator.connect(this.gain);
+                                this.oscillator.frequency.value = this.f;
+                                break;
+                        }
+                    },
+                    disconnect: function() {
+                        this.gain.disconnect();
+                    }
                 }
+                obj.root.className = "calibration-slider";
+                obj.root.appendChild(obj.input);
+                obj.oscillator.connect(obj.gain);
+                obj.gain.connect(audioContext.destination);
+                obj.gain.gain.value = Math.random()*2;
+                obj.input.value = obj.gain.gain.value;
+                obj.input.setAttribute('orient','vertical');
+                obj.input.type = "range";
+                obj.input.min = -6;
+                obj.input.max = 6;
+                obj.input.step = 0.25;
+                if (f0 != 1000) {
+                    obj.input.value = (Math.random()*12)-6;
+                } else {
+                    obj.input.value = 0;
+                    obj.root.style.backgroundColor="rgb(255,125,125)";
+                }
+                obj.input.addEventListener("change",obj);
+                obj.input.addEventListener("mouseenter",obj);
+                obj.input.addEventListener("mouseleave",obj);
+                obj.gain.gain.value = Math.pow(10,obj.input.value/20);
+                obj.oscillator.frequency.value = f0;
+                this.calibrationNodes.push(obj);
+                this.holder.appendChild(obj.root);
+                f0 *= 2;
             }
-            obj.root.appendChild(obj.input);
-            obj.oscillator.connect(obj.gain);
-            obj.gain.connect(audioContext.destination);
-            obj.gain.gain.value = Math.random()*2;
-            obj.input.value = obj.gain.gain.value;
-            obj.input.type = "range";
-            obj.input.min = -60;
-            obj.input.max = 12;
-            obj.input.step = 0.25;
-            obj.oscillator.frequency.value = f0;
-             this.calibrationNodes.push(obj);
-            f0 *= 2;
+            inject.appendChild(this.holder);
+        }
+        this.collect = function() {
+            for (var obj of this.calibrationNodes) {
+                var node = storage.document.createElement("calibrationresult");
+                node.setAttribute("frequency",obj.f);
+                node.setAttribute("range-min",obj.input.min);
+                node.setAttribute("range-max",obj.input.max);
+                node.setAttribute("gain-db",20*Math.log10(obj.gain.gain.value));
+                node.setAttribute("gain-lin",obj.gain.gain.value);
+                this.storeDOM.appendChild(node);
+            }
         }
     }
     
