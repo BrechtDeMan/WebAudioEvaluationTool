@@ -3107,13 +3107,6 @@ function Interface(specificationObject) {
                     f: f0,
                     parent: this,
                     handleEvent: function(event) {
-                        var value = Math.pow(10,this.input.value/20);
-                        if (this.f == 1000) {
-                            audioEngineContext.outputGain.gain.value = value;
-                            interfaceContext.volume.slider.value = this.input.value;
-                        } else {
-                            this.gain.gain.value = value
-                        }
                         switch(event.type) {
                             case "mouseenter":
                                 this.oscillator.start(0);
@@ -3123,6 +3116,15 @@ function Interface(specificationObject) {
                                 this.oscillator = audioContext.createOscillator();
                                 this.oscillator.connect(this.gain);
                                 this.oscillator.frequency.value = this.f;
+                                break;
+                            case "mousemove":
+                                var value = Math.pow(10,this.input.value/20);
+                                if (this.f == 1000) {
+                                    audioEngineContext.outputGain.gain.value = value;
+                                    interfaceContext.volume.slider.value = this.input.value;
+                                } else {
+                                    this.gain.gain.value = value
+                                }
                                 break;
                         }
                     },
@@ -3147,7 +3149,7 @@ function Interface(specificationObject) {
                     obj.input.value = 0;
                     obj.root.style.backgroundColor="rgb(255,125,125)";
                 }
-                obj.input.addEventListener("change",obj);
+                obj.input.addEventListener("mousemove",obj);
                 obj.input.addEventListener("mouseenter",obj);
                 obj.input.addEventListener("mouseleave",obj);
                 obj.gain.gain.value = Math.pow(10,obj.input.value/20);
