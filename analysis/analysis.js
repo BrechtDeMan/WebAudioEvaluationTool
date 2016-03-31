@@ -166,7 +166,7 @@ function arrayMax(array) {
 function boxplotRow(array) {
     // Take an array of element values and return array of computed intervals
     var result = {
-        median : arrayMean(array),
+        median : percentile(array,50),
         pct25 : percentile(array,25),
         pct75 : percentile(array,75),
         IQR : null,
@@ -599,51 +599,6 @@ function Data() {
     });
     this.update = function(url) {
         var self = this;
-        get(url).then(function(response){
-            var parse = new DOMParser();
-            self.specification.decode(parse.parseFromString(response,'text/xml'));
-            interfaceContext.generateFilters(self.specification);
-            return true;
-        },function(error){
-            console.log("ERROR: Could not get"+url);
-            return false;
-        });
-    }
-    var get_test = new XMLHttpRequest();
-    get_test.parent = this;
-    get_test.open("GET","../scripts/get_tests.php?format=JSON",true);
-    get_test.onload = function() {
-        this.parent.testSavedDiv.innerHTML = null;
-        var table = document.createElement("table");
-        table.innerHTML = "<tr><td>Test Filename</td><td>Count</td><td>Include</td></tr>";
-        this.parent.testSaves = JSON.parse(this.responseText);
-        for (var test of this.parent.testSaves.tests) {
-            var tableRow = document.createElement("tr");
-            var tableRowFilename = document.createElement("td");
-            tableRowFilename.textContent = test.testName;
-            var tableRowCount = document.createElement("td");
-            tableRowCount.textContent = test.files.length;
-            tableRow.appendChild(tableRowFilename);
-            tableRow.appendChild(tableRowCount);
-            var tableRowInclude = document.createElement("td");
-            var tableRowIncludeInput = document.createElement("input");
-            tableRowIncludeInput.type = "radio";
-            tableRowIncludeInput.name = "test-include";
-            tableRowIncludeInput.setAttribute("source",test.testName);
-            tableRowIncludeInput.addEventListener("change",this.parent);
-            tableRowInclude.appendChild(tableRowIncludeInput);
-            tableRow.appendChild(tableRowInclude);
-            table.appendChild(tableRow);
-        }
-        this.parent.testSavedDiv.appendChild(table);
-    }
-    get_test.send();
-    this.handleEvent = function(event) {
-        if (event.currentTarget.nodeName == "INPUT" && event.currentTarget.name == "test-include") {
-            // Changed the test specification
-            this.selectURL = event.currentTarget.getAttribute("source");
-            this.update(this.selectURL);
-        }
     }
     
     this.updateData = function(req_str) {
@@ -669,6 +624,59 @@ var interfaceContext = new function() {
     }
     this.getDataButton.button.textContent = "Get Filtered Data";
     this.getDataButton.button.addEventListener("click",this.getDataButton);
+    
+    this.testSaves = {
+        json: null,
+        selectedURL: null,
+        inputs: [],
+        parent: this
+    };
+    this.init = function() {
+        var self = this;
+        get('../scripts/get_tests.php?format=JSON').then(function(response){
+            document.getElementById("test-saved").innerHTML = null;
+            var table = document.createElement("table");
+            table.innerHTML = "<tr><td>Test Filename</td><td>Count</td><td>Include</td></tr>";
+            self.testSaves.json = JSON.parse(response);
+            for (var test of self.testSaves.json.tests) {
+                var tableRow = document.createElement("tr");
+                var tableRowFilename = document.createElement("td");
+                tableRowFilename.textContent = test.testName;
+                var tableRowCount = document.createElement("td");
+                tableRowCount.textContent = test.files.length;
+                tableRow.appendChild(tableRowFilename);
+                tableRow.appendChild(tableRowCount);
+                var tableRowInclude = document.createElement("td");
+                var obj = {
+                    root: document.createElement("input"),
+                    parent: self.testSaves,
+                    handleEvent: function(event) {
+                        this.parent.selectedURL = event.currentTarget.getAttribute("source");
+                        var self = this;
+                        get(this.parent.selectedURL).then(function(response){
+                            var parse = new DOMParser();
+                            testData.specification.decode(parse.parseFromString(response,'text/xml'));
+                            self.parent.parent.generateFilters(testData.specification);
+                            self.parent.parent.getFileCount();
+                            return true;
+                        },function(error){
+                            console.log("ERROR: Could not get"+url);
+                            return false;
+                        });
+                    }
+                }
+                obj.root.type = "radio";
+                obj.root.name = "test-include";
+                obj.root.setAttribute("source",test.testName);
+                obj.root.addEventListener("change",obj);
+                tableRowInclude.appendChild(obj.root);
+                tableRow.appendChild(tableRowInclude);
+                table.appendChild(tableRow);
+                self.testSaves.inputs.push(obj);
+            }
+            document.getElementById("test-saved").appendChild(table);
+        },function(error){console.error(error);});
+    }
     
     this.filterDOM = document.createElement("div");
     this.filterDOM.innerHTML = "<p>PreTest Filters</p><div id='filter-count'></div>";
@@ -766,20 +774,7 @@ var interfaceContext = new function() {
                     break;
             }
         }
-        for (var survey_entry of specification.preTest.options) {
-            switch(survey_entry.type) {
-                case "number":
-                case "radio":
-                case "checkbox":
-                    var node = new FilterObject(this,survey_entry);
-                    this.filterObjects.push(node);
-                    this.filterDOM.appendChild(node.rootDOM);
-                    break;
-                default:
-                    break;
-            }
-        }
-        for (var survey_entry of specification.postTest.options) {
+        for (var survey_entry of specification.preTest.options.concat(specification.postTest.options)) {
             switch(survey_entry.type) {
                 case "number":
                 case "radio":
@@ -800,7 +795,7 @@ var interfaceContext = new function() {
         for (var obj of this.filterObjects) {
             pairs = pairs.concat(obj.getFilterPairs());
         }
-        var req_str = "?url="+testData.selectURL;
+        var req_str = "?url="+this.testSaves.selectedURL;
         var index = 0;
         while(pairs[index] != undefined) {
             req_str += '&';
@@ -830,4 +825,6 @@ var interfaceContext = new function() {
             document.getElementById("filter-count").textContent = str;
         },function(error){});
     }
+    
+    this.init();
 }
