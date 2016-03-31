@@ -589,7 +589,7 @@ function Data() {
     this.testSavedDiv = document.getElementById("test-saved");
     this.testSaves = null;
     this.selectURL = null;
-
+    
     this.specification = new Specification();
     get("../test-schema.xsd").then(function(response){
         var parse = new DOMParser();
@@ -645,11 +645,31 @@ function Data() {
             this.update(this.selectURL);
         }
     }
+    
+    this.updateData = function(req_str) {
+        // Now go get that data
+        get(req_str).then(function(response){
+            // Returns the data
+            chartContext.valueData = JSON.parse(response);
+        },function(error){console.error(error);});
+    }
 }
 
 var interfaceContext = new function() {
     // This creates the interface for the user to connect with the dynamic back-end to retrieve data
     this.rootDOM = document.createElement("div");
+    this.getDataButton = {
+        button: document.createElement("button"),
+        parent: this,
+        handleEvent: function(event) {
+            // Get the list of files:
+            var req_str = "../scripts/get_filtered_score.php"+this.parent.getFilterString();
+            testData.updateData(req_str);
+        }
+    }
+    this.getDataButton.button.textContent = "Get Filtered Data";
+    this.getDataButton.button.addEventListener("click",this.getDataButton);
+    
     this.filterDOM = document.createElement("div");
     this.filterDOM.innerHTML = "<p>PreTest Filters</p><div id='filter-count'></div>";
     this.filterObjects = [];
@@ -773,31 +793,41 @@ var interfaceContext = new function() {
             }
         }
         document.getElementById("test-saved").appendChild(this.filterDOM);
+        document.getElementById("test-saved").appendChild(this.getDataButton.button);
     }
-    this.getFileCount = function() {
-        // First we must get the filter pairs
+    this.getFilterString = function() {
         var pairs = [];
         for (var obj of this.filterObjects) {
             pairs = pairs.concat(obj.getFilterPairs());
         }
-        var req_str = "../scripts/get_filtered_count.php?url="+testData.selectURL;
+        var req_str = "?url="+testData.selectURL;
         var index = 0;
         while(pairs[index] != undefined) {
             req_str += '&';
             req_str += pairs[index][0]+"="+pairs[index][1];
             index++;
         }
-        get(req_str).then(function(response){
+        return req_str;
+    }
+    this.getFilteredUrlArray = function() {
+        var req_str = "../scripts/get_filtered_count.php"+this.getFilterString();
+        return get(req_str).then(function(response){
             var urls = JSON.parse(response);
-            var str = "Filtered to "+urls.urls.length+" file";
-            if (urls.urls.length != 1) {
+            return urls.urls;
+        },function(error){
+            console.error(error);
+        });
+    }
+    this.getFileCount = function() {
+        // First we must get the filter pairs
+        this.getFilteredUrlArray().then(function(response){
+            var str = "Filtered to "+response.length+" file";
+            if (response.length != 1) {
                 str += "s.";
             } else {
                 str += ".";
             }
             document.getElementById("filter-count").textContent = str;
-        },function(error){
-            console.error(error);
-        });
+        },function(error){});
     }
 }
