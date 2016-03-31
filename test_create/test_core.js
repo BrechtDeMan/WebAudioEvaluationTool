@@ -293,7 +293,7 @@ function buildPage()
                 specification.interface = testXML.getAttribute("interface");
                 if (specification.interfaces == null)
                 {
-                    specification.interfaces = new specification.interfaceNode();
+                    specification.interfaces = new specification.interfaceNode(specification);
                 }
                 if (specification.metrics == null)  {
                     specification.metrics = new specification.metricNode();
@@ -1427,11 +1427,11 @@ function SpecificationToHTML()
         
         // Now both before and after surveys
         if (specification.preTest == undefined){
-            specification.preTest = new specification.surveyNode();
+            specification.preTest = new specification.surveyNode(specification);
             specification.preTest.location = "pre";
         }
         if (specification.postTest == undefined){
-            specification.postTest = new specification.surveyNode();
+            specification.postTest = new specification.surveyNode(specification);
             specification.postTest.location = "post";
         }
         var surveyBefore = new this.surveyNode(this,specification.preTest,"Pre");
@@ -1447,7 +1447,7 @@ function SpecificationToHTML()
             parent: this,
             handleEvent: function()
             {
-                var pageObj = new specification.page();
+                var pageObj = new specification.page(specification);
                 specification.pages.push(pageObj);
                 var newPage = new this.parent.pageNode(this.parent,pageObj);
                 this.parent.injectDOM.appendChild(newPage.rootDOM);
@@ -1893,7 +1893,7 @@ function SpecificationToHTML()
             parent: this,
             handleEvent: function()
             {
-                var newNode = new this.parent.specification.OptionNode();
+                var newNode = new this.parent.specification.OptionNode(this.parent.specification);
                 this.parent.specification.options.push(newNode);
                 popupObject.show();
                 popupStateNodes.state[5].generate(newNode,this.parent);
@@ -1964,11 +1964,11 @@ function SpecificationToHTML()
         
         // Now both before and after surveys
         if (this.specification.preTest == undefined){
-            this.specification.preTest = new specification.surveyNode();
+            this.specification.preTest = new specification.surveyNode(specification);
             this.specification.preTest.location = "pre";
         }
         if (this.specification.postTest == undefined){
-            this.specification.postTest = new specification.surveyNode();
+            this.specification.postTest = new specification.surveyNode(specification);
             this.specification.postTest.location = "post";
         }
         var surveyBefore = new this.parent.surveyNode(this,this.specification.preTest,"Pre");
@@ -2106,7 +2106,7 @@ function SpecificationToHTML()
         
         // Build the components
         if (this.specification.interfaces.length == 0) {
-            this.specification.interfaces.push(new specification.interfaceNode());
+            this.specification.interfaces.push(new specification.interfaceNode(specification));
         }
         for (var interfaceObj of this.specification.interfaces)
         {
@@ -2127,7 +2127,7 @@ function SpecificationToHTML()
             root: document.createElement("button"),
             parent: this,
             handleEvent: function() {
-                var InterfaceObj = new specification.interfaceNode();
+                var InterfaceObj = new specification.interfaceNode(specification);
                 var newInterface = new this.parent.parent.interfaceNode(this.parent.parent,InterfaceObj);
                 newInterface.build("Interface",""+this.parent.specification.id+"-interface",this.parent.childrenDOM);
                 this.parent.children.push(newInterface);
@@ -2143,7 +2143,7 @@ function SpecificationToHTML()
             root: document.createElement("button"),
             parent: this,
             handleEvent: function() {
-                var audioElementObject = new this.parent.specification.audioElementNode();
+                var audioElementObject = new this.parent.specification.audioElementNode(specification);
                 var audioElementDOM = new this.parent.audioElementNode(this.parent,audioElementObject);
                 this.parent.specification.audioElements.push(audioElementObject);
                 this.parent.children.push(audioElementDOM);
