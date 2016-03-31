@@ -2,11 +2,119 @@
 * Analysis script for WAET
 */
 
-var chartContext;
+// Firefox does not have an XMLDocument.prototype.getElementsByName
+// and there is no searchAll style command, this custom function will
+// search all children recusrively for the name. Used for XSD where all
+// element nodes must have a name and therefore can pull the schema node
+XMLDocument.prototype.getAllElementsByName = function(name)
+{
+    name = String(name);
+    var selected = this.documentElement.getAllElementsByName(name);
+    return selected;
+}
+
+Element.prototype.getAllElementsByName = function(name)
+{
+    name = String(name);
+    var selected = [];
+    var node = this.firstElementChild;
+    while(node != null)
+    {
+        if (node.getAttribute('name') == name)
+        {
+            selected.push(node);
+        }
+        if (node.childElementCount > 0)
+        {
+            selected = selected.concat(node.getAllElementsByName(name));
+        }
+        node = node.nextElementSibling;
+    }
+    return selected;
+}
+
+XMLDocument.prototype.getAllElementsByTagName = function(name)
+{
+    name = String(name);
+    var selected = this.documentElement.getAllElementsByTagName(name);
+    return selected;
+}
+
+Element.prototype.getAllElementsByTagName = function(name)
+{
+    name = String(name);
+    var selected = [];
+    var node = this.firstElementChild;
+    while(node != null)
+    {
+        if (node.nodeName == name)
+        {
+            selected.push(node);
+        }
+        if (node.childElementCount > 0)
+        {
+            selected = selected.concat(node.getAllElementsByTagName(name));
+        }
+        node = node.nextElementSibling;
+    }
+    return selected;
+}
+
+// Firefox does not have an XMLDocument.prototype.getElementsByName
+if (typeof XMLDocument.prototype.getElementsByName != "function") {
+    XMLDocument.prototype.getElementsByName = function(name)
+    {
+        name = String(name);
+        var node = this.documentElement.firstElementChild;
+        var selected = [];
+        while(node != null)
+        {
+            if (node.getAttribute('name') == name)
+            {
+                selected.push(node);
+            }
+            node = node.nextElementSibling;
+        }
+        return selected;
+    }
+}
+
+var chartContext, testData;
 window.onload = function() {
     // Load the Visualization API and the corechart package.
-      google.charts.load('current', {'packages':['corechart']});
+    google.charts.load('current', {'packages':['corechart']});
     chartContext = new Chart();
+    testData = new Data();
+}
+
+function get(url) {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+    // Do the usual XHR stuff
+    var req = new XMLHttpRequest();
+    req.open('GET', url);
+    req.onload = function() {
+      // This is called even on 404 etc
+      // so check the status
+      if (req.status == 200) {
+        // Resolve the promise with the response text
+        resolve(req.response);
+      }
+      else {
+        // Otherwise reject with the status text
+        // which will hopefully be a meaningful error
+        reject(Error(req.statusText));
+      }
+    };
+
+    // Handle network errors
+    req.onerror = function() {
+      reject(Error("Network Error"));
+    };
+
+    // Make the request
+    req.send();
+  });
 }
 
 function arrayMean(values) {
@@ -115,29 +223,8 @@ function arrayHistogram(values,steps,min,max) {
 }
 
 function Chart() {
-    this.valueData = null;
-    this.commentData = null;
-    this.loadStatus = 0;
+    this.valueData;
     this.charts = [];
-    
-    var XMLHttp = new XMLHttpRequest();
-    XMLHttp.parent = this;
-    XMLHttp.open("GET","../scripts/score_parser.php?format=JSON",true);
-    XMLHttp.onload = function() {
-        // Now we have the JSON data, extract
-        this.parent.valueData = JSON.parse(this.responseText);
-        this.parent.loadStatus++;
-    }
-    XMLHttp.send();
-    var XMLHttp2 = new XMLHttpRequest();
-    XMLHttp2.parent = this;
-    XMLHttp2.open("GET","../scripts/comment_parser.php?format=JSON",true);
-    XMLHttp2.onload = function() {
-        // Now we have the JSON data, extract
-        this.parent.commentData = JSON.parse(this.responseText);
-        this.parent.loadStatus++;
-    }
-    XMLHttp2.send();
     
     this.chartObject = function(name) {
         // Create the charting object
@@ -490,5 +577,227 @@ function Chart() {
                 this.charts.push(chart);
             }
         }
+    }
+}
+
+function Data() {
+    // This holds the link between the server side calculations and the client side visualisation of the data
+    
+    // Dynamically generate the test filtering / page filterting tools
+    var self = this;
+    // Collect the test types and counts
+    this.testSavedDiv = document.getElementById("test-saved");
+    this.testSaves = null;
+    this.selectURL = null;
+
+    this.specification = new Specification();
+    get("../test-schema.xsd").then(function(response){
+        var parse = new DOMParser();
+        self.specification.schema = parse.parseFromString(response,'text/xml');
+    },function(error){
+        console.log("ERROR: Could not get Test Schema");
+    });
+    this.update = function(url) {
+        var self = this;
+        get(url).then(function(response){
+            var parse = new DOMParser();
+            self.specification.decode(parse.parseFromString(response,'text/xml'));
+            interfaceContext.generateFilters(self.specification);
+            return true;
+        },function(error){
+            console.log("ERROR: Could not get"+url);
+            return false;
+        });
+    }
+    var get_test = new XMLHttpRequest();
+    get_test.parent = this;
+    get_test.open("GET","../scripts/get_tests.php?format=JSON",true);
+    get_test.onload = function() {
+        this.parent.testSavedDiv.innerHTML = null;
+        var table = document.createElement("table");
+        table.innerHTML = "<tr><td>Test Filename</td><td>Count</td><td>Include</td></tr>";
+        this.parent.testSaves = JSON.parse(this.responseText);
+        for (var test of this.parent.testSaves.tests) {
+            var tableRow = document.createElement("tr");
+            var tableRowFilename = document.createElement("td");
+            tableRowFilename.textContent = test.testName;
+            var tableRowCount = document.createElement("td");
+            tableRowCount.textContent = test.files.length;
+            tableRow.appendChild(tableRowFilename);
+            tableRow.appendChild(tableRowCount);
+            var tableRowInclude = document.createElement("td");
+            var tableRowIncludeInput = document.createElement("input");
+            tableRowIncludeInput.type = "radio";
+            tableRowIncludeInput.name = "test-include";
+            tableRowIncludeInput.setAttribute("source",test.testName);
+            tableRowIncludeInput.addEventListener("change",this.parent);
+            tableRowInclude.appendChild(tableRowIncludeInput);
+            tableRow.appendChild(tableRowInclude);
+            table.appendChild(tableRow);
+        }
+        this.parent.testSavedDiv.appendChild(table);
+    }
+    get_test.send();
+    this.handleEvent = function(event) {
+        if (event.currentTarget.nodeName == "INPUT" && event.currentTarget.name == "test-include") {
+            // Changed the test specification
+            this.selectURL = event.currentTarget.getAttribute("source");
+            this.update(this.selectURL);
+        }
+    }
+}
+
+var interfaceContext = new function() {
+    // This creates the interface for the user to connect with the dynamic back-end to retrieve data
+    this.rootDOM = document.createElement("div");
+    this.filterDOM = document.createElement("div");
+    this.filterDOM.innerHTML = "<p>PreTest Filters</p><div id='filter-count'></div>";
+    this.filterObjects = [];
+    this.generateFilters = function(specification) {
+        // Filters are based on the pre and post global surverys
+        var FilterObject = function(parent,specification) {
+            this.parent = parent;
+            this.specification = specification;
+            this.rootDOM = document.createElement("div");
+            this.rootDOM.innerHTML = "<span>ID: "+specification.id+", Type: "+specification.type+"</span>";
+            this.rootDOM.className = "filter-entry";
+            this.handleEvent = function(event) {
+                switch(this.specification.type) {
+                    case "number":
+                        var name = event.currentTarget.name;
+                        eval("this."+name+" = event.currentTarget.value");
+                        break;
+                    case "checkbox":
+                        break;
+                    case "radio":
+                        break;
+                }
+                this.parent.getFileCount();
+            }
+            this.getFilterPairs = function() {
+                var pairs = [];
+                switch(this.specification.type) {
+                    case "number":
+                        if (this.min != "") {
+                            pairs.push([specification.id+"-min",this.min]);
+                        }
+                        if (this.max != "") {
+                            pairs.push([specification.id+"-max",this.max]);
+                        }
+                        break;
+                    case "radio":
+                    case "checkbox":
+                        for (var i=0; i<this.options.length; i++) {
+                            if (!this.options[i].checked) {
+                                pairs.push([specification.id+"-exclude-"+i,specification.options[i].name]);
+                            }
+                        }
+                        break;
+                }
+                return pairs;
+            }
+            switch(specification.type) {
+                case "number":
+                    // Number can be ranged by min/max levels
+                    this.min = "";
+                    this.max = "";
+                    this.minDOM = document.createElement("input");
+                    this.minDOM.type = "number";
+                    this.minDOM.name = "min";
+                    this.minDOM.addEventListener("change",this);
+                    this.minDOMText = document.createElement("span");
+                    this.minDOMText.textContent = "Minimum: ";
+                    var pairHolder = document.createElement("div");
+                    pairHolder.appendChild(this.minDOMText);
+                    pairHolder.appendChild(this.minDOM);
+                    this.rootDOM.appendChild(pairHolder);
+                    
+                    this.maxDOM = document.createElement("input");
+                    this.maxDOM.type = "number";
+                    this.maxDOM.name = "max";
+                    this.maxDOM.addEventListener("change",this);
+                    this.maxDOMText = document.createElement("span");
+                    this.maxDOMText.textContent = "Maximum: ";
+                    var pairHolder = document.createElement("div");
+                    pairHolder.appendChild(this.maxDOMText);
+                    pairHolder.appendChild(this.maxDOM);
+                    this.rootDOM.appendChild(pairHolder);
+                    break;
+                case "radio":
+                case "checkbox":
+                    this.options = [];
+                    for (var i=0; i<specification.options.length; i++) {
+                        var option = specification.options[i];
+                        var pairHolder = document.createElement("div");
+                        var text = document.createElement("span");
+                        text.textContent = option.text;
+                        var check = document.createElement("input");
+                        check.type = "checkbox";
+                        check.setAttribute("option-index",i);
+                        check.checked = true;
+                        check.addEventListener("click",this);
+                        this.options.push(check);
+                        pairHolder.appendChild(text);
+                        pairHolder.appendChild(check);
+                        this.rootDOM.appendChild(pairHolder);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (var survey_entry of specification.preTest.options) {
+            switch(survey_entry.type) {
+                case "number":
+                case "radio":
+                case "checkbox":
+                    var node = new FilterObject(this,survey_entry);
+                    this.filterObjects.push(node);
+                    this.filterDOM.appendChild(node.rootDOM);
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (var survey_entry of specification.postTest.options) {
+            switch(survey_entry.type) {
+                case "number":
+                case "radio":
+                case "checkbox":
+                    var node = new FilterObject(this,survey_entry);
+                    this.filterObjects.push(node);
+                    this.filterDOM.appendChild(node.rootDOM);
+                    break;
+                default:
+                    break;
+            }
+        }
+        document.getElementById("test-saved").appendChild(this.filterDOM);
+    }
+    this.getFileCount = function() {
+        // First we must get the filter pairs
+        var pairs = [];
+        for (var obj of this.filterObjects) {
+            pairs = pairs.concat(obj.getFilterPairs());
+        }
+        var req_str = "../scripts/get_filtered_count.php?url="+testData.selectURL;
+        var index = 0;
+        while(pairs[index] != undefined) {
+            req_str += '&';
+            req_str += pairs[index][0]+"="+pairs[index][1];
+            index++;
+        }
+        get(req_str).then(function(response){
+            var urls = JSON.parse(response);
+            var str = "Filtered to "+urls.urls.length+" file";
+            if (urls.urls.length != 1) {
+                str += "s.";
+            } else {
+                str += ".";
+            }
+            document.getElementById("filter-count").textContent = str;
+        },function(error){
+            console.error(error);
+        });
     }
 }

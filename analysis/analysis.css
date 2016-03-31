@@ -8,3 +8,9 @@ div.code {
     background-color: rgb(200,200,200);
     border: 2px dashed black;
 }
+table td tr{
+    padding: 5px;
+}
+div.filter-entry{
+    padding: 5px;
+}
