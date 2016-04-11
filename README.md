@@ -18,6 +18,8 @@ Please refer to ['docs/Instructions/Instructions.pdf'](https://github.com/Brecht
 
 ## Academic use
 
+### Citing
+
 Please cite 
 
 > Nicholas Jillings, Brecht De Man, David Moffat and Joshua D. Reiss, "[Web Audio Evaluation Tool: A Browser-Based Listening Test Environment](http://www.brechtdeman.com/publications/smc10.pdf)," [12th Sound and Music Computing Conference](http://www.maynoothuniversity.ie/smc15/), July 2015.
@@ -31,7 +33,10 @@ BibTeX:
 	    Title = {Web {A}udio {E}valuation {T}ool: {A} browser-based listening test environment},
     	Year = {2015}}
 
+### License
+
+Please refer to LICENSE.txt ([GNU General Public License](http://www.gnu.org/licenses/gpl-3.0.en.html)).
 
 ## Other use
 
-Please refer to LICENSE.txt ([GNU General Public License](http://www.gnu.org/licenses/gpl-3.0.en.html)).
+Other licensing schemes are available - please contact the authors regarding non-academic use. 
