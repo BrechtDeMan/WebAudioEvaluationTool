@@ -21,7 +21,7 @@
 
 \title{Instructions for \\ Web Audio Evaluation Tool}
 \author{Nicholas Jillings, Brecht De Man and David Moffat}
-\date{7 December 2015}							% Activate to display a given date or no date
+%\date{7 December 2015}							% Activate to display a given date or no date
 
 \begin{document}
 \maketitle
@@ -30,11 +30,10 @@ These instructions are about use of the Web Audio Evaluation Tool on Windows and
 
 We request that you acknowledge the authors and cite our work when using it \cite{waet}, see also CITING.txt. 
 
-The tool is available in its entirety including source code on \url{https://github.com/BrechtDeMan/WebAudioEvaluationTool}, under the GNU General Public License v3.0 (\url{http://choosealicense.com/licenses/gpl-3.0/}), see also LICENSE.txt. 
+The tool is available for academic use in its entirety including source code on \url{https://github.com/BrechtDeMan/WebAudioEvaluationTool}, under the GNU General Public License v3.0 (\url{http://choosealicense.com/licenses/gpl-3.0/}), see also LICENSE.txt. 
 
 The SoundSoftware project page, including a Mercurial repository, is \url{https://code.soundsoftware.ac.uk/projects/webaudioevaluationtool/}. 
 
-% TO DO: Linux (Android, iOS)
 
 \tableofcontents
 
@@ -66,14 +65,14 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	            	\item \texttt{WAVE.js}: decodes and performs WAVE file byte level manipulation
 	            	\item \texttt{xmllint.js}: XML validation\\
 			\end{itemize}
-		\textbf{Analysis of results (./analysis/)}
+		\textbf{Analysis of results (\texttt{./analysis/})}
 	         \begin{itemize}
 	         		\item \texttt{analyse.html}: analysis and diagnostics of a set of result XML files (legacy)
 	         		\item \texttt{analysis.css}: analysis page style file
 	         		\item \texttt{analysis.js}: analysis functions
 	         		\item \texttt{index.html}: web page where analysis of stored results can be performed
 			\end{itemize}
-	     \textbf{Documentation (./docs/)}
+	     \textbf{Documentation (\texttt{./docs/})}
 	         \begin{itemize}
 	         		\item AESPosterComp: PDF and \LaTeX  source of Audio Engineering Society UK Sustaining Members event at Solid State Logic, Begbroke
 	         		\item \href{http://c4dm.eecs.qmul.ac.uk/dmrn/events/dmrnp10/#posters}{DMRN+10}: PDF and \LaTeX source of poster for 10\textsuperscript{th} Digital Music Research Network One-Day workshop (``soft launch'')
@@ -84,23 +83,23 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	            	\item WAC2016: PDF and \LaTeX  source of 2nd Web Audio Conference paper \cite{waetwac}
 	            	\item WAC2016Poster: PDF and \LaTeX  source of 2nd Web Audio Conference poster\\
 			\end{itemize}
-         \textbf{Example project (./example\_eval/)}
+         \textbf{Example project (\texttt{./example\_eval/})}
             	\begin{itemize}
             		\item An example of what the set up XML should look like, with example audio files 0.wav-10.wav which are short recordings at 44.1kHz, 16bit of a woman saying the corresponding number (useful for testing randomisation and general familiarisation with the interface).\\ 
             	\end{itemize}
-          \textbf{Interface files (./interfaces/}
+          \textbf{Interface files (\texttt{./interfaces/})}
               \begin{itemize}
                   \item Each interface class has a JavaScript file and an optional CSS style file. These are loaded as needed.
               \end{itemize}
-          \textbf{Output files (./saves/)}
+          \textbf{Output files (\texttt{./saves/})}
             	\begin{itemize}
             		\item The output XML files of tests will be stored here by default by the \texttt{pythonServer.py} script.\\ 
             	\end{itemize}
-          \textbf{Auxiliary scripts (./scripts/)}
+          \textbf{Auxiliary scripts (\texttt{./scripts/})}
             	\begin{itemize}
             		\item Helpful Python and PHP scripts for extraction and visualisation of data.\\ 
             	\end{itemize}
-          \textbf{Test creation tool (./test\_create/)}
+          \textbf{Test creation tool (\texttt{./test\_create/})}
             	\begin{itemize}
             		\item Webpage for easily setting up your own test without having to delve into the XML.\\ 
             	\end{itemize}
@@ -115,7 +114,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 \clearpage
 
 
-\section{Test setup}
+\section{Test setup} % TO DO: Linux (Android, iOS)
 
 	\subsection{Sample rate}
 		Depending on how the experiment is set up, audio is resampled automatically (the Web Audio default) or the sample rate is enforced. In the latter case, you will need to make sure that the sample rate of the system is equal to the sample rate of these audio files. For this reason, all audio files in the experiment will have to have the same sample rate. 
@@ -220,9 +219,9 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	        \end{center}
 	        \end{figure}
                     
-        If at any point in the test the participant reports weird behaviour or an error of some kind, or the test needs to be interrupted, please notify the experimenter and/or refer to Section \ref{sec:troubleshooting}. 
+        If at any point in the test the participant reports weird behaviour or an error of some kind, or the test needs to be interrupted, please notify the experimenter and/or refer to Section~\ref{sec:troubleshooting}. 
 		
-		When the test is over (the subject should see a message to that effect, and click `Submit' one last time), the output XML file containing all collected data should have appeared in `saves/'. The names of these files are `test-0.xml', `test-1.xml', etc., in ascending order. The Terminal or Command prompt running the local web server will display the following file name. If such a file did not appear, please again refer to Section \ref{sec:troubleshooting}. 
+		When the test is over (the subject should see a message to that effect, and click `Submit' one last time), the output XML file containing all collected data should have appeared in `saves/'. The names of these files are `test-0.xml', `test-1.xml', etc., in ascending order. The Terminal or Command prompt running the local web server will display the following file name. If such a file did not appear, please again refer to Section~\ref{sec:troubleshooting}. 
 		
 		It is advised that you back up these results as often as possible, as a loss of this data means that the time and effort spent by the subject(s) has been in vain. Save the results to an external or network drive, and/or send them to the experimenter regularly. 
 		
@@ -247,21 +246,85 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 
 	To set the interface style for the whole test, set the attribute of the \texttt{setup} node to \texttt{interface="APE"}, where \texttt{"APE"} is one of the interface names below. 
 
-	\subsection{APE}
-		The APE interface is based on \cite{ape}, and consists of one or more axes, each corresponding with an attribute to be rated, on which markers are placed. As such, it is a multiple stimulus interface where (for each dimension or attribute) all elements are on one axis so that they can be maximally compared against each other, as opposed to rated individually or with regards to a single reference. 
-		It also contains an optional text box for each element, to allow for clarification by the subject, tagging, and so on. 
+	\subsection{Templates}
+		This section describes the different templates available in the Interfaces folder (\texttt{./interfaces}), 
 
-	\subsection{MUSHRA}
-		This is a straightforward implementation of \cite{mushra}, especially common for the rating of audio quality, for instance for the evaluation of audio codecs. This can also operate any vertical slider style test and does not necessarily have to match the MUSHRA specification.
-		
-	\subsection{AB}
-	    Performs a pairwise comparison, but supports ABX and n-way comparison (in the example we demonstrate it performing a 7-way comparison).
-	    
-	\subsection{Discrete/Likert}
-	    Each audio element is given a discrete set of values based on the number of slider options specified. For instance, Likert specifies 5 values and therefore each audio element must be one of those 5 values.
-	    
-	\subsection{ACR/CCR/DCR/horizontal}
-	    Creates the same interfaces as MUSHRA except the sliders are horizontal, not vertical.
+		\begin{description}
+			\item[Blank] Use this template to start building your own, custom interface (JavaScript and CSS). 
+
+			\item[AB] Performs a pairwise comparison, but supports n-way comparison (in the example we demonstrate it performing a 7-way comparison).
+
+			\item[ABX] Like AB, but with an unknown sample X which has to be identified as being either A or B. 
+
+			\item[APE] The APE interface is based on \cite{ape}, and consists of one or more axes, each corresponding with an attribute to be rated, on which markers are placed. As such, it is a multiple stimulus interface where (for each dimension or attribute) all elements are on one axis so that they can be maximally compared against each other, as opposed to rated individually or with regards to a single reference. 
+			It also contains an optional text box for each element, to allow for clarification by the subject, tagging, and so on. 
+
+			\item[Discrete] Each audio element is given a discrete set of values based on the number of slider options specified. For instance, Likert specifies 5 values and therefore each audio element must be one of those 5 values.
+
+			\item[Horizontal sliders] Creates the same interfaces as MUSHRA except the sliders are horizontal, not vertical.
+
+			\item[MUSHRA] This is a straightforward implementation of \cite{mushra}, especially common for the rating of audio quality, for instance for the evaluation of audio codecs. This can also operate any vertical slider style test and does not necessarily have to match the MUSHRA specification.
+		\end{description}
+		    
+
+	\subsection{Examples}
+		Below are a number of established interface types, which are all supported using the templates from the previous section. % Confirm?
+		From \cite{waetwac}. 
+
+		% TODO: add labels like (\textbf{\texttt{horizontal-sliders}}) to show which type of interface can be created using which template
+
+		\begin{itemize}
+			\item AB Test / Pairwise comparison~\cite{lipshitz1981great,david1963method}: Two stimuli presented simultaneously, participant selects a preferred stimulus.
+			\item ABC/HR (ITU-R BS. 1116)~\cite{recommendation19971116} (Mean Opinion Score: MOS): each stimulus has a continuous scale (5-1), labeled as Imperceptible, Perceptible but not annoying, Slightly annoying, Annoying, Very annoying.
+			\item -50 to 50 Bipolar with Ref: each stimulus has a continuous scale -50 to 50 with default values as 0 in middle and a reference.
+			\item Absolute Category Rating (ACR) Scale~\cite{rec1996p}: Likert but labels are Bad, Poor, Fair, Good, Excellent 
+			\item ABX Test~\cite{clark1982high}: Two stimuli are presented along with a reference and the participant has to select a preferred stimulus, often the closest to the reference.
+			\item APE \cite{ape}: Multiple stimuli on one or more axes for inter-sample rating.
+			%\item APE style 2D \cite{ape}: Multiple stimuli on a 2D plane for inter-sample rating (e.g. Valence Arousal). % TO BE IMPLEMENTED 
+			\item Comparison Category Rating (CCR) Scale~\cite{rec1996p}: ACR \& DCR but 7 point scale, with reference: Much better, Better, Slightly better, About the same, Slightly worse, Worse, Much worse.
+			\item Degredation Category Rating (DCR) Scale~\cite{rec1996p}: ABC \& Likert but labels are (5) Inaudible, (4) Audible but not annoying, (3) Slightly annoying, (2) Annoying, (1) Very annoying.
+			\item ITU-R 5 Point Continuous Impairment Scale~\cite{rec1997bs}: Same as ABC/HR but with a reference.
+			\item Likert scale~\cite{likert1932technique}: each stimulus has a five point scale with values: Strongly agree, Agree, Neutral, Disagree and Strongly disagree.
+			\item MUSHRA (ITU-R BS. 1534)~\cite{recommendation20031534}  Multiple stimuli are presented and rated on a continuous scale, which includes a reference, hidden reference and hidden anchors.
+			\item Pairwise Comparison (Better/Worse)~\cite{david1963method}: every stimulus is rated as being either better or worse than the reference.
+			\item Rank Scale~\cite{pascoe1983evaluation}: stimuli ranked on single horizontal scale, where they are ordered in preference order.
+			\item 9 Point Hedonic Category Rating Scale~\cite{peryam1952advanced}: each stimulus has a seven point scale with values: Like extremely, Like very much, Like moderate, Like slightly, Neither like nor dislike, Dislike extremely, Dislike very much, Dislike moderate, Dislike slightly. There is also a provided reference.
+		\end{itemize}
+
+	\subsection{Building your own interface}
+
+		\subsubsection{Nodes to familiarise}
+			Core.js handles several very important nodes which you should become familiar with. The first is the Audio Engine, initialised and stored in variable `AudioEngineContext'. This handles the playback of the web audio nodes as well as storing the `AudioObjects'. The `AudioObjects' are custom nodes which hold the audio fragments for playback. These nodes also have a link to two interface objects, the comment box if enabled and the interface providing the ranking. On creation of an `AudioObject' the interface link will be nulled, it is up to the interface to link these correctly.
+
+			The specification document will be decoded and parsed into an object called `specification'. This will hold all of the specifications various nodes. The test pages and any pre/post test objects are processed by a test state which will proceed through the test when called to by the interface. Any checks (such as playback or movement checks) are to be completed by the interface before instructing the test state to proceed. The test state will call the interface on each page load with the page specification node.
+
+		\subsubsection{Modifying \texttt{core.js}}
+			Whilst there is very little code actually needed, you do need to instruct core.js to load your interface file when called for from a specification node. There is a function called `loadProjectSpecCallback' which handles the decoding of the specification and setting any external items (such as metric collection). At the very end of this function there is an if statement, add to this list with your interface string to link to the source. There is an example in there for both the APE and MUSHRA tests already included. Note: Any updates to core.js in future work will most likely overwrite your changes to this file, so remember to check your interface is still here after any update that interferes with core.js.
+			Any further files can be loaded here as well, such as css styling files. jQuery is already included.
+
+		\subsubsection{Building the Interface}
+			Your interface file will get loaded automatically when the `interface' attribute of the setup node matches the string in the `loadProjectSpecCallback' function. The following functions must be defined in your interface file.
+			\begin{itemize}
+				\item \texttt{loadInterface} - Called once when the document is parsed. This creates any necessary bindings, such as to the metric collection classes and any check commands. Here you can also start the structure for your test such as placing in any common nodes (such as the title and empty divs to drop content into later).
+				\item \texttt{loadTest(audioHolderObject)} - Called for each page load. The audioHolderObject contains a specification node holding effectively one of the audioHolder nodes.
+				\item \texttt{resizeWindow(event)} - Handle for any window resizing. Simply scale your interface accordingly. This function must be here, but can me an empty function call.
+			\end{itemize}
+
+			\textbf{loadInterface}\\
+				This function is called by the interface once the document has been parsed since some browsers may parse files asynchronously. The best method is simply to put `loadInterface()' at the top of your interface file, therefore when the JavaScript engine is ready the function is called.
+
+				By default the HTML file has an element with id ``topLevelBody'' where you can build your interface. Make sure you blank the contents of that object. This function is the perfect time to build any fixed items, such as the page title, session titles, interface buttons (Start, Stop, Submit) and any holding and structure elements for later on.
+
+				At the end of the function, insert these two function calls: testState.initialise() and testState.advanceState();. This will actually begin the test sequence, including the pre-test options (if any are included in the specification document).
+
+			\textbf{loadTest(audioHolderObject)}\\
+				This function is called on each new test page. It is this functions job to clear out the previous test and set up the new page. Use the function audioEngineContext.newTestPage(); to instruct the audio engine to prepare for a new page. ``audioEngineContext.audioObjects = [];'' will delete any audioObjects, interfaceContext.deleteCommentBoxes(); will delete any comment boxes and interfaceContext.deleteCommentQuestions(); will delete any extra comment boxes specified by commentQuestion nodes.
+
+				This function will need to instruct the audio engine to build each fragment. Just passing the constructor each element from the audioHolderObject will build the track, audioEngineContext.newTrack(element) (where element is the audioHolderObject audio element). This will return a reference to the constructed audioObject. Decoding of the audio will happen asynchronously.
+
+				You also need to link audioObject.interfaceDOM with your interface object for that audioObject. The interfaceDOM object has a few default methods. Firstly it must start disabled and become enabled once the audioObject has decoded the audio (function call: enable()). Next it must have a function exportXMLDOM(), this will return the xml node for your interface, however the default is for it to return a value node, with textContent equal to the normalised value. You can perform other functions, but our scripts may not work if something different is specified (as it will breach our results specifications). Finally it must also have a method getValue, which returns the normalised value.
+
+				It is also the job the interfaceDOM to call any metric collection functions necessary, however some functions may be better placed outside (for example, the APE interface uses drag and drop, therefore the best way was to call the metric functions from the dragEnd function, which is called when the interface object is dropped). Metrics based upon listening are handled by the audioObject. The interfaceDOM object must manage any movement metrics. For a list of valid metrics and their behaviours, look at the project specification document included in the repository/docs location. The same goes for any checks required when pressing the submit button, or any other method to proceed the test state.
 
 	
 \clearpage
@@ -298,13 +361,13 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
             \item \texttt{projectReturn}: URL, mandatory, specifies the return point. Can be a 3rd party server or the local server. Set to null to disable automatic saving. Specifying ``save.php'' will trigger the return if either the PHP or python servers are used. On error, it will always default to presenting the save on page.
             \item \texttt{randomiseOrder}: Boolean, optional, if true it will randomise the order of the test pages. Default is false.
             \item \texttt{testPages}: non-negative integer, optional. Specifies the number of test pages to actually test with. Combined with randomiseOrder being true will give a random set of test pages per participant from the given pool of \texttt{<page>} nodes. Specifying 0 disables this option, default is 0.
-            \item \texttt{loudness}: non-positive integer, optional. Set the default LUFS target value. See \ref{sec:loudness} for more.
-            \item \texttt{sampleRate}: positive integer, optional. If set, the sample rate reported by the Web Audio API must match this number. See \ref{sec:samplerate}.
+            \item \texttt{loudness}: non-positive integer, optional. Set the default LUFS target value. See Section~\ref{sec:loudness} for more.
+            \item \texttt{sampleRate}: positive integer, optional. If set, the sample rate reported by the Web Audio API must match this number. See Section~\ref{sec:samplerate}.
         \end{itemize}
         
         The \texttt{<setup>} node takes the following child nodes, note these must appear in this order:
         \begin{itemize}
-            \item \texttt{<survey>}: Min of 0, max of 2 occurences. See \ref{sec:survey}
+            \item \texttt{<survey>}: Min of 0, max of 2 occurences. See Section~\ref{sec:survey}
             \item \texttt{<metric>}: Must appear only once.
             \item \texttt{<interface>}: Must appear only once.
         \end{itemize}
@@ -315,11 +378,11 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
         \begin{itemize}
             \item \texttt{id}: ID, mandatory. A string which must be unique across the entire XML. It is used to identify the page on test completion as pages are returned in the results in the order they appeared, not specified.
             \item \texttt{hostURL}: URL, mandatory. Used in conjuction with the \texttt{<audioelement>} url to specify where the audio files are located. For instance if all your files are in the directory \texttt{./test/} you can set this attribute to ``/test/'' and the \texttt{<audioelement>} url attribute only needs to file name. Set to ``'' if no hostURL prefix desired.
-            \item \texttt{randomiseOrder}: Boolean, optional. If true the audio fragments are presented randomly rather than the order specified. See \ref{sec:randomisation}. Default is false.
+            \item \texttt{randomiseOrder}: Boolean, optional. If true the audio fragments are presented randomly rather than the order specified. See Section~\ref{sec:randomisation}. Default is false.
             \item \texttt{repeatCount}: non-negative integer, optional. Specify the number of times to repeat the test page (re-present). Each presentation will appear as an individual page in the results. Default is 0.
             \item \texttt{loop}: Boolean, optional. If true, the audio elements will loop synchronously with each other. See \ref{sec:looping}. Default is false.
-            \item \texttt{showElementComments}: Boolean, optional. If true then there will be a comment box on the test page for each audio element presented, see \ref{sec:commentboxes}.
-            \item \texttt{loudness}: non-positive integer, optional. Set the LUFS target value for this page. Supersedes the \texttt{<setup>} loudness attribute for this page. See \ref{sec:loudness} for more.
+            \item \texttt{showElementComments}: Boolean, optional. If true then there will be a comment box on the test page for each audio element presented, see Section~\ref{sec:commentboxes}.
+            \item \texttt{loudness}: non-positive integer, optional. Set the LUFS target value for this page. Supersedes the \texttt{<setup>} loudness attribute for this page. See Section~\ref{sec:loudness} for more.
         \end{itemize}
         
         The \texttt{<page>} node takes the following child, nodes note these must appear in this order:
@@ -327,9 +390,9 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
             \item \texttt{<title>}: Appear once or not at all. The text content of this node specifies the title of the test page, for instance \texttt{<title>John Doe's Test</title>}
             \item \texttt{<commentboxprefix}: Appear once or not at all. The text content specifies the prefix of the comment boxes, see \ref{sec:commentboxes}.
             \item \texttt{<interface>}: Must appear only once.
-            \item \texttt{<audioelement>}: Minimum of one. Specifies an audio element, see \ref{sec:audioelement}.
-            \item \texttt{<commentquestion>}: Min of 0, max unlimited occurences. See \ref{sec:commentboxes}.
-            \item \texttt{<survey>}: Min of 0, max of 2 occurences. See \ref{sec:survey}
+            \item \texttt{<audioelement>}: Minimum of one. Specifies an audio element, see Section~\ref{sec:audioelement}.
+            \item \texttt{<commentquestion>}: Min of 0, max unlimited occurences. See Section~\ref{sec:commentboxes}.
+            \item \texttt{<survey>}: Min of 0, max of 2 occurences. See Section~\ref{sec:survey}
         \end{itemize}
 
     \subsection{Survey}
@@ -361,21 +424,22 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
         The node has the following children, note the order these must appear in is as follows:
         \begin{itemize}
             \item \texttt{title}: Min 0, max 1 occurence. The text content specifies the name of the axis as shown to the user.
-            \item \texttt{interfaceoption}: Min 0, max unbounded. Specifies the interface options. See \ref{sec:interfaceoption}.
-            \item \texttt{scales}: Min 0, max 1 occurence. Contains \texttt{<scalelable>} nodes which define the displayed scales. See \ref{sec:scales}.
+            \item \texttt{interfaceoption}: Min 0, max unbounded. Specifies the interface options. See Section~\ref{sec:interfaceoption}.
+            \item \texttt{scales}: Min 0, max 1 occurence. Contains \texttt{<scalelabel>} nodes which define the displayed scales. See Section~\ref{sec:scales}.
         \end{itemize}
 
     \subsection{Audio Element}
-    \label{sec:audioelement}
-    Appear as children of the \texttt{page} node. Each of these specify an individual interface fragment to display. Multiple fragments can reference the same file (allowing for repetition with different parameters or blind-doubles). The node has the following attributes:
-    \begin{itemize}
-        \item \texttt{id}: ID, mandatory. Must be unique across the test page. Used to identify the specific fragment in the results.
-        \item \texttt{url}: URL, mandatory. Used with the parent \texttt{page} nodes' \texttt{hostURL} attribute to get the full url of the audio file to load.
-        \item \texttt{gain}: Float, optional. Specify the gain in decibels to apply to the node after loudness normalisation. Default is 0.
-        \item \texttt{type}: String, optional. Must be one of the following: normal (default when not specified), anchor, reference or outside-reference. Normal, anchor and reference are presented as normal, outside-reference presents the node as a separate interface option.
-        \item \texttt{marker}: Integer between 0 and 100, optional. Only used when \texttt{type="anchor"|"reference"}. See \ref{sec:referencesandanchors}.
-    \end{itemize}
+	    \label{sec:audioelement}
+	    Appear as children of the \texttt{page} node. Each of these specify an individual interface fragment to display. Multiple fragments can reference the same file (allowing for repetition with different parameters or blind-doubles). The node has the following attributes:
+	    \begin{itemize}
+	        \item \texttt{id}: ID, mandatory. Must be unique across the test page. Used to identify the specific fragment in the results.
+	        \item \texttt{url}: URL, mandatory. Used with the parent \texttt{page} nodes' \texttt{hostURL} attribute to get the full url of the audio file to load.
+	        \item \texttt{gain}: Float, optional. Specify the gain in decibels to apply to the node after loudness normalisation. Default is 0.
+	        \item \texttt{type}: String, optional. Must be one of the following: normal (default when not specified), anchor, reference or outside-reference. Normal, anchor and reference are presented as normal, outside-reference presents the node as a separate interface option.
+	        \item \texttt{marker}: Integer between 0 and 100, optional. Only used when \texttt{type="anchor"|"reference"}. See Section~\ref{sec:referencesandanchors}.
+	    \end{itemize}
 
+\clearpage
 
 \section{Features}
 
@@ -386,15 +450,16 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	As the example project showcases (nearly) all of these features, please refer to its configuration XML document for a demonstration of how to enable and adjust them.
 
 	\subsection{Interface options}
+		\label{sec:interfaceoption}
 	    The interface node has children of interface options which are used to specify modifications to the test environment. These are divided into two catagories: check and show. Check are used to specify conditions which must be met before a page can be completed, these include checking all fragments have been played or checking all fragments have a comment and so on. Show is used to show an optional on page element or control, such as the playhead or master volume.
 	    
 	    Check items have the attribute ``type'' set to ``check''. The following list gives the string to give the ``name'' attribute along with a description of the check.
 	    \begin{itemize}
-	    \item \texttt{fragmentPlayed}: Checks that all fragments have been at least partially played
-	    \item \texttt{fragmentFullPlayback}: Checks that all fragments have been fully played. \emph{NOTE:} This will always clear if the page is looping as it is not possible to know every sample has been played.
-	    \item \texttt{fragmentMoved}: Checks that all fragments have been moved. This is interface dependent, for instance on AB this will always clear as there is no movement.
-	    \item \texttt{fragmentComments}: Cheks that all fragments have a comment. Will clear if there are no on page comments but with a console warning.
-	    \item \texttt{scalerange}: Has two extra attributes ``min'' and ``max''. Checks that at least one element is below the min value and one element is above the max value.
+		    \item \texttt{fragmentPlayed}: Checks that all fragments have been at least partially played
+		    \item \texttt{fragmentFullPlayback}: Checks that all fragments have been fully played. \emph{NOTE:} This will always clear if the page is looping as it is not possible to know every sample has been played.
+		    \item \texttt{fragmentMoved}: Checks that all fragments have been moved. This is interface dependent, for instance on AB this will always clear as there is no movement.
+		    \item \texttt{fragmentComments}: Cheks that all fragments have a comment. Will clear if there are no on page comments but with a console warning.
+		    \item \texttt{scalerange}: Has two extra attributes ``min'' and ``max''. Checks that at least one element is below the min value and one element is above the max value.
 	    \end{itemize}
 	    % QUANTISATION OF THE SCALE: to be implemented?
 
@@ -424,12 +489,12 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 
 
 		\subsubsection{Randomsation of page order}
-        The page order randomisation is set by the \texttt{<setup>} node attribute \texttt{randomise-order}, for example \texttt{<setup ... randomise-order="true">...</setup>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order.
+        The page order randomisation is set by the \texttt{<setup>} node attribute \texttt{randomise-order}, for example \texttt{<setup ... randomise-order=\texttt{\char`\"}true\texttt{\char`\"}>...</setup>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order. 
 
 		\subsubsection{Randomisation of axis order}
 
 		\subsubsection{Randomisation of fragment order}
-        The audio fragment randomisation is set by the \texttt{<audioholder>} node attribute \texttt{randomise-order}, for example \texttt{<audioholder ... randomise-order="true">...</audioholder>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order.
+        The audio fragment randomisation is set by the \texttt{<audioholder>} node attribute \texttt{randomise-order}, for example \texttt{<audioholder ... randomise-order=\texttt{\char`\"}true\texttt{\char`\"}>...</audioholder>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order.
 
 		\subsubsection{Randomisation of initial slider position}
         By default slider values are randomised on start. The MUSHRA interface supports setting the initial values of all sliders throught the \texttt{<audioholder>} attribute \texttt{initial-position}. This takes an integer between 0 and 100 to signify the slider position.
@@ -468,15 +533,15 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 
 		\subsubsection{Time test duration}
 			\texttt{testTimer}\\
-			One per test page. Presents the total test time from the first playback on the test page to the submission of the test page (exculding test time of the pre-/post- test surveys). This is presented in the results as \texttt{<metricresult id="testTime"> 8.60299319727892 </metricresult>}. The time is in seconds.
+			One per test page. Presents the total test time from the first playback on the test page to the submission of the test page (exculding test time of the pre-/post- test surveys). This is presented in the results as \texttt{<metricresult id=\texttt{\char`\"}testTime\texttt{\char`\"}> 8.60299319727892 </metricresult>}. The time is in seconds.
 
 		\subsubsection{Time fragment playback}
 			\texttt{elementTimer}\\
-			One per audio fragment per test page. This totals up the entire time the audio fragment has been listened to in this test and presented \texttt{<metricresult name="enableElementTimer"> 1.0042630385487428 </metricresult>}. The time is in seconds.
+			One per audio fragment per test page. This totals up the entire time the audio fragment has been listened to in this test and presented \texttt{<metricresult name="enableElementTimer\texttt{\char`\"}> 1.0042630385487428 </metricresult>}. The time is in seconds.
 
 		\subsubsection{Initial positions}
 			\texttt{elementInitialPosition}\\
-			One per audio fragment per test page. Tracks the initial position of the sliders, especially relevant when these are randomised. Example result \texttt{<metricresult name="elementInitialPosition"> 0.8395522388059702 </metricresult>}.
+			One per audio fragment per test page. Tracks the initial position of the sliders, especially relevant when these are randomised. Example result \texttt{<metricresult name="elementInitialPosition\texttt{\char`\"}> 0.8395522388059702 </metricresult>}.
 
 		\subsubsection{Track movements}
 		    \texttt{elementTracker}\\
@@ -572,7 +637,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 		
 	\subsection{Comment Boxes}
 	\label{sec:commentboxes}
-	    There are two types of comment boxes which can be presented, those linked to the audio fragments on the page and those which pose a general question. The audio fragment boxes are shown by setting the attribute \texttt{showElementComments} to true of the page in question. This will then show a comment box below the main interface for every fragment on the page. There is some customisation around the text that accompanies the box, by default the text will read ``Comment on fragment'' followed by the fragment identifier (the number / letter shown by the interface). This `prefix' can be modified using the page node \texttt{<commentboxprefix>}, see \ref{sec:page} for where to place this node in the document. The comment box prefix node takes no attribute and the text contained by the node represents to the prefix. For instance if we have a node \texttt{<commentboxprefix> Describe fragment </commentboxprefix>}, then the interface will show ``Describe fragment'' followed by the identifier.
+	    There are two types of comment boxes which can be presented, those linked to the audio fragments on the page and those which pose a general question. The audio fragment boxes are shown by setting the attribute \texttt{showElementComments} to true of the page in question. This will then show a comment box below the main interface for every fragment on the page. There is some customisation around the text that accompanies the box, by default the text will read ``Comment on fragment'' followed by the fragment identifier (the number / letter shown by the interface). This `prefix' can be modified using the page node \texttt{<commentboxprefix>}, see Section~\ref{sec:page} for where to place this node in the document. The comment box prefix node takes no attribute and the text contained by the node represents to the prefix. For instance if we have a node \texttt{<commentboxprefix> Describe fragment </commentboxprefix>}, then the interface will show ``Describe fragment'' followed by the identifier.
 	    
 	    The second type of comment box is slightly more complex because it can handle different types of response data. These are called comment questions because they are located in the comment section of the test but pose a specific question.
 
@@ -590,40 +655,6 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	
 	This guide will help you to construct your own interface on top of the WAET (Web Audio Evaluation Tool) engine. The WAET engine resides in the core.js file, this contains prototype objects to handle most of the test creation, operation and data collection. The interface simply has to link into this at the correct points.
 	
-\section{Building your own interface}
-
-	\subsection{Nodes to familiarise}
-		Core.js handles several very important nodes which you should become familiar with. The first is the Audio Engine, initialised and stored in variable `AudioEngineContext'. This handles the playback of the web audio nodes as well as storing the `AudioObjects'. The `AudioObjects' are custom nodes which hold the audio fragments for playback. These nodes also have a link to two interface objects, the comment box if enabled and the interface providing the ranking. On creation of an `AudioObject' the interface link will be nulled, it is up to the interface to link these correctly.
-
-		The specification document will be decoded and parsed into an object called `specification'. This will hold all of the specifications various nodes. The test pages and any pre/post test objects are processed by a test state which will proceed through the test when called to by the interface. Any checks (such as playback or movement checks) are to be completed by the interface before instructing the test state to proceed. The test state will call the interface on each page load with the page specification node.
-
-	\subsection{Modifying \texttt{core.js}}
-		Whilst there is very little code actually needed, you do need to instruct core.js to load your interface file when called for from a specification node. There is a function called `loadProjectSpecCallback' which handles the decoding of the specification and setting any external items (such as metric collection). At the very end of this function there is an if statement, add to this list with your interface string to link to the source. There is an example in there for both the APE and MUSHRA tests already included. Note: Any updates to core.js in future work will most likely overwrite your changes to this file, so remember to check your interface is still here after any update that interferes with core.js.
-		Any further files can be loaded here as well, such as css styling files. jQuery is already included.
-
-	\subsection{Building the Interface}
-		Your interface file will get loaded automatically when the `interface' attribute of the setup node matches the string in the `loadProjectSpecCallback' function. The following functions must be defined in your interface file.
-		\begin{itemize}
-		\item \texttt{loadInterface} - Called once when the document is parsed. This creates any necessary bindings, such as to the metric collection classes and any check commands. Here you can also start the structure for your test such as placing in any common nodes (such as the title and empty divs to drop content into later).
-		\item \texttt{loadTest(audioHolderObject)} - Called for each page load. The audioHolderObject contains a specification node holding effectively one of the audioHolder nodes.
-		\item \texttt{resizeWindow(event)} - Handle for any window resizing. Simply scale your interface accordingly. This function must be here, but can me an empty function call.
-		\end{itemize}
-
-		\subsubsection{loadInterface}
-			This function is called by the interface once the document has been parsed since some browsers may parse files asynchronously. The best method is simply to put `loadInterface()' at the top of your interface file, therefore when the JavaScript engine is ready the function is called.
-
-			By default the HTML file has an element with id ``topLevelBody'' where you can build your interface. Make sure you blank the contents of that object. This function is the perfect time to build any fixed items, such as the page title, session titles, interface buttons (Start, Stop, Submit) and any holding and structure elements for later on.
-
-			At the end of the function, insert these two function calls: testState.initialise() and testState.advanceState();. This will actually begin the test sequence, including the pre-test options (if any are included in the specification document).
-
-		\subsubsection{loadTest(audioHolderObject)}
-			This function is called on each new test page. It is this functions job to clear out the previous test and set up the new page. Use the function audioEngineContext.newTestPage(); to instruct the audio engine to prepare for a new page. ``audioEngineContext.audioObjects = [];'' will delete any audioObjects, interfaceContext.deleteCommentBoxes(); will delete any comment boxes and interfaceContext.deleteCommentQuestions(); will delete any extra comment boxes specified by commentQuestion nodes.
-
-			This function will need to instruct the audio engine to build each fragment. Just passing the constructor each element from the audioHolderObject will build the track, audioEngineContext.newTrack(element) (where element is the audioHolderObject audio element). This will return a reference to the constructed audioObject. Decoding of the audio will happen asynchronously.
-
-			You also need to link audioObject.interfaceDOM with your interface object for that audioObject. The interfaceDOM object has a few default methods. Firstly it must start disabled and become enabled once the audioObject has decoded the audio (function call: enable()). Next it must have a function exportXMLDOM(), this will return the xml node for your interface, however the default is for it to return a value node, with textContent equal to the normalised value. You can perform other functions, but our scripts may not work if something different is specified (as it will breach our results specifications). Finally it must also have a method getValue, which returns the normalised value.
-
-			It is also the job the interfaceDOM to call any metric collection functions necessary, however some functions may be better placed outside (for example, the APE interface uses drag and drop, therefore the best way was to call the metric functions from the dragEnd function, which is called when the interface object is dropped). Metrics based upon listening are handled by the audioObject. The interfaceDOM object must manage any movement metrics. For a list of valid metrics and their behaviours, look at the project specification document included in the repository/docs location. The same goes for any checks required when pressing the submit button, or any other method to proceed the test state.
 
 \clearpage
 \section{Analysis and diagnostics}
