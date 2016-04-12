@@ -9,6 +9,8 @@
         <xs:attribute name="id" type="xs:ID" />
         <xs:attribute name="mandatory" type="xs:boolean" />
         <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="poolSize" type="xs:nonNegativeInteger" default="0" />
+        <xs:attribute name="alwaysInclude" type="xs:boolean" default="false" />
 
         <xs:attribute name="preSilence" default="0">
             <xs:simpleType>
@@ -46,7 +48,7 @@
                 <xs:attribute name="interface" type="xs:string" use="required" />
                 <xs:attribute name="projectReturn" type="xs:string" use="optional" default="" />
                 <xs:attribute name="randomiseOrder" type="xs:boolean" default="false" />
-                <xs:attribute name="testPages" type="xs:nonNegativeInteger" default="0" />
+                <xs:attribute ref="poolSize" />
                 <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional" />
                 <xs:attribute name="sampleRate" type="xs:positiveInteger" use="optional" />
                 <xs:attribute name="calibration" type="xs:boolean" default="false" />
@@ -83,6 +85,8 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute ref="poolSize" />
+                <xs:attribute ref="alwaysInclude" />
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
             </xs:complexType>
@@ -168,6 +172,7 @@
                     </xs:simpleType>
                 </xs:attribute>
                 <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional" />
+                <xs:attribute ref="alwaysInclude" />
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
             </xs:complexType>

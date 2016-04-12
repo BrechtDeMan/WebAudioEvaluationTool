@@ -868,25 +868,11 @@ function stateMachine()
 		}
 		for (var i=0; i<pageHolder.length; i++)
 		{
-			if (specification.testPages <= i && specification.testPages != 0) {break;}
+			if (specification.poolSize <= i && specification.poolSize != 0) {break;}
             pageHolder[i].presentedId = i;
 			this.stateMap.push(pageHolder[i]);
             storage.createTestPageStore(pageHolder[i]);
-            for (var element of pageHolder[i].audioElements) {
-                var URL = pageHolder[i].hostURL + element.url;
-                var buffer = null;
-                for (var buffObj of audioEngineContext.buffers) {
-                    if (URL == buffObj.url) {
-                        buffer = buffObj;
-                        break;
-                    }
-                }
-                if (buffer == null) {
-                    buffer = new audioEngineContext.bufferObj();
-                    buffer.getMedia(URL);
-                    audioEngineContext.buffers.push(buffer);
-                }
-            }
+            audioEngineContext.loadPageData(pageHolder[i]);
 		}
         
 		if (specification.preTest != null) {this.preTestSurvey = specification.preTest;}
@@ -1172,6 +1158,25 @@ function AudioEngine(specification) {
             }
         }
 	};
+    
+    this.loadPageData = function(page) {
+        // Load the URL from pages
+        for (var element of page.audioElements) {
+            var URL = page.hostURL + element.url;
+            var buffer = null;
+            for (var buffObj of this.buffers) {
+                if (URL == buffObj.url) {
+                    buffer = buffObj;
+                    break;
+                }
+            }
+            if (buffer == null) {
+                buffer = new this.bufferObj();
+                buffer.getMedia(URL);
+                this.buffers.push(buffer);
+            }
+        }
+    };
 	
 	this.play = function(id) {
 		// Start the timer and set the audioEngine state to playing (1)
