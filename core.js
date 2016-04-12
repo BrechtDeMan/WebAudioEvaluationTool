@@ -496,6 +496,47 @@ function randomString(length) {
     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
 }
 
+function randomiseOrder(input)
+{
+	// This takes an array of information and randomises the order
+	var N = input.length;
+	
+	var inputSequence = []; // For safety purposes: keep track of randomisation
+	for (var counter = 0; counter < N; ++counter) 
+		inputSequence.push(counter) // Fill array
+	var inputSequenceClone = inputSequence.slice(0);
+	
+	var holdArr = [];
+	var outputSequence = [];
+	for (var n=0; n<N; n++)
+	{
+		// First pick a random number
+		var r = Math.random();
+		// Multiply and floor by the number of elements left
+		r = Math.floor(r*input.length);
+		// Pick out that element and delete from the array
+		holdArr.push(input.splice(r,1)[0]);
+		// Do the same with sequence
+		outputSequence.push(inputSequence.splice(r,1)[0]);
+	}
+	console.log(inputSequenceClone.toString()); // print original array to console
+	console.log(outputSequence.toString()); 	// print randomised array to console
+	return holdArr;
+}
+
+function randomSubArray(array,num) {
+    if (num > array.length) {
+        num = array.length;
+    }
+    var ret = [];
+    while (num > 0) {
+        var index = Math.floor(Math.random() * array.length);
+        ret.push( array.splice(index,1)[0] );
+        num--;
+    }
+    return ret;
+}
+
 function interfacePopup() {
 	// Creates an object to manage the popup
 	this.popup = null;
@@ -556,12 +597,14 @@ function interfacePopup() {
 	};
 	
 	this.hidePopup = function(){
-		this.popup.style.zIndex = -1;
-		this.popup.style.visibility = 'hidden';
-		var blank = document.getElementsByClassName('testHalt')[0];
-		blank.style.zIndex = -2;
-		blank.style.visibility = 'hidden';
-		this.buttonPrevious.style.visibility = 'inherit';
+        if (this.popup) {
+            this.popup.style.zIndex = -1;
+            this.popup.style.visibility = 'hidden';
+            var blank = document.getElementsByClassName('testHalt')[0];
+            blank.style.zIndex = -2;
+            blank.style.visibility = 'hidden';
+            this.buttonPrevious.style.visibility = 'inherit';
+        }
 	};
 	
 	this.postNode = function() {
@@ -850,29 +893,68 @@ function stateMachine()
 	this.currentStatePosition = null;
     this.currentStore = null;
 	this.initialise = function(){
-		
+        
 		// Get the data from Specification
-		var pageHolder = [];
+		var pagePool = [];
+        var pageInclude = [];
 		for (var page of specification.pages)
 		{
-            var repeat = page.repeatCount;
-            while(repeat >= 0)
-            {
-                pageHolder.push(page);
-                repeat--;
+            if (page.alwaysInclude) {
+                pageInclude.push(page);
+            } else {
+                pagePool.push(page);
             }
 		}
+        
+        // Find how many are left to get
+        var numPages = specification.poolSize;
+        if (numPages > pagePool.length) {
+            console.log("WARNING - You have specified more pages in <setup poolSize> than you have created!!");
+            numPages = specification.pages.length;
+        }
+        if (specification.poolSize == 0) {
+            numPages = specification.pages.length;
+        }
+        numPages -= pageInclude.length;
+        
+        if (numPages > 0) {
+            // Go find the rest of the pages from the pool
+            var subarr = null;
+            if (specification.randomiseOrder) {
+                // Append a random sub-array
+                subarr = randomSubArray(pagePool,numPages);
+            } else {
+                // Append the matching number
+                subarr = pagePool.slice(0,numPages);
+            }
+            pageInclude = pageInclude.concat(subarr);
+        }
+        
+        // We now have our selected pages in pageInclude array
 		if (specification.randomiseOrder)
 		{
-			pageHolder = randomiseOrder(pageHolder);
+			pageInclude = randomiseOrder(pageInclude);
 		}
-		for (var i=0; i<pageHolder.length; i++)
+		for (var i=0; i<pageInclude.length; i++)
 		{
-			if (specification.poolSize <= i && specification.poolSize != 0) {break;}
-            pageHolder[i].presentedId = i;
-			this.stateMap.push(pageHolder[i]);
-            storage.createTestPageStore(pageHolder[i]);
-            audioEngineContext.loadPageData(pageHolder[i]);
+            pageInclude[i].presentedId = i;
+			this.stateMap.push(pageInclude[i]);
+            // For each selected page, we must get the sub pool
+            if (pageInclude[i].poolSize != 0 && pageInclude[i].poolSize != pageInclude[i].audioElements.length) {
+                var elemInclude = [];
+                var elemPool = [];
+                for (var elem of pageInclude[i].audioElements) {
+                    if (elem.include || elem.type != "normal") {
+                        elemInclude.push(elem);
+                    } else {
+                        elemPool.push(elem);
+                    }
+                }
+                var numElems = pageInclude[i].poolSize - elemInclude.length;
+                pageInclude[i].audioElements = elemInclude.concat(randomSubArray(elemPool,numElems));
+            }
+            storage.createTestPageStore(pageInclude[i]);
+            audioEngineContext.loadPageData(pageInclude[i]);
 		}
         
 		if (specification.preTest != null) {this.preTestSurvey = specification.preTest;}
@@ -1767,34 +1849,6 @@ function metricTracker(caller)
 		}
 		return storeDOM;
 	};
-}
-
-function randomiseOrder(input)
-{
-	// This takes an array of information and randomises the order
-	var N = input.length;
-	
-	var inputSequence = []; // For safety purposes: keep track of randomisation
-	for (var counter = 0; counter < N; ++counter) 
-		inputSequence.push(counter) // Fill array
-	var inputSequenceClone = inputSequence.slice(0);
-	
-	var holdArr = [];
-	var outputSequence = [];
-	for (var n=0; n<N; n++)
-	{
-		// First pick a random number
-		var r = Math.random();
-		// Multiply and floor by the number of elements left
-		r = Math.floor(r*input.length);
-		// Pick out that element and delete from the array
-		holdArr.push(input.splice(r,1)[0]);
-		// Do the same with sequence
-		outputSequence.push(inputSequence.splice(r,1)[0]);
-	}
-	console.log(inputSequenceClone.toString()); // print original array to console
-	console.log(outputSequence.toString()); 	// print randomised array to console
-	return holdArr;
 }
 			
 function Interface(specificationObject) {

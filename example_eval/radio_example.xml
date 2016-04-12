@@ -18,7 +18,7 @@
 			<interfaceoption type="show" name="page-count"/>
 		</interface>
 	</setup>
-	<page id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='4' loop='true' showElementComments='true' loudness="-23">
+	<page id='test-0' hostURL="example_eval/" randomiseOrder='true' repeatCount='4' loop='true' showElementComments='true' loudness="-23" poolSize="3">
 		<interface>
 			<scales>
 				<scalelabel position="0">(1) Very Annoying</scalelabel>
@@ -28,8 +28,9 @@
 				<scalelabel position="100">(5) Inaudible</scalelabel>
 			</scales>
 		</interface>
-		<audioelement url="0.wav" id="track-1"/>
+		<audioelement url="0.wav" id="track-1" alwaysInclude="true"/>
 		<audioelement url="1.wav" id="track-2"/>
+        <audioelement url="3.wav" id="track-4"/>
         <audioelement url="2.wav" id="track-3" type="outside-reference"/>
 	</page>
 </waet>
