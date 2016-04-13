@@ -27,7 +27,19 @@ function Specification() {
 		}
 		var dataType = schema.getAttribute('type');
 		if (typeof dataType == "string") { dataType = dataType.substr(3);}
-		else {dataType = "string";}
+		else {
+            var rest = schema.getAllElementsByTagName("xs:restriction").concat(schema.getAllElementsByTagName("xs:enumeration"));
+            if (rest.length > 0) {
+                dataType = rest[0].getAttribute("base");
+                if (typeof dataType == "string") {
+                    dataType = dataType.substr(3);
+                } else {
+                    dataType = "string";
+                }
+            } else {
+                dataType = "string";
+            }
+        }
 		if (attribute == null)
 		{
 			return attribute;

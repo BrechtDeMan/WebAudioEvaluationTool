@@ -1278,13 +1278,13 @@ function AudioEngine(specification) {
 			this.timer.startTest();
 			if (id == undefined) {
 				id = -1;
-				console.log('FATAL - Passed id was undefined - AudioEngineContext.play(id)');
+				console.error('FATAL - Passed id was undefined - AudioEngineContext.play(id)');
 				return;
 			} else {
 				interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
 			}
 			if (this.loopPlayback) {
-                var setTime = audioContext.currentTime;
+                var setTime = audioContext.currentTime+specification.crossFade;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
 					this.audioObjects[i].play(setTime);
@@ -1295,7 +1295,7 @@ function AudioEngine(specification) {
 					}
 				}
 			} else {
-                var setTime = audioContext.currentTime+0.1;
+                var setTime = audioContext.currentTime+specification.crossFade;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
 					if (i != id) {
