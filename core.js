@@ -1287,7 +1287,7 @@ function AudioEngine(specification) {
                 var setTime = audioContext.currentTime+specification.crossFade;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
-					this.audioObjects[i].play(setTime);
+					this.audioObjects[i].play(audioContext.currentTime);
 					if (id == i) {
 						this.audioObjects[i].loopStart(setTime);
 					} else {
