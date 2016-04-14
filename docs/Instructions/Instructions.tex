@@ -47,62 +47,86 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 		
 		\textbf{Main folder:} 
 			\begin{itemize}
-	            	\item \texttt{core.css, graphics.css, structure.css}: core style files (edit to change appearance)
-	            	\item \texttt{CITING.txt, LICENSE.txt, README.md}: text files with, respectively, the citation which we ask to include in any work where this tool or any portion thereof is used, modified or otherwise; the license under which the software is shared; and a general readme file.
-	            	\item \texttt{core.js}: JavaScript file with core functionality
-	            	\item \texttt{demo.html}: Several demonstrations of listening tests, using examples from the example\_eval folder
-	            	\item \texttt{index.html}: webpage where interface should appear (append link to configuration XML, e.g. index.html?url=config.xml)
-	            	\item \texttt{jquery-2.1.4.js}: jQuery JavaScript Library
-	            	\item \texttt{keygen.php}: generates a unique file name for saved results
-	            	\item \texttt{loudness.js}: Allows for automatic calculation of loudness of Web Audio API Buffer objects, return gain values to correct for a target loudness or match loudness between multiple objects
-	            	\item \texttt{pseudo.php}: allows for pseudo-random selection from a range of configuration XML files
-	            	\item \texttt{pythonServer.py}: webserver for running tests locally
-	            	\item \texttt{pythonServer-legacy.py}: webserver with limited functionality (no automatic storing of output XML files)
-	            	\item \texttt{save.php}: PHP script to store result XML files to web server
-	            	\item \texttt{scaledefinitions.xml}: marker text and positions for various scales
-	            	\item \texttt{specification.js}: decodes configuration XML to JavaScript object
-	            	\item \texttt{test-schema.xsd}: definition of configuration and result XML file structure
-	            	\item \texttt{WAVE.js}: decodes and performs WAVE file byte level manipulation
-	            	\item \texttt{xmllint.js}: XML validation\\
+            	\item \texttt{CITING.txt, LICENSE.txt, README.md}: text files with, respectively, the citation which we ask to include in any work where this tool or any portion thereof is used, modified or otherwise; the license under which the software is shared; and a general readme file.
+            	\item \texttt{demo.html}: Several demonstrations of listening tests, using examples from the example\_eval folder
+            	\item \texttt{index.html}: webpage where interface should appear (append link to configuration XML, e.g. index.html?url=config.xml)
+            	\item \texttt{pythonServer.py}: webserver for running tests locally
+            	\item \texttt{pythonServer-legacy.py}: webserver with limited functionality (no automatic storing of output XML files)
+            	\\
 			\end{itemize}
 		\textbf{Analysis of results (\texttt{./analysis/})}
-	         \begin{itemize}
-	         		\item \texttt{analyse.html}: analysis and diagnostics of a set of result XML files (legacy)
-	         		\item \texttt{analysis.css}: analysis page style file
-	         		\item \texttt{analysis.js}: analysis functions
-	         		\item \texttt{index.html}: web page where analysis of stored results can be performed
+	        \begin{itemize}
+         		\item \texttt{analyse.html}: analysis and diagnostics of a set of result XML files (legacy)
+         		\item \texttt{analysis.css}: analysis page style file
+         		\item \texttt{analysis.js}: analysis functions
+         		\item \texttt{index.html}: web page where analysis of stored results can be performed
 			\end{itemize}
-	     \textbf{Documentation (\texttt{./docs/})}
-	         \begin{itemize}
-	         		\item AESPosterComp: PDF and \LaTeX  source of Audio Engineering Society UK Sustaining Members event at Solid State Logic, Begbroke
-	         		\item \href{http://c4dm.eecs.qmul.ac.uk/dmrn/events/dmrnp10/#posters}{DMRN+10}: PDF and \LaTeX source of poster for 10\textsuperscript{th} Digital Music Research Network One-Day workshop (``soft launch'')
-	         		\item Instructions: PDF and \LaTeX source of these instructions
-	            	\item Project Specification Document (\LaTeX/PDF)
-	            	\item Results Specification Document (\LaTeX/PDF)
-	            	\item SMC15: PDF and \LaTeX  source of 12th Sound and Music Computing Conference paper \cite{waet}
-	            	\item WAC2016: PDF and \LaTeX  source of 2nd Web Audio Conference paper \cite{waetwac}
-	            	\item WAC2016Poster: PDF and \LaTeX  source of 2nd Web Audio Conference poster\\
+		\textbf{CSS files (\texttt{./css/})}
+			\begin{itemize}
+				\item \texttt{core.css}: core style file (edit to change appearance)
 			\end{itemize}
-         \textbf{Example project (\texttt{./example\_eval/})}
-            	\begin{itemize}
-            		\item An example of what the set up XML should look like, with example audio files 0.wav-10.wav which are short recordings at 44.1kHz, 16bit of a woman saying the corresponding number (useful for testing randomisation and general familiarisation with the interface).\\ 
-            	\end{itemize}
-          \textbf{Interface files (\texttt{./interfaces/})}
-              \begin{itemize}
-                  \item Each interface class has a JavaScript file and an optional CSS style file. These are loaded as needed.
-              \end{itemize}
-          \textbf{Output files (\texttt{./saves/})}
-            	\begin{itemize}
-            		\item The output XML files of tests will be stored here by default by the \texttt{pythonServer.py} script.\\ 
-            	\end{itemize}
-          \textbf{Auxiliary scripts (\texttt{./scripts/})}
-            	\begin{itemize}
-            		\item Helpful Python and PHP scripts for extraction and visualisation of data.\\ 
-            	\end{itemize}
-          \textbf{Test creation tool (\texttt{./test\_create/})}
-            	\begin{itemize}
-            		\item Webpage for easily setting up your own test without having to delve into the XML.\\ 
-            	\end{itemize}
+	    \textbf{Documentation (\texttt{./docs/})}
+	        \begin{itemize}
+         		\item AESPosterComp: PDF and \LaTeX  source of Audio Engineering Society UK Sustaining Members event at Solid State Logic, Begbroke
+         		\item \href{http://c4dm.eecs.qmul.ac.uk/dmrn/events/dmrnp10/#posters}{DMRN+10}: PDF and \LaTeX source of poster for 10\textsuperscript{th} Digital Music Research Network One-Day workshop (``soft launch'')
+         		\item Instructions: PDF and \LaTeX source of these instructions
+            	\item Project Specification Document (\LaTeX/PDF)
+            	\item Results Specification Document (\LaTeX/PDF)
+            	\item SMC15: PDF and \LaTeX  source of 12th Sound and Music Computing Conference paper \cite{waet}
+            	\item WAC2016: PDF and \LaTeX  source of 2nd Web Audio Conference paper \cite{waetwac}
+            	\item WAC2016Poster: PDF and \LaTeX  source of 2nd Web Audio Conference poster\\
+			\end{itemize}
+        \textbf{Interface files (\texttt{./interfaces/})}
+          	\begin{itemize}
+              	\item Each interface class has a JavaScript file and an optional CSS style file. These are loaded as needed.
+          	\end{itemize}
+        \textbf{JavaScript code (\texttt{./js/})}
+          	\begin{itemize}
+              	\item \texttt{core.js}: JavaScript file with core functionality
+              	\item \texttt{jquery-2.1.4.js}: jQuery JavaScript Library
+				\item \texttt{loudness.js}: Allows for automatic calculation of loudness of Web Audio API Buffer objects, return gain values to correct for a target loudness or match loudness between multiple objects
+				\item \texttt{specification.js}: decodes configuration XML to JavaScript object
+				\item \texttt{WAVE.js}: decodes and performs WAVE file byte level manipulation
+              	\item \texttt{xmllint.js}: XML validation
+          	\end{itemize}
+         \textbf{Media files (\texttt{./media/})}
+          	\begin{itemize}
+              	\item \texttt{example}: contains example audio files 0.wav-10.wav which are short recordings at 44.1kHz, 16bit of a woman saying the corresponding number (useful for testing randomisation and general familiarisation with the interface).
+          	\end{itemize}
+        \textbf{PHP scripts (\texttt{./php/})}
+        	\begin{itemize}
+        		\item \texttt{keygen.php}: generates a unique file name for saved results
+            	\item \texttt{pseudo.php}: allows for pseudo-random selection from a range of configuration XML files
+				\item \texttt{save.php}: PHP script to store result XML files to web server
+        		\item PHP analysis scripts % ELABORATE
+        	\end{itemize}
+        \textbf{Output files (\texttt{./saves/})}
+        	\begin{itemize}
+        		\item The output XML files of tests will be stored here by default by the \texttt{pythonServer.py} script.\\ 
+        	\end{itemize}
+        \textbf{Auxiliary scripts (\texttt{./scripts/})}
+        	\begin{itemize}
+        		\item Helpful Python and PHP scripts for extraction and visualisation of data.\\ 
+        	\end{itemize}
+        \textbf{Test creation tool (\texttt{./test\_create/})}
+        	\begin{itemize}
+        		\item Webpage for easily setting up your own test without having to delve into the XML.\\ 
+        	\end{itemize}
+        \textbf{Tests (\texttt{./tests/})}
+        	\begin{itemize}
+        		\item This is where you can store your configuration XML files.
+        		\item Contains a folder with examples.\\  % ELABORATE
+        	\end{itemize}
+        \textbf{XML specifications (\texttt{./xml/})}
+        	\begin{itemize}
+        		\item \texttt{scaledefinitions.xml}: marker text and positions for various scales
+            	\item \texttt{test-schema.xsd}: definition of configuration and result XML file structure\\  % ELABORATE
+        	\end{itemize}
+
+        % \textbf{Example project (\texttt{./example\_eval/})}
+        %     	\begin{itemize}
+        %     		\item An example of what the set up XML should look like,
+        %     	\end{itemize}
                     	
 	\subsection{Compatibility}
 		As Microsoft Internet Explorer doesn't support the Web Audio API\footnote{\url{http://caniuse.com/\#feat=audio-api}}, you will need another browser like Google Chrome, Safari or Firefox (all three are tested and confirmed to work). 
