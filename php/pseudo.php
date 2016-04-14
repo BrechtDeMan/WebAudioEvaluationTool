@@ -8,7 +8,7 @@
         $numsaves = count( $files );
     }
 
-    $files = glob('pseudo/' . '*.xml');
+    $files = glob('tests/' . '*.xml');
     $numtests = 0;
     if ( $numtests !== false )
     {
