@@ -492,8 +492,57 @@ function decibelToLinear(gain)
 	return Math.pow(10,gain/20.0);
 }
 
+function secondsToSamples(time,fs) {
+    return Math.round(time*fs);
+}
+
+function samplesToSeconds(samples,fs) {
+    return samples / fs;
+}
+
 function randomString(length) {
     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+}
+
+function randomiseOrder(input)
+{
+	// This takes an array of information and randomises the order
+	var N = input.length;
+	
+	var inputSequence = []; // For safety purposes: keep track of randomisation
+	for (var counter = 0; counter < N; ++counter) 
+		inputSequence.push(counter) // Fill array
+	var inputSequenceClone = inputSequence.slice(0);
+	
+	var holdArr = [];
+	var outputSequence = [];
+	for (var n=0; n<N; n++)
+	{
+		// First pick a random number
+		var r = Math.random();
+		// Multiply and floor by the number of elements left
+		r = Math.floor(r*input.length);
+		// Pick out that element and delete from the array
+		holdArr.push(input.splice(r,1)[0]);
+		// Do the same with sequence
+		outputSequence.push(inputSequence.splice(r,1)[0]);
+	}
+	console.log(inputSequenceClone.toString()); // print original array to console
+	console.log(outputSequence.toString()); 	// print randomised array to console
+	return holdArr;
+}
+
+function randomSubArray(array,num) {
+    if (num > array.length) {
+        num = array.length;
+    }
+    var ret = [];
+    while (num > 0) {
+        var index = Math.floor(Math.random() * array.length);
+        ret.push( array.splice(index,1)[0] );
+        num--;
+    }
+    return ret;
 }
 
 function interfacePopup() {
@@ -556,12 +605,14 @@ function interfacePopup() {
 	};
 	
 	this.hidePopup = function(){
-		this.popup.style.zIndex = -1;
-		this.popup.style.visibility = 'hidden';
-		var blank = document.getElementsByClassName('testHalt')[0];
-		blank.style.zIndex = -2;
-		blank.style.visibility = 'hidden';
-		this.buttonPrevious.style.visibility = 'inherit';
+        if (this.popup) {
+            this.popup.style.zIndex = -1;
+            this.popup.style.visibility = 'hidden';
+            var blank = document.getElementsByClassName('testHalt')[0];
+            blank.style.zIndex = -2;
+            blank.style.visibility = 'hidden';
+            this.buttonPrevious.style.visibility = 'inherit';
+        }
 	};
 	
 	this.postNode = function() {
@@ -850,43 +901,68 @@ function stateMachine()
 	this.currentStatePosition = null;
     this.currentStore = null;
 	this.initialise = function(){
-		
+        
 		// Get the data from Specification
-		var pageHolder = [];
+		var pagePool = [];
+        var pageInclude = [];
 		for (var page of specification.pages)
 		{
-            var repeat = page.repeatCount;
-            while(repeat >= 0)
-            {
-                pageHolder.push(page);
-                repeat--;
+            if (page.alwaysInclude) {
+                pageInclude.push(page);
+            } else {
+                pagePool.push(page);
             }
 		}
+        
+        // Find how many are left to get
+        var numPages = specification.poolSize;
+        if (numPages > pagePool.length) {
+            console.log("WARNING - You have specified more pages in <setup poolSize> than you have created!!");
+            numPages = specification.pages.length;
+        }
+        if (specification.poolSize == 0) {
+            numPages = specification.pages.length;
+        }
+        numPages -= pageInclude.length;
+        
+        if (numPages > 0) {
+            // Go find the rest of the pages from the pool
+            var subarr = null;
+            if (specification.randomiseOrder) {
+                // Append a random sub-array
+                subarr = randomSubArray(pagePool,numPages);
+            } else {
+                // Append the matching number
+                subarr = pagePool.slice(0,numPages);
+            }
+            pageInclude = pageInclude.concat(subarr);
+        }
+        
+        // We now have our selected pages in pageInclude array
 		if (specification.randomiseOrder)
 		{
-			pageHolder = randomiseOrder(pageHolder);
+			pageInclude = randomiseOrder(pageInclude);
 		}
-		for (var i=0; i<pageHolder.length; i++)
+		for (var i=0; i<pageInclude.length; i++)
 		{
-			if (specification.testPages <= i && specification.testPages != 0) {break;}
-            pageHolder[i].presentedId = i;
-			this.stateMap.push(pageHolder[i]);
-            storage.createTestPageStore(pageHolder[i]);
-            for (var element of pageHolder[i].audioElements) {
-                var URL = pageHolder[i].hostURL + element.url;
-                var buffer = null;
-                for (var buffObj of audioEngineContext.buffers) {
-                    if (URL == buffObj.url) {
-                        buffer = buffObj;
-                        break;
+            pageInclude[i].presentedId = i;
+			this.stateMap.push(pageInclude[i]);
+            // For each selected page, we must get the sub pool
+            if (pageInclude[i].poolSize != 0 && pageInclude[i].poolSize != pageInclude[i].audioElements.length) {
+                var elemInclude = [];
+                var elemPool = [];
+                for (var elem of pageInclude[i].audioElements) {
+                    if (elem.include || elem.type != "normal") {
+                        elemInclude.push(elem);
+                    } else {
+                        elemPool.push(elem);
                     }
                 }
-                if (buffer == null) {
-                    buffer = new audioEngineContext.bufferObj();
-                    buffer.getMedia(URL);
-                    audioEngineContext.buffers.push(buffer);
-                }
+                var numElems = pageInclude[i].poolSize - elemInclude.length;
+                pageInclude[i].audioElements = elemInclude.concat(randomSubArray(elemPool,numElems));
             }
+            storage.createTestPageStore(pageInclude[i]);
+            audioEngineContext.loadPageData(pageInclude[i]);
 		}
         
 		if (specification.preTest != null) {this.preTestSurvey = specification.preTest;}
@@ -1170,8 +1246,56 @@ function AudioEngine(specification) {
                 // The buffer is already ready, trigger bufferLoaded
                 audioObject.bufferLoaded(this);
             }
+        };
+        
+        this.copyBuffer = function(preSilenceTime,postSilenceTime) {
+            // Copies the entire bufferObj.
+            if (preSilenceTime == undefined) {preSilenceTime = 0;}
+            if (postSilenceTime == undefined) {postSilenceTime = 0;}
+            var copy = new this.constructor();
+            copy.url = this.url;
+            var preSilenceSamples = secondsToSamples(preSilenceTime,this.buffer.sampleRate);
+            var postSilenceSamples = secondsToSamples(postSilenceTime,this.buffer.sampleRate);
+            var newLength = this.buffer.length+preSilenceSamples+postSilenceSamples;
+            copy.buffer = audioContext.createBuffer(this.buffer.numberOfChannels, newLength, this.buffer.sampleRate);
+            // Now we can use some efficient background copy schemes if we are just padding the end
+            if (preSilenceSamples == 0 && typeof copy.buffer.copyToChannel == "function") {
+                for (var c=0; c<this.buffer.numberOfChannels; c++) {
+                    copy.buffer.copyToChannel(this.buffer.getChannelData(c),c);
+                }
+            } else {
+                for (var c=0; c<this.buffer.numberOfChannels; c++) {
+                    var src = this.buffer.getChannelData(c);
+                    var dst = copy.buffer.getChannelData(c);
+                    for (var n=0; n<src.length; n++)
+                        dst[n+preSilenceSamples] = src[n];
+                }
+            }
+            // Copy in the rest of the buffer information
+            copy.buffer.lufs = this.buffer.lufs;
+            copy.buffer.playbackGain = this.buffer.playbackGain;
+            return copy;
         }
 	};
+    
+    this.loadPageData = function(page) {
+        // Load the URL from pages
+        for (var element of page.audioElements) {
+            var URL = page.hostURL + element.url;
+            var buffer = null;
+            for (var buffObj of this.buffers) {
+                if (URL == buffObj.url) {
+                    buffer = buffObj;
+                    break;
+                }
+            }
+            if (buffer == null) {
+                buffer = new this.bufferObj();
+                buffer.getMedia(URL);
+                this.buffers.push(buffer);
+            }
+        }
+    };
 	
 	this.play = function(id) {
 		// Start the timer and set the audioEngine state to playing (1)
@@ -1191,16 +1315,16 @@ function AudioEngine(specification) {
 			this.timer.startTest();
 			if (id == undefined) {
 				id = -1;
-				console.log('FATAL - Passed id was undefined - AudioEngineContext.play(id)');
+				console.error('FATAL - Passed id was undefined - AudioEngineContext.play(id)');
 				return;
 			} else {
 				interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
 			}
 			if (this.loopPlayback) {
-                var setTime = audioContext.currentTime;
+                var setTime = audioContext.currentTime+specification.crossFade;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
-					this.audioObjects[i].play(setTime);
+					this.audioObjects[i].play(audioContext.currentTime);
 					if (id == i) {
 						this.audioObjects[i].loopStart(setTime);
 					} else {
@@ -1208,7 +1332,7 @@ function AudioEngine(specification) {
 					}
 				}
 			} else {
-                var setTime = audioContext.currentTime+0.1;
+                var setTime = audioContext.currentTime+specification.crossFade;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
 					if (i != id) {
@@ -1314,6 +1438,7 @@ function AudioEngine(specification) {
 	
 	this.setSynchronousLoop = function() {
 		// Pads the signals so they are all exactly the same length
+        // Get the length of the longest signal.
 		var length = 0;
 		var maxId;
 		for (var i=0; i<this.audioObjects.length; i++)
@@ -1325,20 +1450,10 @@ function AudioEngine(specification) {
 			}
 		}
 		// Extract the audio and zero-pad
-		for (var i=0; i<this.audioObjects.length; i++)
+		for (var ao of this.audioObjects)
 		{
-			var orig = this.audioObjects[i].buffer.buffer;
-			var hold = audioContext.createBuffer(orig.numberOfChannels,length,orig.sampleRate);
-			for (var c=0; c<orig.numberOfChannels; c++)
-			{
-				var inData = hold.getChannelData(c);
-				var outData = orig.getChannelData(c);
-				for (var n=0; n<orig.length; n++)
-				{inData[n] = outData[n];}
-			}
-			hold.playbackGain = orig.playbackGain;
-			hold.lufs = orig.lufs;
-			this.audioObjects[i].buffer.buffer = hold;
+            var lengthDiff = length - ao.buffer.buffer.length;
+			ao.buffer = ao.buffer.copyBuffer(0,samplesToSeconds(lengthDiff,ao.buffer.buffer.sampleRate));
 		}
 	};
     
@@ -1387,26 +1502,13 @@ function audioObject(id) {
             this.buffer = callee;
             return;
         }
-		if (audioEngineContext.loopPlayback){
-			// First copy the buffer into this.buffer
-			this.buffer = new audioEngineContext.bufferObj();
-			this.buffer.url = callee.url;
-			this.buffer.buffer = audioContext.createBuffer(callee.buffer.numberOfChannels, callee.buffer.length, callee.buffer.sampleRate);
-			for (var c=0; c<callee.buffer.numberOfChannels; c++)
-			{
-				var src = callee.buffer.getChannelData(c);
-				var dst = this.buffer.buffer.getChannelData(c);
-				for (var n=0; n<src.length; n++)
-				{
-					dst[n] = src[n];
-				}
-			}
-		} else {
-			this.buffer = callee;
-		}
+        this.buffer = callee;
+        var preSilenceTime = this.specification.preSilence || this.specification.parent.preSilence || specification.preSilence || 0.0;
+        var postSilenceTime = this.specification.postSilence || this.specification.parent.postSilence || specification.postSilence || 0.0;
+        if (preSilenceTime != 0 || postSilenceTime != 0) {
+            this.buffer = callee.copyBuffer(preSilenceTime,postSilenceTime);    
+        }
 		this.state = 1;
-		this.buffer.buffer.playbackGain = callee.buffer.playbackGain;
-		this.buffer.buffer.lufs = callee.buffer.lufs;
 		var targetLUFS = this.specification.parent.loudness || specification.loudness;
 		if (typeof targetLUFS === "number")
 		{
@@ -1762,34 +1864,6 @@ function metricTracker(caller)
 		}
 		return storeDOM;
 	};
-}
-
-function randomiseOrder(input)
-{
-	// This takes an array of information and randomises the order
-	var N = input.length;
-	
-	var inputSequence = []; // For safety purposes: keep track of randomisation
-	for (var counter = 0; counter < N; ++counter) 
-		inputSequence.push(counter) // Fill array
-	var inputSequenceClone = inputSequence.slice(0);
-	
-	var holdArr = [];
-	var outputSequence = [];
-	for (var n=0; n<N; n++)
-	{
-		// First pick a random number
-		var r = Math.random();
-		// Multiply and floor by the number of elements left
-		r = Math.floor(r*input.length);
-		// Pick out that element and delete from the array
-		holdArr.push(input.splice(r,1)[0]);
-		// Do the same with sequence
-		outputSequence.push(inputSequence.splice(r,1)[0]);
-	}
-	console.log(inputSequenceClone.toString()); // print original array to console
-	console.log(outputSequence.toString()); 	// print randomised array to console
-	return holdArr;
 }
 			
 function Interface(specificationObject) {
