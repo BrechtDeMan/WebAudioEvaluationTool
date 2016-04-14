@@ -88,7 +88,7 @@ window.onload = function()
     specification = new Specification();
     convert = new SpecificationToHTML();
     xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET","./interface-specs.xml",true);
+    xmlHttp.open("GET","test_create/interface-specs.xml",true);
     xmlHttp.onload = function()
     {
         var parse = new DOMParser();
@@ -99,7 +99,7 @@ window.onload = function()
     xmlHttp.send();
     
     var xsdGet = new XMLHttpRequest();
-    xsdGet.open("GET","../test-schema.xsd",true);
+    xsdGet.open("GET","xml/test-schema.xsd",true);
     xsdGet.onload = function()
     {
         var parse = new DOMParser();
@@ -108,7 +108,7 @@ window.onload = function()
     xsdGet.send();
     
     var jsonAttribute = new XMLHttpRequest();
-    jsonAttribute.open("GET","./attributes.json",true);
+    jsonAttribute.open("GET","test_create/attributes.json",true);
     jsonAttribute.onload = function()
     {
         attributeText = JSON.parse(jsonAttribute.response)

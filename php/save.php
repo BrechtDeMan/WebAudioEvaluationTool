@@ -4,7 +4,7 @@
 	header("Content-type: text/xml");
 	$postText = file_get_contents('php://input');
     $file_key = $_GET['key'];
-    $filename = "saves/save-".$file_key.".xml";
+    $filename = "../saves/save-".$file_key.".xml";
 	$fileHandle = fopen($filename, 'w');
 	if ($fileHandle == FALSE)
 	{

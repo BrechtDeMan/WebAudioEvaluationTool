@@ -591,7 +591,7 @@ function Data() {
     this.selectURL = null;
     
     this.specification = new Specification();
-    get("../test-schema.xsd").then(function(response){
+    get("../xml/test-schema.xsd").then(function(response){
         var parse = new DOMParser();
         self.specification.schema = parse.parseFromString(response,'text/xml');
     },function(error){
@@ -618,7 +618,7 @@ var interfaceContext = new function() {
         parent: this,
         handleEvent: function(event) {
             // Get the list of files:
-            var req_str = "../scripts/get_filtered_score.php"+this.parent.getFilterString();
+            var req_str = "../php/get_filtered_score.php"+this.parent.getFilterString();
             testData.updateData(req_str);
         }
     }
@@ -633,7 +633,7 @@ var interfaceContext = new function() {
     };
     this.init = function() {
         var self = this;
-        get('../scripts/get_tests.php?format=JSON').then(function(response){
+        get('../php/get_tests.php?format=JSON').then(function(response){
             document.getElementById("test-saved").innerHTML = null;
             var table = document.createElement("table");
             table.innerHTML = "<tr><td>Test Filename</td><td>Count</td><td>Include</td></tr>";
@@ -805,7 +805,7 @@ var interfaceContext = new function() {
         return req_str;
     }
     this.getFilteredUrlArray = function() {
-        var req_str = "../scripts/get_filtered_count.php"+this.getFilterString();
+        var req_str = "../php/get_filtered_count.php"+this.getFilterString();
         return get(req_str).then(function(response){
             var urls = JSON.parse(response);
             return urls.urls;

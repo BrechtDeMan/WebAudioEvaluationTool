@@ -146,7 +146,7 @@ function loadProjectSpec(url) {
 	// Load the project document from the given URL, decode the XML and instruct audioEngine to get audio data
 	// If url is null, request client to upload project XML document
 	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("GET",'test-schema.xsd',true);
+	xmlhttp.open("GET",'xml/test-schema.xsd',true);
 	xmlhttp.onload = function()
 	{
 		schemaXSD = xmlhttp.response;
@@ -408,7 +408,7 @@ function createProjectSave(destURL) {
 		popup.popupContent.appendChild(a);
 	} else {
 		var xmlhttp = new XMLHttpRequest;
-		xmlhttp.open("POST","\save.php?key="+storage.SessionKey.key,true);
+		xmlhttp.open("POST","php/save.php?key="+storage.SessionKey.key,true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
 		xmlhttp.onerror = function(){
 			console.log('Error saving file to server! Presenting download locally');
@@ -2832,14 +2832,14 @@ function Storage()
         },
         generateKey: function() {
             var temp_key = randomString(32);
-            this.request.open("GET","keygen.php?key="+temp_key,true);
+            this.request.open("GET","php/keygen.php?key="+temp_key,true);
             this.request.addEventListener("load",this);
             this.request.send();
         },
         update: function() {
             this.parent.root.setAttribute("state","update");
             var xmlhttp = new XMLHttpRequest();
-            xmlhttp.open("POST",specification.projectReturn+"?key="+this.key);
+            xmlhttp.open("POST","php/"+specification.projectReturn+"?key="+this.key);
             xmlhttp.setRequestHeader('Content-Type', 'text/xml');
             xmlhttp.onerror = function(){
                 console.log('Error updating file to server!');

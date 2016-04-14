@@ -1,7 +1,7 @@
 <?php
     header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
-    $files = glob('saves/' . '*.xml');
+    $files = glob('../saves/' . '*.xml');
     $numsaves = 0;
     if ( $files !== false )
     {

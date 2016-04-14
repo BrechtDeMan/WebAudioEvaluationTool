@@ -1,7 +1,7 @@
 <?php
 // This checks the key sent by the JavaScript against the current bunch of saves
 // XML Saves location - assumes it will be saves/
-$saves = glob("saves/*.xml");
+$saves = glob("../saves/*.xml");
 
 $key_requested = $_GET['key'];
 
