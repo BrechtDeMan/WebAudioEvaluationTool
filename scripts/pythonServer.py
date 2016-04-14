@@ -26,9 +26,10 @@ elif sys.version_info[0] == 3:
 scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
 os.chdir(scriptdir) # does this work?
 
-PSEUDO_PATH = '../example_eval/'
+PSEUDO_PATH = '../tests/'
 pseudo_files = []
 for filename in listdir(PSEUDO_PATH):
+    print(filename)
     if filename.endswith('.xml'):
         pseudo_files.append(filename)
 
@@ -38,12 +39,12 @@ while(path.isfile('../saves/'+curFileName)):
     curSaveIndex += 1;
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
-pseudo_index = curSaveIndex % len(pseudo_files)
+if len(pseudo_files) > 0:
+    pseudo_index = curSaveIndex % len(pseudo_files)
+else:
+    pseudo_index = 0
 
-if sys.version_info[0] == 2:
-    print 'URL: http://localhost:8000/index.html'
-elif sys.version_info[0] == 3:
-    print('URL: http://localhost:8000/index.html')
+print('URL: http://localhost:8000/index.html')
 
 def send404(s):
     s.send_response(404)
@@ -82,7 +83,7 @@ def processFile(s):
         st = s.path.rsplit(',')
         lenSt = len(st)
         fmt = st[lenSt-1].rsplit('.')
-        fpath = "../"+urllib2.unquote(s.path)
+        fpath = "../"+urllib2.parse.unquote(s.path)
         s.send_response(200)
         if (fmt[1] == 'html'):
             s.send_header("Content-type", 'text/html')
@@ -113,7 +114,7 @@ def keygen(s):
 	options = s.path.rsplit('?')
 	options = options[1].rsplit('=')
 	key = options[1]
-	print key
+	print("Registered key "+key)
 	if os.path.isfile("saves/save-"+key+".xml"):
 		reply = "<response><state>NO</state><key>"+key+"</key></response>"
 	else:
@@ -132,13 +133,9 @@ def saveFile(self):
     options = self.path.rsplit('?')
     options = options[1].rsplit('=')
     key = options[1]
-    print key
     varLen = int(self.headers['Content-Length'])
     postVars = self.rfile.read(varLen)
-    if sys.version_info[0] == 2:
-        print "Saving file key "+key
-    elif sys.version_info[0] == 3:
-        print("Saving file key "+key)
+    print("Saving file key "+key)
     file = open('../saves/save-'+key+'.xml','w')
     file.write(postVars)
     file.close()
@@ -156,47 +153,60 @@ def saveFile(self):
     curSaveIndex += 1
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
-class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-	def do_HEAD(s):
-		s.send_response(200)
-		s.send_header("Content-type", "text/html")
-		s.end_headers()
-	def do_GET(request):
-		global pseudo_index
-		global pseudo_files
-		global PSEUDO_PATH
-		if(request.client_address[0] == "127.0.0.1"):
-			if (request.path == "/favicon.ico"):
-				send404(request)
-			elif (request.path.split('?',1)[0] == "/keygen.php"):
-				keygen(request);
-			else:
-				if (request.path == '/'):
-					request.path = '/index.html'
-				elif (request.path == '/pseudo.xml'):
-					request.path = '/'+PSEUDO_PATH + pseudo_files[pseudo_index]
-					print request.path
-					pseudo_index += 1
-					pseudo_index %= len(pseudo_files)
-				processFile(request)
-		else:
-			send404(request)
+def http_do_HEAD(s):
+    s.send_response(200)
+    s.send_header("Content-type", "text/html")
+    s.end_headers()
 
-	def do_POST(request):
-		if(request.client_address[0] == "127.0.0.1"):
-			if (request.path.rsplit('?',1)[0] == "/save" or request.path.rsplit('?',1)[0] == "/save.php"):
-				saveFile(request)
-		else:
-			send404(request)
+def http_do_GET(request):
+    if(request.client_address[0] == "127.0.0.1"):
+        if (request.path == "/favicon.ico"):
+            send404(request)
+        elif (request.path.split('?',1)[0] == "/keygen.php"):
+            keygen(request);
+        else:
+            request.path = request.path.split('?',1)[0]
+            if (request.path == '/'):
+                request.path = '/index.html'
+            elif (request.path == '/pseudo.xml'):
+                request.path = '/'+PSEUDO_PATH + pseudo_files[pseudo_index]
+                print(request.path)
+                pseudo_index += 1
+                pseudo_index %= len(pseudo_files)
+            processFile(request)
+    else:
+        send404(request)
+
+def http_do_POST(request):
+    if(request.client_address[0] == "127.0.0.1"):
+        if (request.path.rsplit('?',1)[0] == "/save" or request.path.rsplit('?',1)[0] == "/save.php"):
+            saveFile(request)
+        else:
+            send404(request)
+
 if sys.version_info[0] == 2:
+    class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+        def do_HEAD(s):
+            http_do_HEAD(s)
+        def do_GET(request):
+            http_do_GET(request)
+        def do_POST(request):
+            http_do_POST(request)
     def run(server_class=BaseHTTPServer.HTTPServer,handler_class=MyHandler):
         server_address = ('', 8000)
         httpd = server_class(server_address, handler_class)
         httpd.serve_forever()
+    run()
 elif sys.version_info[0] == 3:
+    class MyHandler(BaseHTTPRequestHandler):
+        def do_HEAD(s):
+            send404(s)
+        def do_GET(request):
+            http_do_GET(request)
+        def do_POST(request):
+            http_do_POST(request)
     def run(server_class=HTTPServer,handler_class=MyHandler):
         server_address = ('', 8000)
         httpd = server_class(server_address, handler_class)
         httpd.serve_forever()
-
-run()
+    run()
