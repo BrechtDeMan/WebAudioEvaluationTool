@@ -56,12 +56,14 @@ for file in files_list: # iterate over all files in files_list
         
         # get list of all page names
         for audioholder in root.findall("./page"):   # iterate over pages
-            page_name = audioholder.get('id')               # get page name
+            page_name = audioholder.get('ref')               # get page name
             
             if page_name is None: # ignore 'empty' audio_holders
                 print "WARNING: " + file + " contains empty audio holder. (evaluation_stats.py)"
                 break # move on to next
-            
+            if audioholder.get("state") != "complete":
+                print "WARNING" + file + " contains incomplete audio holder."
+                break
             number_of_comments = 0 # for this page
             number_of_missing_comments = 0 # for this page
             not_played = 0 # for this page

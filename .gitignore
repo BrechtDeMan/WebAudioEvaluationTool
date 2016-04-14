@@ -7,4 +7,4 @@
 *.out
 *.synctex.gz
 *.toc
-save/*.xml
+saves/*.xml

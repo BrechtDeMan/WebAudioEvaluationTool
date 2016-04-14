@@ -71,19 +71,23 @@ for file in os.listdir(folder_name):
         # ONE TIMELINE PER PAGE - make new plot per page
 
         # get list of all page names
-        for audioholder in root.findall("./audioholder"):   # iterate over pages
-            page_name = audioholder.get('id')               # get page name
+        for audioholder in root.findall("./page"):   # iterate over pages
+            page_name = audioholder.get('ref')               # get page name
             plot_empty = True                               # check if any data is plotted
             
             if page_name is None: # ignore 'empty' audio_holders
+                print "WARNING: " + file + " contains empty page. (comment_parser.py)"
                 break
-
+                
+            if audioholder.get("state") != "complete":
+                print "WARNING: " + file + "test page " + page_name + " is not complete, skipping."
+                break;
             # SORT AUDIO ELEMENTS ALPHABETICALLY
             audioelements = audioholder.findall("./audioelement")
             
             data = []
             for elem in audioelements: # from http://effbot.org/zone/element-sort.htm
-                key = elem.get("id")
+                key = elem.get("ref")
                 data.append((key, elem))
             data.sort()
             
@@ -99,7 +103,7 @@ for file in os.listdir(folder_name):
             for tuple in data:
                 audioelement = tuple[1]
                 if audioelement is not None: # Check it exists
-                    audio_id = str(audioelement.get('id'))
+                    audio_id = str(audioelement.get('ref'))
                     audioelements_names.append(audio_id)
                     
                     # for this audioelement, loop over all listen events
