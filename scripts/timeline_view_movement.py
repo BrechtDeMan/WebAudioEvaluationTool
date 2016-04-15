@@ -116,7 +116,7 @@ for file in os.listdir(folder_name):
                     
                     # get move events, initial and eventual position
                     initial_position = float(initial_position_temp.text)
-                    move_events = audioelement.findall("./metric/metricresult/[@name='elementTrackerFull']/timepos")
+                    move_events = audioelement.findall("./metric/metricresult/[@name='elementTrackerFull']/movement")
                     final_position = float(audioelement.find("./value").text)
                     
                     # get listen events
@@ -144,8 +144,8 @@ for file in os.listdir(folder_name):
                         plot_empty = False
                     
                         # get time and final position of move event
-                        new_time = float(event.find("./time").text)-time_offset
-                        new_position = float(event.find("./position").text)
+                        new_time = float(event.get("time"))-time_offset
+                        new_position = float(event.get("value"))
                         
                         # get play/stop events since last move until current move event
                         stop_times = []
