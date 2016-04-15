@@ -23,5 +23,8 @@
     "label": "Label",
     "calibration": "Perform Calibration",
     "preSilence": "Pre Silence",
-    "postSilence": "Post Silence"
+    "postSilence": "Post Silence",
+    "poolSize": "Pool Size",
+    "alwaysInclude": "Always Include",
+    "crossFade": "Cross Fade"
 }

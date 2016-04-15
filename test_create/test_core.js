@@ -1248,7 +1248,8 @@ function SpecificationToHTML()
                 value = this.default;
             }
             if (this.input.type == "checkbox") {
-                this.input.checked = value;
+                if (value == "true" || value == "True") {this.input.checked = false;}
+                else {this.input.checked = false;}
             } else {
                 this.input.value = value;
             }
