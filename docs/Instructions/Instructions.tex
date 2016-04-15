@@ -133,9 +133,10 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	\subsection{Compatibility}
 		As Microsoft Internet Explorer doesn't support the Web Audio API\footnote{\url{http://caniuse.com/\#feat=audio-api}}, you will need another browser like Google Chrome, Safari or Firefox (all three are tested and confirmed to work). 
 
-		Firefox does not currently support other bit depths than 8 or 16 bit for PCM wave files. In the future, this will throw a warning message to tell the user that their content is being quantised automatically. %Nick? Right? To be removed if and when actually implemented
+		%Firefox does not currently support other bit depths than 8 or 16 bit for PCM wave files. In the future, this will throw a warning message to tell the user that their content is being quantised automatically. %Nick? Right? To be removed if and when actually implemented
+		% REPLY: Brecht, implemented our own in WAVE.js. Firefox have said they will support all bit-depth in the future.
 		
-		The tool is platform-independent and works in any browser that supports the Web Audio API. It does not require any specific, proprietary software. However, in case the tool is hosted locally (i.e. you are not hosting it on an actual webserver) you will need Python (2.7), which is a free programming language - see the next paragraph. 
+		The tool is platform-independent and works in any browser that supports the Web Audio API. It does not require any specific, proprietary software. However, in case the tool is hosted locally (i.e. you are not hosting it on an actual webserver) you will need Python (2.7 or 3.x), which is a free programming language - see the next paragraph.
 	
 \clearpage
 
@@ -145,10 +146,11 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	\begin{itemize} % WIP
 		\item Download the tool (see Section~\ref{sec:installation})
 		\item Copy the tool to a PHP-enabled web server if you have access to one. 
-		\item Go to \path{test\_create.html} and configure your test.
-		\item Your test will be live at \path{[web server address]/index.html?url=[testname].xml}. If you are not using a web server, you can simulate one locally by running 
+		\item Go to \path{test_create.html} and configure your test.
+		\item Save your test file in the folder \path{.\tests\}.
+		\item Your test will be live at \path{[web server address]/index.html?url=tests/[testname].xml}. If you are not using a web server, you can simulate one locally by running 
 		\path{scripts/pythonServer.py} (requires Python), after which you can access the test at \\ % hack
-		\path{http://localhost:8000/index.html?url=[testname].xml}
+		\path{http://localhost:8000/index.html?url=tests/[testname].xml}
 	\end{itemize}
 
 \clearpage
@@ -177,7 +179,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 		
 		\subsubsection{Windows}
 			To change the sample rate in Windows, right-click on the speaker icon in the lower-right corner of your desktop and choose `Playback devices'. Right-click the appropriate playback device and click `Properties'. Click the `Advanced' tab and verify or change the sample rate under `Default Format'.    % NEEDS CONFIRMATION
-			If you are using an external audio interface, you may have to go to the preference pane of that device to change the sample rate. 
+			If you are using an external audio interface, you may have to go to the preference pane of that device to change the sample rate.
 
 	\subsection{Local test}
 		If the test is hosted locally, you will need to run the local webserver provided with this tool. 
@@ -186,13 +188,13 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 
 			On Mac OS X, Python comes preinstalled, as with most Unix/Linux distributions.
 
-			Open the Terminal (find it in \textbf{Applications/Terminal} or via Spotlight), and go to the folder you downloaded. To do this, type \texttt{cd [folder]}, where \texttt{[folder]} is the folder where to find the \texttt{pythonServer.py} script you downloaded. For instance, if the location is \texttt{/Users/John/Documents/test/}, then type
+			Open the Terminal (find it in \textbf{Applications/Terminal} or via Spotlight), and go to the folder you downloaded. To do this, type \texttt{cd [folder]}, where \texttt{[folder]} is the folder where to find the \texttt{pythonServer.py} script you downloaded. For instance, if the location is \texttt{/Users/John/Documents/WebAudioEvaluationToolbox/}, then type
 			
-				\texttt{cd /Users/John/Documents/test/}
+				\texttt{cd /Users/John/Documents/WebAudioEvaluationToolbox/}
 				
 			Then hit enter and run the Python script by typing
 
-				\texttt{python pythonServer.py}
+				\texttt{python scripts/pythonServer.py}
 
 			and hit enter again. See also Figure \ref{fig:terminal}.
 			
@@ -207,6 +209,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	        Alternatively, you can simply type \texttt{python} (follwed by a space) and drag the file into the Terminal window from Finder. % DOESN'T WORK YET
 			
 			You can leave this running throughout the different experiments (i.e. leave the Terminal open). Once running the terminal will report the current URL to type into your browser to initiate the test, usually this is http://localhost:8000/.
+			On OSX 10.10 or newer, you may get a dialogue asking if Python can accept incomming connections, click yes.
 
 			To start the test, open the browser and type 
 				
@@ -218,9 +221,9 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 
 		\subsubsection{Windows}
 
-			On Windows, Python 2.7 is not generally preinstalled and therefore has to be downloaded\footnote{\url{https://www.python.org/downloads/windows/}} and installed to be able to run scripts such as the local webserver, necessary if the tool is hosted locally. 
+			On Windows, Python is not generally preinstalled and therefore has to be downloaded\footnote{\url{https://www.python.org/downloads/windows/}} and installed to be able to run scripts such as the local webserver, necessary if the tool is hosted locally. 
 		
-			Simply double click the Python script \texttt{pythonServer.py} in the folder you downloaded. 
+			Once installed, simply double click the Python script \texttt{pythonServer.py} in the folder you downloaded.
 			
 			You may see a warning like the one in Figure \ref{fig:warning}. Click `Allow access'. 
 			
@@ -258,24 +261,26 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	        \end{center}
 	        \end{figure}
                     
-        If at any point in the test the participant reports weird behaviour or an error of some kind, or the test needs to be interrupted, please notify the experimenter and/or refer to Section~\ref{sec:troubleshooting}. 
+        If at any point in the test the participant reports weird behaviour or an error of some kind, or the test needs to be interrupted, please notify the experimenter and/or refer to Section~\ref{sec:troubleshooting}.
 		
 		When the test is over (the subject should see a message to that effect, and click `Submit' one last time), the output XML file containing all collected data should have appeared in `saves/'. The names of these files are `test-0.xml', `test-1.xml', etc., in ascending order. The Terminal or Command prompt running the local web server will display the following file name. If such a file did not appear, please again refer to Section~\ref{sec:troubleshooting}. 
 		
 		It is advised that you back up these results as often as possible, as a loss of this data means that the time and effort spent by the subject(s) has been in vain. Save the results to an external or network drive, and/or send them to the experimenter regularly. 
 		
-		To start the test again for a new participant, you do not need to close the browser or shut down the Terminal or Command Prompt. Simply refresh the page or go to \texttt{localhost:8000} again. 
+		To start the test again for a new participant, you do not need to close the browser or shut down the Terminal or Command Prompt. Simply refresh the page or go to \texttt{localhost:8000} again, a new session will be created.
 		
 
 	\subsection{Remote test}
-		Put all files on a web server which supports PHP. This allows the `save.php' script to store the XML result files in the `saves/' folder. If the web server is not able to store the XML file there at the end of the test, it will present the XML file locally to the user, as a `Save file' link. 
+		Put all files on a web server which supports PHP. This allows the `save.php' script to store the XML result files in the `saves/' folder. If the web server is not able to store the XML file there at the end of the test, it will present the XML file locally to the user, as a `Save file' link.
+		
+		Ensure that the \path{saves/} directory has public read-write access. On most linux servers this can be achieved using the command \texttt{sudo chmod 777 ./saves}.
 
 		Make sure the \texttt{projectReturn} attribute of the \texttt{setup} node is set to the \texttt{save.php} script. 
 
-		Then, just go to the URL of the corresponding HTML file, e.g. \texttt{http://server.com/path/to/WAET/index.html?url=test/my-test.xml}. If storing on the server doesn't work at submission (e.g. if the \texttt{projectReturn} attribute isn't properly set), the result XML file will be presented to the subject on the client side, as a `Save file' link. 
+		Then, just go to the URL of the corresponding HTML file, e.g. \texttt{http://server.com/path/to/WAET/index.html?url=test/my-test.xml}. If storing on the server doesn't work at submission (e.g. if the \texttt{projectReturn} attribute isn't properly set or PHP does not have the correct permissions), the result XML file will be presented to the subject on the client side, as a `Save file' link. 
 
     \subsection{Load a test / Multiple test documents}
-        By default the index page will load a demo page of tests. To automatically load a test document, you need to append the location in the URL. If your URL is normally http://localhost:8000/index.html you would append the following: \texttt{?url=/path/to/your/test.xml}. Replace the fields with your actual path, the path is local to the running directory, so if you have your test in the directory \texttt{example\_eval} called \texttt{project.xml} you would append \texttt{?url=/example\_eval/project.xml}.
+        By default the index page will load an empty page. To automatically load a test document, you need to append the location in the URL. If your URL is normally http://localhost:8000/index.html you would append the following: \texttt{?url=/path/to/your/test.xml}. Replace the fields with your actual path, the path is local to the running directory, so if you have your test in the directory \texttt{example\_eval} called \texttt{project.xml} you would append \texttt{?url=/example\_eval/project.xml}.
 
 \clearpage
 
@@ -342,7 +347,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 			Any further files can be loaded here as well, such as css styling files. jQuery is already included.
 
 		\subsubsection{Building the Interface}
-			Your interface file will get loaded automatically when the `interface' attribute of the setup node matches the string in the `loadProjectSpecCallback' function. The following functions must be defined in your interface file.
+			Your interface file will get loaded automatically when the `interface' attribute of the setup node matches the string in the `loadProjectSpecCallback' function. The following functions must be defined in your interface file. A template file is provided in \path{interfaces\blank.js}.	
 			\begin{itemize}
 				\item \texttt{loadInterface} - Called once when the document is parsed. This creates any necessary bindings, such as to the metric collection classes and any check commands. Here you can also start the structure for your test such as placing in any common nodes (such as the title and empty divs to drop content into later).
 				\item \texttt{loadTest(audioHolderObject)} - Called for each page load. The audioHolderObject contains a specification node holding effectively one of the audioHolder nodes.
@@ -370,17 +375,17 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 
 \section{Project XML}
 
-    Each test is defined by its project XML file, examples of these can be seen in the ./example\_eval/ directory.
+    Each test is defined by its project XML file, examples of these can be seen in the ./tests/examplesl/ directory.
     
     In the XML there are several nodes which must be defined:
 	\begin{itemize}
 	    \item \texttt{<waet>}: The root node.
 	    \item \texttt{<setup>}: The first child node, defines whole-test parameters
-	    \item \texttt{<page>}: Specifies a test page, attached \emph{after} the \texttt{<setup>}.
+	    \item \texttt{<page>}: Specifies a test page, attached \emph{after} the \texttt{<setup>} nodes.
 	    \item \texttt{<audioelement>}: Specifies an audio element.
 	\end{itemize}
 
-    The test uses XML validation, so the ordering of nodes is important to pass this validation. Some nodes also have specific attributes which must be set and may even have a certain format to apply them. This is done so error checking can be performed both quickly and succintly with easy to find errors before loading and running a test session.
+    The test uses XML validation, so the ordering of nodes is important to pass this validation. Some nodes also have specific attributes which must be set and may even have a certain format to apply them. This is done so error checking can be performed to catch easy to find errors before loading and running a test session. If your project XML fails this validation, all the errors will be listed.
     
     Before identifying any features, this part will walk you through the available nodes, their function and their attributes.
     
@@ -399,9 +404,13 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
             \item \texttt{interface}: String, mandatory, specifies the interface to load
             \item \texttt{projectReturn}: URL, mandatory, specifies the return point. Can be a 3rd party server or the local server. Set to null to disable automatic saving. Specifying ``save.php'' will trigger the return if either the PHP or python servers are used. On error, it will always default to presenting the save on page.
             \item \texttt{randomiseOrder}: Boolean, optional, if true it will randomise the order of the test pages. Default is false.
-            \item \texttt{testPages}: non-negative integer, optional. Specifies the number of test pages to actually test with. Combined with randomiseOrder being true will give a random set of test pages per participant from the given pool of \texttt{<page>} nodes. Specifying 0 disables this option, default is 0.
+            \item \texttt{poolSize}: non-negative integer, optional. Specifies the number of test pages to actually test with. Combined with randomiseOrder being true will give a random set of test pages per participant from the given pool of \texttt{<page>} nodes. Specifying 0 disables this option, default is 0.
             \item \texttt{loudness}: non-positive integer, optional. Set the default LUFS target value. See Section~\ref{sec:loudness} for more.
             \item \texttt{sampleRate}: positive integer, optional. If set, the sample rate reported by the Web Audio API must match this number. See Section~\ref{sec:samplerate}.
+            \item \texttt{calibration}: boolean, optional. If true, a simple hearing test is presented to user to gather system frequency response (DAC, listening device and subject hearing). Default is false.
+            \item \texttt{crossFade}: decimal greater than or equal to 0.0, optional. Define the crossFade between fragments when clicked in seconds. Default is 0.0s.
+            \item \texttt{preSilence}: decimal greater than or equal to 0.0, optional. Add a portion of silence to all elements in the test at the beginning of the buffer in seconds. Default is 0.0s
+            \item \texttt{postSilence}: decimal greater than or equal to 0.0, optional. Add a portion of silence to all elements in the test at the end of the buffer in seconds. Default is 0.0s
         \end{itemize}
         
         The \texttt{<setup>} node takes the following child nodes, note these must appear in this order:
@@ -422,6 +431,19 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
             \item \texttt{loop}: Boolean, optional. If true, the audio elements will loop synchronously with each other. See \ref{sec:looping}. Default is false.
             \item \texttt{showElementComments}: Boolean, optional. If true then there will be a comment box on the test page for each audio element presented, see Section~\ref{sec:commentboxes}.
             \item \texttt{loudness}: non-positive integer, optional. Set the LUFS target value for this page. Supersedes the \texttt{<setup>} loudness attribute for this page. See Section~\ref{sec:loudness} for more.
+            \item \texttt{label}: enumeration, optional. Set the label to one of the following
+            \begin{itemize}
+            	\item \texttt{default}: The default by the interface (Default if undefined)
+            	\item \texttt{none}: Show no labels
+            	\item \texttt{number}: Show natural numbers starting at index 1
+            	\item \texttt{letter}: Show letters starting at 'a'
+            	\item \texttt{capital}: Show letters starting at 'A'
+            \end{itemize}
+            \item \texttt{poolSize}: non-negative integer, optional. Determine the number of \texttt{<audioelement>} nodes to take from those defined. For instance if \texttt{poolSize=3} and there are 4 audio elements, only 3 will actually be loaded and presented to the user.
+            \item \texttt{alwaysInclude}: boolean, optional. If the parent \texttt{<setup>} node has poolSize set, you can enforce the page to always be selected by setting alwaysInclude to true. Default is false
+             \item \texttt{preSilence}: decimal greater than or equal to 0.0, optional. Add a portion of silence to all elements in the page at the beginning of the buffer in seconds. Supercedes any value set in \texttt{<setup>}. Default is 0.0s
+            \item \texttt{postSilence}: decimal greater than or equal to 0.0, optional. Add a portion of silence to all elements in the test at the end of the buffer in seconds. Supercedes any value set in \texttt{<setup>}. Default is 0.0s
+            
         \end{itemize}
         
         The \texttt{<page>} node takes the following child, nodes note these must appear in this order:
@@ -472,10 +494,15 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	    Appear as children of the \texttt{page} node. Each of these specify an individual interface fragment to display. Multiple fragments can reference the same file (allowing for repetition with different parameters or blind-doubles). The node has the following attributes:
 	    \begin{itemize}
 	        \item \texttt{id}: ID, mandatory. Must be unique across the test page. Used to identify the specific fragment in the results.
+	        \item \texttt{name}: String, optional. If you wish to group fragment across pages when performing result analysis, set the group name here.
 	        \item \texttt{url}: URL, mandatory. Used with the parent \texttt{page} nodes' \texttt{hostURL} attribute to get the full url of the audio file to load.
 	        \item \texttt{gain}: Float, optional. Specify the gain in decibels to apply to the node after loudness normalisation. Default is 0.
 	        \item \texttt{type}: String, optional. Must be one of the following: normal (default when not specified), anchor, reference or outside-reference. Normal, anchor and reference are presented as normal, outside-reference presents the node as a separate interface option.
 	        \item \texttt{marker}: Integer between 0 and 100, optional. Only used when \texttt{type="anchor"|"reference"}. See Section~\ref{sec:referencesandanchors}.
+	        \item \texttt{loudness}: Set the loudness of this element in LUFS. Supercedes all other set values. See Section~\ref{sec:loudness}.
+	        \item \texttt{alwaysInclude}: boolean, optional. If the parent \texttt{<page>} node has poolSize set, you can enforce the element to always be selected by setting alwaysInclude to true. Default is false
+             \item \texttt{preSilence}: decimal greater than or equal to 0.0, optional. Add a portion of silence to all elements in the page at the beginning of the buffer in seconds. Supercedes any other value. Default is 0.0s
+            \item \texttt{postSilence}: decimal greater than or equal to 0.0, optional. Add a portion of silence to all elements in the test at the end of the buffer in seconds. Supercedes any other value. Default is 0.0s
 	    \end{itemize}
 
 \clearpage
