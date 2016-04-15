@@ -35,7 +35,7 @@
 					searchQueries[i] = searchQueries[i].split('=');
 					if (searchQueries[i][0] == "url")
 					{
-						url = searchQueries[i][1];
+						url = decodeURI(searchQueries[i][1]);
 					}
 				}
 				loadProjectSpec(url);
