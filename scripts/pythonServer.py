@@ -162,7 +162,7 @@ def http_do_GET(request):
     if(request.client_address[0] == "127.0.0.1"):
         if (request.path == "/favicon.ico"):
             send404(request)
-        elif (request.path.split('?',1)[0] == "/keygen.php"):
+        elif (request.path.split('?',1)[0] == "/php/keygen.php"):
             keygen(request);
         else:
             request.path = request.path.split('?',1)[0]
@@ -179,7 +179,7 @@ def http_do_GET(request):
 
 def http_do_POST(request):
     if(request.client_address[0] == "127.0.0.1"):
-        if (request.path.rsplit('?',1)[0] == "/save" or request.path.rsplit('?',1)[0] == "/save.php"):
+        if (request.path.rsplit('?',1)[0] == "/save" or request.path.rsplit('?',1)[0] == "/php/save.php"):
             saveFile(request)
         else:
             send404(request)
