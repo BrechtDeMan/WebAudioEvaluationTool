@@ -16,6 +16,7 @@
 \usepackage{cite}
 \usepackage{hyperref}				% Hyperlinks
 \usepackage[nottoc,numbib]{tocbibind}	% 'References' in TOC
+\usepackage{url}
 
 \graphicspath{{img/}}					% Relative path where the images are stored. 
 
@@ -40,7 +41,8 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 \clearpage
 
 \section{Installation}
-	Download the folder (\url{https://code.soundsoftware.ac.uk/hg/webaudioevaluationtool/archive/tip.zip}) and unzip in a location of your choice, or pull the source code from \url{https://code.soundsoftware.ac.uk/hg/webaudioevaluationtool} (Mercurial). 
+	\label{sec:installation}
+	Download the folder (\url{https://code.soundsoftware.ac.uk/hg/webaudioevaluationtool/archive/tip.zip}) and unzip in a location of your choice, or pull the source code from \url{https://github.com/BrechtDeMan/WebAudioEvaluationTool.git} (git) or \url{https://code.soundsoftware.ac.uk/hg/webaudioevaluationtool} (Mercurial). 
 	
 	\subsection{Contents}
 		The folder should contain the following elements: \\
@@ -137,6 +139,19 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	
 \clearpage
 
+\section{Quick start}
+	This document aims to provide an overview of all features and how to use them. However, if you are just trying out this tool, or you need to put together a test very quickly, or you simply don't want to read through all the details first, this section gives you the bare necessities to put together a simple listening test very quickly. 
+
+	\begin{itemize} % WIP
+		\item Download the tool (see Section~\ref{sec:installation})
+		\item Copy the tool to a PHP-enabled web server if you have access to one. 
+		\item Go to \path{test\_create.html} and configure your test.
+		\item Your test will be live at \path{[web server address]/index.html?url=[testname].xml}. If you are not using a web server, you can simulate one locally by running 
+		\path{scripts/pythonServer.py} (requires Python), after which you can access the test at \\ % hack
+		\path{http://localhost:8000/index.html?url=[testname].xml}
+	\end{itemize}
+
+\clearpage
 
 \section{Test setup} % TO DO: Linux (Android, iOS)
 
@@ -813,7 +828,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	\begin{description}
 		\item[Subject] The word we use for a participant, user, ... of the test, i.e. not the experimenter who designs the test but the person who evaluates the audio under test as part of an experiment (or the preparation of one). 
 		\item[User] The person who uses the tool to configure, run and analyse the test - i.e. the experimenter, most likely a researcher - or at least 
-		\item[Page] A screen in a test; corresponds with an \texttt{audioholder}
+		\item[Page] A screen in a test
 		\item[Fragment] An element, stimulus or sample in a test; corresponds with an \texttt{audioelement}
 		\item[Test] A complete test which can consist of several pages; corresponds with an entire configuration XML file
 		\item[Configuration XML file] The XML file containing the necessary information on interface, samples, survey questions, configurations, ... which the JavaScript modules read to produce the desired test.
