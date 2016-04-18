@@ -1585,6 +1585,27 @@ function SpecificationToHTML()
             this.buttonDOM = obj.buttonsDOM;
             this.HTMLPoint = parent;
             this.rootDOM.removeChild(this.attributeDOM);
+            if (parent.id != "setup") {
+                // Put in the <title> node:
+                this.titleNode = {
+                    root: document.createElement("div"),
+                    label: document.createElement("span"),
+                    input: document.createElement("input"),
+                    parent: this,
+                    handleEvent: function(event) {
+                        this.parent.specification.title = event.currentTarget.value;
+                    }
+                }
+                this.titleNode.label.textContent = "Axis Title:";
+                this.titleNode.root.className = "node-children";
+                this.titleNode.root.appendChild(this.titleNode.label);
+                this.titleNode.root.appendChild(this.titleNode.input);
+                this.titleNode.input.addEventListener("change",this.titleNode,false);
+                this.titleNode.input.value = this.specification.title;
+                this.children.push(this.titleNode);
+                this.childrenDOM.appendChild(this.titleNode.root);
+            }
+            
             // Put in the check / show options as individual children
             var checks = this.parent.createGeneralNodeDOM("Checks","setup-interface-checks",this);
 
