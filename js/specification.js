@@ -370,6 +370,11 @@ function Specification() {
 			var node = doc.createElement("interface");
             if (typeof name == "string")
                 node.setAttribute("name",this.name);
+            if (typeof this.title == "string") {
+                var titleNode = doc.createElement("title");
+                titleNode.textContent = this.title;
+                node.appendChild(titleNode);
+            }
             for (var option of this.options)
             {
                 var child = doc.createElement("interfaceoption");
