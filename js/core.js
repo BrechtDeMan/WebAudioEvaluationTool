@@ -1174,6 +1174,8 @@ function AudioEngine(specification) {
                 } else {
                     audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
                         bufferObj.buffer = decodedData;
+                        bufferObj.status = 2;
+                        calculateLoudness(bufferObj,"I");
                     }, function(e){
                         // Should only be called if there was an error, but sometimes gets called continuously
                         // Check here if the error is genuine
