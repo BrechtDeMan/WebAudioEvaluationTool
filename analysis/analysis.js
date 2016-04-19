@@ -774,7 +774,14 @@ var interfaceContext = new function() {
                     break;
             }
         }
-        for (var survey_entry of specification.preTest.options.concat(specification.postTest.options)) {
+        var options = [];
+        if(specification.preTest) {
+            options = options.concat(specification.preTest.options);
+        }
+        if (specification.postTest) {
+            options = options.concat(specification.postTest.options);
+        }
+        for (var survey_entry of options) {
             switch(survey_entry.type) {
                 case "number":
                 case "radio":
