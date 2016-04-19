@@ -107,20 +107,25 @@ function Specification() {
 		for (var i in survey) {
 			if (isNaN(Number(i)) == true){break;}
 			var location = survey[i].getAttribute('location');
-			if (location == 'pre' || location == 'before')
-			{
-				if (this.preTest != null){this.errors.push("Already a pre/before test survey defined! Ignoring second!!");}
-				else {
-					this.preTest = new this.surveyNode(this);
-					this.preTest.decode(this,survey[i]);
-				}
-			} else if (location == 'post' || location == 'after') {
-				if (this.postTest != null){this.errors.push("Already a post/after test survey defined! Ignoring second!!");}
-				else {
-					this.postTest = new this.surveyNode(this);
-					this.postTest.decode(this,survey[i]);
-				}
-			}
+            switch(location)
+            {
+                case 'pre':
+                case 'before':
+                    if (this.preTest != null){console.log("Already a pre/before test survey defined! Ignoring second!!");}
+                    else {
+                        this.preTest = new this.surveyNode(this);
+                        this.preTest.decode(this,survey[i]);
+                    }
+                    break;
+                case 'post':
+                case 'after':
+                    if (this.postTest != null){console.log("Already a post/after test survey defined! Ignoring second!!");}
+                    else {
+                        this.postTest = new this.surveyNode(this);
+                        this.postTest.decode(this,survey[i]);
+                    }
+                    break;
+            }
 		}
 		
 		var interfaceNode = setupNode.getElementsByTagName('interface');
@@ -294,6 +299,10 @@ function Specification() {
 				node.decode(parent,xml.children[i]);
 				this.options.push(node);
 			}
+            if (this.options.length == 0) {
+                console.log("Empty survey node");
+                console.log(this);
+            }
 		};
 		this.encode = function(doc) {
 			var node = doc.createElement('survey');
