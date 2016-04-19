@@ -356,11 +356,11 @@ function Specification() {
 			var scaleParent = xml.getElementsByTagName('scales');
 			if (scaleParent.length == 1) {
 				scaleParent = scaleParent[0];
-				for (var i=0; i<scaleParent.children.length; i++) {
-					var child = scaleParent.children[i];
+                var scalelabels = scaleParent.getAllElementsByTagName('scalelabel');
+				for (var i=0; i<scalelabels.length; i++) {
 					this.scales.push({
-						text: child.textContent,
-						position: Number(child.getAttribute('position'))
+						text: scalelabels[i].textContent,
+						position: Number(scalelabels[i].getAttribute('position'))
 					});
 				}
 			}
