@@ -2691,7 +2691,7 @@ function Interface(specificationObject) {
 			if (passed == false)
 			{
 				check_pass = false;
-				console.log("Continue listening to track-"+object.interfaceDOM.getPresentedId()+1);
+				console.log("Continue listening to track-"+object.interfaceDOM.getPresentedId());
 				error_obj.push(object.interfaceDOM.getPresentedId());
 			}
 		}
@@ -2720,7 +2720,7 @@ function Interface(specificationObject) {
 		{
 			if(ao.metric.wasMoved == false && ao.interfaceDOM.canMove() == true)
 			{
-				failed.push(ao.interfaceDOM.getPresentedId()+1);
+				failed.push(ao.interfaceDOM.getPresentedId());
 			}
 		}
 		if (failed.length == 0)
@@ -2751,7 +2751,7 @@ function Interface(specificationObject) {
 		{
 			if(ao.metric.wasListenedTo == false)
 			{
-				failed.push(ao.interfaceDOM.getPresentedId()+1);
+				failed.push(ao.interfaceDOM.getPresentedId());
 			}
 		}
 		if (failed.length == 0)
