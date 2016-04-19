@@ -192,7 +192,7 @@ function loadProjectSpecCallback(response) {
 		document.getElementsByTagName('body')[0].appendChild(errorNode[0]);
 		return;
 	}
-    if (responseDocument == undefined) {
+    if (responseDocument == undefined || responseDocument.firstChild == undefined) {
         var msg = document.createElement("h3");
 		msg.textContent = "FATAL ERROR";
 		var span = document.createElement("span");
@@ -202,7 +202,7 @@ function loadProjectSpecCallback(response) {
 		document.getElementsByTagName('body')[0].appendChild(span);
 		return;
     }
-    if (responseDocument.children[0].nodeName == "waet") {
+    if (responseDocument.firstChild.nodeName == "waet") {
         // document is a specification
         
         // Perform XML schema validation
@@ -238,7 +238,7 @@ function loadProjectSpecCallback(response) {
         // Generate the session-key
         storage.initialise();
         
-    } else if (responseDocument.children[0].nodeName == "waetresult") {
+    } else if (responseDocument.firstChild.nodeName == "waetresult") {
         // document is a result
         projectXML = document.implementation.createDocument(null,"waet");
         projectXML.children[0].appendChild(responseDocument.getElementsByTagName('waet')[0].getElementsByTagName("setup")[0].cloneNode(true));
