@@ -14,19 +14,19 @@ assert len(sys.argv)<3, "timeline_view takes at most 1 command line argument\n"+
 # XML results files location
 if len(sys.argv) == 1:
     folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
-    print "Use: python timeline_view.py [XML_files_location]"
-    print "Using default path: " + folder_name
+    print("Use: python timeline_view.py [XML_files_location]")
+    print("Using default path: " + folder_name)
 elif len(sys.argv) == 2:
     folder_name = sys.argv[1]   # First command line argument is folder
 
 # check if folder_name exists
 if not os.path.exists(folder_name):
     #the file is not there
-    print "Folder '"+folder_name+"' does not exist."
+    print("Folder '"+folder_name+"' does not exist.")
     sys.exit() # terminate script execution
 elif not os.access(os.path.dirname(folder_name), os.W_OK):
     #the file does exist but write privileges are not given
-    print "No write privileges in folder '"+folder_name+"'."
+    print("No write privileges in folder '"+folder_name+"'.")
 
 
 # CONFIGURATION 
@@ -76,11 +76,11 @@ for file in os.listdir(folder_name):
             plot_empty = True                               # check if any data is plotted
             
             if page_name is None: # ignore 'empty' audio_holders
-                print "WARNING: " + file + " contains empty page. (comment_parser.py)"
+                print("WARNING: " + file + " contains empty page. (comment_parser.py)")
                 break
                 
             if audioholder.get("state") != "complete":
-                print "WARNING: " + file + "test page " + page_name + " is not complete, skipping."
+                print("WARNING: " + file + "test page " + page_name + " is not complete, skipping.")
                 break;
             # SORT AUDIO ELEMENTS ALPHABETICALLY
             audioelements = audioholder.findall("./audioelement")

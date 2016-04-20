@@ -15,19 +15,19 @@ assert len(sys.argv)<3, "timeline_view_movement takes at most 1 command line arg
 # XML results files location
 if len(sys.argv) == 1:
     folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
-    print "Use: python timeline_view_movement.py [XML_files_location]"
-    print "Using default path: " + folder_name
+    print("Use: python timeline_view_movement.py [XML_files_location]")
+    print("Using default path: " + folder_name)
 elif len(sys.argv) == 2:
     folder_name = sys.argv[1]   # First command line argument is folder
 
 # check if folder_name exists
 if not os.path.exists(folder_name):
     #the file is not there
-    print "Folder '"+folder_name+"' does not exist."
+    print("Folder '"+folder_name+"' does not exist.")
     sys.exit() # terminate script execution
 elif not os.access(os.path.dirname(folder_name), os.W_OK):
     #the file does exist but write privileges are not given
-    print "No write privileges in folder '"+folder_name+"'."
+    print("No write privileges in folder '"+folder_name+"'.")
 
 
 # CONFIGURATION 
@@ -72,7 +72,7 @@ for file in os.listdir(folder_name):
             plot_empty = True                               # check if any data is plotted
             
             if page_name is None: # ignore 'empty' audio_holders
-                print "Skipping empty page name from "+subject_id+"."
+                print("Skipping empty page name from "+subject_id+".")
                 break
                 
             # subtract total page length from subsequent page event times
@@ -80,7 +80,7 @@ for file in os.listdir(folder_name):
             if page_time_temp is not None: 
                 page_time = float(page_time_temp.text)
             else: 
-                print "Skipping page without total time specified from "+subject_id+"."
+                print("Skipping page without total time specified from "+subject_id+".")
                 break
 
             # get audioelements
@@ -111,7 +111,7 @@ for file in os.listdir(folder_name):
                     # break if no initial position or move events registered
                     initial_position_temp = audioelement.find("./metric/metricResult/[@name='elementInitialPosition']")
                     if initial_position_temp is None:
-                        print "Skipping "+page_name+" from "+subject_id+": does not have initial positions specified."
+                        print("Skipping "+page_name+" from "+subject_id+": does not have initial positions specified.")
                         break
                     
                     # get move events, initial and eventual position
