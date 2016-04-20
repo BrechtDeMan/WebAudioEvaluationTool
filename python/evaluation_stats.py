@@ -13,8 +13,8 @@ assert len(sys.argv)<3, "evaluation_stats takes at most 1 command line argument\
 # XML results files location
 if len(sys.argv) == 1:
     folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
-    print "Use: python evaluation_stats.py [results_folder]"
-    print "Using default path: " + folder_name
+    print("Use: python evaluation_stats.py [results_folder]")
+    print("Using default path: " + folder_name)
 elif len(sys.argv) == 2:
     folder_name = sys.argv[1]   # First command line argument is folder
 
@@ -48,35 +48,35 @@ for file in files_list: # iterate over all files in files_list
         tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
         
-        print file # print file name (subject name)
+        print(file) # print file name (subject name)
         
         # reset for new subject
         total_duration = 0
         page_number = 0
         
         # get list of all page names
-        for audioholder in root.findall("./page"):   # iterate over pages
-            page_name = audioholder.get('ref')               # get page name
+        for page in root.findall("./page"):   # iterate over pages
+            page_name = page.get('ref')               # get page name
             
             if page_name is None: # ignore 'empty' audio_holders
-                print "WARNING: " + file + " contains empty audio holder. (evaluation_stats.py)"
+                print("\tWARNING: " + file + " contains empty audio holder. (evaluation_stats.py)")
                 break # move on to next
-            if audioholder.get("state") != "complete":
-                print "WARNING" + file + " contains incomplete audio holder."
+            if page.get("state") != "complete":
+                print("\tWARNING: " + file + " contains incomplete audio holder.")
                 break
             number_of_comments = 0 # for this page
             number_of_missing_comments = 0 # for this page
             not_played = 0 # for this page
             not_moved = 0 # for this page
             
-            # 'testTime' keeps total duration: subtract time so far for duration of this audioholder
-            duration = float(audioholder.find("./metric/metricresult[@id='testTime']").text) - total_duration
+            # 'testTime' keeps total duration: subtract time so far for duration of this page
+            duration = float(page.find("./metric/metricresult[@id='testTime']").text) - total_duration
             
             # total duration of test
             total_duration += duration
             
             # number of audio elements
-            audioelements = audioholder.findall("./audioelement") # get audioelements
+            audioelements = page.findall("./audioelement") # get audioelements
             number_of_fragments += len(audioelements) # add length of this list to total
             
             # number of comments (interesting if comments not mandatory)
@@ -99,22 +99,22 @@ for file in files_list: # iterate over all files in files_list
             total_not_played += not_played
             total_not_moved += not_moved
             
-            # print audioholder id and duration
-            print "    " + page_name + ": " + seconds2timestr(duration) + ", "\
+            # print page id and duration
+            print("    " + page_name + ": " + seconds2timestr(duration) + ", "\
                   + str(number_of_comments)+"/"\
-                  +str(number_of_comments+number_of_missing_comments)+" comments"
+                  +str(number_of_comments+number_of_missing_comments)+" comments")
             
             # number of audio elements not played
             if not_played > 1:
-                print 'ATTENTION: '+str(not_played)+' fragments were not listened to!'
+                print('ATTENTION: '+str(not_played)+' fragments were not listened to!')
             if not_played == 1: 
-                print 'ATTENTION: one fragment was not listened to!'
+                print('ATTENTION: one fragment was not listened to!')
             
             # number of audio element markers not moved
             if not_moved > 1:
-                print 'ATTENTION: '+str(not_moved)+' markers were not moved!'
+                print('ATTENTION: '+str(not_moved)+' markers were not moved!')
             if not_moved == 1: 
-                print 'ATTENTION: one marker was not moved!'
+                print('ATTENTION: one marker was not moved!')
             
             # keep track of duration in function of page index
             if len(duration_order)>page_number:
@@ -122,9 +122,9 @@ for file in files_list: # iterate over all files in files_list
             else:
                 duration_order.append([duration])
                 
-            # keep list of audioholder ids and count how many times each audioholder id
+            # keep list of page ids and count how many times each page id
             # was tested, how long it took, and how many fragments there were (if number of 
-            # fragments is different, store as different audioholder id)
+            # fragments is different, store as different page id)
             if page_name in page_names: 
                 page_index = page_names.index(page_name) # get index
                 # check if number of audioelements the same
@@ -154,35 +154,28 @@ for file in files_list: # iterate over all files in files_list
             time_per_page_accum += duration # total duration (for average time spent per page)
 
         # print total duration of this test
-        print "    TOTAL: " + seconds2timestr(total_duration)
+        print("    TOTAL: " + seconds2timestr(total_duration))
 
 
 # PRINT EVERYTHING
 
-print "Number of XML files: " + str(number_of_XML_files)
-print "Number of pages: " + str(number_of_pages)
-print "Number of fragments: " + str(number_of_fragments)
-print "Number of empty comments: " + str(total_empty_comments) +\
-      " (" + str(round(100.0*total_empty_comments/number_of_fragments,2)) + "%)"
-print "Number of unplayed fragments: " + str(total_not_played) +\
-      " (" + str(round(100.0*total_not_played/number_of_fragments,2)) + "%)"
-print "Number of unmoved markers: " + str(total_not_moved) +\
-      " (" + str(round(100.0*total_not_moved/number_of_fragments,2)) + "%)"
-print "Average time per page: " + seconds2timestr(time_per_page_accum/number_of_pages)
-
-# Pages and number of times tested
-page_count_strings = list(str(x) for x in page_count)
-count_list = page_names + page_count_strings
-count_list[::2] = page_names
-count_list[1::2] = page_count_strings
-print "Pages tested: " + str(count_list)
+print("Number of XML files: " + str(number_of_XML_files))
+print("Number of pages: " + str(number_of_pages))
+print("Number of fragments: " + str(number_of_fragments))
+print("Number of empty comments: " + str(total_empty_comments) +\
+      " (" + str(round(100.0*total_empty_comments/number_of_fragments,2)) + "%)")
+print("Number of unplayed fragments: " + str(total_not_played) +\
+      " (" + str(round(100.0*total_not_played/number_of_fragments,2)) + "%)")
+print("Number of unmoved markers: " + str(total_not_moved) +\
+      " (" + str(round(100.0*total_not_moved/number_of_fragments,2)) + "%)")
+print("Average time per page: " + seconds2timestr(time_per_page_accum/number_of_pages))
 
 # Average duration for first, second, ... page
-print "Average duration per page:"
+print("Average duration per ordered page:")
 for page_number in range(len(duration_order)): 
-    print "        page " + str(page_number+1) + ": " +\
+    print("        page " + str(page_number+1) + ": " +\
         seconds2timestr(sum(duration_order[page_number])/len(duration_order[page_number])) +\
-            " ("+str(len(duration_order[page_number]))+" subjects)"
+            " ("+str(len(duration_order[page_number]))+" subjects)")
 
 
 # Sort pages by number of audioelements, then by duration
@@ -199,12 +192,12 @@ combined_list = [page_names, average_duration_page, fragments_per_page, number_o
 combined_list = sorted(zip(*combined_list), key=operator.itemgetter(1, 2)) # sort
 
 # Show average duration for all songs
-print "Average duration per audioholder:"
+print("Average duration per page ID:")
 for page_index in range(len(page_names)):
-    print "        "+combined_list[page_index][0] + ": " \
+    print("        "+combined_list[page_index][0] + ": " \
           + seconds2timestr(combined_list[page_index][1]) \
           + " (" + str(combined_list[page_index][3]) + " subjects, " \
-          + str(combined_list[page_index][2]) + " fragments)"
+          + str(combined_list[page_index][2]) + " fragments)")
 
 
 #TODO
