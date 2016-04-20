@@ -109,20 +109,20 @@ for file in os.listdir(folder_name):
                     audio_id = str(audioelement.get('ref'))
                     
                     # break if no initial position or move events registered
-                    initial_position_temp = audioelement.find("./metric/metricResult/[@name='elementInitialPosition']")
+                    initial_position_temp = audioelement.find("./metric/metricresult/[@name='elementInitialPosition']")
                     if initial_position_temp is None:
                         print("Skipping "+page_name+" from "+subject_id+": does not have initial positions specified.")
                         break
                     
                     # get move events, initial and eventual position
                     initial_position = float(initial_position_temp.text)
-                    move_events = audioelement.findall("./metric/metricResult/[@name='elementTrackerFull']/movement")
+                    move_events = audioelement.findall("./metric/metricresult/[@name='elementTrackerFull']/movement")
                     final_position = float(audioelement.find("./value").text)
                     
                     # get listen events
                     start_times_global = []
                     stop_times_global  = []
-                    listen_events = audioelement.findall("./metric/metricResult/[@name='elementListenTracker']/event")
+                    listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
                     for event in listen_events:
                         # get testtime: start and stop
                         start_times_global.append(float(event.find('testtime').get('start'))-time_offset)

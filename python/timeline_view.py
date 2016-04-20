@@ -102,7 +102,7 @@ for file in os.listdir(folder_name):
                     audioelements_names.append(audio_id)
                     
                     # for this audioelement, loop over all listen events
-                    listen_events = audioelement.findall("./metric/metricResult/[@name='elementListenTracker']/event")
+                    listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
                     for event in listen_events:
                         # mark this plot as not empty
                         plot_empty = False

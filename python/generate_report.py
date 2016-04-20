@@ -179,8 +179,8 @@ for file in files_list: # iterate over all files in files_list
             # number of comments (interesting if comments not mandatory)
             for audioelement in audioelements:
                 response = audioelement.find("./comment/response")
-                was_played = audioelement.find("./metric/metricResult/[@name='elementFlagListenedTo']")
-                was_moved = audioelement.find("./metric/metricResult/[@name='elementFlagMoved']")
+                was_played = audioelement.find("./metric/metricresult/[@name='elementFlagListenedTo']")
+                was_moved = audioelement.find("./metric/metricresult/[@name='elementFlagMoved']")
                 if response is not None and response.text is not None and len(response.text) > 1: 
                     number_of_comments += 1
                 else: 

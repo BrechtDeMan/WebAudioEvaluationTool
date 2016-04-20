@@ -613,13 +613,13 @@
 					// subtract total audioholder length from subsequent audioholder event times
 					audioholder_children = audioholderNodes[audioholderIndex].childNodes; 
 					foundIt = false;
-					console.log(audioholder_children[2].getElementsByTagName("metricResult")) // not working! 
+					console.log(audioholder_children[2].getElementsByTagName("metricresult")) // not working! 
 					for (idx = 0; idx<audioholder_children.length; idx++) { // go over children
 
-						if (audioholder_children[idx].getElementsByTagName('metricResult').length) {
-							console.log(audioholder_children[idx].getElementsByTagName('metricResult')[0]);
-							if (audioholder_children[idx].getElementsByTagName('metricResult')[0].getAttribute('id') == "testTime"){
-								audioholder_time = parseFloat(audioholder_children[idx].getElementsByTagName('metricResult')[0].textContent);
+						if (audioholder_children[idx].getElementsByTagName('metricresult').length) {
+							console.log(audioholder_children[idx].getElementsByTagName('metricresult')[0]);
+							if (audioholder_children[idx].getElementsByTagName('metricresult')[0].getAttribute('id') == "testTime"){
+								audioholder_time = parseFloat(audioholder_children[idx].getElementsByTagName('metricresult')[0].textContent);
 								console.log(audioholder_time); 
 								foundIt = true;
 							}

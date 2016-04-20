@@ -1816,7 +1816,7 @@ function metricTracker(caller)
 			storeDOM.push(mElementTimer);
 		}
 		if (audioEngineContext.metric.enableElementTracker) {
-			var elementTrackerFull = storage.document.createElement('metricResult');
+			var elementTrackerFull = storage.document.createElement('metricresult');
 			elementTrackerFull.setAttribute('name','elementTrackerFull');
 			for (var k=0; k<this.movementTracker.length; k++)
 			{
@@ -1828,7 +1828,7 @@ function metricTracker(caller)
 			storeDOM.push(elementTrackerFull);
 		}
 		if (audioEngineContext.metric.enableElementListenTracker) {
-			var elementListenTracker = storage.document.createElement('metricResult');
+			var elementListenTracker = storage.document.createElement('metricresult');
 			elementListenTracker.setAttribute('name','elementListenTracker');
 			for (var k=0; k<this.listenTracker.length; k++) {
 				elementListenTracker.appendChild(this.listenTracker[k]);
@@ -1836,25 +1836,25 @@ function metricTracker(caller)
 			storeDOM.push(elementListenTracker);
 		}
 		if (audioEngineContext.metric.enableElementInitialPosition) {
-			var elementInitial = storage.document.createElement('metricResult');
+			var elementInitial = storage.document.createElement('metricresult');
 			elementInitial.setAttribute('name','elementInitialPosition');
 			elementInitial.textContent = this.initialPosition;
 			storeDOM.push(elementInitial);
 		}
 		if (audioEngineContext.metric.enableFlagListenedTo) {
-			var flagListenedTo = storage.document.createElement('metricResult');
+			var flagListenedTo = storage.document.createElement('metricresult');
 			flagListenedTo.setAttribute('name','elementFlagListenedTo');
 			flagListenedTo.textContent = this.wasListenedTo;
 			storeDOM.push(flagListenedTo);
 		}
 		if (audioEngineContext.metric.enableFlagMoved) {
-			var flagMoved = storage.document.createElement('metricResult');
+			var flagMoved = storage.document.createElement('metricresult');
 			flagMoved.setAttribute('name','elementFlagMoved');
 			flagMoved.textContent = this.wasMoved;
 			storeDOM.push(flagMoved);
 		}
 		if (audioEngineContext.metric.enableFlagComments) {
-			var flagComments = storage.document.createElement('metricResult');
+			var flagComments = storage.document.createElement('metricresult');
 			flagComments.setAttribute('name','elementFlagComments');
 			if (this.parent.commentDOM == null)
 				{flag.textContent = 'false';}
