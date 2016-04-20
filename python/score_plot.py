@@ -31,34 +31,34 @@ rating_folder = "../saves/ratings/"
 # XML results files location
 if len(sys.argv) == 1: # no extra arguments
     enable_boxplot    = True # show box plot
-    print "Use: python score_plot.py [rating folder] [plot_type] [-l/-legend]"
-    print "Type 'python score_plot.py -h' for help."
-    print "Using default path: " + rating_folder + " with boxplot."
+    print("Use: python score_plot.py [rating folder] [plot_type] [-l/-legend]")
+    print("Type 'python score_plot.py -h' for help.")
+    print("Using default path: " + rating_folder + " with boxplot.")
 else:
     for arg in sys.argv: # go over all arguments
         if arg == '-h':
             # show help
             #TODO: replace with contents of helpfile score_plot.info (or similar)
-            print "Use: python score_plot.py [rating_folder] [plot_type] [-l] [confidence]"
-            print "   rating_folder:"
-            print "            folder where output of 'score_parser' can be found, and"
-            print "            where plots will be stored."
-            print "            By default, '../saves/ratings/' is used."
-            print ""
-            print "PLOT TYPES"
-            print " Can be used in combination."
-            print "    box | boxplot | -b"
-            print "            Enables the boxplot" 
-            print "    conf | confidence | -c"
-            print "            Enables the confidence interval plot" 
-            print "    ind | individual | -i"
-            print "            Enables plot of individual ratings" 
-            print ""
-            print "PLOT OPTIONS"
-            print "    leg | legend | -l"
-            print "            For individual plot: show legend with individual file names"
-            print "    numeric value between 0 and 1, e.g. 0.95"
-            print "            For confidence interval plot: confidence value"
+            print("Use: python score_plot.py [rating_folder] [plot_type] [-l] [confidence]")
+            print("   rating_folder:")
+            print("            folder where output of 'score_parser' can be found, and")
+            print("            where plots will be stored.")
+            print("            By default, '../saves/ratings/' is used.")
+            print("")
+            print("PLOT TYPES")
+            print(" Can be used in combination.")
+            print("    box | boxplot | -b")
+            print("            Enables the boxplot" )
+            print("    conf | confidence | -c")
+            print("            Enables the confidence interval plot" )
+            print("    ind | individual | -i")
+            print("            Enables plot of individual ratings" )
+            print("")
+            print("PLOT OPTIONS")
+            print("    leg | legend | -l")
+            print("            For individual plot: show legend with individual file names")
+            print("    numeric value between 0 and 1, e.g. 0.95")
+            print("            For confidence interval plot: confidence value")
             assert False, ""# stop immediately after showing help #TODO cleaner way
             
         # PLOT TYPES
@@ -73,17 +73,17 @@ else:
         # PLOT OPTIONS
         elif arg == 'leg' or arg == 'legend' or arg == '-l':
             if not enable_individual: 
-                print "WARNING: The 'legend' option is only relevant to plots of "+\
-                      "individual ratings"
+                print("WARNING: The 'legend' option is only relevant to plots of "+\
+                      "individual ratings")
             show_legend = True     # show all individual ratings
         elif arg.isdigit():
             if not enable_confidence: 
-                print "WARNING: The numeric confidence value is only relevant when "+\
-                      "confidence plot is enabled"
+                print("WARNING: The numeric confidence value is only relevant when "+\
+                      "confidence plot is enabled")
             if float(arg)>0 and float(arg)<1:
                 confidence = float(arg)
             else: 
-                print "WARNING: The confidence value needs to be between 0 and 1"
+                print("WARNING: The confidence value needs to be between 0 and 1")
         
         # FOLDER NAME
         else: 
@@ -97,11 +97,11 @@ if not enable_boxplot and not enable_confidence and not enable_individual:
 # check if folder_name exists
 if not os.path.exists(rating_folder):
     #the file is not there
-    print "Folder '"+rating_folder+"' does not exist."
+    print("Folder '"+rating_folder+"' does not exist.")
     sys.exit() # terminate script execution
 elif not os.access(os.path.dirname(rating_folder), os.W_OK):
     #the file does exist but write rating_folder are not given
-    print "No write privileges in folder '"+rating_folder+"'."
+    print("No write privileges in folder '"+rating_folder+"'.")
 
 
 # CONFIGURATION
@@ -119,28 +119,25 @@ for file in os.listdir(rating_folder):
     if file.endswith(".csv"):
         page_name = file[:-4] # file name (without extension) is page ID
 
-        # get header
-        with open(rating_folder+file, 'rb') as readfile: # read this csv file
+        # get header (as text)
+        with open(rating_folder+file, 'rt') as readfile: # read this csv file
             filereader = csv.reader(readfile, delimiter=',')
-            headerrow = filereader.next() # use headerrow as X-axis
+            headerrow = next(filereader) # use headerrow as X-axis
             headerrow = headerrow[1:]
 
-        # read ratings into matrix
-#         ratings = np.loadtxt(open(rating_folder+file,"rb"),
-#                             delimiter=",",
-#                             skiprows=1,
-#                             usecols=range(1,len(headerrow)+1)
-#                             )
+        # read ratings into matrix (as bytes)
+        with open(rating_folder+file, 'rb') as readfile: # read this csv file
+            filereader = csv.reader(readfile, delimiter=',')
             ratings = np.genfromtxt(readfile,
                                    delimiter=",",
-                                   #skip_header = 1,
+                                   skip_header = 1,
                                    converters = {3: lambda s: float(s or 'Nan')},
-                                   usecols=range(1,len(headerrow)+1)
+                                   usecols=list(range(1,len(headerrow)+1))
                                    )
         
         # assert at least 2 subjects (move on to next file if violated)
         if ratings.shape[0]<2:
-            print "WARNING: Just one subject for " + page_name + ". Moving on to next file."
+            print("WARNING: Just one subject for " + page_name + ". Moving on to next file.")
             break
 
         # BOXPLOT
@@ -183,9 +180,9 @@ for file in os.listdir(rating_folder):
             increment = 0
             linehandles = []
             legendnames = []
-            with open(rating_folder+file, 'rb') as readfile: # read this csv file
+            with open(rating_folder+file, 'r') as readfile: # read this csv file
                 filereader = csv.reader(readfile, delimiter=',')
-                headerrow = filereader.next() # use headerrow as X-axis
+                headerrow = next(filereader) # use headerrow as X-axis
                 headerrow = headerrow[1:]
                 for row in filereader:
                     subject_id = row[0][:-4] # read from beginning of line
