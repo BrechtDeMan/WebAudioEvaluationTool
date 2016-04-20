@@ -16,6 +16,14 @@
 Please refer to ['docs/Instructions/Instructions.pdf'](https://github.com/BrechtDeMan/WebAudioEvaluationTool/raw/master/docs/Instructions/Instructions.pdf).
 
 
+## Dependencies
+
+Runs out of the box on any web server with PHP (tested on PHP 5.1<=), no third party software needed. 
+
+Alternatively, a local server (no web server or internet connection needed!) and optional Python analysis scripts run on Python 2.7 or 3.x. 
+Plots rendered using [matplotlib](http://matplotlib.org), [NumPy](http://matplotlib.org) and [SciPy](http://scipy.org). 
+
+
 ## Academic use
 
 ### Citing
@@ -36,6 +44,7 @@ BibTeX:
 ### License
 
 Please refer to LICENSE.txt ([GNU General Public License](http://www.gnu.org/licenses/gpl-3.0.en.html)).
+
 
 ## Other use
 
