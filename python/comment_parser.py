@@ -14,19 +14,19 @@ assert len(sys.argv)<3, "comment_parser takes at most 1 command line argument\n"
 # XML results files location
 if len(sys.argv) == 1:
     folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
-    print "Use: python  comment_parser.py [XML_files_location]"
-    print "Using default path: " + folder_name
+    print("Use: python comment_parser.py [XML_files_location]")
+    print("Using default path: " + folder_name)
 elif len(sys.argv) == 2:
     folder_name = sys.argv[1]   # First command line argument is folder
 
 # check if folder_name exists
 if not os.path.exists(folder_name):
     #the file is not there
-    print "Folder '"+folder_name+"' does not exist."
+    print("Folder '"+folder_name+"' does not exist.")
     sys.exit() # terminate script execution
 elif not os.access(os.path.dirname(folder_name), os.W_OK):
     #the file does exist but write privileges are not given
-    print "No write privileges in folder '"+folder_name+"'."
+    print("No write privileges in folder '"+folder_name+"'.")
 
 
 # CODE
@@ -45,11 +45,11 @@ for file in os.listdir(folder_name):
             page_name = audioholder.get('ref')               # get page name
             
             if page_name is None: # ignore 'empty' audio_holders
-                print "WARNING: " + file + " contains empty page. (comment_parser.py)"
+                print("WARNING: " + file + " contains empty page. (comment_parser.py)")
                 break
                 
             if audioholder.get("state") != "complete":
-                print "WARNING: " + file + "test page " + page_name + " is not complete, skipping."
+                print("WARNING: " + file + "test page " + page_name + " is not complete, skipping.")
             else:
                 # create folder [page_name] if not yet created
                 if not os.path.exists(folder_name + "/" + page_name):
@@ -79,9 +79,9 @@ for file in os.listdir(folder_name):
                            commentstr = ''
 
                         # anonymous comments:
-                        #writer.writerow([commentstr.encode("utf-8")]) 
+                        #writer.writerow([commentstr])  # .encode("utf-8")
                         # comments with (file) name:
-                        writer.writerow([file[:-4]] + [commentstr.encode("utf-8")]) 
+                        writer.writerow([file[:-4]] + [commentstr]) 
 
                     #TODO Replace 'new line' in comment with something else?
                         
