@@ -292,11 +292,11 @@ function Specification() {
 			this.location = xml.getAttribute('location');
 			if (this.location == 'before'){this.location = 'pre';}
 			else if (this.location == 'after'){this.location = 'post';}
-			for (var i in xml.children)
+            var children = xml.getAllElementsByTagName('surveyentry');
+			for (var i=0; i<children.length; i++)
 			{
-				if(isNaN(Number(i))==true){break;}
 				var node = new this.OptionNode(this.specification);
-				node.decode(parent,xml.children[i]);
+				node.decode(parent,children[i]);
 				this.options.push(node);
 			}
             if (this.options.length == 0) {
