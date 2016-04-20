@@ -102,13 +102,13 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 				\item \texttt{save.php}: PHP script to store result XML files to web server
         		\item PHP analysis scripts % ELABORATE
         	\end{itemize}
+         \textbf{Python scripts (\texttt{./python/})}
+        	\begin{itemize}
+        		\item Helpful Python and PHP scripts for extraction and visualisation of data.\\ 
+        	\end{itemize}
         \textbf{Output files (\texttt{./saves/})}
         	\begin{itemize}
         		\item The output XML files of tests will be stored here by default by the \texttt{pythonServer.py} script.\\ 
-        	\end{itemize}
-        \textbf{Auxiliary scripts (\texttt{./scripts/})}
-        	\begin{itemize}
-        		\item Helpful Python and PHP scripts for extraction and visualisation of data.\\ 
         	\end{itemize}
         \textbf{Test creation tool (\texttt{./test\_create/})}
         	\begin{itemize}
@@ -149,7 +149,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 		\item Go to \path{test_create.html} and configure your test.
 		\item Save your test file in the folder \path{.\tests\}.
 		\item Your test will be live at \path{[web server address]/index.html?url=tests/[testname].xml}. If you are not using a web server, you can simulate one locally by running 
-		\path{scripts/pythonServer.py} (requires Python), after which you can access the test at \\ % hack
+		\path{python/pythonServer.py} (requires Python), after which you can access the test at \\ % hack
 		\path{http://localhost:8000/index.html?url=tests/[testname].xml}
 	\end{itemize}
 
@@ -194,7 +194,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 				
 			Then hit enter and run the Python script by typing
 
-				\texttt{python scripts/pythonServer.py}
+				\texttt{python python/pythonServer.py}
 
 			and hit enter again. See also Figure \ref{fig:terminal}.
 			
@@ -728,10 +728,10 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 		See `analysis.html' in the main folder: immediate visualisation of (by default) all results in the `saves/' folder. 
 
 	\subsection{Python scripts}
-		The package includes Python (2.7) scripts (in `scripts/') to extract ratings and comments, generate visualisations of ratings and timelines, and produce a fully fledged report. 
+		The package includes Python (2.7) scripts (in `python/') to extract ratings and comments, generate visualisations of ratings and timelines, and produce a fully fledged report. 
 
 		Visualisation requires the free matplotlib toolbox (http://matplotlib.org), numpy and scipy. 
-		By default, the scripts can be run from the `scripts' folder, with the result files in the `saves' folder (the default location where result XMLs are stored). Each script takes the XML file folder as an argument, along with other arguments in some cases.
+		By default, the scripts can be run from the `python' folder, with the result files in the `saves' folder (the default location where result XMLs are stored). Each script takes the XML file folder as an argument, along with other arguments in some cases.
 		Note: to avoid all kinds of problems, please avoid using spaces in file and folder names (this may work on some systems, but others don't like it). 
 
 		\subsubsection{comment\_parser.py}
