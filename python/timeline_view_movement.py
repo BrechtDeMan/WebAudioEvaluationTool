@@ -144,7 +144,7 @@ for file in os.listdir(folder_name):
                         plot_empty = False
                     
                         # get time and final position of move event
-                        new_time = float(event.get("time"))-time_offset
+                        new_time = float(event.get("time")) #-time_offset # (legacy)
                         new_position = float(event.get("value"))
                         
                         # get play/stop events since last move until current move event
@@ -219,10 +219,10 @@ for file in os.listdir(folder_name):
                     start_times = []
                     # is there a play and/or stop event between previous_time and new_time?
                     for time in start_times_global:
-                        if time>previous_time and time<page_time-time_offset:
+                        if time>previous_time and time<page_time: #-time_offset:
                             start_times.append(time)
                     for time in stop_times_global:
-                        if time>previous_time and time<page_time-time_offset:
+                        if time>previous_time and time<page_time: #-time_offset:
                             stop_times.append(time)
                     # if no play/stop events between move events, find out whether playing
                     
@@ -259,7 +259,7 @@ for file in os.listdir(folder_name):
                         currently_playing = not currently_playing # toggle to draw final segment correctly
                     
                     # draw final segment (horizontal line) from last 'segment_start' to current move event time
-                    plt.plot([segment_start, page_time-time_offset], # x-values
+                    plt.plot([segment_start, page_time], # x-values
                         [previous_position, previous_position], # y-values
                         # color depends on playing during move event or not:
                         color='r' if currently_playing else colormap[increment%len(colormap)], 
@@ -273,35 +273,25 @@ for file in os.listdir(folder_name):
 #                     )
                     
                     # display fragment name at end
-                    plt.text(page_time-time_offset,previous_position,\
+                    plt.text(page_time,previous_position,\
                              audio_id,color=colormap[increment%len(colormap)]) #,rotation=45
                         
                 increment+=1 # to next audioelement
             
-            last_page_duration = page_time-time_offset
+            last_page_duration = page_time #-time_offset
             time_offset = page_time
             
-            if not plot_empty: # if plot is not empty, show or store
+            if not plot_empty: # if plot is not empty, show and/or store
                 # set plot parameters
                 plt.title('Timeline ' + file + ": "+page_name)
                 plt.xlabel('Time [seconds]')
                 plt.xlim(0, last_page_duration)
                 plt.ylabel('Rating') # default
                 plt.ylim(0, 1) # rating between 0 and 1
-            
-                #y-ticks: labels on rating axis
-                label_positions = []
-                label_text = []
-                scale_tags = root.findall("./BrowserEvalProjectDocument/audioHolder/interface/scale")
-                scale_title = root.find("./BrowserEvalProjectDocument/audioHolder/interface/title")
-                for tag in scale_tags:
-                    label_positions.append(float(tag.get('position'))/100) # on a scale from 0 to 100
-                    label_text.append(tag.text)
-                if len(label_positions) > 0: # if any labels available
-                    plt.yticks(label_positions, label_text) # show rating axis labels
-                # set label Y-axis
-                if scale_title is not None: 
-                    plt.ylabel(scale_title.text)
+
+                # TO DO: 
+                # Y axis title and tick labels as specified in 'setup' for corresponding page
+                # Different plots for different axes
             
                 #plt.show() # uncomment to show plot; comment when just saving
                 #exit()

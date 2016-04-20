@@ -42,9 +42,6 @@ plt.rc('font', **font)
 # Colormap for to cycle through
 colormap = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
 
-# if enabled, x-axis shows time per audioholder, not total test time
-show_audioholder_time = True
-
 # bar height (<1 to avoid overlapping)
 bar_height = 0.6
 
@@ -65,8 +62,6 @@ for file in os.listdir(folder_name):
         tree = ET.parse(folder_name + '/' + file)
         root = tree.getroot()
         subject_id = file[:-4] # drop '.xml'
-        
-        time_offset = 0 # test starts at zero
         
         # ONE TIMELINE PER PAGE - make new plot per page
 
@@ -113,8 +108,8 @@ for file in os.listdir(folder_name):
                         plot_empty = False
                     
                         # get testtime: start and stop
-                        start_time = float(event.find('testtime').get('start'))-time_offset
-                        stop_time  = float(event.find('testtime').get('stop'))-time_offset
+                        start_time = float(event.find('testtime').get('start'))
+                        stop_time  = float(event.find('testtime').get('stop'))
                         # event lines:
                         ax.plot([start_time, start_time], # x-values
                             [0, N_audioelements+1], # y-values
@@ -135,11 +130,6 @@ for file in os.listdir(folder_name):
                         )
                         
                 increment+=1 # to next audioelement
-                
-            # subtract total audioholder length from subsequent audioholder event times
-            audioholder_time = audioholder.find("./metric/metricresult/[@id='testTime']")
-            if audioholder_time is not None and show_audioholder_time: 
-                time_offset = float(audioholder_time.text)
             
             if not plot_empty:
                 # set plot parameters
@@ -150,7 +140,6 @@ for file in os.listdir(folder_name):
             
                 #y-ticks: fragment IDs, top to bottom
                 plt.yticks(range(N_audioelements, 0, -1), audioelements_names) # show fragment names
-
 
                 #plt.show() # uncomment to show plot; comment when just saving
                 #exit()
