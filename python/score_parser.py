@@ -13,19 +13,19 @@ assert len(sys.argv)<3, "score_parser takes at most 1 command line argument\n"+\
 # XML results files location
 if len(sys.argv) == 1:
     folder_name = "../saves"    # Looks in 'saves/' folder from 'scripts/' folder
-    print "Use: python score_parser.py [rating_folder_location]"
-    print "Using default path: " + folder_name
+    print("Use: python score_parser.py [rating_folder_location]")
+    print("Using default path: " + folder_name)
 elif len(sys.argv) == 2:
     folder_name = sys.argv[1]   # First command line argument is folder
 
 # check if folder_name exists
 if not os.path.exists(folder_name):
     #the file is not there
-    print "Folder '"+folder_name+"' does not exist."
+    print("Folder '"+folder_name+"' does not exist.")
     sys.exit() # terminate script execution
 elif not os.access(os.path.dirname(folder_name), os.W_OK):
     #the file does exist but write privileges are not given
-    print "No write privileges in folder '"+folder_name+"'."
+    print("No write privileges in folder '"+folder_name+"'.")
 
     
 # CODE
@@ -47,11 +47,11 @@ for file_name in os.listdir(folder_name):
             page_name = page.get('ref') # get page reference ID
                        
             if page_name is None: # ignore 'empty' audio_holders
-                print "WARNING: " + file_name + " contains empty audio holder. (score_parser.py)"
+                print("WARNING: " + file_name + " contains empty audio holder. (score_parser.py)")
                 break
                 
             if page.get('state') != "complete":
-                print "WARNING:" + file_name + " contains incomplete page " +page_name+ ". (score_parser.py)"
+                print("WARNING: " + file_name + " contains incomplete page " +page_name+ ". (score_parser.py)")
                 break;
 
             file_name = folder_name+'/ratings/'+page_name+'-ratings.csv' # score file name
@@ -77,7 +77,7 @@ for file_name in os.listdir(folder_name):
             if os.path.isfile(file_name):
                 with open(file_name, 'r') as readfile:
                     filereader = csv.reader(readfile, delimiter=',')
-                    headerrow = filereader.next()
+                    headerrow = next(filereader)
 
                 # If file hasn't been opened yet this time, remove all rows except header
                 if file_name not in file_history:
@@ -97,7 +97,7 @@ for file_name in os.listdir(folder_name):
                         filewriter.writerow(headerrow + newfragments) # write new header
                         with open(file_name, 'r') as readfile:
                             filereader = csv.reader(readfile, delimiter=',')
-                            filereader.next() # skip header
+                            next(filereader) # skip header
                             for row in filereader: # rewrite row plus empty cells for every new fragment name
                                 filewriter.writerow(row + ['']*len(newfragments))
                     os.rename('temp.csv', file_name) # replace old file with temp file
