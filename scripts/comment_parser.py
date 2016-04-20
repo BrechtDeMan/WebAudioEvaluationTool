@@ -50,7 +50,7 @@ for file in os.listdir(folder_name):
                 
             if audioholder.get("state") != "complete":
                 print "WARNING: " + file + "test page " + page_name + " is not complete, skipping."
-            else :
+            else:
                 # create folder [page_name] if not yet created
                 if not os.path.exists(folder_name + "/" + page_name):
                     os.makedirs(folder_name + "/" + page_name)

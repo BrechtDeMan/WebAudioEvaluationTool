@@ -61,30 +61,30 @@ for file in os.listdir(folder_name):
         root = tree.getroot()
         subject_id = file[:-4] # drop '.xml'
         
-        previous_audioholder_time = 0 # time spent before current audioholder
+        previous_page_time = 0 # time spent before current page
         time_offset = 0 # test starts at zero
         
         # ONE TIMELINE PER PAGE - make new plot per page
 
         # get list of all page names
-        for audioholder in root.findall("./page"):   # iterate over pages
-            page_name = audioholder.get('ref')               # get page name
+        for page in root.findall("./page"):   # iterate over pages
+            page_name = page.get('ref')               # get page name
             plot_empty = True                               # check if any data is plotted
             
             if page_name is None: # ignore 'empty' audio_holders
-                print "Skipping empty audioholder name from "+subject_id+"."
+                print "Skipping empty page name from "+subject_id+"."
                 break
                 
-            # subtract total audioholder length from subsequent audioholder event times
-            audioholder_time_temp = audioholder.find("./metric/metricresult/[@id='testTime']")
-            if audioholder_time_temp is not None: 
-                audioholder_time = float(audioholder_time_temp.text)
+            # subtract total page length from subsequent page event times
+            page_time_temp = page.find("./metric/metricresult/[@id='testTime']")
+            if page_time_temp is not None: 
+                page_time = float(page_time_temp.text)
             else: 
-                print "Skipping audioholder without total time specified from "+subject_id+"."
+                print "Skipping page without total time specified from "+subject_id+"."
                 break
 
             # get audioelements
-            audioelements = audioholder.findall("./audioelement")
+            audioelements = page.findall("./audioelement")
             
             # sort alphabetically
             data = []
@@ -109,20 +109,20 @@ for file in os.listdir(folder_name):
                     audio_id = str(audioelement.get('ref'))
                     
                     # break if no initial position or move events registered
-                    initial_position_temp = audioelement.find("./metric/metricresult/[@name='elementInitialPosition']")
+                    initial_position_temp = audioelement.find("./metric/metricResult/[@name='elementInitialPosition']")
                     if initial_position_temp is None:
                         print "Skipping "+page_name+" from "+subject_id+": does not have initial positions specified."
                         break
                     
                     # get move events, initial and eventual position
                     initial_position = float(initial_position_temp.text)
-                    move_events = audioelement.findall("./metric/metricresult/[@name='elementTrackerFull']/movement")
+                    move_events = audioelement.findall("./metric/metricResult/[@name='elementTrackerFull']/movement")
                     final_position = float(audioelement.find("./value").text)
                     
                     # get listen events
                     start_times_global = []
                     stop_times_global  = []
-                    listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
+                    listen_events = audioelement.findall("./metric/metricResult/[@name='elementListenTracker']/event")
                     for event in listen_events:
                         # get testtime: start and stop
                         start_times_global.append(float(event.find('testtime').get('start'))-time_offset)
@@ -212,17 +212,17 @@ for file in os.listdir(folder_name):
                     
                     
                     # draw final horizontal segment (or only segment if audioelement not moved)
-                    # horizontal line from previous time to end of audioholder
+                    # horizontal line from previous time to end of page
                     
                     # get play/stop events since last move until current move event
                     stop_times = []
                     start_times = []
                     # is there a play and/or stop event between previous_time and new_time?
                     for time in start_times_global:
-                        if time>previous_time and time<audioholder_time-time_offset:
+                        if time>previous_time and time<page_time-time_offset:
                             start_times.append(time)
                     for time in stop_times_global:
-                        if time>previous_time and time<audioholder_time-time_offset:
+                        if time>previous_time and time<page_time-time_offset:
                             stop_times.append(time)
                     # if no play/stop events between move events, find out whether playing
                     
@@ -259,33 +259,33 @@ for file in os.listdir(folder_name):
                         currently_playing = not currently_playing # toggle to draw final segment correctly
                     
                     # draw final segment (horizontal line) from last 'segment_start' to current move event time
-                    plt.plot([segment_start, audioholder_time-time_offset], # x-values
+                    plt.plot([segment_start, page_time-time_offset], # x-values
                         [previous_position, previous_position], # y-values
                         # color depends on playing during move event or not:
                         color='r' if currently_playing else colormap[increment%len(colormap)], 
                         linewidth=3
                     )
                     
-#                     plt.plot([previous_time, audioholder_time-time_offset], # x-values
+#                     plt.plot([previous_time, page_time-time_offset], # x-values
 #                         [previous_position, previous_position], # y-values
 #                         color=colormap[increment%len(colormap)],
 #                         linewidth=3
 #                     )
                     
                     # display fragment name at end
-                    plt.text(audioholder_time-time_offset,previous_position,\
+                    plt.text(page_time-time_offset,previous_position,\
                              audio_id,color=colormap[increment%len(colormap)]) #,rotation=45
                         
                 increment+=1 # to next audioelement
             
-            last_audioholder_duration = audioholder_time-time_offset
-            time_offset = audioholder_time
+            last_page_duration = page_time-time_offset
+            time_offset = page_time
             
             if not plot_empty: # if plot is not empty, show or store
                 # set plot parameters
                 plt.title('Timeline ' + file + ": "+page_name)
                 plt.xlabel('Time [seconds]')
-                plt.xlim(0, last_audioholder_duration)
+                plt.xlim(0, last_page_duration)
                 plt.ylabel('Rating') # default
                 plt.ylim(0, 1) # rating between 0 and 1
             
