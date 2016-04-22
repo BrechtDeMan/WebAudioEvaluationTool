@@ -28,7 +28,8 @@ function loadInterface() {
 	    	str = "";
 	    	if (hasBeenPlayed.length > 1) {
 		    	for (var i=0; i<hasBeenPlayed.length; i++) {
-		    		str = str + (hasBeenPlayed[i]+1); // start from 1
+                    var ao_id = audioEngineContext.audioObjects[hasBeenPlayed[i]].interfaceDOM.getPresentedId();
+		    		str = str + ao_id; // start from 1
 		    		if (i < hasBeenPlayed.length-2){
 		    			str += ", ";
 		    		} else if (i == hasBeenPlayed.length-2) {
@@ -37,7 +38,7 @@ function loadInterface() {
 		    	}
 		    	alert('You have not played fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
 	       } else {
-	       		alert('You have not played fragment ' + (hasBeenPlayed[0]+1) + ' yet. Please listen, rate and comment all samples before submitting.');
+	       		alert('You have not played fragment ' + (audioEngineContext.audioObjects[hasBeenPlayed[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.');
 	       }
 	        return false;
 	    }
@@ -68,15 +69,15 @@ function loadInterface() {
 				}
 				if (interfaceTID.length == 1)
 				{
-					str += 'slider '+(interfaceTID[0]+1)+'. '; // start from 1
+					str += 'slider '+(audioEngineContext.audioObjects[interfaceTID[0]].interfaceDOM.getPresentedId())+'. '; // start from 1
 				}
 				else {
 					str += 'sliders ';
 					for (var k=0; k<interfaceTID.length-1; k++)
 					{
-						str += (interfaceTID[k]+1)+', '; // start from 1
+						str += (audioEngineContext.audioObjects[interfaceTID[k]].interfaceDOM.getPresentedId())+', '; // start from 1
 					}
-					str += (interfaceTID[interfaceTID.length-1]+1) +'. ';
+					str += (audioEngineContext.audioObjects[interfaceTID[interfaceTID.length-1]].interfaceDOM.getPresentedId()) +'. ';
 				}
 			}
 		}
@@ -105,7 +106,8 @@ function loadInterface() {
 				if (strNums.length > 1) {
 					var str = "";
 			    	for (var i=0; i<strNums.length; i++) {
-			    		str = str + (strNums[i]+1); // start from 1
+                        var ao_id = audioEngineContext.audioObjects[strNums[i]].interfaceDOM.getPresentedId();
+			    		str = str + (ao_id); // start from 1
 			    		if (i < strNums.length-2){
 			    			str += ", ";
 			    		} else if (i == strNums.length-2) {
@@ -114,7 +116,7 @@ function loadInterface() {
 			    	}
 			    	alert('You have not commented on fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
 		       } else {
-		       		alert('You have not commented on fragment ' + (strNums[0]+1) + ' yet. Please listen, rate and comment all samples before submitting.');
+		       		alert('You have not commented on fragment ' + (audioEngineContext.audioObjects[strNums[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.');
 		       }
 			}
 		}

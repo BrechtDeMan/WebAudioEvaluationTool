@@ -46,6 +46,7 @@
 		</metric>
 		<interface>
 			<interfaceoption type="check" name="fragmentMoved"/>
+            <interfaceoption type="check" name="fragmentPlayed"/>
 			<interfaceoption type="check" name="scalerange" min="25" max="75"/>
 			<interfaceoption type="show" name='playhead'/>
 			<interfaceoption type="show" name="page-count"/>
@@ -54,6 +55,7 @@
 	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' showElementComments='true' loudness="-12">
 		<commentboxprefix>Comment on fragment</commentboxprefix>
 		<interface name="preference">
+            <title>Preference</title>
 			<scales>
 				<scalelabel position="0">Min</scalelabel>
 				<scalelabel position="100">Max</scalelabel>
