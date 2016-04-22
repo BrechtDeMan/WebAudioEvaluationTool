@@ -17,7 +17,7 @@ $master_file = "../tests/pool.xml";
 // Note this is relative to the PHP location
 
 // First set up the store with all the test page key nodes
-$pages = [];
+$pages = array();
 $master_xml = simplexml_load_string(file_get_contents($master_file, FILE_TEXT));
 if ($master_xml) {
     if (!isset($master_xml->setup["poolSize"]))
@@ -72,12 +72,12 @@ $dom_setup = $new_doc->importNode(dom_import_simplexml($master_xml->setup),true)
 $root->appendChild($dom_setup);
 
 // We must now extract the number which have been performed the least
-$rot_pages = [];
+$rot_pages = array();
 foreach($pages as $key => $var)
     if(array_key_exists($var,$rot_pages)) {
         array_push($rot_pages[$var],$key);
     } else {
-        $rot_pages[$var] = [$key];
+        $rot_pages[$var] = array($key);
     }
 ksort($rot_pages);
 $Keys = array_keys($rot_pages);
