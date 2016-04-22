@@ -50,12 +50,13 @@ div#popupContent {
     margin-bottom: 35px;
 }
 
-div#popupTitle {
+div#popupTitleHolder {
     width: inherit;
     min-height: 25px;
     max-height: 250px;
     overflow: auto;
     margin-bottom: 5px;
+    text-align: center;
 }
 
 div#popupResponse {

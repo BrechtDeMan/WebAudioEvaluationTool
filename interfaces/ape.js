@@ -53,7 +53,8 @@ function loadInterface() {
 			var interfaceTID = [];
 			for (var j=0; j<this.interfaceSliders[i].metrics.length; j++)
 			{
-				if (this.interfaceSliders[i].metrics[j].wasMoved == false)
+                var ao_id = this.interfaceSliders[i].sliders[j].getAttribute("trackIndex");
+				if (this.interfaceSliders[i].metrics[j].wasMoved == false && audioEngineContext.audioObjects[ao_id].interfaceDOM.canMove())
 				{
 					state = false;
 					interfaceTID.push(j);
