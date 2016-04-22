@@ -42,7 +42,13 @@ class nestedObject {
     }
 }
 
-
+$requestFormat = 'JSON';
+if (isset($_GET["format"])) {
+    $requestFormat = $_GET["format"];
+    if ($requestFormat != "CSV" && $requestFormat != "JSON" && $requestFormat != "XML") {
+        return "Invalid format parameter in get request. Must be CSV, JSON or XML";
+    }
+}
 $request = "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 $request = explode("get_filtered_score.php",$request);
 $request = implode("get_filtered_count.php",$request);
@@ -103,44 +109,87 @@ foreach($saves as $url) {
         }
     }
 }
-$doc_root = '{ "pages": [';
-for ($pageIndex = 0; $pageIndex < $root->num; $pageIndex++)
-{
-    $page = $root->nest[$pageIndex];
-    $doc_page = '{ "id": "'.$page->id.'", "elements": [';
-    for($elementIndex = 0; $elementIndex < $page->num; $elementIndex++)
-    {
-        $element = $page->nest[$elementIndex];
-        $doc_element = '{ "id": "'.$element->id.'", "axis": [';
-        for($axisIndex = 0; $axisIndex < $element->num; $axisIndex++)
+switch($requestFormat) {
+    case "JSON":
+        $doc_root = '{ "pages": [';
+        for ($pageIndex = 0; $pageIndex < $root->num; $pageIndex++)
         {
-            $axis = $element->nest[$axisIndex];
-            $doc_axis = '{ "name": "'.$axis->id.'", "values": [';
-            for ($valueIndex = 0; $valueIndex < $axis->num; $valueIndex++)
+            $page = $root->nest[$pageIndex];
+            $doc_page = '{ "id": "'.$page->id.'", "elements": [';
+            for($elementIndex = 0; $elementIndex < $page->num; $elementIndex++)
             {
-                $doc_axis = $doc_axis."".strval($axis->nest[$valueIndex]);
-                if ($valueIndex < $axis->num-1) {
-                    $doc_axis = $doc_axis.', ';
+                $element = $page->nest[$elementIndex];
+                $doc_element = '{ "id": "'.$element->id.'", "axis": [';
+                for($axisIndex = 0; $axisIndex < $element->num; $axisIndex++)
+                {
+                    $axis = $element->nest[$axisIndex];
+                    $doc_axis = '{ "name": "'.$axis->id.'", "values": [';
+                    for ($valueIndex = 0; $valueIndex < $axis->num; $valueIndex++)
+                    {
+                        $doc_axis = $doc_axis."".strval($axis->nest[$valueIndex]);
+                        if ($valueIndex < $axis->num-1) {
+                            $doc_axis = $doc_axis.', ';
+                        }
+                    }
+                    $doc_axis = $doc_axis.']}';
+                    if ($axisIndex < $element->num-1) {
+                        $doc_axis = $doc_axis.', ';
+                    }
+                    $doc_element = $doc_element.$doc_axis;
+                }
+                $doc_element = $doc_element.']}';
+                if ($elementIndex < $page->num-1) {
+                    $doc_element = $doc_element.', ';
+                }
+                $doc_page = $doc_page.$doc_element;
+            }
+            $doc_page = $doc_page.']}';
+            if ($pageIndex < $root->num-1) {
+                $doc_page = $doc_page.', ';
+            }
+            $doc_root = $doc_root.$doc_page;
+        }
+        $doc_root = $doc_root.']}';
+        echo $doc_root;
+        break;
+    case "XML":
+        $xml_root = new SimpleXMLElement('<waetprocess/>');
+        for ($pageIndex=0; $pageIndex < $root->num; $pageIndex++) {
+            $page = $root->nest[$pageIndex];
+            $xml_page = $xml_root->addChild("page");
+            $xml_page->addAttribute("id",$page->id);
+            for($elementIndex = 0; $elementIndex < $page->num; $elementIndex++)
+            {
+                $element = $page->nest[$elementIndex];
+                $xml_element = $xml_page->addChild("audioelement");
+                $xml_element->addAttribute("id", $element->id);
+                for($axisIndex = 0; $axisIndex < $element->num; $axisIndex++)
+                {
+                    $axis = $element->nest[$axisIndex];
+                    $xml_axis = $xml_element->addChild("axis");
+                    $xml_axis->addAttribute("name",$axis->id);
+                    for ($valueIndex = 0; $valueIndex < $axis->num; $valueIndex++)
+                    {
+                        $xml_value = $xml_axis->addChild("value",strval($axis->nest[$valueIndex]));
+                    }
                 }
             }
-            $doc_axis = $doc_axis.']}';
-            if ($axisIndex < $element->num-1) {
-                $doc_axis = $doc_axis.', ';
+        }
+        echo $xml_root->asXML();
+        break;
+    case "CSV":
+        $doc_string = "page,element,axis,value"."\r\n";
+        foreach($root->nest as $page){
+            foreach($page->nest as $element) {
+                foreach($element->nest as $axis) {
+                    foreach($axis->nest as $value) {
+                        $doc_string = $doc_string.$page->id.',';
+                        $doc_string = $doc_string.$element->id.',';
+                        $doc_string = $doc_string.$axis->id.',';
+                        $doc_string = $doc_string.$value."\r\n";
+                    }
+                }
             }
-            $doc_element = $doc_element.$doc_axis;
         }
-        $doc_element = $doc_element.']}';
-        if ($elementIndex < $page->num-1) {
-            $doc_element = $doc_element.', ';
-        }
-        $doc_page = $doc_page.$doc_element;
-    }
-    $doc_page = $doc_page.']}';
-    if ($pageIndex < $root->num-1) {
-        $doc_page = $doc_page.', ';
-    }
-    $doc_root = $doc_root.$doc_page;
 }
-$doc_root = $doc_root.']}';
-echo $doc_root;
 ?>

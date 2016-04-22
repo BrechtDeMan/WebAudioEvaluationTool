@@ -625,6 +625,66 @@ var interfaceContext = new function() {
     this.getDataButton.button.textContent = "Get Filtered Data";
     this.getDataButton.button.addEventListener("click",this.getDataButton);
     
+    this.getRawScoreData = {
+        root: document.createElement("div"),
+        csvDOM: document.createElement("button"),
+        jsonDOM: document.createElement("button"),
+        xmlDOM: document.createElement("button"),
+        presentDOM: document.createElement("div"),
+        parent: this,
+        XHR: new XMLHttpRequest(),
+        handleEvent: function(event) {
+            this.presentDOM.innerHTML = null;
+            var url = "../php/get_filtered_score.php"+this.parent.getFilterString();
+            this.XHR.open("GET",url+"&format="+event.currentTarget.textContent,true);
+            switch(event.currentTarget.textContent) {
+                case "CSV":
+                    this.XHR.onload = function() {
+                        var file = [this.response];
+                        var bb = new Blob(file,{type: 'text/csv'});
+                        this.parent.presentDOM.appendChild( this.parent.generateLink(bb,"scores.csv") );
+                    }
+                    break;
+                case "JSON":
+                    this.XHR.onload = function() {
+                        var file = [this.response];
+                        var bb = new Blob(file,{type: 'application/json'});
+                        this.parent.presentDOM.appendChild( this.parent.generateLink(bb,"scores.json") );
+                    }
+                    break;
+                case "XML":
+                    this.XHR.onload = function() {
+                        var file = [this.response];
+                        var bb = new Blob(file,{type: 'text/xml'});
+                        this.parent.presentDOM.appendChild( this.parent.generateLink(bb,"scores.xml") );
+                    }
+                    break;
+            }
+            this.XHR.send();
+        },
+        generateLink: function(blob,filename) {
+            var dnlk = window.URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.hidden = '';
+            a.href = dnlk;
+            a.download = filename;
+            a.textContent = "Save File";
+            return a;
+        }
+    }
+    
+    this.getRawScoreData.root.appendChild(this.getRawScoreData.csvDOM);
+    this.getRawScoreData.root.appendChild(this.getRawScoreData.jsonDOM);
+    this.getRawScoreData.root.appendChild(this.getRawScoreData.xmlDOM);
+    this.getRawScoreData.root.appendChild(this.getRawScoreData.presentDOM);
+    this.getRawScoreData.XHR.parent = this.getRawScoreData;
+    this.getRawScoreData.csvDOM.textContent = 'CSV';
+    this.getRawScoreData.csvDOM.addEventListener('click',this.getRawScoreData);
+    this.getRawScoreData.jsonDOM.textContent = 'JSON';
+    this.getRawScoreData.jsonDOM.addEventListener('click',this.getRawScoreData);
+    this.getRawScoreData.xmlDOM.textContent = 'XML';
+    this.getRawScoreData.xmlDOM.addEventListener('click',this.getRawScoreData);
+    
     this.testSaves = {
         json: null,
         selectedURL: null,
@@ -796,6 +856,7 @@ var interfaceContext = new function() {
         }
         document.getElementById("test-saved").appendChild(this.filterDOM);
         document.getElementById("test-saved").appendChild(this.getDataButton.button);
+        document.getElementById("test-saved").appendChild(this.getRawScoreData.root);
     }
     this.getFilterString = function() {
         var pairs = [];
