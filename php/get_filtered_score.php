@@ -191,5 +191,6 @@ switch($requestFormat) {
                 }
             }
         }
+        echo $doc_string;
 }
 ?>
