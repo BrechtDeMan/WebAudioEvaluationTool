@@ -206,17 +206,17 @@ function comparator(page)
 			interfaceContext.comparator.selected = id;
             if ($(event.currentTarget).hasClass("selected")) {
                 $(".comparator-selector").removeClass('selected');
-                for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
+                for (var i=0; i<interfaceContext.comparator.pair.length; i++)
                 {
-                     var obj = interfaceContext.comparator.comparators[i];
+                     var obj = interfaceContext.comparator.pair[i];
                     obj.parent.metric.moved(time,0);
                 }
             } else {
                 $(".comparator-selector").removeClass('selected');
                 $(event.currentTarget).addClass('selected');
-                for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
+                for (var i=0; i<interfaceContext.comparator.pair.length; i++)
                 {
-                    var obj = interfaceContext.comparator.comparators[i];
+                    var obj = interfaceContext.comparator.pair[i];
                     if (i == id) {
                         obj.value = 1;
                     } else {
@@ -346,7 +346,7 @@ function comparator(page)
         this.boxHolders.appendChild(node.box);
     }
     var elementId = Math.floor(Math.random() * 2); //Randomly pick A or B to be X
-    var element = new page.audioElementNode();
+    var element = new page.audioElementNode(specification);
     for (var atr in page.audioElements[elementId]) {
         eval("element."+atr+" = page.audioElements[elementId]."+atr);
     }
