@@ -390,6 +390,10 @@ function buttonSubmitClick()
 				var checkState = interfaceContext.checkAllCommented();
 				if (checkState == false) {canContinue = false;}
 				break;
+			case 'oneFragmentSelected':
+				var checkState = interfaceContext.checkOneFragmentSelected();
+				if (checkState == false) {canContinue = false;}
+				break;
 			default:
 				console.log("WARNING - Check option "+checks[i].check+" is not supported on this interface");
 				break;

@@ -2772,7 +2772,15 @@ function Interface(specificationObject) {
         this.storeErrorNode(str);
 		return false;
 	};
-    
+	this.checkOneFragmentSelected = function(){
+         var str = "You should select an answer before continuing";
+         if(this.comparator.selected === null){
+			 alert(str);
+			 return false;
+         } else {
+			 return true;
+         }
+    };
     this.storeErrorNode = function(errorMessage)
     {
         var time = audioEngineContext.timer.getTestTime();
