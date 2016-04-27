@@ -17,7 +17,7 @@ var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var audioEngineContext; // The custome AudioEngine object
 var projectReturn; // Hold the URL for the return
-
+var returnUrl; // Holds the url to be redirected to at the end of the test
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
@@ -404,7 +404,7 @@ function createProjectSave(destURL) {
 		a.textContent = "Save File";
 		
 		popup.showPopup();
-		popup.popupContent.innerHTML = "</span>Please save the file below to give to your test supervisor</span><br>";
+		popup.popupContent.innerHTML = "<span>Please save the file below to give to your test supervisor</span><br>";
 		popup.popupContent.appendChild(a);
 	} else {
 		var xmlhttp = new XMLHttpRequest;
@@ -425,8 +425,11 @@ function createProjectSave(destURL) {
                 var response = xmlDoc.getElementsByTagName('response')[0];
                 if (response.getAttribute("state") == "OK") {
                     var file = response.getElementsByTagName("file")[0];
-                    console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
-                    popup.popupContent.textContent = specification.exitText;
+					console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
+					if(typeof(returnUrl) !== "undefined"){
+						window.location = returnUrl;
+					}
+					popup.popupContent.textContent = specification.exitText;
                 } else {
                     var message = response.getElementsByTagName("message");
                     console.log("Save: Error! "+message.textContent);

@@ -33,9 +33,14 @@
 				{
 					// Split each request into
 					searchQueries[i] = searchQueries[i].split('=');
-					if (searchQueries[i][0] == "url")
+					var key = searchQueries[i][0];
+					var string = decodeURIComponent(searchQueries[i][1]);
+					if (key === "url")
 					{
-						url = decodeURI(searchQueries[i][1]);
+						url = string;
+					}
+					if (key === "returnUrl"){
+						returnUrl = string;
 					}
 				}
 				loadProjectSpec(url);
