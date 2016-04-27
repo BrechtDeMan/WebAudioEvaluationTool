@@ -2822,13 +2822,18 @@ function Storage()
         handleEvent: function() {
             var parse = new DOMParser();
             var xml = parse.parseFromString(this.request.response,"text/xml");
-            if (xml.getAllElementsByTagName("state")[0].textContent == "OK") {
-                this.key = xml.getAllElementsByTagName("key")[0].textContent;
-                this.parent.root.setAttribute("key",this.key);
-                this.parent.root.setAttribute("state","empty");
-            } else {
-                this.generateKey();
-            }
+            var shouldGenerateKey = true;
+            if(xml.getAllElementsByTagName("state").length > 0){
+				if (xml.getAllElementsByTagName("state")[0].textContent == "OK") {
+					this.key = xml.getAllElementsByTagName("key")[0].textContent;
+					this.parent.root.setAttribute("key",this.key);
+					this.parent.root.setAttribute("state","empty");
+					shouldGenerateKey = false;
+				}
+			}
+			if(shouldGenerateKey === true){
+				this.generateKey();
+			}
         },
         generateKey: function() {
             var temp_key = randomString(32);
