@@ -587,8 +587,6 @@ function interfacePopup() {
 		this.buttonPrevious.onclick = function(){popup.previousClick();};
 		
         this.hidePopup();
-        
-		this.popup.style.zIndex = -1;
 		this.popup.style.visibility = 'hidden';
 	};
 	
@@ -596,20 +594,16 @@ function interfacePopup() {
 		if (this.popup == null) {
 			this.createPopup();
 		}
-		this.popup.style.zIndex = 3;
 		this.popup.style.visibility = 'visible';
 		var blank = document.getElementsByClassName('testHalt')[0];
-		blank.style.zIndex = 2;
 		blank.style.visibility = 'visible';
         this.popupResponse.style.left="0%";
 	};
 	
 	this.hidePopup = function(){
         if (this.popup) {
-            this.popup.style.zIndex = -1;
             this.popup.style.visibility = 'hidden';
             var blank = document.getElementsByClassName('testHalt')[0];
-            blank.style.zIndex = -2;
             blank.style.visibility = 'hidden';
             this.buttonPrevious.style.visibility = 'inherit';
         }
