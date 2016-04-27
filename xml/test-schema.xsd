@@ -159,6 +159,8 @@
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute name="url" type="xs:anyURI" use="required" />
                 <xs:attribute name="gain" type="xs:decimal" default="0" />
+		<xs:attribute name="inactive" type="xs:boolean" default="false" />
+		<xs:attribute name="label" type="xs:string" />
                 <xs:attribute ref="name" />
                 <xs:attribute name="type" default="normal">
                     <xs:simpleType>

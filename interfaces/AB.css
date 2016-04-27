@@ -62,6 +62,10 @@ div.selected {
 	background-color: #008000;
 }
 
+div.comparator-selector.inactive{
+	background-color: yellow !important;
+}
+
 div.comparator-selector span {
 	font-size: 4em;
 }

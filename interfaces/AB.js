@@ -327,6 +327,9 @@ function comparator(audioHolderObject)
             var node = new this.comparatorBox(audioObject,index,label);
             audioObject.bindInterface(node);
             this.comparators.push(node);
+            if(element.inactive===true){
+                node.box.children[0].classList.add('inactive');
+            }
             this.boxHolders.appendChild(node.box);
         }
 	}
