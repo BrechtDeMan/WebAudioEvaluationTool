@@ -320,6 +320,9 @@ function comparator(audioHolderObject)
                 case "letter":
                     label = String.fromCharCode(97 + index);
                     break;
+                case "given":
+                	label = element.label;
+                	break;
                 default:
                     label = String.fromCharCode(65 + index);
                     break;
