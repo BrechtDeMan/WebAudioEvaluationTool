@@ -2773,14 +2773,22 @@ function Interface(specificationObject) {
 		return false;
 	};
 	this.checkOneFragmentSelected = function(){
-         var str = "You should select an answer before continuing";
-         if(this.comparator.selected === null){
-			 alert(str);
-			 return false;
-         } else {
-			 return true;
-         }
-    };
+		var str = "You should select an answer before continuing";
+		var thereIsOneInactive = 0;
+		for (var ao of audioEngineContext.audioObjects)
+		{
+			if(ao.specification.inactive === true)
+			{
+				++thereIsOneInactive;
+			}
+		}
+		if(this.comparator.selected === null && thereIsOneInactive===0){
+			alert(str);
+			return false;
+		} else {
+			return true;
+		}
+	};
     this.storeErrorNode = function(errorMessage)
     {
         var time = audioEngineContext.timer.getTestTime();
