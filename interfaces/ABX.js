@@ -375,6 +375,7 @@ function comparator(page)
             break;
     }
     var node = new this.interfaceObject(audioObject,label);
+    node.box.children[0].classList.add('inactive');
     audioObject.bindInterface(node);
     this.X = node;
     this.boxHolders.appendChild(node.box);
