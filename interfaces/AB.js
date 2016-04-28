@@ -208,8 +208,9 @@ function comparator(audioHolderObject)
                 $(".comparator-selector").removeClass('selected');
                 for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
                 {
-                     var obj = interfaceContext.comparator.comparators[i];
+                    var obj = interfaceContext.comparator.comparators[i];
                     obj.parent.metric.moved(time,0);
+                    obj.value = 0;
                 }
             } else {
                 $(".comparator-selector").removeClass('selected');
