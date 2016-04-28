@@ -1892,6 +1892,10 @@ function Interface(specificationObject) {
 		interfaceContext.commentBoxes.deleteCommentBoxes();
 		interfaceContext.deleteCommentQuestions();
 		loadTest(audioHolderObject,store);
+		if(audioHolderObject.hidden === true){
+		// work-around to have zero pages: set only one page with the attribute hidden=true and it will automatically skip over.
+			testState.advanceState();
+		}
 	};
 	
 	// Bounded by interface!!
