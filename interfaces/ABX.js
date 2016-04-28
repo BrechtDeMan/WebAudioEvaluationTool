@@ -208,8 +208,9 @@ function comparator(page)
                 $(".comparator-selector").removeClass('selected');
                 for (var i=0; i<interfaceContext.comparator.pair.length; i++)
                 {
-                     var obj = interfaceContext.comparator.pair[i];
+                    var obj = interfaceContext.comparator.pair[i];
                     obj.parent.metric.moved(time,0);
+                    obj.value = 0;
                 }
             } else {
                 $(".comparator-selector").removeClass('selected');
