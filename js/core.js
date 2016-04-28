@@ -407,8 +407,24 @@ function createProjectSave(destURL) {
 		popup.popupContent.innerHTML = "<span>Please save the file below to give to your test supervisor</span><br>";
 		popup.popupContent.appendChild(a);
 	} else {
+		var saveUrlSuffix = "";
+		// parse the querystring of destUrl, get the "id" (if any) and append it to destUrl
+		if(typeof(returnUrl) !== "undefined"){
+			var qs = returnUrl.split("?");
+			if(qs.length == 2){
+				qs = qs[1];
+				qs = qs.split("&");
+				for(var n = 0; n < qs.length; n++){
+					var pair = qs[n].split("=");
+					if (pair[0] == "id") {
+						saveUrlSuffix  = "&saveFilenamePrefix="+pair[1];
+					}
+				}
+			}
+		}
+		var saveUrl = "php/"+destURL+"?key="+storage.SessionKey.key+saveUrlSuffix;
 		var xmlhttp = new XMLHttpRequest;
-		xmlhttp.open("POST","php/save.php?key="+storage.SessionKey.key,true);
+		xmlhttp.open("POST", saveUrl, true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
 		xmlhttp.onerror = function(){
 			console.log('Error saving file to server! Presenting download locally');
