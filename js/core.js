@@ -430,9 +430,14 @@ function createProjectSave(destURL) {
                 var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
                 var response = xmlDoc.getElementsByTagName('response')[0];
                 if (response.getAttribute("state") == "OK") {
+                    window.onbeforeunload = undefined;
                     var file = response.getElementsByTagName("file")[0];
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
-                    popup.popupContent.textContent = specification.exitText;
+                    if (typeof specification.returnURL == "string") {
+                        window.location = returnURL;
+                    } else {
+                        popup.popupContent.textContent = specification.exitText;
+                    }
                 } else {
                     var message = response.getElementsByTagName("message");
                     console.log("Save: Error! "+message.textContent);
