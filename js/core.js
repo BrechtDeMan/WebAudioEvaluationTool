@@ -408,7 +408,13 @@ function createProjectSave(destURL) {
 		popup.popupContent.appendChild(a);
 	} else {
 		var xmlhttp = new XMLHttpRequest;
-		xmlhttp.open("POST","php/save.php?key="+storage.SessionKey.key,true);
+        var returnURL = "";
+        if (typeof specification.projectReturn == "string") {
+            if (specification.projectReturn.substr(0,4) == "http") {
+                returnURL = specification.projectReturn;
+            }
+        }
+		xmlhttp.open("POST",returnURL+"php/save.php?key="+storage.SessionKey.key,true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
 		xmlhttp.onerror = function(){
 			console.log('Error saving file to server! Presenting download locally');
@@ -2837,14 +2843,26 @@ function Storage()
         },
         generateKey: function() {
             var temp_key = randomString(32);
-            this.request.open("GET","php/keygen.php?key="+temp_key,true);
+            var returnURL = "";
+            if (typeof specification.projectReturn == "string") {
+                if (specification.projectReturn.substr(0,4) == "http") {
+                    returnURL = specification.projectReturn;
+                }
+            }
+            this.request.open("GET",returnURL+"php/keygen.php?key="+temp_key,true);
             this.request.addEventListener("load",this);
             this.request.send();
         },
         update: function() {
             this.parent.root.setAttribute("state","update");
             var xmlhttp = new XMLHttpRequest();
-            xmlhttp.open("POST","php/"+specification.projectReturn+"?key="+this.key);
+            var returnURL = "";
+            if (typeof specification.projectReturn == "string") {
+                if (specification.projectReturn.substr(0,4) == "http") {
+                    returnURL = specification.projectReturn;
+                }
+            }
+            xmlhttp.open("POST",returnURL+"php/save.php?key="+this.key);
             xmlhttp.setRequestHeader('Content-Type', 'text/xml');
             xmlhttp.onerror = function(){
                 console.log('Error updating file to server!');
