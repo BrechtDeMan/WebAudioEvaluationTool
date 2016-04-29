@@ -25,7 +25,7 @@ function loadInterface() {
 		hasBeenPlayed = audioEngineContext.checkAllPlayed();
 		if (hasBeenPlayed.length > 0) // if a fragment has not been played yet
 	    {
-	    	str = "";
+	    	var str = "";
 	    	if (hasBeenPlayed.length > 1) {
 		    	for (var i=0; i<hasBeenPlayed.length; i++) {
                     var ao_id = audioEngineContext.audioObjects[hasBeenPlayed[i]].interfaceDOM.getPresentedId();
@@ -36,10 +36,12 @@ function loadInterface() {
 		    			str += " or ";
 		    		}
 		    	}
-		    	alert('You have not played fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
+                str = 'You have not played fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.';
 	       } else {
-	       		alert('You have not played fragment ' + (audioEngineContext.audioObjects[hasBeenPlayed[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.');
-	       }
+               str = 'You have not played fragment ' + (audioEngineContext.audioObjects[hasBeenPlayed[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.';
+           }
+            this.storeErrorNode(str);
+            alert(str);
 	        return false;
 	    }
 	    return true;
@@ -84,6 +86,7 @@ function loadInterface() {
 		}
 		if (state != true)
 		{
+            this.storeErrorNode(str);
 			alert(str);
 			console.log(str);
 		}
@@ -104,8 +107,9 @@ function loadInterface() {
 				}
 			}
 			if (state == false) {
+                var str = "";
 				if (strNums.length > 1) {
-					var str = "";
+					
 			    	for (var i=0; i<strNums.length; i++) {
                         var ao_id = audioEngineContext.audioObjects[strNums[i]].interfaceDOM.getPresentedId();
 			    		str = str + (ao_id); // start from 1
@@ -115,10 +119,13 @@ function loadInterface() {
 			    			str += " or ";
 			    		}
 			    	}
-			    	alert('You have not commented on fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.');
+                    str = 'You have not commented on fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.';
 		       } else {
-		       		alert('You have not commented on fragment ' + (audioEngineContext.audioObjects[strNums[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.');
+                   str = 'You have not commented on fragment ' + (audioEngineContext.audioObjects[strNums[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.';
 		       }
+                this.storeErrorNode(str);
+                alert(str);
+                console.log(str);
 			}
 		}
 		return state;
@@ -164,6 +171,7 @@ function loadInterface() {
 		}
 		if (state != true)
 		{
+            this.storeErrorNode(str);
 			alert(str);
 			console.log(str);
 		}
