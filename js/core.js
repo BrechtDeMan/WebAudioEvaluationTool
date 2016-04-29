@@ -809,10 +809,9 @@ function interfacePopup() {
 					if (node.specification.mandatory == true)
 					{
 						alert("This radio is mandatory");
-					} else {
-						node.response = -1;
+                        return;
 					}
-					return;
+                    break;
 				}
 				if (inputs[i].checked == true) {
 					node.response = node.specification.options[i];
