@@ -2849,17 +2849,6 @@ function Interface(specificationObject) {
 	this.checkScaleRange = function(min, max) {
 		var page = testState.getCurrentTestPage();
 		var audioObjects = audioEngineContext.audioObjects;
-		var thereIsOneInactive = 0;
-		for (var ao of audioEngineContext.audioObjects)
-		{
-			if(ao.specification.inactive === true)
-			{
-				++thereIsOneInactive;
-			}
-		}
-		if(thereIsOneInactive){
-			return true;
-		}
 		var state = true;
 		var str = "Please keep listening. ";
 		var minRanking = Infinity;
