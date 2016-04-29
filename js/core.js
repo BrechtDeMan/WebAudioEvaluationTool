@@ -17,7 +17,7 @@ var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var audioEngineContext; // The custome AudioEngine object
 var projectReturn; // Hold the URL for the return
-var returnURL = ""; // Holds the url to be redirected to at the end of the test
+var getReturnURL = null; // Holds the url to be redirected to at the end of the test
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
@@ -409,8 +409,8 @@ function createProjectSave(destURL) {
 	} else {
 		var saveUrlSuffix = "";
 		// parse the querystring of destUrl, get the "id" (if any) and append it to destUrl
-		if(returnURL !== ""){
-			var qs = returnURL.split("?");
+		if(getReturnURL !== null){
+			var qs = getReturnURL.split("?");
 			if(qs.length == 2){
 				qs = qs[1];
 				qs = qs.split("&");
@@ -443,8 +443,13 @@ function createProjectSave(destURL) {
                     window.onbeforeunload = undefined;
                     var file = response.getElementsByTagName("file")[0];
 		      console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
-		      if (typeof specification.returnURL == "string") {
-				window.location = returnURL;
+		      var returnURL;
+		      if(getReturnURL === null)
+		      	  returnURL = specification.returnURL;
+		      else
+		      	  returnURL = getReturnURL;
+		      if (typeof(returnURL) === "string" && returnURL.length > 0) {
+				  window.location = returnURL;
 		      } else {
 			      popup.popupContent.textContent = specification.exitText;
 		      }
@@ -459,8 +464,12 @@ function createProjectSave(destURL) {
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
 		popup.popupContent.textContent = "Submitting. Please Wait";
-        popup.hidenextbutton();
-        popup.hidepreviousButton();
+        if(typeof(popup.hidenextbutton) === "function"){
+            popup.hidenextbutton();
+        }
+        if(typeof(popup.hidepreviousButton) === "function"){
+            popup.hidepreviousButton();
+        }
 	}
 }
 
