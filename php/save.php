@@ -6,6 +6,11 @@
 	$postText = file_get_contents('php://input');
 	$file_key = $_GET['key'];
 	$filename = '../saves/'.$saveFilenamePrefix.'save-'.$file_key.".xml";
+    $doc = new DOMDocument;
+    $doc->preserveWhiteSpace = false;
+    $doc->formatOutput = true;
+    $doc->loadXML($postText);
+    $postText = $doc->saveXML();
 	$fileHandle = fopen($filename, 'w');
 	if ($fileHandle == FALSE)
 	{

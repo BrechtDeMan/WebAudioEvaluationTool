@@ -78,7 +78,7 @@ div.disabled{
 }
 
 
-div#content > div.node{
+div#page-holder > div.node{
     background-color: rgb(200,228,151);
 }
 

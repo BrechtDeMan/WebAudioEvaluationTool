@@ -81,6 +81,7 @@
                 <xs:attribute name="randomiseOrder" type="xs:boolean" default="false" />
                 <xs:attribute name="repeatCount" type="xs:nonNegativeInteger" default="0" />
                 <xs:attribute name="loop" type="xs:boolean" default="false" />
+                <xs:attribute name="synchronous" type="xs:boolean" default="false" />
                 <xs:attribute name="showElementComments" type="xs:boolean" default="false" />
                 <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional" />
                 <xs:attribute name="label" use="optional" default="default">
@@ -165,6 +166,7 @@
 		<xs:attribute name="inactive" type="xs:boolean" default="false" />
 		<xs:attribute name="label" type="xs:string" default="" />
                 <xs:attribute ref="name" />
+		<xs:attribute name="originalId" type="xs:string" />
                 <xs:attribute name="type" default="normal">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">

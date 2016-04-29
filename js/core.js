@@ -140,6 +140,32 @@ window.onload = function() {
 	storage = new Storage();
 	// Define window callbacks for interface
 	window.onresize = function(event){interfaceContext.resizeWindow(event);};
+    
+    if (window.location.search.length != 0)
+    {
+        var search = window.location.search.split('?')[1];
+        // Now split the requests into pairs
+        var searchQueries = search.split('&');
+
+	for (var i in searchQueries)
+	{
+	// Split each request into
+		searchQueries[i] = searchQueries[i].split('=');
+		var key = searchQueries[i][0];
+		var string = decodeURIComponent(searchQueries[i][1]);
+		if (key === "url")
+		{
+			url = string;
+		}
+		if (key === "returnUrl"){
+			getReturnURL = string;
+		}
+	}
+        loadProjectSpec(url);
+        window.onbeforeunload = function() {
+            return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
+        };
+    }
 };
 
 function loadProjectSpec(url) {
@@ -828,10 +854,9 @@ function interfacePopup() {
 					if (node.specification.mandatory == true)
 					{
 						alert("This radio is mandatory");
-					} else {
-						node.response = -1;
+                        return;
 					}
-					return;
+                    break;
 				}
 				if (inputs[i].checked == true) {
 					node.response = node.specification.options[i];
@@ -1118,6 +1143,13 @@ function stateMachine()
     this.getCurrentTestPage = function() {
         if (this.stateIndex >= 0 && this.stateIndex< this.stateMap.length) {
             return this.currentStateMap;
+        } else {
+            return null;
+        }
+    }
+    this.getCurrentTestPageStore = function() {
+        if (this.stateIndex >= 0 && this.stateIndex< this.stateMap.length) {
+            return this.currentStore;
         } else {
             return null;
         }
@@ -2857,8 +2889,8 @@ function Interface(specificationObject) {
 			this.storeErrorNode(str);
 			alert(str);
 		}
-		return state;
-	}
+        return state;
+    }
     this.storeErrorNode = function(errorMessage)
     {
         var time = audioEngineContext.timer.getTestTime();
