@@ -1095,6 +1095,14 @@ function stateMachine()
 		pageXMLSave(storePoint.XMLDOM, this.currentStateMap);
         storePoint.complete();
 	};
+    
+    this.getCurrentTestPage = function() {
+        if (this.stateIndex >= 0 && this.stateIndex< this.stateMap.length) {
+            return this.currentStateMap;
+        } else {
+            return null;
+        }
+    }
 }
 
 function AudioEngine(specification) {
@@ -2783,6 +2791,33 @@ function Interface(specificationObject) {
         this.storeErrorNode(str);
 		return false;
 	};
+    this.checkScaleRange = function(min, max) {
+        var page = testState.getCurrentTestPage();
+        var audioObjects = audioEngineContext.audioObjects;
+        var state = true;
+        var str = "Please keep listening. ";
+        var minRanking = Infinity;
+        var maxRanking = -Infinity;
+        for (var ao of audioObjects) {
+            var rank = ao.interfaceDOM.getValue();
+            if (rank < minRanking) {minRanking = rank;}
+            if (rank > maxRanking) {maxRanking = rank;}
+        }
+        if (minRanking*100 > min) {
+            str += "At least one fragment must be below the "+min+" mark.";
+            state = false;
+        }
+        if (maxRanking*100 < max) {
+            str += "At least one fragment must be above the "+max+" mark."
+            state = false;
+        }
+        if (!state) {
+            console.log(str);
+            this.storeErrorNode(str);
+            alert(str);
+        }
+        return state;
+    }
     
     this.storeErrorNode = function(errorMessage)
     {

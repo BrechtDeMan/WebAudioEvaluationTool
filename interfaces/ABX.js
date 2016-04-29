@@ -430,6 +430,11 @@ function buttonSubmitClick()
 				var checkState = interfaceContext.checkAllCommented();
 				if (checkState == false) {canContinue = false;}
 				break;
+            case 'scalerange':
+                // Check the scale has been used effectively
+                var checkState = interfaceContext.checkScaleRange(checks[i].min,checks[i].max);
+                if (checkState == false) {canContinue = false;}
+				break;
 			default:
 				console.log("WARNING - Check option "+checks[i].check+" is not supported on this interface");
 				break;
