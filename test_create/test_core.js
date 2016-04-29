@@ -1451,21 +1451,28 @@ function SpecificationToHTML()
                 var pageObj = new specification.page(specification);
                 specification.pages.push(pageObj);
                 var newPage = new this.parent.pageNode(this.parent,pageObj);
-                this.parent.injectDOM.appendChild(newPage.rootDOM);
+                document.getElementById("page-holder").appendChild(newPage.rootDOM);
                 this.parent.pages.push(newPage);
             }
         }
         this.addPage.root.textContent = "Add Page";
+        this.addPage.root.id = "new-page-button";
+        this.addPage.root.style.float = "left";
         this.addPage.root.addEventListener("click",this.addPage,false);
-        this.injectDOM.appendChild(this.addPage.root);
+        
+        var pageHolder = document.createElement("div");
+        pageHolder.id ="page-holder";
+        this.injectDOM.appendChild(pageHolder);
         
         // Build each page
         for (var page of specification.pages)
         {
             var newPage = new this.pageNode(this,page);
-            this.injectDOM.appendChild(newPage.rootDOM);
+            pageHolder.appendChild(newPage.rootDOM);
             this.pages.push(newPage);
         }
+        
+        this.injectDOM.appendChild(this.addPage.root);
     }
     
     this.interfaceNode = function(parent,rootObject)
