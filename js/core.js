@@ -2849,7 +2849,7 @@ function Interface(specificationObject) {
 			alert(str);
 		}
 		return state;
-	}	     
+	}
     this.storeErrorNode = function(errorMessage)
     {
         var time = audioEngineContext.timer.getTestTime();
