@@ -469,8 +469,12 @@ function createProjectSave(destURL) {
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
 		popup.popupContent.textContent = "Submitting. Please Wait";
-        popup.hideNextButton();
-        popup.hidePreviousButton();
+		if(typeof(popup.hideNextButton) === "function"){
+			popup.hideNextButton();
+		}
+		if(typeof(popup.hidePreviousButton) === "function"){
+			popup.hidePreviousButton();
+		}
 	}
 }
 
