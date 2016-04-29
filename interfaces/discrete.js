@@ -492,11 +492,11 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 				var checkState = interfaceContext.checkAllCommented();
 				if (checkState == false) {canContinue = false;}
 				break;
-			//case 'scalerange':
-				// Check the scale is used to its full width outlined by the node
-				//var checkState = interfaceContext.checkScaleRange();
-				//if (checkState == false) {canContinue = false;}
-			//	break;
+			case 'scalerange':
+                // Check the scale has been used effectively
+                var checkState = interfaceContext.checkScaleRange(checks[i].min,checks[i].max);
+                if (checkState == false) {canContinue = false;}
+				break;
 			default:
 				console.log("WARNING - Check option "+checks[i].check+" is not supported on this interface");
 				break;

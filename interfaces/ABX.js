@@ -208,8 +208,9 @@ function comparator(page)
                 $(".comparator-selector").removeClass('selected');
                 for (var i=0; i<interfaceContext.comparator.pair.length; i++)
                 {
-                     var obj = interfaceContext.comparator.pair[i];
+                    var obj = interfaceContext.comparator.pair[i];
                     obj.parent.metric.moved(time,0);
+                    obj.value = 0;
                 }
             } else {
                 $(".comparator-selector").removeClass('selected');
@@ -375,6 +376,7 @@ function comparator(page)
             break;
     }
     var node = new this.interfaceObject(audioObject,label);
+    node.box.children[0].classList.add('inactive');
     audioObject.bindInterface(node);
     this.X = node;
     this.boxHolders.appendChild(node.box);
@@ -427,6 +429,11 @@ function buttonSubmitClick()
 				// Check all fragment sliders have been moved.
 				var checkState = interfaceContext.checkAllCommented();
 				if (checkState == false) {canContinue = false;}
+				break;
+            case 'scalerange':
+                // Check the scale has been used effectively
+                var checkState = interfaceContext.checkScaleRange(checks[i].min,checks[i].max);
+                if (checkState == false) {canContinue = false;}
 				break;
 			default:
 				console.log("WARNING - Check option "+checks[i].check+" is not supported on this interface");

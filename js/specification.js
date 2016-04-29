@@ -2,7 +2,8 @@ function Specification() {
 	// Handles the decoding of the project specification XML into a simple JavaScript Object.
 	
 	this.interface = null;
-	this.projectReturn = "null";
+	this.projectReturn = null;
+    this.returnURL = null;
 	this.randomiseOrder = null;
 	this.testPages = null;
 	this.pages = [];

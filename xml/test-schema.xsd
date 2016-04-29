@@ -47,6 +47,7 @@
                 </xs:sequence>
                 <xs:attribute name="interface" type="xs:string" use="required" />
                 <xs:attribute name="projectReturn" type="xs:string" use="optional" default="" />
+                <xs:attribute name="returnURL" type="xs:string" use="optional" default="" />
                 <xs:attribute name="randomiseOrder" type="xs:boolean" default="false" />
                 <xs:attribute ref="poolSize" />
                 <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional" />

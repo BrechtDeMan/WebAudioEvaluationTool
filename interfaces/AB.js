@@ -208,8 +208,9 @@ function comparator(audioHolderObject)
                 $(".comparator-selector").removeClass('selected');
                 for (var i=0; i<interfaceContext.comparator.comparators.length; i++)
                 {
-                     var obj = interfaceContext.comparator.comparators[i];
+                    var obj = interfaceContext.comparator.comparators[i];
                     obj.parent.metric.moved(time,0);
+                    obj.value = 0;
                 }
             } else {
                 $(".comparator-selector").removeClass('selected');
@@ -393,8 +394,9 @@ function buttonSubmitClick()
 				var checkState = interfaceContext.checkAllCommented();
 				if (checkState == false) {canContinue = false;}
 				break;
-			case 'oneFragmentSelected':
-				var checkState = interfaceContext.checkOneFragmentSelected();
+			case 'scalerange':
+			// Check the scale has been used effectively
+			var checkState = interfaceContext.checkScaleRange(checks[i].min,checks[i].max);
 				if (checkState == false) {canContinue = false;}
 				break;
 			default:

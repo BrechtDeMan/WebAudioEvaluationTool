@@ -17,7 +17,7 @@ var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var audioEngineContext; // The custome AudioEngine object
 var projectReturn; // Hold the URL for the return
-var returnUrl; // Holds the url to be redirected to at the end of the test
+var returnURL = ""; // Holds the url to be redirected to at the end of the test
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
@@ -409,8 +409,8 @@ function createProjectSave(destURL) {
 	} else {
 		var saveUrlSuffix = "";
 		// parse the querystring of destUrl, get the "id" (if any) and append it to destUrl
-		if(typeof(returnUrl) !== "undefined"){
-			var qs = returnUrl.split("?");
+		if(returnURL !== ""){
+			var qs = returnURL.split("?");
 			if(qs.length == 2){
 				qs = qs[1];
 				qs = qs.split("&");
@@ -440,12 +440,14 @@ function createProjectSave(destURL) {
                 var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
                 var response = xmlDoc.getElementsByTagName('response')[0];
                 if (response.getAttribute("state") == "OK") {
+                    window.onbeforeunload = undefined;
                     var file = response.getElementsByTagName("file")[0];
-					console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
-					if(typeof(returnUrl) !== "undefined"){
-						window.location = returnUrl;
-					}
-					popup.popupContent.textContent = specification.exitText;
+		      console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
+		      if (typeof specification.returnURL == "string") {
+				window.location = returnURL;
+		      } else {
+			      popup.popupContent.textContent = specification.exitText;
+		      }
                 } else {
                     var message = response.getElementsByTagName("message");
                     console.log("Save: Error! "+message.textContent);
@@ -457,16 +459,16 @@ function createProjectSave(destURL) {
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
 		popup.popupContent.textContent = "Submitting. Please Wait";
-        popup.hideNextButton();
-        popup.hidePreviousButton();
+        popup.hidenextbutton();
+        popup.hidepreviousButton();
 	}
 }
 
-function errorSessionDump(msg){
-	// Create the partial interface XML save
-	// Include error node with message on why the dump occured
-	popup.showPopup();
-	popup.popupContent.innerHTML = null;
+function errorsessiondump(msg){
+	// create the partial interface XML save
+	// include error node with message on why the dump occured
+	popup.showpopup();
+	popup.popupcontent.innerHTML = null;
 	var err = document.createElement('error');
 	var parent = document.createElement("div");
 	if (typeof msg === "object")
@@ -1103,6 +1105,14 @@ function stateMachine()
 		pageXMLSave(storePoint.XMLDOM, this.currentStateMap);
         storePoint.complete();
 	};
+    
+    this.getCurrentTestPage = function() {
+        if (this.stateIndex >= 0 && this.stateIndex< this.stateMap.length) {
+            return this.currentStateMap;
+        } else {
+            return null;
+        }
+    }
 }
 
 function AudioEngine(specification) {
@@ -2795,8 +2805,9 @@ function Interface(specificationObject) {
         this.storeErrorNode(str);
 		return false;
 	};
-	this.checkOneFragmentSelected = function(){
-		var str = "You should select an answer before continuing";
+	this.checkScaleRange = function(min, max) {
+		var page = testState.getCurrentTestPage();
+		var audioObjects = audioEngineContext.audioObjects;
 		var thereIsOneInactive = 0;
 		for (var ao of audioEngineContext.audioObjects)
 		{
@@ -2805,13 +2816,40 @@ function Interface(specificationObject) {
 				++thereIsOneInactive;
 			}
 		}
-		if(this.comparator.selected === null && thereIsOneInactive===0){
-			alert(str);
-			return false;
-		} else {
+		if(thereIsOneInactive){
 			return true;
 		}
-	};
+		var state = true;
+		var str = "Please keep listening. ";
+		var minRanking = Infinity;
+		var maxRanking = -Infinity;
+		var interface = page.specification.interface;
+		var isAb = interface === "AB" || interface === "ABX";
+		for (var ao of audioObjects) {
+			var rank = ao.interfaceDOM.getValue();
+			if (rank < minRanking) {minRanking = rank;}
+			if (rank > maxRanking) {maxRanking = rank;}
+		}
+		if (minRanking*100 > min) {
+			str += "At least one fragment must be below the "+min+" mark.";
+			state = false;
+		}
+		if (maxRanking*100 < max) {
+			if(isAb){ // if it is AB or ABX let's phrase it differently
+				str += "You must select a fragment before continuing";
+			}
+			else{
+				str += "At least one fragment must be above the "+max+" mark."
+			}
+			state = false;
+		}
+		if (!state) {
+			console.log(str);
+			this.storeErrorNode(str);
+			alert(str);
+		}
+		return state;
+	}	     
     this.storeErrorNode = function(errorMessage)
     {
         var time = audioEngineContext.timer.getTestTime();
@@ -2876,14 +2914,26 @@ function Storage()
         },
         generateKey: function() {
             var temp_key = randomString(32);
-            this.request.open("GET","php/keygen.php?key="+temp_key,true);
+            var returnURL = "";
+            if (typeof specification.projectReturn == "string") {
+                if (specification.projectReturn.substr(0,4) == "http") {
+                    returnURL = specification.projectReturn;
+                }
+            }
+            this.request.open("GET",returnURL+"php/keygen.php?key="+temp_key,true);
             this.request.addEventListener("load",this);
             this.request.send();
         },
         update: function() {
             this.parent.root.setAttribute("state","update");
             var xmlhttp = new XMLHttpRequest();
-            xmlhttp.open("POST","php/"+specification.projectReturn+"?key="+this.key);
+            var returnURL = "";
+            if (typeof specification.projectReturn == "string") {
+                if (specification.projectReturn.substr(0,4) == "http") {
+                    returnURL = specification.projectReturn;
+                }
+            }
+            xmlhttp.open("POST",returnURL+"php/save.php?key="+this.key);
             xmlhttp.setRequestHeader('Content-Type', 'text/xml');
             xmlhttp.onerror = function(){
                 console.log('Error updating file to server!');
