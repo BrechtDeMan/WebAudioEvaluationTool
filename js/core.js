@@ -1103,6 +1103,13 @@ function stateMachine()
             return null;
         }
     }
+    this.getCurrentTestPageStore = function() {
+        if (this.stateIndex >= 0 && this.stateIndex< this.stateMap.length) {
+            return this.currentStore;
+        } else {
+            return null;
+        }
+    }
 }
 
 function AudioEngine(specification) {
