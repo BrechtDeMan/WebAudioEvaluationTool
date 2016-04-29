@@ -140,6 +140,26 @@ window.onload = function() {
 	storage = new Storage();
 	// Define window callbacks for interface
 	window.onresize = function(event){interfaceContext.resizeWindow(event);};
+    
+    if (window.location.search.length != 0)
+    {
+        var search = window.location.search.split('?')[1];
+        // Now split the requests into pairs
+        var searchQueries = search.split('&');
+        for (var i in searchQueries)
+        {
+            // Split each request into
+            searchQueries[i] = searchQueries[i].split('=');
+            if (searchQueries[i][0] == "url")
+            {
+                url = decodeURI(searchQueries[i][1]);
+            }
+        }
+        loadProjectSpec(url);
+        window.onbeforeunload = function() {
+            return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
+        };
+    }
 };
 
 function loadProjectSpec(url) {
