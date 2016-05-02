@@ -490,20 +490,20 @@ function createProjectSave(destURL) {
 		popup.showPopup();
 		popup.popupContent.innerHTML = null;
 		popup.popupContent.textContent = "Submitting. Please Wait";
-        if(typeof(popup.hidenextbutton) === "function"){
-            popup.hidenextbutton();
-        }
-        if(typeof(popup.hidepreviousButton) === "function"){
-            popup.hidepreviousButton();
-        }
+		if(typeof(popup.hideNextButton) === "function"){
+			popup.hideNextButton();
+		}
+		if(typeof(popup.hidePreviousButton) === "function"){
+			popup.hidePreviousButton();
+		}
 	}
 }
 
-function errorsessiondump(msg){
-	// create the partial interface XML save
-	// include error node with message on why the dump occured
-	popup.showpopup();
-	popup.popupcontent.innerHTML = null;
+function errorSessionDump(msg){
+	// Create the partial interface XML save
+	// Include error node with message on why the dump occured
+	popup.showPopup();
+	popup.popupContent.innerHTML = null;
 	var err = document.createElement('error');
 	var parent = document.createElement("div");
 	if (typeof msg === "object")
@@ -2846,38 +2846,37 @@ function Interface(specificationObject) {
         this.storeErrorNode(str);
 		return false;
 	};
-	this.checkScaleRange = function(min, max) {
-		var page = testState.getCurrentTestPage();
-		var audioObjects = audioEngineContext.audioObjects;
-		var state = true;
-		var str = "Please keep listening. ";
-		var minRanking = Infinity;
-		var maxRanking = -Infinity;
-		var interface = page.specification.interface;
-		var isAb = interface === "AB" || interface === "ABX";
-		for (var ao of audioObjects) {
-			var rank = ao.interfaceDOM.getValue();
-			if (rank < minRanking) {minRanking = rank;}
-			if (rank > maxRanking) {maxRanking = rank;}
-		}
-		if (minRanking*100 > min) {
-			str += "At least one fragment must be below the "+min+" mark.";
-			state = false;
-		}
-		if (maxRanking*100 < max) {
-			if(isAb){ // if it is AB or ABX let's phrase it differently
-				str += "You must select a fragment before continuing";
-			}
-			else{
-				str += "At least one fragment must be above the "+max+" mark."
-			}
-			state = false;
-		}
-		if (!state) {
-			console.log(str);
-			this.storeErrorNode(str);
-			alert(str);
-		}
+    this.checkScaleRange = function(min, max) {
+        var page = testState.getCurrentTestPage();
+        var audioObjects = audioEngineContext.audioObjects;
+        var state = true;
+        var str = "Please keep listening. ";
+        var minRanking = Infinity;
+        var maxRanking = -Infinity;
+        var interface = page.specification.interface;
+        var isAb = interface === "AB" || interface === "ABX";
+        for (var ao of audioObjects) {
+            var rank = ao.interfaceDOM.getValue();
+            if (rank < minRanking) {minRanking = rank;}
+            if (rank > maxRanking) {maxRanking = rank;}
+        }
+        if (minRanking*100 > min) {
+            str += "At least one fragment must be below the "+min+" mark.";
+            state = false;
+        }
+	if (maxRanking*100 < max) {
+	    if(isAb){ // if it is AB or ABX let's phrase it differently
+                str += "You must select a fragment before continuing";
+            } else{
+                str += "At least one fragment must be above the "+max+" mark."
+            }
+            state = false;
+        }
+        if (!state) {
+            console.log(str);
+            this.storeErrorNode(str);
+            alert(str);
+        }
         return state;
     }
     this.storeErrorNode = function(errorMessage)
