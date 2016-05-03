@@ -9,3 +9,4 @@
 *.toc
 saves/*.xml
 *.DS_STORE
+*.swp
