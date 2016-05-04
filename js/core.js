@@ -16,7 +16,7 @@ var popup; // Hold the interfacePopup object
 var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var audioEngineContext; // The custome AudioEngine object
-var projectReturn; // Hold the URL for the return
+var gReturnURL;
 
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
@@ -150,9 +150,13 @@ window.onload = function() {
         {
             // Split each request into
             searchQueries[i] = searchQueries[i].split('=');
-            if (searchQueries[i][0] == "url")
-            {
-                url = decodeURI(searchQueries[i][1]);
+            switch(searchQueries[i][0]) {
+                case "url":
+                    url = decodeURI(searchQueries[i][1]);
+                    break;
+                case "returnURL":
+                    gReturnURL = decodeURI(searchQueries[i][1]);
+                    break;
             }
         }
         loadProjectSpec(url);
@@ -399,6 +403,11 @@ function loadProjectSpecCallback(response) {
             break;
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
+    
+    if (gReturnURL != undefined) {
+        console.log("returnURL Overide from "+specification.returnURL+" to "+gReturnURL);
+        specification.returnURL = gReturnURL;
+    }
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine(specification);
@@ -454,7 +463,9 @@ function createProjectSave(destURL) {
                     var file = response.getElementsByTagName("file")[0];
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
                     if (typeof specification.returnURL == "string") {
-                        window.location = returnURL;
+                        if (specification.returnURL.length > 0) {
+                            window.location = specification.returnURL;
+                        }
                     } else {
                         popup.popupContent.textContent = specification.exitText;
                     }
