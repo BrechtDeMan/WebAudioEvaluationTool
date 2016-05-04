@@ -16,8 +16,8 @@ var popup; // Hold the interfacePopup object
 var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var audioEngineContext; // The custome AudioEngine object
-var projectReturn; // Hold the URL for the return
-var getReturnURL = null; // Holds the url to be redirected to at the end of the test
+var gReturnURL;
+
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
 AudioBufferSourceNode.prototype.owner = undefined;
@@ -147,20 +147,21 @@ window.onload = function() {
         // Now split the requests into pairs
         var searchQueries = search.split('&');
 
-	for (var i in searchQueries)
-	{
-	// Split each request into
-		searchQueries[i] = searchQueries[i].split('=');
-		var key = searchQueries[i][0];
-		var string = decodeURIComponent(searchQueries[i][1]);
-		if (key === "url")
-		{
-			url = string;
-		}
-		if (key === "returnUrl"){
-			getReturnURL = string;
-		}
-	}
+        for (var i in searchQueries)
+        {
+            // Split each key-value pair
+            searchQueries[i] = searchQueries[i].split('=');
+            var key = searchQueries[i][0];
+            var value = decodeURIComponent(searchQueries[i][1]);
+            switch(key) {
+            case "url":
+                url = value;
+                break;
+            case "returnURL":
+                gReturnURL = value;
+                break;
+            }
+        }
         loadProjectSpec(url);
         window.onbeforeunload = function() {
             return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
@@ -405,6 +406,11 @@ function loadProjectSpecCallback(response) {
             break;
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
+    
+    if (gReturnURL != undefined) {
+        console.log("returnURL Overide from "+specification.returnURL+" to "+gReturnURL);
+        specification.returnURL = gReturnURL;
+    }
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine(specification);
@@ -468,17 +474,14 @@ function createProjectSave(destURL) {
                 if (response.getAttribute("state") == "OK") {
                     window.onbeforeunload = undefined;
                     var file = response.getElementsByTagName("file")[0];
-		      console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
-		      var returnURL;
-		      if(getReturnURL === null)
-		      	  returnURL = specification.returnURL;
-		      else
-		      	  returnURL = getReturnURL;
-		      if (typeof(returnURL) === "string" && returnURL.length > 0) {
-				  window.location = returnURL;
-		      } else {
-			      popup.popupContent.textContent = specification.exitText;
-		      }
+                    console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
+                    if (typeof specification.returnURL == "string") {
+                        if (specification.returnURL.length > 0) {
+                            window.location = specification.returnURL;
+                        }
+                    } else {
+                        popup.popupContent.textContent = specification.exitText;
+                    }
                 } else {
                     var message = response.getElementsByTagName("message");
                     console.log("Save: Error! "+message.textContent);
