@@ -146,17 +146,20 @@ window.onload = function() {
         var search = window.location.search.split('?')[1];
         // Now split the requests into pairs
         var searchQueries = search.split('&');
+
         for (var i in searchQueries)
         {
-            // Split each request into
+            // Split each key-value pair
             searchQueries[i] = searchQueries[i].split('=');
-            switch(searchQueries[i][0]) {
-                case "url":
-                    url = decodeURI(searchQueries[i][1]);
-                    break;
-                case "returnURL":
-                    gReturnURL = decodeURI(searchQueries[i][1]);
-                    break;
+            var key = searchQueries[i][0];
+            var value = decodeURIComponent(searchQueries[i][1]);
+            switch(key) {
+            case "url":
+                url = value;
+                break;
+            case "returnURL":
+                gReturnURL = value;
+                break;
             }
         }
         loadProjectSpec(url);
