@@ -441,8 +441,9 @@ function createProjectSave(destURL) {
 	} else {
 		var saveUrlSuffix = "";
 		// parse the querystring of destUrl, get the "id" (if any) and append it to destUrl
-		if(getReturnURL !== null){
-			var qs = getReturnURL.split("?");
+		var returnURL = specification.returnURL;
+		if(returnURL.length > 0){
+			var qs = returnURL.split("?");
 			if(qs.length == 2){
 				qs = qs[1];
 				qs = qs.split("&");
