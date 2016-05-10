@@ -42,12 +42,13 @@ div.popupHolder {
 	border-radius: 10px;
 	box-shadow: 0px 0px 50px #000;
 	z-index: 10;
-    position: fixed;
+	position: fixed;
 }
 
 div#popupContent {
     margin-top: 20px;
     margin-bottom: 35px;
+    overflow: auto;
 }
 
 div#popupTitleHolder {
@@ -56,7 +57,11 @@ div#popupTitleHolder {
     max-height: 250px;
     overflow: auto;
     margin-bottom: 5px;
-    text-align: center;
+    padding: 8px;
+}
+
+#popupTitle {
+    white-space: pre-line;
 }
 
 div#popupResponse {
