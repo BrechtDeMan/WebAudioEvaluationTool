@@ -1,10 +1,11 @@
 <?php
 	error_reporting(0);
+	$saveFilenamePrefix = isset($_GET['saveFilenamePrefix']) ? $_GET['saveFilenamePrefix'].'-' : '';
 	header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
 	$postText = file_get_contents('php://input');
-    $file_key = $_GET['key'];
-    $filename = "../saves/save-".$file_key.".xml";
+	$file_key = $_GET['key'];
+	$filename = '../saves/'.$saveFilenamePrefix.'save-'.$file_key.".xml";
     $doc = new DOMDocument;
     $doc->preserveWhiteSpace = false;
     $doc->formatOutput = true;

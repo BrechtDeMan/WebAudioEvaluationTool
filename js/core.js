@@ -17,6 +17,7 @@ var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var audioEngineContext; // The custome AudioEngine object
 var gReturnURL;
+var gSaveFilenamePrefix;
 
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
@@ -159,6 +160,9 @@ window.onload = function() {
                 break;
             case "returnURL":
                 gReturnURL = value;
+                break;
+            case "saveFilenamePrefix":
+                gSaveFilenamePrefix = value;
                 break;
             }
         }
@@ -411,6 +415,9 @@ function loadProjectSpecCallback(response) {
         console.log("returnURL Overide from "+specification.returnURL+" to "+gReturnURL);
         specification.returnURL = gReturnURL;
     }
+    if (gSaveFilenamePrefix != undefined){
+        specification.saveFilenamePrefix = gSaveFilenamePrefix;
+    }
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine(specification);
@@ -439,14 +446,20 @@ function createProjectSave(destURL) {
 		popup.popupContent.innerHTML = "<span>Please save the file below to give to your test supervisor</span><br>";
 		popup.popupContent.appendChild(a);
 	} else {
+		var saveUrlSuffix = "";
+		var saveFilenamePrefix = specification.saveFilenamePrefix;
+		if(typeof(saveFilenamePrefix) === "string" && saveFilenamePrefix.length > 0){
+			saveUrlSuffix  = "&saveFilenamePrefix="+saveFilenamePrefix;
+		}
+		var projectReturn = "";
+		if (typeof specification.projectReturn == "string") {
+			if (specification.projectReturn.substr(0,4) == "http") {
+				projectReturn = specification.projectReturn;
+			}
+		}
+		var saveURL = projectReturn+"php/save.php?key="+storage.SessionKey.key+saveUrlSuffix;
 		var xmlhttp = new XMLHttpRequest;
-        var returnURL = "";
-        if (typeof specification.projectReturn == "string") {
-            if (specification.projectReturn.substr(0,4) == "http") {
-                returnURL = specification.projectReturn;
-            }
-        }
-		xmlhttp.open("POST",returnURL+"php/save.php?key="+storage.SessionKey.key,true);
+		xmlhttp.open("POST", saveURL, true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
 		xmlhttp.onerror = function(){
 			console.log('Error saving file to server! Presenting download locally');
