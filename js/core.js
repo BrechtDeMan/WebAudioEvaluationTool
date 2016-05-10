@@ -476,10 +476,8 @@ function createProjectSave(destURL) {
                     window.onbeforeunload = undefined;
                     var file = response.getElementsByTagName("file")[0];
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
-                    if (typeof specification.returnURL == "string") {
-                        if (specification.returnURL.length > 0) {
+                    if (typeof specification.returnURL == "string" && specification.returnURL.length > 0) {
                             window.location = specification.returnURL;
-                        }
                     } else {
                         popup.popupContent.textContent = specification.exitText;
                     }
