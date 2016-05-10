@@ -17,6 +17,7 @@ var testState;
 var currentTrackOrder = []; // Hold the current XML tracks in their (randomised) order
 var audioEngineContext; // The custome AudioEngine object
 var gReturnURL;
+var gSaveFilenamePrefix;
 
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
@@ -160,6 +161,9 @@ window.onload = function() {
             case "returnURL":
                 gReturnURL = value;
                 break;
+            case "saveFilenamePrefix":
+            	gSaveFilenamePrefix = value;
+            	break;
             }
         }
         loadProjectSpec(url);
@@ -411,6 +415,9 @@ function loadProjectSpecCallback(response) {
         console.log("returnURL Overide from "+specification.returnURL+" to "+gReturnURL);
         specification.returnURL = gReturnURL;
     }
+    if (gSaveFilenamePrefix != undefined){
+    	specification.saveFilenamePrefix = gSaveFilenamePrefix;
+    }
 	
 	// Create the audio engine object
 	audioEngineContext = new AudioEngine(specification);
@@ -440,24 +447,19 @@ function createProjectSave(destURL) {
 		popup.popupContent.appendChild(a);
 	} else {
 		var saveUrlSuffix = "";
-		// parse the querystring of destUrl, get the "id" (if any) and append it to destUrl
-		var returnURL = specification.returnURL;
-		if(returnURL.length > 0){
-			var qs = returnURL.split("?");
-			if(qs.length == 2){
-				qs = qs[1];
-				qs = qs.split("&");
-				for(var n = 0; n < qs.length; n++){
-					var pair = qs[n].split("=");
-					if (pair[0] == "id") {
-						saveUrlSuffix  = "&saveFilenamePrefix="+pair[1];
-					}
-				}
+		var saveFilenamePrefix = specification.saveFilenamePrefix;
+		if(typeof(saveFilenamePrefix) === "string" && saveFilenamePrefix.length > 0){
+			saveUrlSuffix  = "&saveFilenamePrefix="+saveFilenamePrefix;
+		}
+		var projectReturn = "";
+		if (typeof specification.projectReturn == "string") {
+			if (specification.projectReturn.substr(0,4) == "http") {
+				projectReturn = specification.projectReturn;
 			}
 		}
-		var saveUrl = "php/"+destURL+"?key="+storage.SessionKey.key+saveUrlSuffix;
+		var saveURL = projectReturn+"php/save.php?key="+storage.SessionKey.key+saveUrlSuffix;
 		var xmlhttp = new XMLHttpRequest;
-		xmlhttp.open("POST", saveUrl, true);
+		xmlhttp.open("POST", saveURL, true);
 		xmlhttp.setRequestHeader('Content-Type', 'text/xml');
 		xmlhttp.onerror = function(){
 			console.log('Error saving file to server! Presenting download locally');
