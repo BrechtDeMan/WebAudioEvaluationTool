@@ -732,8 +732,6 @@ function interfacePopup() {
                 index++;
 			}
             this.popupResponse.style.textAlign="";
-            var leftP = 50-(((max_w/$('#popupContent').width())/2)*100);
-            this.popupResponse.style.left=leftP+"%";
 		} else if (node.specification.type == 'radio') {
             if (node.response == undefined) {
                 node.response = {name: "", text: ""};
@@ -761,8 +759,6 @@ function interfacePopup() {
                     max_w = w;
 			}
             this.popupResponse.style.textAlign="";
-            var leftP = 50-(((max_w/$('#popupContent').width())/2)*100);
-            this.popupResponse.style.left=leftP+"%";
 		} else if (node.specification.type == 'number') {
 			var input = document.createElement('input');
 			input.type = 'textarea';
