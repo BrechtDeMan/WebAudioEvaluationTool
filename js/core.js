@@ -147,6 +147,7 @@ window.onload = function() {
         var search = window.location.search.split('?')[1];
         // Now split the requests into pairs
         var searchQueries = search.split('&');
+        var allowEarlyExit = false;
 
         for (var i in searchQueries)
         {
@@ -164,12 +165,22 @@ window.onload = function() {
             case "saveFilenamePrefix":
             	gSaveFilenamePrefix = value;
             	break;
+            case "allowEarlyExit":
+                allowEarlyExit = (value === 'true');
+                break;
             }
         }
         loadProjectSpec(url);
         window.onbeforeunload = function() {
             return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
         };
+        if(allowEarlyExit === true){
+			window.onbeforeunload = undefined;
+			var msg = document.createElement('div');
+			msg.innerHTML = 'You can exit the training and go back to the test at any time by clicking <a href="'+gReturnURL+'">here</a>.';
+			msg.id = 'earlyExitBox';
+			document.getElementsByTagName('body')[0].appendChild(msg);
+        }
     }
 };
 

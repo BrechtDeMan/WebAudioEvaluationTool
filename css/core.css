@@ -72,6 +72,16 @@ div#popupResponse {
     position: relative;
 }
 
+div#earlyExitBox{
+	z-index: 100;
+	float: left;
+	padding: 20px;
+	border: 1px solid black;
+	position: absolute;
+	background: wheat;
+	bottom: 20px;
+}
+
 button.popupButton {
 	/* Button for popup window
 	 */
