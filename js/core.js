@@ -618,7 +618,7 @@ function interfacePopup() {
 	this.node = null;
 	this.store = null;
 	$(window).keypress(function(e){
-			if (e.keyCode == 13 && popup.popup.style.visibility == 'visible')
+			if (e.keyCode == 13 && e.shiftKey === true && popup.popup.style.visibility == 'visible')
 			{
 				console.log(e);
 				popup.buttonProceed.onclick();
