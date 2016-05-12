@@ -72,14 +72,22 @@ div#popupResponse {
     position: relative;
 }
 
-div#earlyExitBox{
+div.bottomBox{
 	z-index: 100;
-	float: left;
 	padding: 20px;
 	border: 1px solid black;
+	max-width: 45%;
 	position: absolute;
 	background: wheat;
 	bottom: 20px;
+}
+
+div#earlyExitBox{
+	left: 2%;
+}
+
+div#trainingUrlBox{
+	right: 2%;
 }
 
 button.popupButton {

@@ -146,9 +146,10 @@ window.onload = function() {
     {
         var search = window.location.search.split('?')[1];
         // Now split the requests into pairs
-        var searchQueries = search.split('&');
         var allowEarlyExit = false;
+        var trainingURL = '';
 
+        var searchQueries = search.split('&');
         for (var i in searchQueries)
         {
             // Split each key-value pair
@@ -166,7 +167,10 @@ window.onload = function() {
             	gSaveFilenamePrefix = value;
             	break;
             case "allowEarlyExit":
-                allowEarlyExit = (value === 'true');
+                allowEarlyExit = value;
+                break;
+            case "trainingURL":
+                trainingURL = value;
                 break;
             }
         }
@@ -174,11 +178,23 @@ window.onload = function() {
         window.onbeforeunload = function() {
             return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
         };
-        if(allowEarlyExit === true){
+        if(allowEarlyExit === "true" || allowEarlyExit === "show"){
 			window.onbeforeunload = undefined;
 			var msg = document.createElement('div');
-			msg.innerHTML = 'You can exit the training and go back to the test at any time by clicking <a href="'+gReturnURL+'">here</a>.';
+	        if(allowEarlyExit === "show"){
+	            msg.innerHTML = 'You can exit this training and go back to the test at any time by clicking <a href="'+gReturnURL+'">here</a>.';
+	        } else if (allowEarlyExit === "true"){
+	            msg.innerHTML = 'You can close this training window at any time.';
+	        }
 			msg.id = 'earlyExitBox';
+			msg.className = 'bottomBox';
+			document.getElementsByTagName('body')[0].appendChild(msg);
+        }
+        if(trainingURL.length > 0){
+			var msg = document.createElement('div');
+			msg.innerHTML = 'You can open the training page in a new tab by clicking <a target="_blank" href="'+trainingURL+'">here</a>.';
+			msg.id = 'trainingUrlBox';
+			msg.className = 'bottomBox';
 			document.getElementsByTagName('body')[0].appendChild(msg);
         }
     }
