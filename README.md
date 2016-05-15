@@ -13,7 +13,7 @@
 
 ## Instructions
 
-Please refer to ['docs/Instructions/Instructions.pdf'](https://github.com/BrechtDeMan/WebAudioEvaluationTool/raw/master/docs/Instructions/Instructions.pdf).
+Please refer to the [Wiki](https://github.com/BrechtDeMan/WebAudioEvaluationTool/wiki) or the documentation in ['docs/Instructions/Instructions.pdf'](https://github.com/BrechtDeMan/WebAudioEvaluationTool/raw/master/docs/Instructions/Instructions.pdf).
 
 
 ## Dependencies
