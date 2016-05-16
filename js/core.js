@@ -1085,10 +1085,20 @@ function stateMachine()
 			if (this.currentStateMap == null)
 			{
 				this.currentStateMap = this.stateMap[this.stateIndex];
+                // Find and extract the outside reference
+                var elements = [], ref = null;
+                for (var elem of this.currentStateMap.audioElements) {
+                    if (elem.type == "outside-reference") {ref = elem;}
+                    else {elements.push(elem);}
+                }
 				if (this.currentStateMap.randomiseOrder)
 				{
-					this.currentStateMap.audioElements = randomiseOrder(this.currentStateMap.audioElements);
+					this.currentStateMap.audioElements = randomiseOrder(elements);
 				}
+                if (ref != null)
+                {
+                    this.currentStateMap.audioElements.push(ref);
+                }
                 this.currentStore = storage.testPages[this.stateIndex];
 				if (this.currentStateMap.preTest != null)
 				{
