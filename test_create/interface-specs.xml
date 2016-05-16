@@ -21,7 +21,7 @@
             <list name="volume">Show master volume control</list>
             <list name="page-count">Show test page count</list>
             <list name="playhead">Show playhead</list>
-            <list name="comments">Show Element Comment Boxes</list>
+            <list name="comments">Show element comment boxes</list>
         </show>
     </global>
     <interfaces>

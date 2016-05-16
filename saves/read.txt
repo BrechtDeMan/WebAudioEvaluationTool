@@ -1,2 +1,1 @@
-This folder is where the pythonServer.py server will save the received test results
-Files will return as test-#.xml where # is the number they were received!
+This folder is where the remote PHP server (through save.php) or local server (python/pythonServer.py) will save the received test results. 

@@ -1323,7 +1323,7 @@ function SpecificationToHTML()
             obj.content = document.createElement("div");
             obj.content.id = "finish";
             var span = document.createElement("span");
-            span.textContent = "Your XML document is linked below. On most browsers, simply right click on the link and select 'Save As'. Or clicking on the link may download the file directly."
+            span.textContent = "Your XML document is linked below. On most browsers, simply right click on the link and select 'Save As'. Or clicking on the link may download the file directly. "
             obj.content.appendChild(span);
             var link = document.createElement("div");
             link.appendChild(doc.children[0]);
