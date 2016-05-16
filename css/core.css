@@ -58,6 +58,7 @@ div#popupTitleHolder {
     overflow: auto;
     margin-bottom: 5px;
     padding: 8px;
+    text-align: center;
 }
 
 #popupTitle {
