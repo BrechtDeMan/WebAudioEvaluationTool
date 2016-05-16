@@ -734,6 +734,7 @@ function interfacePopup() {
                         input.checked = "true";
                     }
                 }
+                index++;
             }
             this.popupResponse.appendChild(table);
 		} else if (node.specification.type == 'radio') {
@@ -768,6 +769,7 @@ function interfacePopup() {
                         input.checked = "true";
                     }
                 }
+                index++;
             }
             this.popupResponse.appendChild(table);
 		} else if (node.specification.type == 'number') {
