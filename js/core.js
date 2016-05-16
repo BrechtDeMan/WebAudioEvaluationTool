@@ -1192,6 +1192,8 @@ function AudioEngine(specification) {
 	this.metric = new sessionMetrics(this,specification);
 	
 	this.loopPlayback = false;
+    this.synchPlayback = false;
+    this.pageSpecification = null;
 	
 	this.pageStore = null;
 	
@@ -1399,7 +1401,8 @@ function AudioEngine(specification) {
 			} else {
 				interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
 			}
-			if (this.loopPlayback) {
+			if (this.synchPlayback && this.loopPlayback) {
+                // Traditional looped playback
                 var setTime = audioContext.currentTime+specification.crossFade;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
@@ -1410,7 +1413,7 @@ function AudioEngine(specification) {
 						this.audioObjects[i].loopStop(setTime);
 					}
 				}
-			} else {
+            } else {
                 var setTime = audioContext.currentTime+specification.crossFade;
 				for (var i=0; i<this.audioObjects.length; i++)
 				{
@@ -1481,6 +1484,7 @@ function AudioEngine(specification) {
 	
 	this.newTestPage = function(audioHolderObject,store) {
 		this.pageStore = store;
+        this.pageSpecification = audioHolderObject;
 		this.status = 0;
 		this.audioObjectsReady = false;
 		this.metric.reset();
@@ -1491,6 +1495,7 @@ function AudioEngine(specification) {
 		this.audioObjects = [];
         this.timer = new timer();
         this.loopPlayback = audioHolderObject.loop;
+        this.synchPlayback = audioHolderObject.synchronous;
 	};
 	
 	this.checkAllPlayed = function() {
@@ -1645,7 +1650,7 @@ function audioObject(id) {
 				    event.currentTarget.owner.stop(audioContext.currentTime+1);
                 }
 			};
-			if (this.bufferNode.loop == false) {
+			if (!audioEngineContext.loopPlayback || !audioEngineContext.synchPlayback) {
 				this.metric.startListening(audioEngineContext.timer.getTestTime());
                 this.outputGain.gain.setValueAtTime(this.onplayGain,startTime);
                 this.interfaceDOM.startPlayback();
