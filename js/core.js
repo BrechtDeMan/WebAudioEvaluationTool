@@ -1972,6 +1972,7 @@ function Interface(specificationObject) {
 	this.resizeWindow = function(event)
 	{
 		popup.resize(event);
+        this.volume.resize();
 		for(var i=0; i<this.commentBoxes.length; i++)
 		{this.commentBoxes[i].resize();}
 		for(var i=0; i<this.commentQuestions.length; i++)
@@ -2569,8 +2570,11 @@ function Interface(specificationObject) {
         // Volume does NOT reset to 0dB on each page load
         this.valueLin = 1.0;
         this.valueDB = 0.0;
+        this.root = document.createElement('div');
+        this.root.id = 'master-volume-root';
         this.object = document.createElement('div');
-        this.object.id = 'master-volume-holder';
+        this.object.className = 'master-volume-holder-float';
+        this.object.appendChild(this.root);
         this.slider = document.createElement('input');
         this.slider.id = 'master-volume-control';
         this.slider.type = 'range';
@@ -2613,10 +2617,18 @@ function Interface(specificationObject) {
         title.style.fontSize = '0.75em';
         title.style.width = "100%";
         title.align = 'center';
-        this.object.appendChild(title);
+        this.root.appendChild(title);
         
-        this.object.appendChild(this.slider);
-        this.object.appendChild(this.valueText);
+        this.root.appendChild(this.slider);
+        this.root.appendChild(this.valueText);
+        
+        this.resize = function(event) {
+            if (window.innerWidth < 1000) {
+                this.object.className = "master-volume-holder-inline"
+            } else {
+                this.object.className = 'master-volume-holder-float';
+            }
+        }
     }
     
     this.calibrationModuleObject = null;

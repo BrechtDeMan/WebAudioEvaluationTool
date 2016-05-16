@@ -169,12 +169,25 @@ div#playhead-scrubber {
 	background-color: #000;
 }
 
-div#master-volume-holder {
-    width: 250px;
-    float: left;
+div.master-volume-holder-inline {
+    width: 100%;
+    padding: 5px;
+}
+
+div.master-volume-holder-float {
+    position: absolute;
+    top: 20px;
+    left: 50px;
+    width: 250px%;
+    padding: 5px;
+}
+
+div#master-volume-root {
+    margin:auto;
     border: black 1px solid;
     border-radius: 5px;
-    padding: 5px;
+    width: 250px;
+    height: 40px;
 }
 
 input#master-volume-control {
