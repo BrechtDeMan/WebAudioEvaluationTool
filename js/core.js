@@ -1044,7 +1044,9 @@ function stateMachine()
 		if (this.stateIndex == null) {
 			this.initialise();
 		}
-        storage.update();
+        if (this.stateIndex > -2) {
+            storage.update();
+        }
 		if (this.stateIndex == -2) {
             this.stateIndex++;
 			if (this.preTestSurvey != null)
@@ -2990,6 +2992,10 @@ function Storage()
             this.request.send();
         },
         update: function() {
+            if (this.key == null) {
+                console.log("Cannot save as key == null");
+                return;
+            }
             this.parent.root.setAttribute("state","update");
             var xmlhttp = new XMLHttpRequest();
             var returnURL = "";
