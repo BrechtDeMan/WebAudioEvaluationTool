@@ -163,6 +163,11 @@ function loadTest(audioHolderObject)
         interfaceContext.commentBoxes.showCommentBoxes(commentHolder,true);
     }
 	resizeWindow(null);
+    
+    $(audioHolderObject.commentQuestions).each(function(index,element) {
+		var node = interfaceContext.createCommentQuestion(element);
+		commentHolder.appendChild(node.holder);
+	});
 }
 
 function comparator(audioHolderObject)
