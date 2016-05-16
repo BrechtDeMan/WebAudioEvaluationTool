@@ -133,6 +133,46 @@ div.testHalt {
 	top: 0px;
 }
 
+div#lightbox-root {
+    visibility: hidden;
+    z-index: 20;
+    top: 25px;
+    min-height: 50px;
+    max-height: 250px;
+}
+
+div.lightbox-error {
+    margin: 25px;
+    margin-bottom: 50px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: rgb(255,220,220);
+    border: 2px rgb(200,0,0) solid;
+}
+
+div.lightbox-warning {
+    margin: 25px;
+    margin-bottom: 50px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: rgb(255,255,220);
+    border: 2px rgb(255,250,0) solid;
+}
+
+div.lightbox-message {
+    margin: 25px;
+    margin-bottom: 50px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: rgb(200,220,255);
+    border: 2px rgb(50,100,250) solid;
+}
+
+div#lightbox-blanker {
+    visibility: hidden;
+    z-index: 19;
+}
+
 button.outside-reference {
 	width:120px;
 	height:20px;

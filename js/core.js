@@ -171,6 +171,7 @@ window.onload = function() {
             return "Please only leave this page once you have completed the tests. Are you sure you have completed all testing?";
         };
     }
+    interfaceContext.lightbox.resize();
 };
 
 function loadProjectSpec(url) {
@@ -834,7 +835,8 @@ function interfacePopup() {
 			// Must extract the question data
 			var textArea = $(popup.popupContent).find('textarea')[0];
 			if (node.specification.mandatory == true && textArea.value.length == 0) {
-				alert('This question is mandatory');
+                interfaceContext.lightbox.post("Error","This Question is mandatory");
+				//alert('This question is mandatory');
 				return;
 			} else {
 				// Save the text content
@@ -1985,6 +1987,7 @@ function Interface(specificationObject) {
 	{
 		popup.resize(event);
         this.volume.resize();
+        this.lightbox.resize();
 		for(var i=0; i<this.commentBoxes.length; i++)
 		{this.commentBoxes[i].resize();}
 		for(var i=0; i<this.commentQuestions.length; i++)
@@ -2043,6 +2046,62 @@ function Interface(specificationObject) {
         return hold;
 
     }
+    
+    this.lightbox = {
+        parent: this,
+        root: document.createElement("div"),
+        content: document.createElement("div"),
+        accept: document.createElement("button"),
+        blanker: document.createElement("div"),
+        post: function(type,message) {
+            switch(type) {
+                case "Error":
+                    this.content.className = "lightbox-error";
+                    break;
+                case "Warning":
+                    this.content.className = "lightbox-warning";
+                    break;
+                default:
+                    this.content.className = "lightbox-message";
+                    break;
+            }
+            var msg = document.createElement("p");
+            msg.textContent = message;
+            this.content.appendChild(msg);
+            this.show();
+        },
+        show: function() {
+            this.root.style.visibility = "visible";
+            this.blanker.style.visibility = "visible";
+        },
+        clear: function() {
+            this.root.style.visibility = "";
+            this.blanker.style.visibility = "";
+            this.content.textContent = "";
+        },
+        handleEvent: function(event) {
+            if (event.currentTarget == this.accept) {
+                this.clear();
+            }
+        },
+        resize: function(event) {
+            this.root.style.left = (window.innerWidth/2)-250 + 'px';
+        }
+    }
+    
+    this.lightbox.root.appendChild(this.lightbox.content);
+    this.lightbox.root.appendChild(this.lightbox.accept);
+    this.lightbox.root.className = "popupHolder";
+    this.lightbox.root.id = "lightbox-root";
+    this.lightbox.accept.className = "popupButton";
+    this.lightbox.accept.style.bottom = "10px";
+    this.lightbox.accept.textContent = "OK";
+    this.lightbox.accept.style.left = "237.5px";
+    this.lightbox.accept.addEventListener("click",this.lightbox);
+    this.lightbox.blanker.className = "testHalt";
+    this.lightbox.blanker.id = "lightbox-blanker";
+    document.getElementsByTagName("body")[0].appendChild(this.lightbox.root);
+    document.getElementsByTagName("body")[0].appendChild(this.lightbox.blanker);
 	
 	this.commentBoxes = new function() {
         this.boxes = [];
