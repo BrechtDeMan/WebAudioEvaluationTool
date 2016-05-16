@@ -206,7 +206,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	                \end{center}
 	                \end{figure}
 
-	        Alternatively, you can simply type \texttt{python} (follwed by a space) and drag the file into the Terminal window from Finder. % DOESN'T WORK YET
+	        Alternatively, you can simply type \texttt{python} (followed by a space) and drag the file into the Terminal window from Finder. % DOESN'T WORK YET
 			
 			You can leave this running throughout the different experiments (i.e. leave the Terminal open). Once running the terminal will report the current URL to type into your browser to initiate the test, usually this is http://localhost:8000/.
 			On OSX 10.10 or newer, you may get a dialogue asking if Python can accept incomming connections, click yes.
@@ -261,17 +261,17 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	        \end{center}
 	        \end{figure}
                     
-        If at any point in the test the participant reports weird behaviour or an error of some kind, or the test needs to be interrupted, please notify the experimenter and/or refer to Section~\ref{sec:troubleshooting}.
-		
-		When the test is over (the subject should see a message to that effect, and click `Submit' one last time), the output XML file containing all collected data should have appeared in `saves/'. The names of these files are `test-0.xml', `test-1.xml', etc., in ascending order. The Terminal or Command prompt running the local web server will display the following file name. If such a file did not appear, please again refer to Section~\ref{sec:troubleshooting}. 
-		
-		It is advised that you back up these results as often as possible, as a loss of this data means that the time and effort spent by the subject(s) has been in vain. Save the results to an external or network drive, and/or send them to the experimenter regularly. 
-		
-		To start the test again for a new participant, you do not need to close the browser or shut down the Terminal or Command Prompt. Simply refresh the page or go to \texttt{localhost:8000} again, a new session will be created.
+	        If at any point in the test the participant reports weird behaviour or an error of some kind, or the test needs to be interrupted, please notify the experimenter and/or refer to Section~\ref{sec:troubleshooting}.
+			
+			When the test is over (the subject should see a message to that effect), the output XML file containing all collected data should have appeared in `saves/'. The names of these files are `test-0.xml', `test-1.xml', etc., in ascending order. The Terminal or Command prompt running the local web server will display the following file name. If such a file did not appear, please again refer to Section~\ref{sec:troubleshooting}. % Is this still the case?
+			
+			It is advised that you back up these results as often as possible, as a loss of this data means that the time and effort spent by the subject(s) has been in vain. Save the results to an external or network drive, and/or send them to the experimenter regularly. 
+			
+			To start the test again for a new participant, you do not need to close the browser or shut down the Terminal or Command Prompt. Simply refresh the page or go to \texttt{localhost:8000} again, a new session will be created.
 		
 
 	\subsection{Remote test}
-		Put all files on a web server which supports PHP. This allows the `save.php' script to store the XML result files in the `saves/' folder. If the web server is not able to store the XML file there at the end of the test, it will present the XML file locally to the user, as a `Save file' link.
+		Put all files on a web server which supports PHP. This allows the `save.php' script to store the XML result files in the `saves/' folder. 
 		
 		Ensure that the \path{saves/} directory has public read-write access. On most linux servers this can be achieved using the command \texttt{sudo chmod 777 ./saves}.
 
@@ -437,8 +437,8 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
             	\item \texttt{default}: The default by the interface (Default if undefined)
             	\item \texttt{none}: Show no labels
             	\item \texttt{number}: Show natural numbers starting at index 1
-            	\item \texttt{letter}: Show letters starting at 'a'
-            	\item \texttt{capital}: Show letters starting at 'A'
+            	\item \texttt{letter}: Show letters starting at `a'
+            	\item \texttt{capital}: Show letters starting at `A'
             \end{itemize}
             \item \texttt{poolSize}: non-negative integer, optional. Determine the number of \texttt{<audioelement>} nodes to take from those defined. For instance if \texttt{poolSize=3} and there are 4 audio elements, only 3 will actually be loaded and presented to the user.
             \item \texttt{alwaysInclude}: boolean, optional. If the parent \texttt{<setup>} node has poolSize set, you can enforce the page to always be selected by setting alwaysInclude to true. Default is false
