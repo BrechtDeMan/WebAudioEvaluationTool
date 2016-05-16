@@ -41,7 +41,7 @@ function loadInterface() {
                str = 'You have not played fragment ' + (audioEngineContext.audioObjects[hasBeenPlayed[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.';
            }
             this.storeErrorNode(str);
-            alert(str);
+            interfaceContext.lightbox.post("Message",str);
 	        return false;
 	    }
 	    return true;
@@ -87,7 +87,7 @@ function loadInterface() {
 		if (state != true)
 		{
             this.storeErrorNode(str);
-			alert(str);
+			interfaceContext.lightbox.post("Message",str);
 			console.log(str);
 		}
 		return state;
@@ -124,7 +124,7 @@ function loadInterface() {
                    str = 'You have not commented on fragment ' + (audioEngineContext.audioObjects[strNums[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.';
 		       }
                 this.storeErrorNode(str);
-                alert(str);
+                interfaceContext.lightbox.post("Message",str);
                 console.log(str);
 			}
 		}
@@ -172,7 +172,7 @@ function loadInterface() {
 		if (state != true)
 		{
             this.storeErrorNode(str);
-			alert(str);
+			interfaceContext.lightbox.post("Message",str);
 			console.log(str);
 		}
 		return state;
@@ -811,7 +811,7 @@ function buttonSubmitClick()
 	    {
 	        if (audioEngineContext.timer.testStarted == false)
 	        {
-	            alert('You have not started the test! Please click a fragment to begin the test!');
+	            interfaceContext.lightbox.post("Warning",'You have not started the test! Please click a fragment to begin the test!');
 	            return;
 	        }
 	    }

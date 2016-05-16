@@ -29,7 +29,7 @@ function loadInterface() {
         if (!state) {
             console.log(str);
             this.storeErrorNode(str);
-            alert(str);
+            interfaceContext.lightbox.post("Message",str);
         }
         return state;
     }
@@ -227,7 +227,7 @@ function comparator(audioHolderObject)
 			}
 			if (audioEngineContext.status == 0)
 			{
-				alert("Please listen to the samples before making a selection");
+				interfaceContext.lightbox.post("Message","Please listen to the samples before making a selection");
 				console.log("Please listen to the samples before making a selection");
 				return;
             }
@@ -440,7 +440,7 @@ function buttonSubmitClick()
 	    {
 	        if (audioEngineContext.timer.testStarted == false)
 	        {
-	            alert('You have not started the test! Please press start to begin the test!');
+	            interfaceContext.lightbox.post("Warning",'You have not started the test! Please click play on a sample to begin the test!');
 	            return;
 	        }
 	    }

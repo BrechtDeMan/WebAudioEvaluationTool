@@ -468,7 +468,7 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
 	    {
 	        if (audioEngineContext.timer.testStarted == false)
 	        {
-	            alert('You have not started the test! Please press start to begin the test!');
+	            interfaceContext.lightbox.post("Warning",'You have not started the test! Please press start to begin the test!');
 	            return;
 	        }
 	    }
