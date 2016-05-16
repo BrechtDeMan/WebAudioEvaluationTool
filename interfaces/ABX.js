@@ -12,6 +12,30 @@ function loadInterface() {
     
     interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
     
+    Interface.prototype.checkScaleRange = function(min, max) {
+        var page = testState.getCurrentTestPage();
+        var audioObjects = audioEngineContext.audioObjects;
+        var state = true;
+        var str = "Please keep listening. ";
+        var minRanking = Infinity;
+        var maxRanking = -Infinity;
+        for (var ao of audioObjects) {
+            var rank = ao.interfaceDOM.getValue();
+            if (rank < minRanking) {minRanking = rank;}
+            if (rank > maxRanking) {maxRanking = rank;}
+        }
+        if (maxRanking*100 < max) {
+            str += "At least one fragment must be selected."
+            state = false;
+        }
+        if (!state) {
+            console.log(str);
+            this.storeErrorNode(str);
+            alert(str);
+        }
+        return state;
+    }
+    
     // Custom comparator Object
 	Interface.prototype.comparator = null;
     
