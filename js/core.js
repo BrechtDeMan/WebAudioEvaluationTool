@@ -708,61 +708,68 @@ function interfacePopup() {
                 node.response = Array(node.specification.options.length);
             }
             var index = 0;
-            var max_w = 0;
+            var table = document.createElement("table");
+            table.className = "popup-option-list";
+            table.border = "0";
 			for (var option of node.specification.options) {
-				var input = document.createElement('input');
-				input.id = option.name;
+                var tr = document.createElement("tr");
+                table.appendChild(tr);
+                var td = document.createElement("td");
+                tr.appendChild(td);
+                var input = document.createElement('input');
+                input.id = option.name;
 				input.type = 'checkbox';
+                td.appendChild(input);
+                
+                td = document.createElement("td");
+                tr.appendChild(td);
 				var span = document.createElement('span');
 				span.textContent = option.text;
-				var hold = document.createElement('div');
-				hold.setAttribute('name','option');
-                hold.className = "popup-option-checbox";
-				hold.appendChild(input);
-				hold.appendChild(span);
-				this.popupResponse.appendChild(hold);
+                td.appendChild(span);
+				var tr = document.createElement('div');
+				tr.setAttribute('name','option');
+                tr.className = "popup-option-checbox";
                 if (node.response[index] != undefined){
                     if (node.response[index].checked == true) {
                         input.checked = "true";
                     }
                 }
-                var w = $(hold).width();
-                if (w > max_w)
-                    max_w = w;
-                index++;
-			}
-            this.popupResponse.style.textAlign="";
-            var leftP = 50-(((max_w/$('#popupContent').width())/2)*100);
-            this.popupResponse.style.left=leftP+"%";
+            }
+            this.popupResponse.appendChild(table);
 		} else if (node.specification.type == 'radio') {
             if (node.response == undefined) {
                 node.response = {name: "", text: ""};
             }
             var index = 0;
-            var max_w = 0;
+			var table = document.createElement("table");
+            table.className = "popup-option-list";
+            table.border = "0";
 			for (var option of node.specification.options) {
-				var input = document.createElement('input');
-				input.id = option.name;
+                var tr = document.createElement("tr");
+                table.appendChild(tr);
+                var td = document.createElement("td");
+                tr.appendChild(td);
+                var input = document.createElement('input');
+                input.id = option.name;
 				input.type = 'radio';
-				input.name = node.specification.id;
+                input.name = node.specification.id;
+                td.appendChild(input);
+                
+                td = document.createElement("td");
+                tr.appendChild(td);
 				var span = document.createElement('span');
 				span.textContent = option.text;
-				var hold = document.createElement('div');
-				hold.setAttribute('name','option');
-				hold.className = "popup-option-checbox";
-				hold.appendChild(input);
-				hold.appendChild(span);
-				this.popupResponse.appendChild(hold);
-                if (input.id == node.response.name) {
-                    input.checked = "true";
+                td.appendChild(span);
+				var tr = document.createElement('div');
+				tr.setAttribute('name','option');
+                tr.className = "popup-option-checbox";
+                if (node.response[index] != undefined){
+                    if (node.response[index].checked == true) {
+                        input.checked = "true";
+                    }
                 }
-                var w = $(hold).width();
-                if (w > max_w)
-                    max_w = w;
-			}
-            this.popupResponse.style.textAlign="";
-            var leftP = 50-(((max_w/$('#popupContent').width())/2)*100);
-            this.popupResponse.style.left=leftP+"%";
+            }
+            this.popupResponse.appendChild(table);
 		} else if (node.specification.type == 'number') {
 			var input = document.createElement('input');
 			input.type = 'textarea';
