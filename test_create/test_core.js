@@ -5,6 +5,7 @@ var popupStateNodes;
 var specification;
 var convert;
 var attributeText;
+var page_lang = "en";
 
 // Firefox does not have an XMLDocument.prototype.getElementsByName
 // and there is no searchAll style command, this custom function will
@@ -278,6 +279,9 @@ function buildPage()
             spnH.appendChild(span);
             this.content.appendChild(spnH);
             this.select = document.createElement("select");
+            this.content.appendChild(this.select);
+            this.description = document.createElement("p");
+            this.content.appendChild(this.description);
             this.testsXML = interfaceSpecs.getElementsByTagName('tests')[0].children;
             for (var i=0; i<this.testsXML.length; i++)
             {
@@ -286,7 +290,18 @@ function buildPage()
                 option.textContent = this.testsXML[i].getAttribute('name');
                 this.select.appendChild(option);
             }
-            this.content.appendChild(this.select);
+            this.handleEvent = function(event) {
+                var testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(this.select.value)[0];
+                var descriptors = testXML.getAllElementsByTagName("description");
+                this.description.textContent = "";
+                for (var i=0; i<descriptors.length; i++) {
+                    if (descriptors[i].getAttribute("lang") == page_lang) {
+                        this.description.textContent = descriptors[i].textContent;
+                    }
+                }
+            }
+            this.select.addEventListener("change",this);
+            this.handleEvent();
             this.continue = function()
             {
                 var testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(this.select.value)[0];
