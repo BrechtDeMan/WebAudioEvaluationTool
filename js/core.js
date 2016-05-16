@@ -322,7 +322,7 @@ function loadProjectSpecCallback(response) {
 	if (specification.sampleRate != undefined) {
 		if (Number(specification.sampleRate) != audioContext.sampleRate) {
 			var errStr = 'Sample rates do not match! Requested '+Number(specification.sampleRate)+', got '+audioContext.sampleRate+'. Please set the sample rate to match before completing this test.';
-			alert(errStr);
+            interfaceContext.lightbox.post("Error",errStr);
 			return;
 		}
 	}
@@ -836,7 +836,6 @@ function interfacePopup() {
 			var textArea = $(popup.popupContent).find('textarea')[0];
 			if (node.specification.mandatory == true && textArea.value.length == 0) {
                 interfaceContext.lightbox.post("Error","This Question is mandatory");
-				//alert('This question is mandatory');
 				return;
 			} else {
 				// Save the text content
@@ -868,7 +867,7 @@ function interfacePopup() {
 				{
 					if (node.specification.mandatory == true)
 					{
-						alert("This radio is mandatory");
+                        interfaceContext.lightbox.post("Error","Please select one option");
                         return;
 					}
                     break;
@@ -882,20 +881,20 @@ function interfacePopup() {
 		} else if (node.specification.type == "number") {
 			var input = this.popupContent.getElementsByTagName('input')[0];
 			if (node.mandatory == true && input.value.length == 0) {
-				alert('This question is mandatory. Please enter a number');
+				interfaceContext.lightbox.post("Error",'This question is mandatory. Please enter a number');
 				return;
 			}
 			var enteredNumber = Number(input.value);
 			if (isNaN(enteredNumber)) {
-				alert('Please enter a valid number');
+				interfaceContext.lightbox.post("Error",'Please enter a valid number');
 				return;
 			}
 			if (enteredNumber < node.min && node.min != null) {
-				alert('Number is below the minimum value of '+node.min);
+				interfaceContext.lightbox.post("Error",'Number is below the minimum value of '+node.min);
 				return;
 			}
 			if (enteredNumber > node.max && node.max != null) {
-				alert('Number is above the maximum value of '+node.max);
+				interfaceContext.lightbox.post("Error",'Number is above the maximum value of '+node.max);
 				return;
 			}
 			node.response = input.value;
@@ -2801,7 +2800,7 @@ function Interface(specificationObject) {
 				if (ao.interfaceDOM.getValue() > (ao.specification.marker/100) && ao.specification.marker > 0) {
 					// Anchor is not set below
 					console.log('Anchor node not below marker value');
-					alert('Please keep listening');
+					interfaceContext.lightbox.post("Message",'Please keep listening');
                     this.storeErrorNode('Anchor node not below marker value');
 					return false;
 				}
@@ -2820,7 +2819,7 @@ function Interface(specificationObject) {
 					// Anchor is not set below
 					console.log('Reference node not above marker value');
                     this.storeErrorNode('Reference node not above marker value');
-					alert('Please keep listening');
+					interfaceContext.lightbox.post("Message",'Please keep listening');
 					return false;
 				}
 			}
@@ -2878,7 +2877,7 @@ function Interface(specificationObject) {
 			str_start += ". Please keep listening";
 			console.log("[ALERT]: "+str_start);
             this.storeErrorNode("[ALERT]: "+str_start);
-			alert(str_start);
+			interfaceContext.lightbox.post("Error",str_start);
 		}
 	};
 	this.checkAllMoved = function()
@@ -2907,7 +2906,7 @@ function Interface(specificationObject) {
 			str += 'and '+failed[i];
 		}
 		str +='.';
-		alert(str);
+		interfaceContext.lightbox.post("Error",str);
 		console.log(str);
         this.storeErrorNode(str);
 		return false;
@@ -2938,7 +2937,7 @@ function Interface(specificationObject) {
 			str += 'and '+failed[i];
 		}
 		str +='.';
-		alert(str);
+		interfaceContext.lightbox.post("Error",str);
 		console.log(str);
         this.storeErrorNode(str);
 		return false;
@@ -2966,7 +2965,7 @@ function Interface(specificationObject) {
         if (!state) {
             console.log(str);
             this.storeErrorNode(str);
-            alert(str);
+            interfaceContext.lightbox.post("Error",str);
         }
         return state;
     }
