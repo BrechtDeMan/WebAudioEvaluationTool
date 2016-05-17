@@ -207,6 +207,8 @@
         </interface>
     </interfaces>
     <scaledefinitions>
+        <scale name="(Blank)">
+        </scale>
         <scale name="Likert">
             <scalelabel position="0">Strongly Disagree</scalelabel>
             <scalelabel position="25">Disagree</scalelabel>

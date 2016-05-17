@@ -1369,6 +1369,9 @@ function SpecificationToHTML()
                 this.specification.exitText = this.inputDOM.value;
             }
         }
+        var exitWarning = document.createElement("div");
+        obj.rootDOM.appendChild(exitWarning);
+        exitWarning.textContent = "Only visible when the above 'On complete redirect URL' field is empty.";
         obj.rootDOM.appendChild(obj.labelDOM);
         obj.rootDOM.appendChild(obj.inputDOM);
         obj.labelDOM.textContent = "Text: ";
