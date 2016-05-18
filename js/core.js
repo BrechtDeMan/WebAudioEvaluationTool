@@ -835,7 +835,7 @@ function interfacePopup() {
 			// Must extract the question data
 			var textArea = $(popup.popupContent).find('textarea')[0];
 			if (node.specification.mandatory == true && textArea.value.length == 0) {
-                interfaceContext.lightbox.post("Error","This Question is mandatory");
+                interfaceContext.lightbox.post("Error","This question is mandatory");
 				return;
 			} else {
 				// Save the text content
