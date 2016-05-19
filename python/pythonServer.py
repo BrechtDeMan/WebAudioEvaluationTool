@@ -122,7 +122,7 @@ def keygen(s):
 	s.send_response(200)
 	s.send_header("Content-type", "application/xml")
 	s.end_headers()
-	s.wfile.write(reply)
+	s.wfile.write(bytes(reply, "utf-8"))
 	file = open("../saves/save-"+key+".xml",'w')
 	file.write("<waetresult key="+key+"/>")
 	file.close();
@@ -136,7 +136,7 @@ def saveFile(self):
     varLen = int(self.headers['Content-Length'])
     postVars = self.rfile.read(varLen)
     print("Saving file key "+key)
-    file = open('../saves/save-'+key+'.xml','w')
+    file = open('../saves/save-'+key+'.xml','wb')
     file.write(postVars)
     file.close()
     try:
@@ -149,7 +149,8 @@ def saveFile(self):
     self.send_response(200)
     self.send_header("Content-type", "text/xml")
     self.end_headers()
-    self.wfile.write('<response state="OK"><message>OK</message><file bytes="'+str(wbytes)+'">"saves/'+curFileName+'"</file></response>')
+    reply = '<response state="OK"><message>OK</message><file bytes="'+str(wbytes)+'">"saves/'+curFileName+'"</file></response>'
+    self.wfile.write(bytes(reply, "utf-8"))
     curSaveIndex += 1
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
