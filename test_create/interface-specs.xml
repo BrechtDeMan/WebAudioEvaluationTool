@@ -4,7 +4,7 @@
         <metrics>
             <list name="testTimer">Test Timer</list>
             <list name="elementTimer">Element Playback Timer</list>
-            <list name="elementInitialPosition">Element Initial Poisition</list>
+            <list name="elementInitialPosition">Element Initial Position</list>
             <list name="elementTracker">Element Movement Tracker</list>
             <list name="elementFlagListenedTo">Element Listened to Flag</list>
             <list name="elementFlagMoved">Element Moved Flag</list>
