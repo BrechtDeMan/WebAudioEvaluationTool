@@ -94,7 +94,7 @@ function loadInterface() {
 	feedbackHolder.id = 'feedbackHolder';
 	
 	testContent.style.zIndex = 1;
-	interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
+	interfaceContext.insertPoint.innerHTML = ""; // Clear the current schema
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
@@ -114,7 +114,7 @@ function loadTest(audioHolderObject)
 	var id = audioHolderObject.id;
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
-    feedbackHolder.innerHTML = null;
+    feedbackHolder.innerHTML = "";
 	var interfaceObj = audioHolderObject.interfaces;
 	if (interfaceObj.length > 1)
 	{
@@ -170,7 +170,7 @@ function loadTest(audioHolderObject)
 	}
 	
 	var sliderBox = document.getElementById('slider-holder');
-	sliderBox.innerHTML = null;
+	sliderBox.innerHTML = "";
 	
 	var commentBoxPrefix = "Comment on track";
 	if (interfaceObj.commentBoxPrefix != undefined) {
@@ -390,9 +390,14 @@ function resizeWindow(event)
 	}
 	document.getElementById('scale-holder').style.marginLeft = (diff-100) + 'px';
 	document.getElementById('scale-text-holder').style.height = window.innerHeight-194 + 'px';
+    // Cheers edge for making me delete a canvas every resize.
 	var canvas = document.getElementById('scale-canvas');
-	canvas.width = totalWidth;
-	canvas.height = window.innerHeight-194;
+    var new_canvas = document.createElement("canvas");
+    new_canvas.id = 'scale-canvas';
+    canvas.parentElement.appendChild(new_canvas);
+    canvas.parentElement.removeChild(canvas);
+	new_canvas.width = totalWidth;
+	new_canvas.height = window.innerHeight-194;
 	drawScale();
 }
 
@@ -407,9 +412,10 @@ function drawScale()
 	var ctx = canvas.getContext("2d");
 	var height = canvas.height;
 	var width = canvas.width;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 	var draw_heights = [24, height-34];
 	var textHolder = document.getElementById('scale-text-holder');
-	textHolder.innerHTML = null;
+	textHolder.innerHTML = "";
 	var lastHeight = 0;
 	for (var scale of scales)
 	{

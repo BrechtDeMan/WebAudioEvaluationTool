@@ -92,7 +92,7 @@ function loadInterface() {
 	feedbackHolder.id = 'feedbackHolder';
 	
 	testContent.style.zIndex = 1;
-	interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
+	interfaceContext.insertPoint.innerHTML = ""; // Clear the current schema
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
@@ -113,7 +113,7 @@ function loadTest(page)
 	var id = page.id;
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
-    feedbackHolder.innerHTML = null;
+    feedbackHolder.innerHTML = "";
     
 	var interfaceObj = page.interfaces;
 	if (interfaceObj.length > 1)
@@ -171,7 +171,7 @@ function loadTest(page)
 	}
 	
 	var sliderBox = document.getElementById('slider-holder');
-	sliderBox.innerHTML = null;
+	sliderBox.innerHTML = "";
 	
 	var commentBoxPrefix = "Comment on track";
 	if (interfaceObj.commentBoxPrefix != undefined) {
@@ -359,9 +359,15 @@ function resizeWindow(event)
 	var numObj = document.getElementsByClassName('track-slider').length;
 	var totalHeight = (numObj * 125)-25;
 	document.getElementById('scale-holder').style.width = window.innerWidth-220 + 'px';
+	// Cheers edge for making me delete a canvas every resize.
 	var canvas = document.getElementById('scale-canvas');
-	canvas.width = window.innerWidth-420;
-	canvas.height = totalHeight;
+    var new_canvas = document.createElement("canvas");
+    new_canvas.id = 'scale-canvas';
+    new_canvas.style.marginLeft = "100px";
+    canvas.parentElement.appendChild(new_canvas);
+    canvas.parentElement.removeChild(canvas);
+	new_canvas.width = window.innerWidth-420;
+	new_canvas.height = totalHeight;
 	for (var i in audioEngineContext.audioObjects)
 	{
 		if (audioEngineContext.audioObjects[i].specification.type != 'outside-reference'){
@@ -384,7 +390,7 @@ function drawScale()
 	var height = canvas.height;
 	var width = canvas.width;
 	var textHolder = document.getElementById('scale-text-holder');
-	textHolder.innerHTML = null;
+	textHolder.innerHTML = "";
 	ctx.fillStyle = "#000000";
 	ctx.setLineDash([1,4]);
 	for (var scale of scales)

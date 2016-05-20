@@ -562,7 +562,13 @@ function samplesToSeconds(samples,fs) {
 }
 
 function randomString(length) {
-    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+    var str = ""
+    for (var i=0; i<length; i+=2) {
+        var num = Math.floor(Math.random()*1295);
+        str += num.toString(36);
+    }
+    return str;
+    //return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
 }
 
 function randomiseOrder(input)
@@ -673,7 +679,7 @@ function interfacePopup() {
 	this.postNode = function() {
 		// This will take the node from the popupOptions and display it
 		var node = this.popupOptions[this.currentIndex];
-		this.popupResponse.innerHTML = null;
+		this.popupResponse.innerHTML = "";
 		this.popupTitle.textContent = node.specification.statement;
 		if (node.specification.type == 'question') {
 			var textArea = document.createElement('textarea');
@@ -2995,7 +3001,7 @@ function Storage()
         if (existingStore == undefined) {
             // We need to get the sessionKey
             this.SessionKey.generateKey();
-            this.document = document.implementation.createDocument(null,"waetresult");
+            this.document = document.implementation.createDocument(null,"waetresult",null);
             this.root = this.document.childNodes[0];
             var projectDocument = specification.projectXML;
             projectDocument.setAttribute('file-name',url);
@@ -3020,8 +3026,12 @@ function Storage()
             var parse = new DOMParser();
             var xml = parse.parseFromString(this.request.response,"text/xml");
             var shouldGenerateKey = true;
-            if(xml.getAllElementsByTagName("state").length > 0){
-				if (xml.getAllElementsByTagName("state")[0].textContent == "OK") {
+            if (this.request.response.length == 0) {
+                console.log("Error: Server did not respond");
+                return;
+            }
+            if(xml.getElementsByTagName("state").length > 0){
+				if (xml.getElementsByTagName("state")[0].textContent == "OK") {
 					this.key = xml.getAllElementsByTagName("key")[0].textContent;
 					this.parent.root.setAttribute("key",this.key);
 					this.parent.root.setAttribute("state","empty");

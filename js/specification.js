@@ -1,15 +1,25 @@
 function Specification() {
 	// Handles the decoding of the project specification XML into a simple JavaScript Object.
 	
+    // <setup> attributes
 	this.interface = null;
 	this.projectReturn = null;
     this.returnURL = null;
 	this.randomiseOrder = null;
-	this.testPages = null;
+	this.poolSize = null;
+    this.loudness = null;
+    this.sampleRate = null;
+    this.calibration = null;
+    this.crossFade = null;
+    this.preSilence = null;
+    this.postSilence = null;
+    
+    // nodes
+    this.metrics = null;
+    this.preTest = undefined;
+    this.postTest = undefined;
 	this.pages = [];
-	this.metrics = null;
 	this.interfaces = null;
-	this.loudness = null;
 	this.errors = [];
 	this.schema = null;
     this.exitText = "Thank you.";
@@ -75,9 +85,8 @@ function Specification() {
 		var schemaSetup = this.schema.getAllElementsByName('setup')[0];
 		// First decode the attributes
 		var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
-		for (var i in attributes)
+		for (var i=0; i<attributes.length; i++)
 		{
-			if (isNaN(Number(i)) == true){break;}
 			var attributeName = attributes[i].getAttribute('name') || attributes[i].getAttribute('ref');
 			var projectAttr = setupNode.getAttribute(attributeName);
 			projectAttr = this.processAttribute(projectAttr,attributes[i],this.schema);
@@ -105,8 +114,7 @@ function Specification() {
 		
 		// Now process the survey node options
 		var survey = setupNode.getElementsByTagName('survey');
-		for (var i in survey) {
-			if (isNaN(Number(i)) == true){break;}
+		for (var i=0; i<survey.length; i++){
 			var location = survey[i].getAttribute('location');
             switch(location)
             {
@@ -240,9 +248,8 @@ function Specification() {
 						this.type = 'statement';
 					} else {
 						this.options = [];
-						for (var i in children)
+						for (var i=0; i<children.length; i++)
 						{
-							if (isNaN(Number(i))==true){break;}
 							this.options.push({
 								name: children[i].getAttribute('name'),
 								text: children[i].textContent
@@ -488,8 +495,7 @@ function Specification() {
 			// Now process the survey node options
 			var survey = xml.getElementsByTagName('survey');
 			var surveySchema = parent.schema.getAllElementsByName('survey')[0];
-			for (var i in survey) {
-				if (isNaN(Number(i)) == true){break;}
+			for (var i=0; i<survey.length; i++){
 				var location = survey[i].getAttribute('location');
 				if (location == 'pre' || location == 'before')
 				{
