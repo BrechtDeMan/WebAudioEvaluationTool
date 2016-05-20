@@ -153,7 +153,10 @@ def saveFile(self):
     self.send_header("Content-type", "text/xml")
     self.end_headers()
     reply = '<response state="OK"><message>OK</message><file bytes="'+str(wbytes)+'">"saves/'+curFileName+'"</file></response>'
-    self.wfile.write(bytes(reply, "utf-8"))
+    if sys.version_info[0] == 2:
+        self.wfile.write(reply)
+    elif sys.version_info[0] == 3:
+        self.wfile.write(bytes(reply, "utf-8"))
     curSaveIndex += 1
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
