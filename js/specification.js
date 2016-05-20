@@ -248,9 +248,8 @@ function Specification() {
 						this.type = 'statement';
 					} else {
 						this.options = [];
-						for (var i in children)
+						for (var i=0; i<children.length; i++)
 						{
-							if (isNaN(Number(i))==true){break;}
 							this.options.push({
 								name: children[i].getAttribute('name'),
 								text: children[i].textContent

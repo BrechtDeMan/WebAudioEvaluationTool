@@ -679,7 +679,7 @@ function interfacePopup() {
 	this.postNode = function() {
 		// This will take the node from the popupOptions and display it
 		var node = this.popupOptions[this.currentIndex];
-		this.popupResponse.innerHTML = null;
+		this.popupResponse.innerHTML = "";
 		this.popupTitle.textContent = node.specification.statement;
 		if (node.specification.type == 'question') {
 			var textArea = document.createElement('textarea');
