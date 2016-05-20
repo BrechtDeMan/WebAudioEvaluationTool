@@ -116,7 +116,7 @@ if (typeof XMLDocument.prototype.getElementsByName != "function") {
     }
 }
 
-window.onload = function() {
+var onload = function() {
 	// Function called once the browser has loaded all files.
 	// This should perform any initial commands such as structure / loading documents
 	
@@ -3225,3 +3225,5 @@ function Storage()
 		return this.root;
 	};
 }
+
+onload();
