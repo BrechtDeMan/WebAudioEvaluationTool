@@ -122,7 +122,10 @@ def keygen(s):
 	s.send_response(200)
 	s.send_header("Content-type", "application/xml")
 	s.end_headers()
-	s.wfile.write(bytes(reply, "utf-8"))
+	if sys.version_info[0] == 2:
+		s.wfile.write(reply)
+	elif sys.version_info[0] == 3:
+		s.wfile.write(bytes(reply, "utf-8"))
 	file = open("../saves/save-"+key+".xml",'w')
 	file.write("<waetresult key="+key+"/>")
 	file.close();
