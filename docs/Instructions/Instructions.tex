@@ -277,10 +277,10 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 
 		Make sure the \texttt{projectReturn} attribute of the \texttt{setup} node is set to the \texttt{save.php} script. 
 
-		Then, just go to the URL of the corresponding HTML file, e.g. \texttt{http://server.com/path/to/WAET/index.html?url=test/my-test.xml}. If storing on the server doesn't work at submission (e.g. if the \texttt{projectReturn} attribute isn't properly set or PHP does not have the correct permissions), the result XML file will be presented to the subject on the client side, as a `Save file' link. 
+		Then, just go to the URL of the corresponding HTML file, e.g. \url{http://server.com/path/to/WAET/index.html?url=test/my-test.xml}. If storing on the server doesn't work at submission (e.g. if the \texttt{projectReturn} attribute isn't properly set or PHP does not have the correct permissions), the result XML file will be presented to the subject on the client side, as a `Save file' link. 
 
     \subsection{Load a test / Multiple test documents}
-        By default the index page will load an empty page. To automatically load a test document, you need to append the location in the URL. If your URL is normally http://localhost:8000/index.html you would append the following: \texttt{?url=/path/to/your/test.xml}. Replace the fields with your actual path, the path is local to the running directory, so if you have your test in the directory \texttt{example\_eval} called \texttt{project.xml} you would append \texttt{?url=/example\_eval/project.xml}.
+        By default the \texttt{test.html} page will load an empty page. To automatically load a test document, you need to append the location in the URL. If your URL is normally \url{http://localhost:8000/index.html} you would append the following: \url{?url=/path/to/your/test.xml}. Replace the fields with your actual path, the path is local to the running directory, so if you have your test in the directory \texttt{example\_eval} called \texttt{project.xml} you would append \url{?url=/example\_eval/project.xml}.
 
 \clearpage
 
@@ -404,6 +404,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
         \begin{itemize}
             \item \texttt{interface}: String, mandatory, specifies the interface to load
             \item \texttt{projectReturn}: URL, mandatory, specifies the return point. Can be a 3rd party server or the local server. Set to null to disable automatic saving. Specifying ``save.php'' will trigger the return if either the PHP or python servers are used. On error, it will always default to presenting the save on page.
+            \item \texttt{returnURL}: Upon successful completion and submission of the test, this URL will be opened. This can be a presentation of the results thus far, some type of reward, or a page with links to other tests. 
             \item \texttt{randomiseOrder}: Boolean, optional, if true it will randomise the order of the test pages. Default is false.
             \item \texttt{poolSize}: non-negative integer, optional. Specifies the number of test pages to actually test with. Combined with randomiseOrder being true will give a random set of test pages per participant from the given pool of \texttt{<page>} nodes. Specifying 0 disables this option, default is 0.
             \item \texttt{loudness}: non-positive integer, optional. Set the default LUFS target value. See Section~\ref{sec:loudness} for more.
