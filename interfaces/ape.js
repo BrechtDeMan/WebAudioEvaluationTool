@@ -266,7 +266,7 @@ function loadInterface() {
 	feedbackHolder.id = 'feedbackHolder';
 	
 	testContent.style.zIndex = 1;
-	interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
+	interfaceContext.insertPoint.innerHTML = ""; // Clear the current schema
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
@@ -291,8 +291,8 @@ function loadTest(audioHolderObject)
 	
 	var feedbackHolder = document.getElementById('feedbackHolder');
 	var sliderHolder = document.getElementById('slider-holder');
-	feedbackHolder.innerHTML = null;
-	sliderHolder.innerHTML = null;
+	feedbackHolder.innerHTML = "";
+	sliderHolder.innerHTML = "";
 	
 	// Delete outside reference
 	var outsideReferenceHolder = document.getElementById('outside-reference');

@@ -5,7 +5,7 @@ function loadInterface() {
 	// Get the dimensions of the screen available to the page
 	var width = window.innerWidth;
 	var height = window.innerHeight;
-	interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
+	interfaceContext.insertPoint.innerHTML = ""; // Clear the current schema
 	
 	// Custom comparator Object
 	Interface.prototype.comparator = null;
@@ -325,7 +325,7 @@ function comparator(audioHolderObject)
 	};
 	
 	this.boxHolders = document.getElementById('box-holders');
-	this.boxHolders.innerHTML = null;
+	this.boxHolders.innerHTML = "";
 	this.comparators = [];
 	this.selected = null;
 	

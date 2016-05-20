@@ -10,7 +10,7 @@ function loadInterface() {
 	// Use this to do any one-time page / element construction. For instance, placing any stationary text objects,
 	// holding div's, or setting up any nodes which are present for the entire test sequence
     
-    interfaceContext.insertPoint.innerHTML = null; // Clear the current schema
+    interfaceContext.insertPoint.innerHTML = ""; // Clear the current schema
     
     Interface.prototype.checkScaleRange = function(min, max) {
         var page = testState.getCurrentTestPage();
@@ -126,7 +126,7 @@ function loadInterface() {
 function loadTest(page)
 {
 	// Called each time a new test page is to be build. The page specification node is the only item passed in
-    document.getElementById('box-holders').innerHTML = null;
+    document.getElementById('box-holders').innerHTML = "";
     
     var interfaceObj = page.interfaces;
 	if (interfaceObj.length > 1)
