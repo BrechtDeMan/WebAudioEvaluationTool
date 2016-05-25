@@ -416,6 +416,7 @@ function loadTest(audioHolderObject)
 			audioEngineContext.audioObjects[id].metric.moved(time,rate);
 			interfaceContext.interfaceSliders[interfaceID].metrics[trackID].moved(time,rate);
 			console.log("slider "+id+" moved to "+rate+' ('+time+')');
+            obj.setAttribute("slider-value",convSliderPosToRate(obj));
 		} else {
 			var id = Number(obj.attributes['trackIndex'].value);
 			//audioEngineContext.metric.sliderPlayed(id);
@@ -496,13 +497,6 @@ function interfaceSliderHolder(interfaceObject)
 		event.dataTransfer.dropEffect = 'copy';
 		return false;
 	},false);
-	var sliderMargin = document.createAttribute('marginsize');
-	sliderMargin.nodeValue = 42; // Set default margins to 42px either side
-	// Must have a known EXACT width, as this is used later to determine the ratings
-	var w = (Number(sliderMargin.nodeValue)+8)*2;
-	this.canvas.style.width = window.innerWidth - w +"px";
-	this.canvas.style.marginLeft = sliderMargin.nodeValue +'px';
-	this.canvas.setAttributeNode(sliderMargin);
 	this.sliderDOM.appendChild(this.canvas);
 	
 	// Create the div to hold any scale objects
@@ -512,13 +506,14 @@ function interfaceSliderHolder(interfaceObject)
 	this.scale.align = 'left';
 	this.sliderDOM.appendChild(this.scale);
 	var positionScale = this.canvas.style.width.substr(0,this.canvas.style.width.length-2);
-	var offset = Number(this.canvas.attributes['marginsize'].value);
+	var offset = 50;
     var dest = document.getElementById("slider-holder").appendChild(this.sliderDOM);
 	for (var scaleObj of interfaceObject.scales)
 	{
 		var position = Number(scaleObj.position)*0.01;
 		var pixelPosition = (position*$(this.canvas).width())+offset;
 		var scaleDOM = document.createElement('span');
+        scaleDOM.className = "ape-marker-text";
 		scaleDOM.textContent = scaleObj.text;
         scaleDOM.setAttribute('value',position)
 		this.scale.appendChild(scaleDOM);
@@ -537,7 +532,7 @@ function interfaceSliderHolder(interfaceObject)
 		} else {
 			trackObj.setAttribute('interface-name',this.id);
 		}
-		var offset = Number(this.canvas.attributes['marginsize'].value);
+		var offset = 50;
 		// Distribute it randomnly
 		var w = window.innerWidth - (offset+8)*2;
 		w = Math.random()*w;
@@ -549,30 +544,24 @@ function interfaceSliderHolder(interfaceObject)
 		var labelHolder = document.createElement("span");
         labelHolder.textContent = label;
         trackObj.appendChild(labelHolder);
-		this.metrics[this.metrics.length-1].initialise(convSliderPosToRate(trackObj));
+        var rate = convSliderPosToRate(trackObj);
+		this.metrics[this.metrics.length-1].initialise(rate);
+        trackObj.setAttribute("slider-value",rate);
 		return trackObj;
 	};
 	
 	this.resize = function(event)
 	{
-		var holdValues = [];
-		for (var index = 0; index < this.sliders.length; index++)
-		{
-			holdValues.push(convSliderPosToRate(this.sliders[index])); 
-		}
-		var width = event.target.innerWidth;
+		var width = window.innerWidth;
 		var sliderDiv = this.canvas;
 		var sliderScaleDiv = this.scale;
-		var marginsize = Number(sliderDiv.attributes['marginsize'].value);
-		var w = (marginsize+8)*2;
-		sliderDiv.style.width = width - w + 'px';
-		var width = width - w;
+		var width = $(sliderDiv).width();
+        var marginsize = 50;
 		// Move sliders into new position
 		for (var index = 0; index < this.sliders.length; index++)
 		{
-			var pos = holdValues[index];
-			var pix = pos * width;
-			this.sliders[index].style.left = pix+marginsize+'px';
+			var pix = Number(this.sliders[index].getAttribute("slider-value")) * width;
+			this.sliders[index].style.left = (pix+marginsize)+'px';
 		}
 		
 		// Move scale labels
@@ -822,9 +811,8 @@ function buttonSubmitClick()
 function convSliderPosToRate(trackSlider)
 {
 	var slider = trackSlider.parentElement;
-	var w = slider.style.width;
-	var marginsize = Number(slider.attributes['marginsize'].value);
-	var maxPix = w.substr(0,w.length-2);
+	var maxPix = $(slider).width();
+	var marginsize = 50;
 	var pix = trackSlider.style.left;
 	pix = pix.substr(0,pix.length-2);
 	var rate = (pix-marginsize)/maxPix;
