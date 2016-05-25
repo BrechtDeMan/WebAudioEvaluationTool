@@ -127,6 +127,10 @@ function loadTest(audioHolderObject)
 		console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
 	}
 	interfaceObj = interfaceObj[0];
+    
+    // Clear any outside references
+    var outsideReferences = document.getElementsByName("outside-reference");
+    for (var i=0; i<outsideReferences.length; i++) {feedbackHolder.removeChild(outsideReferences[i]);}
 	
 	if(interfaceObj.title != null)
 	{
