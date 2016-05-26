@@ -163,7 +163,7 @@ function Specification() {
 	this.encode = function()
 	{
 		var RootDocument = document.implementation.createDocument(null,"waet");
-		var root = RootDocument.children[0];
+		var root = RootDocument.firstChild;
         root.setAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
         root.setAttribute("xsi:noNamespaceSchemaLocation","test-schema.xsd");
 		// Build setup node
