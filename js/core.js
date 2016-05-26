@@ -2485,7 +2485,6 @@ function Interface(specificationObject) {
     {
         this.parent = audioObject;
         this.outsideReferenceHolder = document.createElement('button');
-        this.outsideReferenceHolder.id = 'outside-reference';
         this.outsideReferenceHolder.className = 'outside-reference';
         this.outsideReferenceHolder.setAttribute('track-id',index);
         this.outsideReferenceHolder.textContent = "Play Reference";

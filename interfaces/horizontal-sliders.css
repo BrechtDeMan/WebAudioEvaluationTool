@@ -75,12 +75,16 @@ button.track-slider-button {
 	height: 94px;
 }
 
+div#outside-reference-holder {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    margin-bottom: 5px;
+}
 
 button.outside-reference {
-	width:120px;
-	height:20px;
-	margin-bottom:5px;
-	position: absolute;
+    position: inherit;
+    margin: 0px 5px;
 }
 
 div.track-slider-playing {

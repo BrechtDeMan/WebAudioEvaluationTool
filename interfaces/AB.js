@@ -88,6 +88,10 @@ function loadInterface() {
 	// Global parent for the comment boxes on the page
 	var feedbackHolder = document.createElement('div');
 	feedbackHolder.id = 'feedbackHolder';
+    
+    // Create outside reference holder
+    var outsideRef = document.createElement("div");
+    outsideRef.id = "outside-reference-holder";
 	
 	// Construct the AB Boxes
 	var boxes = document.createElement('div');
@@ -109,6 +113,7 @@ function loadInterface() {
 	testContent.appendChild(title); // Insert the title
 	testContent.appendChild(pagetitle);
 	testContent.appendChild(interfaceButtons);
+    testContent.appendChild(outsideRef);
 	testContent.appendChild(feedbackHolder);
 	testContent.appendChild(submit);
 	interfaceContext.insertPoint.appendChild(testContent);
@@ -127,6 +132,10 @@ function loadTest(audioHolderObject)
 		console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
 	}
 	interfaceObj = interfaceObj[0];
+    
+    // Delete outside reference
+	var outsideReferenceHolder = document.getElementById("outside-reference-holder");
+    outsideReferenceHolder.innerHTML = "";
 	
 	if(interfaceObj.title != null)
 	{
@@ -134,6 +143,16 @@ function loadTest(audioHolderObject)
 	}
     
     var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    // Clear the interfaceElements
+    {
+        var node = document.getElementById('playback-holder');
+        if (node){feedbackHolder.removeChild(node);}
+        node = document.getElementById('page-count');
+        if (node){document.getElementById('interface-buttons').removeChild(node);}
+        node = document.getElementById('master-volume-holder-float');
+        if (node){feedbackHolder.removeChild(node);}
+    }
+    
     for (var option of interfaceOptions)
     {
         if (option.type == "show")
@@ -144,6 +163,7 @@ function loadTest(audioHolderObject)
                     if (playbackHolder == null)
                     {
                         playbackHolder = document.createElement('div');
+                        playbackHolder.id = 'playback-holder';
                         playbackHolder.style.width = "100%";
                         playbackHolder.style.float = "left";
                         playbackHolder.align = 'center';
@@ -157,13 +177,12 @@ function loadTest(audioHolderObject)
                     {
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
+                        document.getElementById('interface-buttons').appendChild(pagecountHolder);
                     }
                     pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
-                    var inject = document.getElementById('interface-buttons');
-                    inject.appendChild(pagecountHolder);
                     break;
                 case "volume":
-                    if (document.getElementById('master-volume-holder') == null)
+                    if (document.getElementById('master-volume-holder-float') == null)
                     {
                         feedbackHolder.appendChild(interfaceContext.volume.object);
                     }
@@ -336,7 +355,7 @@ function comparator(audioHolderObject)
         var audioObject = audioEngineContext.newTrack(element);
 		if (index == audioHolderObject.outsideReference || element.type == 'outside-reference')
 		{
-            var orNode = new interfaceContext.outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
+            var orNode = new interfaceContext.outsideReferenceDOM(audioObject,index,document.getElementById("outside-reference-holder"));
 			audioObject.bindInterface(orNode);
         } else {
             var label;

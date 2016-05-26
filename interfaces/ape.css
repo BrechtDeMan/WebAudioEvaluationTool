@@ -32,7 +32,7 @@ div.slider {
 	/* Specify any structure for the slider holder interface */
 	background-color: #eee;
 	height: 150px;
-	margin-bottom: 5px;
+	margin: 5px 50px;
 	-moz-user-select: -moz-none;
 	-khtml-user-select: none;
 	-webkit-user-select: none;
@@ -50,6 +50,8 @@ div.sliderScale span {
 	/* Any formatting of text below scale */
 	font-size: 1.2em;
 	min-width: 5px;
+    max-width: 100px;
+    text-align: center;
 	height: 20px;
 	position: absolute;
 }
@@ -67,13 +69,20 @@ div.track-slider {
     border: 1px solid black;
 }
 
+div#outside-reference-holder {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
 div.outside-reference {
 	width:120px;
-	padding-left: 55px;
-	margin-left: 100px;
+    text-align: center;
 	height:20px;
-	margin-bottom:5px;
 	background-color: rgb(100,200,100);
+    position: inherit;
+    margin: 0px 5px;
 }
 
 div.track-slider-disabled {

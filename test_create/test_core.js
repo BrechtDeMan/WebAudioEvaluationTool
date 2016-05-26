@@ -282,7 +282,7 @@ function buildPage()
             this.content.appendChild(this.select);
             this.description = document.createElement("p");
             this.content.appendChild(this.description);
-            this.testsXML = interfaceSpecs.getElementsByTagName('tests')[0].children;
+            this.testsXML = interfaceSpecs.getElementsByTagName('tests')[0].getElementsByTagName('test');
             for (var i=0; i<this.testsXML.length; i++)
             {
                 var option = document.createElement('option');
@@ -345,9 +345,10 @@ function buildPage()
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
                 this.interfaceXML = interfaceSpecs.getAllElementsByTagName("interfaces")[0].getAllElementsByName(this.testXML.getAttribute("interface"))[0].getAllElementsByTagName("checks")[0];
                 this.testXML = this.testXML.getAllElementsByTagName("checks");
-                for (var i=0; i<this.interfaceXML.children.length; i++)
+                var interfaceXMLChildren = this.interfaceXML.getElementsByTagName('entry');
+                for (var i=0; i<interfaceXMLChildren.length; i++)
                 {
-                    var interfaceNode = this.interfaceXML.children[i];
+                    var interfaceNode = interfaceXMLChildren[i];
                     var checkName = interfaceNode.getAttribute('name');
                     var testNode
                     if (this.testXML.length > 0)
@@ -472,9 +473,10 @@ function buildPage()
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
                 this.interfaceXML = interfaceSpecs.getAllElementsByTagName("interfaces")[0].getAllElementsByName(this.testXML.getAttribute("interface"))[0].getAllElementsByTagName("metrics")[0];
                 this.testXML = this.testXML.getAllElementsByTagName("metrics");
-                for (var i=0; i<this.interfaceXML.children.length; i++)
+                var interfaceXMLChildren = this.interfaceXML.getElementsByTagName('entry');
+                for (var i=0; i<interfaceXMLChildren.length; i++)
                 {
-                    var interfaceNode = this.interfaceXML.children[i];
+                    var interfaceNode = interfaceXMLChildren[i];
                     var checkName = interfaceNode.getAttribute('name');
                     var testNode
                     if (this.testXML.length > 0)
@@ -599,9 +601,10 @@ function buildPage()
                 this.testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
                 this.interfaceXML = interfaceSpecs.getAllElementsByTagName("interfaces")[0].getAllElementsByName(this.testXML.getAttribute("interface"))[0].getAllElementsByTagName("show")[0];
                 this.testXML = this.testXML.getAllElementsByTagName("show");
-                for (var i=0; i<this.interfaceXML.children.length; i++)
+                var interfaceXMLChildren = this.interfaceXML.getElementsByTagName('entry');
+                for (var i=0; i<interfaceXMLChildren.length; i++)
                 {
-                    var interfaceNode = this.interfaceXML.children[i];
+                    var interfaceNode = interfaceXMLChildren[i];
                     var checkName = interfaceNode.getAttribute('name');
                     var testNode
                     if (this.testXML.length > 0)
@@ -987,7 +990,7 @@ function buildPage()
                 handleEvent: function(event) {
                     this.parent.scaleRoot.scales = [];
                     var protoScale = interfaceSpecs.getAllElementsByTagName('scaledefinitions')[0].getAllElementsByName(event.currentTarget.value)[0];
-                    var protoMarkers = protoScale.children;
+                    var protoMarkers = protoScale.getElementsByTagName("scale");
                     for (var i=0; i<protoMarkers.length; i++)
                     {
                         var marker = {
@@ -1011,7 +1014,7 @@ function buildPage()
                 this.parent = parent;
                 
                 // Generate Pre-Set dropdown
-                var protoScales = interfaceSpecs.getAllElementsByTagName('scaledefinitions')[0].children;
+                var protoScales = interfaceSpecs.getAllElementsByTagName('scaledefinitions')[0].getElementsByTagName("scale");
                 this.preset.input.innerHTML = "";
                 
                 for (var i=0; i<protoScales.length; i++)
@@ -1186,7 +1189,7 @@ function SpecificationToHTML()
             this.dataType = schema.getAttribute('type');
             if (this.dataType == undefined) {
                 if (schema.childElementCount > 0) {
-                    if (schema.children[0].nodeName == "xs:simpleType") {
+                    if (schema.firstElementChild.nodeName == "xs:simpleType") {
                         this.dataType = schema.getAllElementsByTagName("xs:restriction")[0].getAttribute("base");
                     }
                 }
@@ -1326,7 +1329,7 @@ function SpecificationToHTML()
             span.textContent = "Your XML document is linked below. On most browsers, simply right click on the link and select 'Save As'. Or clicking on the link may download the file directly. "
             obj.content.appendChild(span);
             var link = document.createElement("div");
-            link.appendChild(doc.children[0]);
+            link.appendChild(doc.firstElementChild);
             var file = [link.innerHTML];
             var bb = new Blob(file,{type : 'application/xml'});
             var dnlk = window.URL.createObjectURL(bb);
@@ -1394,14 +1397,15 @@ function SpecificationToHTML()
         var testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
         var interfaceXML = interfaceSpecs.getAllElementsByTagName("interfaces")[0].getAllElementsByName(testXML.getAttribute("interface"))[0].getAllElementsByTagName("metrics")[0];
         testXML = testXML.getAllElementsByTagName("metrics");
-        for (var i=0; i<interfaceXML.children.length; i++)
+        var interfaceXMLChild = interfaceXML.firstElementChild;
+        while(interfaceXMLChild)
         {
             var obj = {
                 input: document.createElement('input'),
                 root: document.createElement('div'),
                 text: document.createElement('span'),
                 specification: specification.metrics.enabled,
-                name: interfaceXML.children[i].getAttribute("name"),
+                name: interfaceXMLChild.getAttribute("name"),
                 handleEvent: function()
                 {
                     for (var i=0; i<this.specification.length; i++)
@@ -1431,7 +1435,7 @@ function SpecificationToHTML()
             obj.input.type = "checkbox";
             obj.root.appendChild(obj.text);
             obj.root.appendChild(obj.input);
-            obj.text.textContent = checkText.children[i].textContent;
+            obj.text.textContent = checkText.getAllElementsByName(interfaceXMLChild.getAttribute("name"))[0].textContent;
             metric.children.push(obj);
             metric.childrenDOM.appendChild(obj.root);
             for (var j=0; j<specification.metrics.enabled.length; j++)
@@ -1442,6 +1446,7 @@ function SpecificationToHTML()
                     break;
                 }
             }
+            interfaceXMLChild = interfaceXMLChild.nextElementSibling;
         }
         
         // Now both before and after surveys
@@ -1640,9 +1645,10 @@ function SpecificationToHTML()
             var testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
             var interfaceXML = interfaceSpecs.getAllElementsByTagName("interfaces")[0].getAllElementsByName(testXML.getAttribute("interface"))[0].getAllElementsByTagName("checks")[0];
             testXML = testXML.getAllElementsByTagName("checks");
-            for (var i=0; i<interfaceXML.children.length; i++)
+            var interfaceXMLChild = interfaceXML.firstElementChild;
+            while (interfaceXMLChild)
             {
-                var obj = new this.createIOasAttr(interfaceXML.children[i].getAttribute("name"),this.specification,this,"check");
+                var obj = new this.createIOasAttr(interfaceXMLChild.getAttribute("name"),this.specification,this,"check");
                 for (var option  of this.specification.options)
                 {
                     if (option.name == obj.name)
@@ -1661,10 +1667,11 @@ function SpecificationToHTML()
                     }
                 }
                 var text = document.createElement('span');
-                text.textContent = checkText.children[i].textContent;
+                text.textContent = checkText.getAllElementsByName(interfaceXMLChild.getAttribute("name"))[0].textContent;
                 obj.root.appendChild(text);
                 checks.attributeDOM.appendChild(obj.root);
                 checks.attributes.push(obj);
+                interfaceXMLChild = interfaceXMLChild.nextElementSibling;
             }
             this.children.push(checks);
             this.childrenDOM.appendChild(checks.rootDOM);
@@ -1675,9 +1682,10 @@ function SpecificationToHTML()
             testXML = interfaceSpecs.getElementsByTagName("tests")[0].getAllElementsByName(interfaceName)[0];
             interfaceXML = interfaceSpecs.getAllElementsByTagName("interfaces")[0].getAllElementsByName(testXML.getAttribute("interface"))[0].getAllElementsByTagName("show")[0];
             testXML = testXML.getAllElementsByTagName("show");
-            for (var i=0; i<interfaceXML.children.length; i++)
+            interfaceXMLChild = interfaceXML.firstElementChild;
+            while(interfaceXMLChild)
             {
-                var obj = new this.createIOasAttr(interfaceXML.children[i].getAttribute("name"),this.specification,this,"show");
+                var obj = new this.createIOasAttr(interfaceXMLChild.getAttribute("name"),this.specification,this,"show");
                 for (var option  of this.specification.options)
                 {
                     if (option.name == obj.name)
@@ -1696,10 +1704,11 @@ function SpecificationToHTML()
                     }
                 }
                 var text = document.createElement('span');
-                text.textContent = checkText.children[i].textContent;
+                text.textContent = checkText.getAllElementsByName(interfaceXMLChild.getAttribute("name"))[0].textContent;
                 obj.root.appendChild(text);
                 show.attributeDOM.appendChild(obj.root);
                 show.attributes.push(obj);
+                interfaceXMLChild = interfaceXMLChild.nextElementSibling;
             }
             this.children.push(show);
             this.childrenDOM.appendChild(show.rootDOM);
