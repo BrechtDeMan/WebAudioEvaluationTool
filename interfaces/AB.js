@@ -138,6 +138,16 @@ function loadTest(audioHolderObject)
 	}
     
     var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    // Clear the interfaceElements
+    {
+        var node = document.getElementById('playback-holder');
+        if (node){feedbackHolder.removeChild(node);}
+        node = document.getElementById('page-count');
+        if (node){document.getElementById('interface-buttons').removeChild(node);}
+        node = document.getElementById('master-volume-holder-float');
+        if (node){feedbackHolder.removeChild(node);}
+    }
+    
     for (var option of interfaceOptions)
     {
         if (option.type == "show")
@@ -148,6 +158,7 @@ function loadTest(audioHolderObject)
                     if (playbackHolder == null)
                     {
                         playbackHolder = document.createElement('div');
+                        playbackHolder.id = 'playback-holder';
                         playbackHolder.style.width = "100%";
                         playbackHolder.style.float = "left";
                         playbackHolder.align = 'center';
@@ -166,7 +177,7 @@ function loadTest(audioHolderObject)
                     pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
                     break;
                 case "volume":
-                    if (document.getElementById('master-volume-holder') == null)
+                    if (document.getElementById('master-volume-holder-float') == null)
                     {
                         feedbackHolder.appendChild(interfaceContext.volume.object);
                     }
