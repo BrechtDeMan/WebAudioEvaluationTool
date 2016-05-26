@@ -1676,7 +1676,7 @@ function audioObject(id) {
 			} else {
                  this.outputGain.gain.setValueAtTime(0.0,startTime);
             }
-			this.bufferNode.start(startTime);
+			this.bufferNode.start(startTime,this.specification.startTime || 0, this.specification.stopTime-this.specification.startTime || this.buffer.buffer.duration);
             this.bufferNode.playbackStartTime = audioEngineContext.timer.getTestTime();
 		}
 	};
