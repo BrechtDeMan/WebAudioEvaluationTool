@@ -2487,7 +2487,7 @@ function Interface(specificationObject) {
         this.outsideReferenceHolder = document.createElement('button');
         this.outsideReferenceHolder.className = 'outside-reference';
         this.outsideReferenceHolder.setAttribute('track-id',index);
-        this.outsideReferenceHolder.textContent = "Play Reference";
+        this.outsideReferenceHolder.textContent = this.parent.specification.label || "Reference";
         this.outsideReferenceHolder.disabled = true;
 
         this.outsideReferenceHolder.onclick = function(event)
@@ -2510,7 +2510,7 @@ function Interface(specificationObject) {
                 progress = progress.split('.')[0];
                 this.outsideReferenceHolder.textContent = progress+'%';
             } else {
-                this.outsideReferenceHolder.textContent = "Play Reference";
+                this.outsideReferenceHolder.textContent = this.parent.specification.label || "Reference";
             }
         };
         this.startPlayback = function()
@@ -2535,7 +2535,7 @@ function Interface(specificationObject) {
         };
         this.getPresentedId = function()
         {
-            return 'Reference';
+            return this.parent.specification.label || "Reference";
         };
         this.canMove = function()
         {
