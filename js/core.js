@@ -1095,19 +1095,23 @@ function stateMachine()
 			{
 				this.currentStateMap = this.stateMap[this.stateIndex];
                 // Find and extract the outside reference
-                var elements = [], ref = null;
-                for (var elem of this.currentStateMap.audioElements) {
-                    if (elem.type == "outside-reference") {ref = elem;}
-                    else {elements.push(elem);}
+                var elements = [], ref = [];
+                var elem;
+                while(elem = this.currentStateMap.audioElements.pop())
+                {
+                    if (elem.type == "outside-reference") {
+                        ref.push(elem);
+                    }
+                    else {
+                        elements.push(elem);
+                    }
                 }
 				if (this.currentStateMap.randomiseOrder)
 				{
-					this.currentStateMap.audioElements = randomiseOrder(elements);
+					elements = randomiseOrder(elements);
 				}
-                if (ref != null)
-                {
-                    this.currentStateMap.audioElements.push(ref);
-                }
+                this.currentStateMap.audioElements = elements.concat(ref);
+                
                 this.currentStore = storage.testPages[this.stateIndex];
 				if (this.currentStateMap.preTest != null)
 				{
