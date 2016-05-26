@@ -260,6 +260,9 @@ function loadInterface() {
 	var sliderHolder = document.createElement("div");
 	sliderHolder.id = "slider-holder";
 	
+    // Create outside reference holder
+    var outsideRef = document.createElement("div");
+    outsideRef.id = "outside-reference-holder";
 	
 	// Global parent for the comment boxes on the page
 	var feedbackHolder = document.createElement('div');
@@ -271,6 +274,7 @@ function loadInterface() {
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
 	testContent.appendChild(interfaceButtons);
+    testContent.appendChild(outsideRef);
 	testContent.appendChild(sliderHolder);
 	testContent.appendChild(feedbackHolder);
 	interfaceContext.insertPoint.appendChild(testContent);
@@ -295,10 +299,7 @@ function loadTest(audioHolderObject)
 	sliderHolder.innerHTML = "";
 	
 	// Delete outside reference
-	var outsideReferenceHolder = document.getElementById('outside-reference');
-	if (outsideReferenceHolder != null) {
-		document.getElementById('interface-buttons').removeChild(outsideReferenceHolder);
-	}
+	document.getElementById("outside-reference-holder").innerHTML = "";
 	
 	var interfaceObj = audioHolderObject.interfaces;
 	for (var k=0; k<interfaceObj.length; k++) {
@@ -361,7 +362,7 @@ function loadTest(audioHolderObject)
 		if (element.type == 'outside-reference')
 		{
 			// Construct outside reference;
-			var orNode = new outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
+			var orNode = new outsideReferenceDOM(audioObject,index,document.getElementById("outside-reference-holder"));
 			audioObject.bindInterface(orNode);
 		} else {
 			// Create a slider per track
@@ -704,9 +705,9 @@ function outsideReferenceDOM(audioObject,index,inject)
 		{
 			progress = String(progress);
 			progress = progress.split('.')[0];
-			this.outsideReferenceHolder[0].children[0].textContent = progress+'%';
+			this.outsideReferenceHolder.firstChild.textContent = progress+'%';
 		} else {
-			this.outsideReferenceHolder[0].children[0].textContent = "Play Reference";
+			this.outsideReferenceHolder.firstChild.textContent = "Play Reference";
 		}
 	};
     this.startPlayback = function()

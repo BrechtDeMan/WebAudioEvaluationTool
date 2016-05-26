@@ -62,6 +62,10 @@ function loadInterface() {
 	// Append the interface buttons into the interfaceButtons object.
 	interfaceButtons.appendChild(playback);
 	interfaceButtons.appendChild(submit);
+    
+    // Create outside reference holder
+    var outsideRef = document.createElement("div");
+    outsideRef.id = "outside-reference-holder";
 	
 	// Create a slider box
 	var sliderBox = document.createElement('div');
@@ -98,6 +102,7 @@ function loadInterface() {
 	testContent.appendChild(title); // Insert the title
 	testContent.appendChild(pagetitle);
 	testContent.appendChild(interfaceButtons);
+    testContent.appendChild(outsideRef);
 	testContent.appendChild(sliderBox);
 	testContent.appendChild(feedbackHolder);
 	interfaceContext.insertPoint.appendChild(testContent);
@@ -165,10 +170,7 @@ function loadTest(page)
     }
     
 	// Delete outside reference
-	var outsideReferenceHolder = document.getElementById('outside-reference');
-	if (outsideReferenceHolder != null) {
-		document.getElementById('interface-buttons').removeChild(outsideReferenceHolder);
-	}
+	document.getElementById("outside-reference-holder").innerHTML = "";
 	
 	var sliderBox = document.getElementById('slider-holder');
 	sliderBox.innerHTML = "";
@@ -194,7 +196,7 @@ function loadTest(page)
 		if (element.type == 'outside-reference')
 		{
 			// Construct outside reference;
-			var orNode = new interfaceContext.outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
+			var orNode = new interfaceContext.outsideReferenceDOM(audioObject,index,document.getElementById("outside-reference-holder"));
 			audioObject.bindInterface(orNode);
 		} else {
 			// Create a slider per track

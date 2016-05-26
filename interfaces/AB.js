@@ -88,6 +88,10 @@ function loadInterface() {
 	// Global parent for the comment boxes on the page
 	var feedbackHolder = document.createElement('div');
 	feedbackHolder.id = 'feedbackHolder';
+    
+    // Create outside reference holder
+    var outsideRef = document.createElement("div");
+    outsideRef.id = "outside-reference-holder";
 	
 	// Construct the AB Boxes
 	var boxes = document.createElement('div');
@@ -109,6 +113,7 @@ function loadInterface() {
 	testContent.appendChild(title); // Insert the title
 	testContent.appendChild(pagetitle);
 	testContent.appendChild(interfaceButtons);
+    testContent.appendChild(outsideRef);
 	testContent.appendChild(feedbackHolder);
 	testContent.appendChild(submit);
 	interfaceContext.insertPoint.appendChild(testContent);
@@ -128,9 +133,9 @@ function loadTest(audioHolderObject)
 	}
 	interfaceObj = interfaceObj[0];
     
-    // Clear any outside references
-    var outsideReferences = document.getElementsByName("outside-reference");
-    for (var i=0; i<outsideReferences.length; i++) {feedbackHolder.removeChild(outsideReferences[i]);}
+    // Delete outside reference
+	var outsideReferenceHolder = document.getElementById("outside-reference-holder");
+    outsideReferenceHolder.innerHTML = "";
 	
 	if(interfaceObj.title != null)
 	{
@@ -350,7 +355,7 @@ function comparator(audioHolderObject)
         var audioObject = audioEngineContext.newTrack(element);
 		if (index == audioHolderObject.outsideReference || element.type == 'outside-reference')
 		{
-            var orNode = new interfaceContext.outsideReferenceDOM(audioObject,index,document.getElementById('interface-buttons'));
+            var orNode = new interfaceContext.outsideReferenceDOM(audioObject,index,document.getElementById("outside-reference-holder"));
 			audioObject.bindInterface(orNode);
         } else {
             var label;
