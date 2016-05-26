@@ -161,10 +161,9 @@ function loadTest(audioHolderObject)
                     {
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
+                        document.getElementById('interface-buttons').appendChild(pagecountHolder);
                     }
                     pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
-                    var inject = document.getElementById('interface-buttons');
-                    inject.appendChild(pagecountHolder);
                     break;
                 case "volume":
                     if (document.getElementById('master-volume-holder') == null)
