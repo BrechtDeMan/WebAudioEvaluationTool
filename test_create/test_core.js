@@ -1326,7 +1326,10 @@ function SpecificationToHTML()
             obj.content = document.createElement("div");
             obj.content.id = "finish";
             var span = document.createElement("span");
-            span.textContent = "Your XML document is linked below. On most browsers, simply right click on the link and select 'Save As'. Or clicking on the link may download the file directly. "
+            span.textContent = "Your XML document is linked below. On most browsers, simply right click on the link and select 'Save As'. Or clicking on the link may download the file directly."
+            obj.content.appendChild(span);
+            span = document.createElement("p");
+            span.textContent = "NOTE FOR SAFARI! You cannot right click on the below link and save it as a file, Safari does not like that at all. Instead click on it to open the XML, the Press Cmd+S to open the save dialogue. Make sure you have 'save as Page Source' selected on the bottom of the window. Currently Safari has no plans to support the HTML 'download' attribute which causes this problem";
             obj.content.appendChild(span);
             var link = document.createElement("div");
             link.appendChild(doc.firstElementChild);
