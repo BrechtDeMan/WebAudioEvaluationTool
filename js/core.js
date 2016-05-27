@@ -1270,45 +1270,32 @@ function AudioEngine(specification) {
                 // Use inbuilt WAVE decoder first
                 if (this.status == -1) {return;}
                 var waveObj = new WAVE();
-                if (waveObj.open(bufferObj.xmlRequest.response) == 0)
-                {
-                    bufferObj.buffer = audioContext.createBuffer(waveObj.num_channels,waveObj.num_samples,waveObj.sample_rate);
-                    for (var c=0; c<waveObj.num_channels; c++)
-                    {
-                        var buffer_ptr = bufferObj.buffer.getChannelData(c);
-                        for (var n=0; n<waveObj.num_samples; n++)
-                        {
-                            buffer_ptr[n] = waveObj.decoded_data[c][n];
-                        }
-                    }
-                    
-                    delete waveObj;
-                } else {
-                    audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
+                audioContext.decodeAudioData(bufferObj.xmlRequest.response, function(decodedData) {
                         bufferObj.buffer = decodedData;
                         bufferObj.status = 2;
                         calculateLoudness(bufferObj,"I");
-                    }, function(e){
-                        // Should only be called if there was an error, but sometimes gets called continuously
-                        // Check here if the error is genuine
-                        if (bufferObj.xmlRequest.response == undefined) {
-                            // Genuine error
-                            console.log('FATAL - Error loading buffer on '+audioObj.id);
-                            if (request.status == 404)
+                }, function(e) {
+                    var waveObj = new WAVE();
+                    if (waveObj.open(bufferObj.xmlRequest.response) == 0)
+                    {
+                        bufferObj.buffer = audioContext.createBuffer(waveObj.num_channels,waveObj.num_samples,waveObj.sample_rate);
+                        for (var c=0; c<waveObj.num_channels; c++)
+                        {
+                            var buffer_ptr = bufferObj.buffer.getChannelData(c);
+                            for (var n=0; n<waveObj.num_samples; n++)
                             {
-                                console.log('FATAL - Fragment '+audioObj.id+' 404 error');
-                                console.log('URL: '+audioObj.url);
-                                errorSessionDump('Fragment '+audioObj.id+' 404 error');
+                                buffer_ptr[n] = waveObj.decoded_data[c][n];
                             }
-                            this.parent.status = -1;
                         }
-                    });
-                }
-                if (bufferObj.buffer != undefined)
-                {
-                    bufferObj.status = 2;
-                    calculateLoudness(bufferObj,"I");
-                }
+
+                        delete waveObj;
+                    }
+                    if (bufferObj.buffer != undefined)
+                    {
+                        bufferObj.status = 2;
+                        calculateLoudness(bufferObj,"I");
+                    }
+                });
 			};
             
             // Create callback for any error in loading
