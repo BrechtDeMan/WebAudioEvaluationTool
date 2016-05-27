@@ -625,6 +625,9 @@ function Specification() {
 			this.marker = null;
 			this.enforce = false;
 			this.gain = 0.0;
+            this.label = null;
+            this.startTime = null;
+            this.stopTime = null;
 			this.schema = specification.schema.getAllElementsByName('audioelement')[0];;
 			this.parent = null;
 			this.decode = function(parent,xml)

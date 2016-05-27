@@ -1332,7 +1332,7 @@ function SpecificationToHTML()
             span.textContent = "NOTE FOR SAFARI! You cannot right click on the below link and save it as a file, Safari does not like that at all. Instead click on it to open the XML, the Press Cmd+S to open the save dialogue. Make sure you have 'save as Page Source' selected on the bottom of the window. Currently Safari has no plans to support the HTML 'download' attribute which causes this problem";
             obj.content.appendChild(span);
             var link = document.createElement("div");
-            link.appendChild(doc.firstElementChild);
+            link.appendChild(doc.firstChild);
             var file = [link.innerHTML];
             var bb = new Blob(file,{type : 'application/xml'});
             var dnlk = window.URL.createObjectURL(bb);
@@ -1946,6 +1946,31 @@ function SpecificationToHTML()
             this.deleteNode.root.textContent = "Delete Entry";
             this.deleteNode.root.addEventListener("click",this.deleteNode,false);
             this.buttonDOM.appendChild(this.deleteNode.root);
+            
+            this.moveToPosition = function(new_index){
+                new_index = Math.min(new_index,this.parent.children.length);
+                var curr_index = this.parent.children.findIndex(function(elem){
+                    if (elem == this) {return true;} else {return false;}
+                },this);
+                // Split at the current location to remove the node and shift all the children up
+                var tail = this.parent.children.splice(curr_index+1);
+                this.parent.children.pop();
+                this.parent.children = this.parent.children.concat(tail);
+                
+                //Split at the new location and insert the node
+                tail = this.parent.children.splice(new_index);
+                this.parent.children.push(this);
+                this.parent.children = this.parent.children.concat(tail);
+                
+                // Re-build the specification
+                this.parent.specification.options = [];
+                this.parent.childrenDOM.innerHTML = "";
+                for (var obj of this.parent.children) {
+                    this.parent.specification.options.push(obj.specification);
+                    this.parent.childrenDOM.appendChild(obj.rootDOM);
+                }
+                
+            }
         }
         this.addNode = {
             root: document.createElement("button"),
