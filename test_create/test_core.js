@@ -2116,6 +2116,23 @@ function SpecificationToHTML()
         
         this.interfaces = [];
         
+        this.getAudioElements = function() {
+            var array = [];
+            for (var i=0; i<this.children.length; i++) {
+                if (this.children[i].type == "audioElementNode") {
+                    array[array.length] = this.children[i];
+                }
+            }
+            return array;
+        }
+        
+        this.redrawChildren = function() {
+            this.childrenDOM.innerHTML = "";
+            for(var child of this.children) {
+                this.childrenDOM.appendChild(child.rootDOM);
+            }
+        }
+        
         this.audioElementNode = function(parent,rootObject)
         {
             this.type = "audioElementNode";
@@ -2196,6 +2213,82 @@ function SpecificationToHTML()
             this.deleteNode.root.textContent = "Delete Entry";
             this.deleteNode.root.addEventListener("click",this.deleteNode,false);
             this.buttonDOM.appendChild(this.deleteNode.root);
+            
+            this.moveButtons = {
+                root_up: document.createElement("button"),
+                root_down: document.createElement("button"),
+                parent: this,
+                handleEvent: function(event) {
+                    var index = this.parent.parent.getAudioElements().indexOf(this.parent);
+                    if (event.currentTarget.getAttribute("direction") == "up") {
+                        index = Math.max(index-1,0);
+                    } else if (event.currentTarget.getAttribute("direction") == "down") {
+                        index = Math.min(index+1,this.parent.parent.getAudioElements().length-1);
+                    }
+                    this.parent.moveToPosition(index);
+                    this.disable(index);
+                },
+                disable: function(index) {
+                    if (index == 0) {
+                        this.root_up.disabled = true;
+                    } else {
+                        this.root_up.disabled = false;
+                    }
+                    if (index == this.parent.parent.getAudioElements().length-1) {
+                        this.root_down.disabled = true;
+                    } else {
+                        this.root_down.disabled = false;
+                    }
+                }
+            }
+            this.moveButtons.root_up.setAttribute("direction","up");
+            this.moveButtons.root_down.setAttribute("direction","down");
+            this.moveButtons.root_up.addEventListener("click",this.moveButtons,false);
+            this.moveButtons.root_down.addEventListener("click",this.moveButtons,false);
+            this.moveButtons.root_up.textContent = "Move Up";
+            this.moveButtons.root_down.textContent = "Move Down";
+            this.buttonDOM.appendChild(this.moveButtons.root_up);
+            this.buttonDOM.appendChild(this.moveButtons.root_down);
+            
+            this.moveToPosition = function(new_index) {
+                
+                // Get the zero-th Object
+                var zero_object = this.parent.getAudioElements()[0];
+                var parent_children_root_index = this.parent.children.indexOf(zero_object);
+                // splice out the array for processing
+                var process_array = this.parent.children.splice(parent_children_root_index);
+                
+                
+                new_index = Math.min(new_index, process_array.length);
+                var curr_index = process_array.findIndex(function(elem){
+                    if (elem == this) {return true;} else {return false;}
+                },this);
+                
+                // Split at the current location to remove the node and shift all the children up
+                var tail = process_array.splice(curr_index+1);
+                process_array.pop();
+                process_array = process_array.concat(tail);
+                
+                //Split at the new location and insert the node
+                tail = process_array.splice(new_index);
+                process_array.push(this);
+                process_array = process_array.concat(tail);
+                
+                // Re-attach to the parent.children
+                this.parent.children = this.parent.children.concat(process_array);
+                
+                // Re-build the specification
+                this.parent.specification.audioElements = [];
+                for (var obj of process_array) {
+                    this.parent.specification.audioElements.push(obj.specification);
+                }
+                this.parent.redrawChildren();
+                
+                process_array.forEach(function(obj,index){
+                    obj.moveButtons.disable(index);
+                });
+                
+            }
         }
         
         this.commentQuestionNode = function(parent,rootObject)
@@ -2211,7 +2304,7 @@ function SpecificationToHTML()
             this.parent = parent;
             this.specification = rootObject;
             this.schema = specification.schema.getAllElementsByName("page")[0];
-            this.rootDOM.className = "node";
+            this.rootDOM.className = "node audio-element";
 
             var titleDiv = document.createElement('div');
             titleDiv.className = "node-title";
@@ -2248,6 +2341,10 @@ function SpecificationToHTML()
             this.children.push(audioElementDOM);
             this.childrenDOM.appendChild(audioElementDOM.rootDOM);
         }
+        
+        this.getAudioElements().forEach(function(elem){
+            elem.moveButtons.disable();
+        });
         
         this.addInterface = {
             root: document.createElement("button"),
