@@ -1282,10 +1282,18 @@ function SpecificationToHTML()
                             value = event.currentTarget.checked;
                             break;
                         case "number":
-                            value = Number(event.currentTarget.value);
+                            if (event.currentTarget.value != "") {
+                                value = Number(event.currentTarget.value);
+                            } else {
+                                value = undefined;
+                            }
                             break;
                         default:
-                            value = event.currentTarget.value;
+                            if (event.currentTarget.value != "") {
+                                value = event.currentTarget.value;
+                            } else {
+                                value = undefined;
+                            }
                             break;                    
                     }
                 } else if (this.input.nodeName == "SELECT") {
