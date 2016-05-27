@@ -1309,6 +1309,7 @@ function AudioEngine(specification) {
                         this.parent.users[i].bufferLoaded(this);
                     }
                 }
+                interfaceContext.lightbox.post("Error","Could not load resource "+this.parent.url);
             }
             
 			this.progress = 0;
