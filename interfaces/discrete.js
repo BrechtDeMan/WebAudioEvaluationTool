@@ -355,13 +355,21 @@ function discreteObject(audioObject,label,interfaceScales)
 		if (outsideReference != null) {
 			$(outsideReference).removeClass('track-slider-playing');
 		}
+        if (this.parent.specification.parent.playOne || specification.playOne) {
+            $('.track-slider-button').text = "Wait";
+            $('.track-slider-button').attr("disabled","true");
+        }
     }
     this.stopPlayback = function()
     {
         // Called by audioObject when playback stops
-        this.play.setAttribute("playstate","ready");
-        $(this.holder).removeClass('track-slider-playing');
-        this.play.textContent = "Play";
+        if (this.play.getAttribute("playstate") == "playing") {
+            this.play.setAttribute("playstate","ready");
+            $(this.holder).removeClass('track-slider-playing');
+            $('.track-slider-button').text = "Play";
+            this.play.textContent = "Play";
+            $('.track-slider-button').removeAttr("disabled");
+        }
     }
     
 	this.getValue = function()

@@ -621,6 +621,7 @@ function sliderObject(audioObject,interfaceObjects,index) {
 	this.parent = audioObject;
 	this.trackSliderObjects = [];
     this.label = null;
+    this.playing = false;
     switch(audioObject.specification.parent.label) {
         case "letter":
             this.label = String.fromCharCode(97 + index);
@@ -669,15 +670,24 @@ function sliderObject(audioObject,interfaceObjects,index) {
         $(name).addClass('track-slider-playing');
         $('.comment-div').removeClass('comment-box-playing');
         $('#comment-div-'+this.parent.id).addClass('comment-box-playing');
-        var outsideReference = document.getElementById('outside-reference');
-        if (outsideReference != undefined)
-        $(outsideReference).removeClass('track-slider-playing');
+        $('.outside-reference').removeClass('track-slider-playing');
+        this.playing = true;
+        
+        if (this.parent.specification.parent.playOne || specification.playOne) {
+            $('.track-slider').addClass('track-slider-disabled');
+            $('.outside-reference').addClass('track-slider-disabled');
+        }
     };
     this.stopPlayback = function()
     {
-        var name = ".track-slider-"+this.parent.id;
-        $(name).removeClass('track-slider-playing');
-        $('#comment-div-'+this.parent.id).removeClass('comment-box-playing');
+        if (this.playing) {
+            this.playing = false;
+            var name = ".track-slider-"+this.parent.id;
+            $(name).removeClass('track-slider-playing');
+            $('#comment-div-'+this.parent.id).removeClass('comment-box-playing');
+            $('.track-slider').removeClass('track-slider-disabled');
+            $('.outside-reference').removeClass('track-slider-disabled');
+        }
     };
 	this.exportXMLDOM = function(audioObject) {
 		// Called by the audioObject holding this element. Must be present

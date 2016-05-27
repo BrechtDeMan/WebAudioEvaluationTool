@@ -292,16 +292,23 @@ function comparator(page)
         };
         this.startPlayback = function()
         {
-            // Called when playback has begun
-            $('.comparator-button').text('Listen');
+            if (this.parent.specification.parent.playOne || specification.playOne) {
+                $('.comparator-button').text('Wait');
+                $('.comparator-button').attr("disabled","true");
+                $(this.playback).css("disabled","false");
+            } else {
+                $('.comparator-button').text('Listen');
+            }
             $(this.playback).text('Stop');
             this.playback.setAttribute("playstate","playing");
         };
         this.stopPlayback = function()
         {
-            // Called when playback has stopped. This gets called even if playback never started!
-            $(this.playback).text('Listen');
-            this.playback.setAttribute("playstate","ready");
+            if (this.playback.getAttribute("playstate") == "playing") {
+                $('.comparator-button').text('Listen');
+                $('.comparator-button').removeAttr("disabled");
+                this.playback.setAttribute("playstate","ready");
+            }
         };
         this.getValue = function()
         {
