@@ -130,44 +130,6 @@ function loadTest(page)
 	{
 		document.getElementById("pageTitle").textContent = interfaceObj.title;
 	}
-    
-    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
-    for (var option of interfaceOptions)
-    {
-        if (option.type == "show")
-        {
-            switch(option.name) {
-                case "playhead":
-                    var playbackHolder = document.getElementById('playback-holder');
-                    if (playbackHolder == null)
-                    {
-                        playbackHolder = document.createElement('div');
-                        playbackHolder.style.width = "100%";
-                        playbackHolder.align = 'center';
-                        playbackHolder.appendChild(interfaceContext.playhead.object);
-                        feedbackHolder.appendChild(playbackHolder);
-                    }
-                    break;
-                case "page-count":
-                    var pagecountHolder = document.getElementById('page-count');
-                    if (pagecountHolder == null)
-                    {
-                        pagecountHolder = document.createElement('div');
-                        pagecountHolder.id = 'page-count';
-                    }
-                    pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
-                    var inject = document.getElementById('interface-buttons');
-                    inject.appendChild(pagecountHolder);
-                    break;
-                case "volume":
-                    if (document.getElementById('master-volume-holder') == null)
-                    {
-                        feedbackHolder.appendChild(interfaceContext.volume.object);
-                    }
-                    break;
-            }
-        }
-    }
 	
 	// Delete outside reference
     document.getElementById("outside-reference-holder").innerHTML = "";
@@ -224,10 +186,51 @@ function loadTest(page)
         
 	});
 	
-    if (page.showElementComments)
+    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    for (var option of interfaceOptions)
     {
-        interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
+        if (option.type == "show")
+        {
+            switch(option.name) {
+                case "playhead":
+                    var playbackHolder = document.getElementById('playback-holder');
+                    if (playbackHolder == null)
+                    {
+                        playbackHolder = document.createElement('div');
+                        playbackHolder.style.width = "100%";
+                        playbackHolder.align = 'center';
+                        playbackHolder.appendChild(interfaceContext.playhead.object);
+                        feedbackHolder.appendChild(playbackHolder);
+                    }
+                    break;
+                case "page-count":
+                    var pagecountHolder = document.getElementById('page-count');
+                    if (pagecountHolder == null)
+                    {
+                        pagecountHolder = document.createElement('div');
+                        pagecountHolder.id = 'page-count';
+                    }
+                    pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
+                    var inject = document.getElementById('interface-buttons');
+                    inject.appendChild(pagecountHolder);
+                    break;
+                case "volume":
+                    if (document.getElementById('master-volume-holder') == null)
+                    {
+                        feedbackHolder.appendChild(interfaceContext.volume.object);
+                    }
+                    break;
+                case "comments":
+                    interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
+                    break;
+            }
+        }
     }
+    
+    $(page.commentQuestions).each(function(index,element) {
+		var node = interfaceContext.createCommentQuestion(element);
+		commentHolder.appendChild(node.holder);
+	});
     
 	// Auto-align
 	resizeWindow(null);

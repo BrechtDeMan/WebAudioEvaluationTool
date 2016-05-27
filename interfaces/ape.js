@@ -339,6 +339,12 @@ function loadTest(audioHolderObject)
                 {
                     feedbackHolder.appendChild(interfaceContext.volume.object);
                 }
+            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'comments') {
+                var commentHolder = document.createElement('div');
+                commentHolder.id = 'commentHolder';
+                document.getElementById('testContent').appendChild(commentHolder);
+                interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
+                break;
             }
         }
     }
@@ -444,16 +450,50 @@ function loadTest(audioHolderObject)
 		interfaceContext.releaseObject();
 	});
 	
-	
-	if (audioHolderObject.showElementComments) {
-		interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
-	}
-	
-	$(audioHolderObject.commentQuestions).each(function(index,element) {
+    var interfaceList = audioHolderObject.interfaces.concat(specification.interfaces);
+    for (var k=0; k<interfaceList.length; k++)
+    {
+        for (var i=0; i<interfaceList[k].options.length; i++)
+        {
+            if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'playhead')
+            {
+                var playbackHolder = document.getElementById('playback-holder');
+                if (playbackHolder == null)
+                {
+                    playbackHolder = document.createElement('div');
+                    playbackHolder.id = "playback-holder";
+                    playbackHolder.style.width = "100%";
+                    playbackHolder.align = 'center';
+                    playbackHolder.appendChild(interfaceContext.playhead.object);
+                    feedbackHolder.appendChild(playbackHolder);
+                }
+            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'page-count')
+            {
+                var pagecountHolder = document.getElementById('page-count');
+                if (pagecountHolder == null)
+                {
+                    pagecountHolder = document.createElement('div');
+                    pagecountHolder.id = 'page-count';
+                }
+                pagecountHolder.innerHTML = '<span>Page '+(testState.stateIndex+1)+' of '+testState.stateMap.length+'</span>';
+                var inject = document.getElementById('interface-buttons');
+                inject.appendChild(pagecountHolder);
+            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'volume') {
+                if (document.getElementById('master-volume-holder') == null)
+                {
+                    feedbackHolder.appendChild(interfaceContext.volume.object);
+                }
+            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'comments') {
+                interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder,true);
+                break;
+            }
+        }
+    }
+    
+    $(audioHolderObject.commentQuestions).each(function(index,element) {
 		var node = interfaceContext.createCommentQuestion(element);
 		feedbackHolder.appendChild(node.holder);
 	});
-	
 	
 	//testWaitIndicator();
 }

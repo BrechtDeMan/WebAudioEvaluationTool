@@ -16,9 +16,10 @@
 			<interfaceoption type="show" name='playhead'/>
 			<interfaceoption type="show" name="page-count"/>
             <interfaceoption type="show" name="volume"/>
+            <interfaceoption type="show" name="comments"/>
 		</interface>
 	</setup>
-	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' showElementComments='true' loudness="-12">
+	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
 		<interface>
 			<scales>
 				<scalelabel position="0">-50</scalelabel>

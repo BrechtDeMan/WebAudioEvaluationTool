@@ -16,9 +16,10 @@
             <interfaceoption type="show" name="volume"/>
 			<interfaceoption type="show" name='playhead'/>
 			<interfaceoption type="show" name="page-count"/>
+            <interfaceoption type="show" name="comments"/>
 		</interface>
 	</setup>
-	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' showElementComments='true' loudness="-23">
+	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' loudness="-23">
 		<interface>
 			<scales>
 				<scalelabel position="0">(1) Very Annoying</scalelabel>
@@ -32,16 +33,5 @@
 		<audioelement url="1.wav" id="track-2"/>
         <audioelement url="3.wav" id="track-4"/>
         <audioelement url="3.wav" id="track-5"/>
-        <audioelement url="3.wav" id="track-6"/>
-        <audioelement url="3.wav" id="track-7"/>
-        <audioelement url="3.wav" id="track-8"/>
-        <audioelement url="3.wav" id="track-9"/>
-        <audioelement url="3.wav" id="track-10"/>
-        <audioelement url="3.wav" id="track-11"/>
-        <audioelement url="3.wav" id="track-12"/>
-        <audioelement url="3.wav" id="track-13"/>
-        <audioelement url="3.wav" id="track-14"/>
-        <audioelement url="3.wav" id="track-15"/>
-        <audioelement url="2.wav" id="track-16" type="outside-reference"/>
 	</page>
 </waet>

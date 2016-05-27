@@ -153,6 +153,9 @@ function loadTest(audioHolderObject)
         if (node){feedbackHolder.removeChild(node);}
     }
     
+    // Populate the comparator object
+	interfaceContext.comparator = new comparator(audioHolderObject);
+    
     for (var option of interfaceOptions)
     {
         if (option.type == "show")
@@ -187,30 +190,27 @@ function loadTest(audioHolderObject)
                         feedbackHolder.appendChild(interfaceContext.volume.object);
                     }
                     break;
+                case "comments":
+                    var commentHolder = document.createElement('div');
+                    commentHolder.id = 'commentHolder';
+                    document.getElementById('testContent').appendChild(commentHolder);
+                    // Generate one comment box per presented page
+                    for (var element of audioEngineContext.audioObjects)
+                    {
+                        interfaceContext.commentBoxes.createCommentBox(element);
+                    }
+                    interfaceContext.commentBoxes.showCommentBoxes(commentHolder,true);
+                    break;
             }
         }
     }
-	
-	// Populate the comparator object
-	interfaceContext.comparator = new comparator(audioHolderObject);
-    if (audioHolderObject.showElementComments)
-    {
-        var commentHolder = document.createElement('div');
-        commentHolder.id = 'commentHolder';
-        document.getElementById('testContent').appendChild(commentHolder);
-        // Generate one comment box per presented page
-        for (var element of audioEngineContext.audioObjects)
-        {
-            interfaceContext.commentBoxes.createCommentBox(element);
-        }
-        interfaceContext.commentBoxes.showCommentBoxes(commentHolder,true);
-    }
-	resizeWindow(null);
     
     $(audioHolderObject.commentQuestions).each(function(index,element) {
 		var node = interfaceContext.createCommentQuestion(element);
 		commentHolder.appendChild(node.holder);
 	});
+    
+	resizeWindow(null);
 }
 
 function comparator(audioHolderObject)

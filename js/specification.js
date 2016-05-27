@@ -442,7 +442,6 @@ function Specification() {
 		this.hostURL = undefined;
 		this.randomiseOrder = undefined;
 		this.loop = undefined;
-		this.showElementComments = undefined;
 		this.outsideReference = null;
 		this.loudness = null;
         this.label = null;
