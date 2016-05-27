@@ -116,6 +116,16 @@ if (typeof XMLDocument.prototype.getElementsByName != "function") {
     }
 }
 
+var check_dependancies = function() {
+    // This will check for the data dependancies
+    if (typeof(jQuery) != "function") {return false;}
+    if (typeof(Specification) != "function") {return false;}
+    if (typeof(calculateLoudness) != "function") {return false;}
+    if (typeof(WAVE) != "function") {return false;}
+    if (typeof(validateXML) != "function") {return false;}
+    return true;
+}
+
 var onload = function() {
 	// Function called once the browser has loaded all files.
 	// This should perform any initial commands such as structure / loading documents
@@ -3229,4 +3239,12 @@ function Storage()
 	};
 }
 
-onload();
+var window_depedancy_callback;
+window_depedancy_callback = window.setInterval(function(){
+    if (check_dependancies()) {
+        window.clearInterval(window_depedancy_callback);
+        onload();
+    } else {
+        document.getElementById("topLevelBody").innerHTML = "<h1>Loading Resources</h1>";
+    }
+},100);
