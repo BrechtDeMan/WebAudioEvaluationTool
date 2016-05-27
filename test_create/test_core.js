@@ -1943,6 +1943,21 @@ function SpecificationToHTML()
             this.deleteNode.root.textContent = "Delete Entry";
             this.deleteNode.root.addEventListener("click",this.deleteNode,false);
             this.buttonDOM.appendChild(this.deleteNode.root);
+            
+            this.getSurveyPosition = function() {
+                return this.parent.specification.options.findIndex(function(element){
+                    if (element == this) {return true;}
+                    else {return false;}
+                },this.specification);
+            }
+            
+            this.swapOrder = function(other) {
+                // Enables two nodes to swap their respective positions
+                var other_pos = other.getSurveyPosition();
+                var my_pos = this.getSurveyPosition();
+                this.parent.specification.options[other_pos] = this.specification;
+                this.parent.specification.options[my_pos] = other.specification;
+            }
         }
         this.addNode = {
             root: document.createElement("button"),
