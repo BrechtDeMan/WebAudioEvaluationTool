@@ -26,6 +26,8 @@
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
+        
+        <xs:attribute name="playOne" type="xs:boolean" default="false"/>
 
         <!-- define complex elements-->
         <xs:element name="waet">
@@ -62,6 +64,7 @@
                 </xs:attribute>
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
+                <xs:attribute ref="playOne" />
             </xs:complexType>
         </xs:element>
 
@@ -97,6 +100,7 @@
                 <xs:attribute ref="alwaysInclude" />
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
+                <xs:attribute ref="playOne" />
             </xs:complexType>
         </xs:element>
 

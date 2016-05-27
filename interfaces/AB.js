@@ -315,14 +315,23 @@ function comparator(audioHolderObject)
         }
         this.startPlayback = function()
         {
-            $('.comparator-button').text('Listen');
+            if (this.parent.specification.parent.playOne || specification.playOne) {
+                $('.comparator-button').text('Wait');
+                $('.comparator-button').attr("disabled","true");
+                $(this.playback).css("disabled","false");
+            } else {
+                $('.comparator-button').text('Listen');
+            }
             $(this.playback).text('Stop');
             this.playback.setAttribute("playstate","playing");
         };
         this.stopPlayback = function()
         {
-            $(this.playback).text('Listen');
-            this.playback.setAttribute("playstate","ready");
+            if (this.playback.getAttribute("playstate") == "playing") {
+                $('.comparator-button').text('Listen');
+                $('.comparator-button').removeAttr("disabled");
+                this.playback.setAttribute("playstate","ready");
+            }
         };
 		this.exportXMLDOM = function(audioObject)
 		{

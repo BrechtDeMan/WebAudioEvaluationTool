@@ -13,6 +13,7 @@ function Specification() {
     this.crossFade = null;
     this.preSilence = null;
     this.postSilence = null;
+    this.playOne = null;
     
     // nodes
     this.metrics = null;
@@ -448,6 +449,7 @@ function Specification() {
 		this.preTest = null;
 		this.postTest = null;
 		this.interfaces = [];
+        this.playOne = null;
 		this.commentBoxPrefix = "Comment on track";
 		this.audioElements = [];
 		this.commentQuestions = [];
