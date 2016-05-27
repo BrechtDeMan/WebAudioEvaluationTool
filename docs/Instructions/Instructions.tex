@@ -431,7 +431,6 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
             \item \texttt{randomiseOrder}: Boolean, optional. If true the audio fragments are presented randomly rather than the order specified. See Section~\ref{sec:randomisation}. Default is false.
             \item \texttt{repeatCount}: non-negative integer, optional. Specify the number of times to repeat the test page (re-present). Each presentation will appear as an individual page in the results. Default is 0.
             \item \texttt{loop}: Boolean, optional. If true, the audio elements will loop synchronously with each other. See \ref{sec:looping}. Default is false.
-            \item \texttt{showElementComments}: Boolean, optional. If true then there will be a comment box on the test page for each audio element presented, see Section~\ref{sec:commentboxes}.
             \item \texttt{loudness}: non-positive integer, optional. Set the LUFS target value for this page. Supersedes the \texttt{<setup>} loudness attribute for this page. See Section~\ref{sec:loudness} for more.
             \item \texttt{label}: enumeration, optional. Set the label to one of the following
             \begin{itemize}
@@ -488,7 +487,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
         \begin{itemize}
             \item \texttt{title}: Min 0, max 1 occurence. The text content specifies the name of the axis as shown to the user.
             \item \texttt{interfaceoption}: Min 0, max unbounded. Specifies the interface options. See Section~\ref{sec:interfaceoption}.
-            \item \texttt{scales}: Min 0, max 1 occurence. Contains \texttt{<scalelabel>} nodes which define the displayed scales. See Section~\ref{sec:scales}.
+            \item \texttt{scales}: Min 0, max 1 occurence. Contains \texttt{<scalelabel>} nodes which define the displayed scales. See Section~\ref{sec:multiscale}.
         \end{itemize}
 
     \subsection{Audio Element}
@@ -539,6 +538,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
         \end{itemize}
 
 		\subsubsection{Multiple scales}
+			\label{sec:multiscale}
 			In the case of multiple rating scales, e.g. when the stimuli are to be rated in terms of attributes `timbre' and `spatial impression', multiple interface nodes will have to be added, each specifying the title and annotations. 
 
 			This is where the \texttt{interface}'s \texttt{name} attribute is particularly important: use this to retrieve the rating values, comments and metrics associated with the specified interface. 
@@ -631,7 +631,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 		\subsubsection{Outside Reference}
 		    Set type to `outside-reference'. This will place the object in a separate playback element clearly labelled as an outside reference. This is exempt of any movement checks but will still be included in any listening checks.
 		\subsubsection{Hidden reference} 
-		    Set type to `reference'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the `reference' type in the results to quickly find it. The reference can be forced to be below a value before completing the test page by setting the attribute `marker' to be a value between 0 and 100 representing the integer value position it must be equal to or above.
+		    Set type to `reference'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the `reference' type in the results to quickly find it. The reference can be forced to be above a value before completing the test page by setting the attribute `marker' to be a value between 0 and 100 representing the integer value position it must be equal to or above.
 		\subsubsection{Hidden anchor}
 		    Set type to `anchor'. The element will still be randomised as normal (if selected) and presented to the user. However the element will have the `anchor' type in the results to quickly find it. The anchor can be forced to be below a value before completing the test page by setting the attribute `marker' to be a value between 0 and 100 representing the integer value position it must be equal to or below.
 
