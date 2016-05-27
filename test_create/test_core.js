@@ -1947,19 +1947,29 @@ function SpecificationToHTML()
             this.deleteNode.root.addEventListener("click",this.deleteNode,false);
             this.buttonDOM.appendChild(this.deleteNode.root);
             
-            this.getSurveyPosition = function() {
-                return this.parent.specification.options.findIndex(function(element){
-                    if (element == this) {return true;}
-                    else {return false;}
-                },this.specification);
-            }
-            
-            this.swapOrder = function(other) {
-                // Enables two nodes to swap their respective positions
-                var other_pos = other.getSurveyPosition();
-                var my_pos = this.getSurveyPosition();
-                this.parent.specification.options[other_pos] = this.specification;
-                this.parent.specification.options[my_pos] = other.specification;
+            this.moveToPosition = function(new_index){
+                new_index = Math.min(new_index,this.parent.children.length);
+                var curr_index = this.parent.children.findIndex(function(elem){
+                    if (elem == this) {return true;} else {return false;}
+                },this);
+                // Split at the current location to remove the node and shift all the children up
+                var tail = this.parent.children.splice(curr_index+1);
+                this.parent.children.pop();
+                this.parent.children = this.parent.children.concat(tail);
+                
+                //Split at the new location and insert the node
+                tail = this.parent.children.splice(new_index);
+                this.parent.children.push(this);
+                this.parent.children = this.parent.children.concat(tail);
+                
+                // Re-build the specification
+                this.parent.specification.options = [];
+                this.parent.childrenDOM.innerHTML = "";
+                for (var obj of this.parent.children) {
+                    this.parent.specification.options.push(obj.specification);
+                    this.parent.childrenDOM.appendChild(obj.rootDOM);
+                }
+                
             }
         }
         this.addNode = {
