@@ -1969,8 +1969,46 @@ function SpecificationToHTML()
                     this.parent.specification.options.push(obj.specification);
                     this.parent.childrenDOM.appendChild(obj.rootDOM);
                 }
-                
+                this.parent.children.forEach(function(obj,index){
+                    obj.moveButtons.disable(index);
+                });
             }
+            
+            this.moveButtons = {
+                root_up: document.createElement("button"),
+                root_down: document.createElement("button"),
+                parent: this,
+                handleEvent: function(event) {
+                    var index = this.parent.parent.children.indexOf(this.parent);
+                    if (event.currentTarget.getAttribute("direction") == "up") {
+                        index = Math.max(index-1,0);
+                    } else if (event.currentTarget.getAttribute("direction") == "down") {
+                        index = Math.min(index+1,this.parent.parent.children.length-1);
+                    }
+                    this.parent.moveToPosition(index);
+                    this.disable(index);
+                },
+                disable: function(index) {
+                    if (index == 0) {
+                        this.root_up.disabled = true;
+                    } else {
+                        this.root_up.disabled = false;
+                    }
+                    if (index == this.parent.parent.children.length-1) {
+                        this.root_down.disabled = true;
+                    } else {
+                        this.root_down.disabled = false;
+                    }
+                }
+            }
+            this.moveButtons.root_up.setAttribute("direction","up");
+            this.moveButtons.root_down.setAttribute("direction","down");
+            this.moveButtons.root_up.addEventListener("click",this.moveButtons,false);
+            this.moveButtons.root_down.addEventListener("click",this.moveButtons,false);
+            this.moveButtons.root_up.textContent = "Move Up";
+            this.moveButtons.root_down.textContent = "Move Down";
+            this.buttonDOM.appendChild(this.moveButtons.root_up);
+            this.buttonDOM.appendChild(this.moveButtons.root_down);
         }
         this.addNode = {
             root: document.createElement("button"),
@@ -1994,6 +2032,10 @@ function SpecificationToHTML()
             this.children.push(newNode);
             this.childrenDOM.appendChild(newNode.rootDOM);
         }
+        
+        this.children.forEach(function(obj,index){
+            obj.moveButtons.disable(index);
+        });
     }
     
     this.pageNode = function(parent,rootObject)
