@@ -35,6 +35,8 @@ The tool is available for academic use in its entirety including source code on 
 
 The SoundSoftware project page, including a Mercurial repository, is \url{https://code.soundsoftware.ac.uk/projects/webaudioevaluationtool/}. 
 
+\textbf{The most current version of these instructions can be found on \url{https://github.com/BrechtDeMan/WebAudioEvaluationTool/wiki}.}
+
 
 \tableofcontents
 
@@ -556,7 +558,7 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 			% Needs to be implemented in PHP and automated better, will complete soon
 
 
-		\subsubsection{Randomsation of page order}
+		\subsubsection{Randomisation of page order}
         The page order randomisation is set by the \texttt{<setup>} node attribute \texttt{randomise-order}, for example \texttt{<setup ... randomise-order=\texttt{\char`\"}true\texttt{\char`\"}>...</setup>} will randomise the test page order. When not set, the default is to \textbf{not} randomise the test page order. 
 
 		\subsubsection{Randomisation of axis order}
@@ -580,13 +582,13 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 
 	\subsection{Sample rate}
 	\label{sec:samplerate}
-		If you require the test to be conducted at a certain sample rate (i.e. you do not tolerate resampling of the elements to correspond with the system's sample rate), add \texttt{sampleRate="96000"} - where ``96000'' can be any support sample rate (in Hz) - so that a warning message is shown alerting the subject that their system's sample rate is different from this enforced sample rate. This is checked immediately after parsing and stops the page loading any other elements if this check has failed.
+		If you require the test to be conducted at a certain sample rate (i.e. you do not tolerate resampling of the elements to correspond with the system's sample rate), add \texttt{sampleRate="96000"} - where ``96000'' can be any supported sample rate (in Hz) - so that a warning message is shown alerting the subject that their system's sample rate is different from this enforced sample rate. This is checked immediately after parsing and stops the page loading any other elements if this check has failed.
 
 	\subsection{Metrics}
-		The \texttt{Metric} node, which contains the metrics to be tracked during the complete test, is a child of the \texttt{setup} node, and it could look as follows.
+		The \texttt{metric} node, which contains the metrics to be tracked during the complete test, is a child of the \texttt{setup} node, and it could look as follows.
 
 		\begin{lstlisting}
-<Metric>
+<metric>
 	<metricEnable>testTimer</metricEnable>
 	<metricEnable>elementTimer</metricEnable>
 	<metricEnable>elementInitialPosition</metricEnable>
@@ -594,14 +596,14 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	<metricEnable>elementFlagListenedTo</metricEnable>
 	<metricEnable>elementFlagMoved</metricEnable>
 	<metricEnable>elementListenTracker</metricEnable>
-</Metric>
+</metric>
 		\end{lstlisting}
 
 		When in doubt, err on the inclusive side, as one never knows which information is needed in the future. Most of these metrics are necessary for post-processing scripts such as timeline\_view\_movement.py. % Brecht: should perhaps list somewhere what metrics are required for which analysis scripts.
 
 		\subsubsection{Time test duration}
 			\texttt{testTimer}\\
-			One per test page. Presents the total test time from the first playback on the test page to the submission of the test page (exculding test time of the pre-/post- test surveys). This is presented in the results as \texttt{<metricresult id=\texttt{\char`\"}testTime\texttt{\char`\"}> 8.60299319727892 </metricresult>}. The time is in seconds.
+			One per test page. Presents the total test time from the first playback on the test page to the submission of the test page (excluding test time of the pre-/post- test surveys). This is presented in the results as \texttt{<metricresult id=\texttt{\char`\"}testTime\texttt{\char`\"}> 8.60299319727892 </metricresult>}. The time is in seconds.
 
 		\subsubsection{Time fragment playback}
 			\texttt{elementTimer}\\
@@ -701,11 +703,11 @@ The SoundSoftware project page, including a Mercurial repository, is \url{https:
 	\label{sec:loudness}
 		% automatic loudness equalisation
 		% guide to loudness.js 
-		Each audio fragment on loading has its loudness calculated. The tool uses the EBU R 128 recommendation following the ITU-R BS.1770-4 loduness calculations to return the integreated LUFS loudness. The attribute \texttt{loudness} will set the loudness from the scope it is applied in. Applying it in the \texttt{<setup>} node will set the loudness for all test pages. Applying it in the \texttt{<page>} node will set the loudness for that page. Applying it in the \texttt{<audioelement>} node will set the loudness for that fragment. The scope is set locally, so if there is a loudness on both the \texttt{<page>} and \texttt{<setup>} nodes, that test page will take the value associated with the \texttt{<page>}. The loudness attribute is set in LUFS
+		Each audio fragment on loading has its loudness calculated. The tool uses the EBU R 128 recommendation following the ITU-R BS.1770-4 loudness calculations to return the integrated LUFS loudness. The attribute \texttt{loudness} will set the loudness from the scope it is applied in. Applying it in the \texttt{<setup>} node will set the loudness for all test pages. Applying it in the \texttt{<page>} node will set the loudness for that page. Applying it in the \texttt{<audioelement>} node will set the loudness for that fragment. The scope is set locally, so if there is a loudness on both the \texttt{<page>} and \texttt{<setup>} nodes, that test page will take the value associated with the \texttt{<page>}. The loudness attribute is set in LUFS
 		
 	\subsection{Comment Boxes}
 	\label{sec:commentboxes}
-	    There are two types of comment boxes which can be presented, those linked to the audio fragments on the page and those which pose a general question. The audio fragment boxes are shown by setting the attribute \texttt{showElementComments} to true of the page in question. This will then show a comment box below the main interface for every fragment on the page. There is some customisation around the text that accompanies the box, by default the text will read ``Comment on fragment'' followed by the fragment identifier (the number / letter shown by the interface). This `prefix' can be modified using the page node \texttt{<commentboxprefix>}, see Section~\ref{sec:page} for where to place this node in the document. The comment box prefix node takes no attribute and the text contained by the node represents to the prefix. For instance if we have a node \texttt{<commentboxprefix> Describe fragment </commentboxprefix>}, then the interface will show ``Describe fragment'' followed by the identifier.
+	    There are two types of comment boxes which can be presented, those linked to the audio fragments on the page and those which pose a general question. When enabled, there is a comment box below the main interface for every fragment on the page. There is some customisation around the text that accompanies the box, by default the text will read ``Comment on fragment'' followed by the fragment identifier (the number / letter shown by the interface). This `prefix' can be modified using the page node \texttt{<commentboxprefix>}, see Section~\ref{sec:page} for where to place this node in the document. The comment box prefix node takes no attribute and the text contained by the node represents to the prefix. For instance if we have a node \texttt{<commentboxprefix> Describe fragment </commentboxprefix>}, then the interface will show ``Describe fragment'' followed by the identifier.
 	    
 	    The second type of comment box is slightly more complex because it can handle different types of response data. These are called comment questions because they are located in the comment section of the test but pose a specific question.
 
