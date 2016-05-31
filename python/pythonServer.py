@@ -4,13 +4,12 @@
 # http://stackoverflow.com/questions/9079036/detect-python-version-at-runtime
 import sys
 
-from os import walk
-from os import path
-from os import listdir
 import inspect
 import os
 import pickle
 import datetime
+import operator
+import xml.etree.ElementTree as ET
 
 if sys.version_info[0] == 2:
     # Version 2.x
@@ -28,14 +27,14 @@ os.chdir(scriptdir) # does this work?
 
 PSEUDO_PATH = '../tests/'
 pseudo_files = []
-for filename in listdir(PSEUDO_PATH):
+for filename in os.listdir(PSEUDO_PATH):
     print(filename)
     if filename.endswith('.xml'):
         pseudo_files.append(filename)
 
 curSaveIndex = 0;
 curFileName = 'test-0.xml'
-while(path.isfile('../saves/'+curFileName)):
+while(os.path.isfile('../saves/'+curFileName)):
     curSaveIndex += 1;
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
@@ -160,6 +159,36 @@ def saveFile(self):
     curSaveIndex += 1
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
 
+def poolXML(s):
+    pool = ET.parse('../tests/pool.xml')
+    root = pool.getroot()
+    setupNode = root.find("setup");
+    poolSize = setupNode.get("poolSize",0);
+    if (poolSize == 0):
+        s.path = s.path.split("/php",1)[0]+"/tests/pool/xml"
+        processFile(s)
+        return
+    # Set up the store will all the test page key nodes
+    pages = {};
+    for page in root.iter("page"):
+        id = page.get("id")
+        print(id)
+        pages[id] = 0
+
+    # Read the saves and determine the completed pages
+    for filename in os.listdir("../saves/"):
+        if filename.endswith(".xml"):
+            print("../saves/"+filename)
+            save = ET.parse("../saves/"+filename)
+            save_root = save.getroot();
+            if (save_root.get("url") == s.path):
+                for page in save_root.iter("page"):
+                    id = page.get("id")
+                    pages[id] = pages[id] + 1
+
+    # Sort the dictionary
+    pages = sorted(pages.items(), key=operator.itemgetter(1))
+
 def http_do_HEAD(s):
     s.send_response(200)
     s.send_header("Content-type", "text/html")
@@ -171,6 +200,8 @@ def http_do_GET(request):
             send404(request)
         elif (request.path.split('?',1)[0] == "/php/keygen.php"):
             keygen(request);
+        elif (request.path.split('?',1)[0] == "/php/pool.php"):
+            poolXML(request);
         else:
             request.path = request.path.split('?',1)[0]
             if (request.path == '/'):
