@@ -1673,7 +1673,7 @@ function audioObject(id) {
 			};
 			if (!audioEngineContext.loopPlayback || !audioEngineContext.synchPlayback) {
 				this.metric.startListening(audioEngineContext.timer.getTestTime());
-                this.outputGain.gain.setValueAtTime(this.onplayGain,startTime);
+                this.outputGain.gain.setValueAtTime(this.onplayGain,0.0);
                 this.interfaceDOM.startPlayback();
 			} else {
                  this.outputGain.gain.setValueAtTime(0.0,startTime);
