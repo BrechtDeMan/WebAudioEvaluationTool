@@ -121,17 +121,13 @@ function Specification() {
             {
                 case 'pre':
                 case 'before':
-                    else {
-                        this.preTest = new this.surveyNode(this);
-                        this.preTest.decode(this,survey[i]);
-                    }
+	            this.preTest = new this.surveyNode(this);
+	            this.preTest.decode(this,survey[i]);
                     break;
                 case 'post':
                 case 'after':
-                    else {
-                        this.postTest = new this.surveyNode(this);
-                        this.postTest.decode(this,survey[i]);
-                    }
+                    this.postTest = new this.surveyNode(this);
+                    this.postTest.decode(this,survey[i]);
                     break;
             }
 		}
