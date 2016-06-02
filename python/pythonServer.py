@@ -10,6 +10,7 @@ import pickle
 import datetime
 import operator
 import xml.etree.ElementTree as ET
+import copy
 
 if sys.version_info[0] == 2:
     # Version 2.x
@@ -168,27 +169,52 @@ def poolXML(s):
         s.path = s.path.split("/php",1)[0]+"/tests/pool/xml"
         processFile(s)
         return
+    poolSize = int(poolSize)
     # Set up the store will all the test page key nodes
     pages = {};
     for page in root.iter("page"):
         id = page.get("id")
-        print(id)
         pages[id] = 0
-
     # Read the saves and determine the completed pages
     for filename in os.listdir("../saves/"):
         if filename.endswith(".xml"):
-            print("../saves/"+filename)
             save = ET.parse("../saves/"+filename)
             save_root = save.getroot();
-            if (save_root.get("url") == s.path):
-                for page in save_root.iter("page"):
-                    id = page.get("id")
+            if (save_root.find("waet").get("url") == "http://localhost:8000/php/pool.php"):
+                for page in save_root.findall("./page"):
+                    id = page.get("ref")
                     pages[id] = pages[id] + 1
 
     # Sort the dictionary
-    pages = sorted(pages.items(), key=operator.itemgetter(1))
+    rot_pages = {}
+    for key, value in pages.items():
+        if (value in rot_pages):
+            rot_pages[value].append(key)
+        else:
+            rot_pages[value] = [key]
+            
+    Keys = list(rot_pages)
+    print ("Current pool state:")
+    print (rot_pages)
+    
+    return_node = ET.fromstring('<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd"/>');
+    return_node.append(copy.deepcopy(root.find("setup")))
+    page_elements = root.findall("page")
 
+    # Now append the pages
+    i = 0
+    while(len(return_node.findall("page")) < poolSize):
+        if (i > 0):
+            for page in return_node.iter("page"):
+                page.set("alwaysInclude","true")
+        for id in rot_pages[Keys[i]]:
+            return_node.append(copy.deepcopy(root.find('./page[@id="'+id+'"]')))
+        i=i+1
+    s.send_response(200)
+    s.send_header("Content-type", "text/xml")
+    s.end_headers()
+    s.wfile.write(ET.tostring(return_node))
+        
 def http_do_HEAD(s):
     s.send_response(200)
     s.send_header("Content-type", "text/html")
