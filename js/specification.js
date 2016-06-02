@@ -121,7 +121,6 @@ function Specification() {
             {
                 case 'pre':
                 case 'before':
-                    if (this.preTest != null){console.log("Already a pre/before test survey defined! Ignoring second!!");}
                     else {
                         this.preTest = new this.surveyNode(this);
                         this.preTest.decode(this,survey[i]);
@@ -129,7 +128,6 @@ function Specification() {
                     break;
                 case 'post':
                 case 'after':
-                    if (this.postTest != null){console.log("Already a post/after test survey defined! Ignoring second!!");}
                     else {
                         this.postTest = new this.surveyNode(this);
                         this.postTest.decode(this,survey[i]);
