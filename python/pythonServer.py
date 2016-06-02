@@ -60,7 +60,7 @@ def processFile(s):
         lenSt = len(st)
         fmt = st[lenSt-1].rsplit('.')
         fpath = "../"+urllib2.unquote(s.path)
-        size = path.getsize(fpath)
+        size = os.path.getsize(fpath)
         fileDump = open(fpath)
         s.send_response(200)
 

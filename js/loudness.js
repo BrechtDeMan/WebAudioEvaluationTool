@@ -19,7 +19,9 @@ function calculateLoudness(buffer, timescale, target, offlineContext)
 	// timescale -> M or Momentary (returns Array), S or Short (returns Array),
 	//   I or Integrated (default, returns number)
 	// target -> default is -23 LUFS but can be any LUFS measurement.
-	
+	if(navigator.platform == 'iPad' || navigator.platform == 'iPhone') {
+        buffer.ready();
+    }
 	if (buffer == undefined)
 	{
 		return 0;
