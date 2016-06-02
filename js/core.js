@@ -1624,7 +1624,7 @@ function audioObject(id) {
 		if (this.interfaceDOM != null) {
 			this.interfaceDOM.enable();
 		}
-		this.onplayGain = decibelToLinear(this.specification.gain)*this.buffer.buffer.playbackGain;
+		this.onplayGain = decibelToLinear(this.specification.gain)*(this.buffer.buffer.playbackGain||1.0);
 		this.storeDOM.setAttribute('playGain',linearToDecibel(this.onplayGain));
 	};
 	
