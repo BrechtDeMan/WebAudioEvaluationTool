@@ -15,6 +15,9 @@
 
 Please refer to the [Wiki](https://github.com/BrechtDeMan/WebAudioEvaluationTool/wiki) or the documentation in ['docs/Instructions/Instructions.pdf'](https://github.com/BrechtDeMan/WebAudioEvaluationTool/raw/master/docs/Instructions/Instructions.pdf).
 
+### Preview
+The video below shows you can set up a simple test from scratch in under five minutes (click to open): 
+[![Web Audio Evaluation Tool test setup](https://img.youtube.com/vi/T_rwE6Gt9sI/0.jpg)](https://www.youtube.com/watch?v=T_rwE6Gt9sI)
 
 ## Dependencies
 
