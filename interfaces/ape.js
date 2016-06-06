@@ -395,7 +395,11 @@ function loadTest(audioHolderObject)
 		event.preventDefault();
 		var obj = interfaceContext.getSelectedObject();
 		if (obj == null) {return;}
-		$(obj).css("left",event.clientX-6 + "px");
+        var move = event.clientX-6;
+        var w = $(event.currentTarget).width();
+        move = Math.max(50,move);
+        move = Math.min(w+50,move);
+		$(obj).css("left",move + "px");
 		interfaceContext.moveObject();
 	});
 	
@@ -404,6 +408,9 @@ function loadTest(audioHolderObject)
 		var obj = interfaceContext.getSelectedObject();
 		if (obj == null) {return;}
 		var move = event.originalEvent.targetTouches[0].clientX - 6;
+        var w = $(event.currentTarget).width();
+        move = Math.max(50,move);
+        move = Math.min(w+50,move);
 		$(obj).css("left",move + "px");
 		interfaceContext.moveObject();
 	});
