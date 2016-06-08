@@ -1354,29 +1354,48 @@ function AudioEngine(specification) {
             // Copies the entire bufferObj.
             if (preSilenceTime == undefined) {preSilenceTime = 0;}
             if (postSilenceTime == undefined) {postSilenceTime = 0;}
-            var copy = new this.constructor();
-            copy.url = this.url;
             var preSilenceSamples = secondsToSamples(preSilenceTime,this.buffer.sampleRate);
             var postSilenceSamples = secondsToSamples(postSilenceTime,this.buffer.sampleRate);
             var newLength = this.buffer.length+preSilenceSamples+postSilenceSamples;
-            copy.buffer = audioContext.createBuffer(this.buffer.numberOfChannels, newLength, this.buffer.sampleRate);
+            var copybuffer = audioContext.createBuffer(this.buffer.numberOfChannels, newLength, this.buffer.sampleRate);
             // Now we can use some efficient background copy schemes if we are just padding the end
-            if (preSilenceSamples == 0 && typeof copy.buffer.copyToChannel == "function") {
+            if (preSilenceSamples == 0 && typeof copybuffer.copyToChannel == "function") {
                 for (var c=0; c<this.buffer.numberOfChannels; c++) {
-                    copy.buffer.copyToChannel(this.buffer.getChannelData(c),c);
+                    copybuffer.copyToChannel(this.buffer.getChannelData(c),c);
                 }
             } else {
                 for (var c=0; c<this.buffer.numberOfChannels; c++) {
                     var src = this.buffer.getChannelData(c);
-                    var dst = copy.buffer.getChannelData(c);
+                    var dst = copybuffer.getChannelData(c);
                     for (var n=0; n<src.length; n++)
                         dst[n+preSilenceSamples] = src[n];
                 }
             }
             // Copy in the rest of the buffer information
-            copy.buffer.lufs = this.buffer.lufs;
-            copy.buffer.playbackGain = this.buffer.playbackGain;
-            return copy;
+            copybuffer.lufs = this.buffer.lufs;
+            copybuffer.playbackGain = this.buffer.playbackGain;
+            return copybuffer;
+        }
+        
+        this.cropBuffer = function(startTime, stopTime) {
+            // Copy and return the cropped buffer
+            var start_sample = Math.floor(startTime*this.buffer.sampleRate);
+            var stop_sample = Math.floor(stopTime*this.buffer.sampleRate);
+            var newLength = stop_sample - start_sample;
+            var copybuffer = audioContext.createBuffer(this.buffer.numberOfChannels, newLength, this.buffer.sampleRate);
+            // Now we can use some efficient background copy schemes if we are just padding the end
+            for (var c=0; c<this.buffer.numberOfChannels; c++) {
+                var buffer = this.buffer.getChannelData(c);
+                var sub_frame = buffer.subarray(start_sample,stop_sample);
+                if (typeof copybuffer.copyToChannel == "function") {
+                    copybuffer.copyToChannel(sub_frame,c);
+                } else {
+                    var dst = copybuffer.getChannelData(c);
+                    for (var n=0; n<newLength; n++)
+                        dst[n] = src[n+start_sample];
+                }
+            }
+            return copybuffer;
         }
 	};
     
@@ -1401,13 +1420,9 @@ function AudioEngine(specification) {
 	
 	this.play = function(id) {
 		// Start the timer and set the audioEngine state to playing (1)
-		if (this.status == 0 && this.loopPlayback) {
+		if (this.status == 0) {
 			// Check if all audioObjects are ready
-			if(this.checkAllReady())
-			{
-				this.status = 1;
-				this.setSynchronousLoop();
-			}
+			this.bufferReady(id);
 		}
 		else
 		{
@@ -1562,6 +1577,15 @@ function AudioEngine(specification) {
 		}
 	};
     
+    this.bufferReady = function(id) {
+        if(this.checkAllReady()) {
+            if (this.synchPlayback){this.setSynchronousLoop();}
+            this.status = 1;
+            return true;
+        }
+        return false;
+    }
+    
     this.exportXML = function()
     {
         
@@ -1610,12 +1634,22 @@ function audioObject(id) {
         this.buffer = callee;
         var preSilenceTime = this.specification.preSilence || this.specification.parent.preSilence || specification.preSilence || 0.0;
         var postSilenceTime = this.specification.postSilence || this.specification.parent.postSilence || specification.postSilence || 0.0;
-        if (preSilenceTime != 0 || postSilenceTime != 0) {
-            this.buffer = callee.copyBuffer(preSilenceTime,postSilenceTime);    
+        var startTime = this.specification.startTime;
+        var stopTime = this.specification.stopTime;
+        var copybuffer = new callee.constructor();
+        if (isFinite(startTime) || isFinite(stopTime)) {
+            copybuffer.buffer = callee.cropBuffer(startTime,stopTime);
         }
-		this.state = 1;
+        if (preSilenceTime != 0 || postSilenceTime != 0) {
+            if (copybuffer.buffer == undefined) {
+                copybuffer.buffer = callee.copyBuffer(preSilenceTime,postSilenceTime);
+            } else {
+                copybuffer.buffer = copybuffer.copyBuffer(preSilenceTime,postSilenceTime);
+            }
+        }
+        
 		var targetLUFS = this.specification.parent.loudness || specification.loudness;
-		if (typeof targetLUFS === "number")
+		if (typeof targetLUFS === "number" && isFinite(targetLUFS))
 		{
 			this.buffer.buffer.playbackGain = decibelToLinear(targetLUFS - this.buffer.buffer.lufs);
 		} else {
@@ -1626,6 +1660,8 @@ function audioObject(id) {
 		}
 		this.onplayGain = decibelToLinear(this.specification.gain)*(this.buffer.buffer.playbackGain||1.0);
 		this.storeDOM.setAttribute('playGain',linearToDecibel(this.onplayGain));
+        this.state = 1;
+        audioEngineContext.bufferReady(id);
 	};
 	
 	this.bindInterface = function(interfaceObject)
