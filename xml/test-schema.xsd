@@ -249,6 +249,22 @@
                                         </xs:simpleContent>
                                     </xs:complexType>
                                 </xs:element>
+                                <xs:element name="conditional" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:complexType>
+                                        <xs:attribute name="check" use="required">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="equals"/>
+                                                    <xs:enumeration value="lessThan"/>
+                                                    <xs:enumeration value="greaterThan"/>
+                                                    <xs:enumeration value="stringContains"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:attribute>
+                                        <xs:attribute name="jumpToOnPass" type="xs:string" use="optional"/>
+                                        <xs:attribute name="jumpToOnFail" type="xs:string" use="optional"/>
+                                    </xs:complexType>
+                                </xs:element>
                             </xs:sequence>
                             <xs:attribute ref="id" use="required" />
                             <xs:attribute ref="name" />
