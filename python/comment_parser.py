@@ -74,14 +74,17 @@ for file in os.listdir(folder_name):
                                             dialect="excel",
                                             quoting=csv.QUOTE_ALL)
                         commentstr = audioelement.find("./comment/response").text
+                        valuestr = audioelement.find("./value").text
 
                         if commentstr is None:
                            commentstr = ''
+                        if valuestr is None:
+                           valuestr = ''
 
                         # anonymous comments:
                         #writer.writerow([commentstr])  # .encode("utf-8")
                         # comments with (file) name:
-                        writer.writerow([file[:-4]] + [commentstr]) 
+                        writer.writerow([file[:-4]] + [valuestr] + [commentstr.encode("utf-8")]) 
 
                     #TODO Replace 'new line' in comment with something else?
                         
