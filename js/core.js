@@ -2890,7 +2890,7 @@ function Interface(specificationObject) {
 			var passed = false;
 			for (var j=0; j<metric.listenTracker.length; j++)
 			{
-				var bt = metric.listenTracker[j].getElementsByTagName('buffertime');
+				var bt = metric.listenTracker[j].getElementsByTagName('testtime');
 				var start_time = Number(bt[0].getAttribute('start'));
 				var stop_time = Number(bt[0].getAttribute('stop'));
 				var delta = stop_time - start_time;
@@ -2922,7 +2922,9 @@ function Interface(specificationObject) {
 			console.log("[ALERT]: "+str_start);
             this.storeErrorNode("[ALERT]: "+str_start);
 			interfaceContext.lightbox.post("Error",str_start);
+            return false;
 		}
+        return true;
 	};
 	this.checkAllMoved = function()
 	{
