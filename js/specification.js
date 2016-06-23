@@ -299,6 +299,14 @@ function Specification() {
                     default:
                         break;
                 }
+                for (var condition of this.conditions) {
+                    var conditionDOM = doc.createElement("conditional");
+                    conditionDOM.setAttribute("check",condition.check);
+                    conditionDOM.setAttribute("value",condition.value);
+                    conditionDOM.setAttribute("jumpToOnPass",condition.jumpToOnPass);
+                    conditionDOM.setAttribute("jumpToOnFail",condition.jumpToOnFail);
+                    node.appendChild(conditionDOM);
+                }
 				return node;
 			};
 		};
