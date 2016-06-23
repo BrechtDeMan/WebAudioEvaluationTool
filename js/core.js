@@ -1116,6 +1116,7 @@ function stateMachine()
                         elements.push(elem);
                     }
                 }
+                elements = elements.reverse();
 				if (this.currentStateMap.randomiseOrder)
 				{
 					elements = randomiseOrder(elements);
