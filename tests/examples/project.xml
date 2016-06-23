@@ -4,6 +4,7 @@
 		<survey location="before">
 			<surveyentry type="question" id="sessionId" mandatory="true">
 				<statement>Please enter your name.</statement>
+                <conditional check="equals" value="John" jumpToOnPass="test-intro" jumpToOnFail="checkboxtest"/>
 			</surveyentry>
 			<surveyentry type="checkbox" id="checkboxtest" mandatory="true">
 				<statement>Please select with which activities you have any experience (example checkbox question)</statement>
@@ -13,6 +14,9 @@
 				<option name="hwdesigner">Designing or building audio hardware</option>
 				<option name="researcher">Research in the field of audio</option>
 			</surveyentry>
+            <surveyentry type="question" id="instrument" mandatory="false">
+                <statement>What instrument did you play</statement>
+            </surveyentry>
 			<surveyentry type="statement" id="test-intro">
 				<statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
 			</surveyentry>

@@ -261,6 +261,7 @@
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:attribute>
+                                        <xs:attribute name="value" type="xs:string" use="optional"/>
                                         <xs:attribute name="jumpToOnPass" type="xs:string" use="optional"/>
                                         <xs:attribute name="jumpToOnFail" type="xs:string" use="optional"/>
                                     </xs:complexType>

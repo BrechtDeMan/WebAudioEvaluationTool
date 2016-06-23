@@ -859,6 +859,39 @@ function interfacePopup() {
 				console.log("Question Response: "+ textArea.value);
 				node.response = textArea.value;
 			}
+            // Perform the conditional
+            for (var condition of node.specification.conditions) {
+                var pass = false;
+                switch(condition.check) {
+                    case "equals":
+                        if (textArea.value == condition.value) {
+                            pass = true;
+                        }
+                        break;
+                    case "greaterThan":
+                    case "lessThan":
+                        console.log("Survey Element of type 'question' cannot interpret greaterThan/lessThan conditions. IGNORING");
+                        break;
+                    case "contains":
+                        if (textArea.value.includes(condition.value)) {
+                            pass = true;
+                        }
+                        break;
+                }
+                var jumpID;
+                if (pass) {
+                    jumpID = condition.jumpToOnPass;
+                } else {
+                    jumpID = condition.jumpToOnFail;
+                }
+                if (jumpID != undefined) {
+                    var index = this.popupOptions.findIndex(function(item,index,element){
+                        if (item.specification.id == jumpID) {return true;} else {return false;}
+                    },this);
+                    this.currentIndex = index-1;
+                    break;
+                }
+            }
 		} else if (node.specification.type == 'checkbox') {
 			// Must extract checkbox data
 			console.log("Checkbox: "+ node.specification.statement);
@@ -872,6 +905,38 @@ function interfacePopup() {
 				});
 				console.log(node.specification.options[i].name+": "+ inputs[i].checked);
 			}
+            // Perform the conditional
+            for (var condition of node.specification.conditions) {
+                var pass = false;
+                switch(condition.check) {
+                    case "equals":
+                    case "greaterThan":
+                    case "lessThan":
+                        console.log("Survey Element of type 'checkbox' cannot interpret equals/greaterThan/lessThan conditions. IGNORING");
+                        break;
+                    case "contains":
+                        for (var response of node.response) {
+                            if (response.name == condition.value && response.checked) {
+                                pass = true;
+                                break;
+                            }
+                        }
+                        break;
+                }
+                var jumpID;
+                if (pass) {
+                    jumpID = condition.jumpToOnPass;
+                } else {
+                    jumpID = condition.jumpToOnFail;
+                }
+                if (jumpID != undefined) {
+                    var index = this.popupOptions.findIndex(function(item,index,element){
+                        if (item.specification.id == jumpID) {return true;} else {return false;}
+                    },this);
+                    this.currentIndex = index-1;
+                    break;
+                }
+            }
 		} else if (node.specification.type == "radio") {
 			var optHold = this.popupResponse;
 			console.log("Radio: "+ node.specification.statement);
@@ -894,6 +959,35 @@ function interfacePopup() {
 				}
 				i++;
 			}
+            // Perform the conditional
+            for (var condition of node.specification.conditions) {
+                var pass = false;
+                switch(condition.check) {
+                    case "contains":
+                    case "greaterThan":
+                    case "lessThan":
+                        console.log("Survey Element of type 'radio' cannot interpret contains/greaterThan/lessThan conditions. IGNORING");
+                        break;
+                    case "equals":
+                        if (node.response == condition.value) {
+                            pass = true;
+                        }
+                        break;
+                }
+                var jumpID;
+                if (pass) {
+                    jumpID = condition.jumpToOnPass;
+                } else {
+                    jumpID = condition.jumpToOnFail;
+                }
+                if (jumpID != undefined) {
+                    var index = this.popupOptions.findIndex(function(item,index,element){
+                        if (item.specification.id == jumpID) {return true;} else {return false;}
+                    },this);
+                    this.currentIndex = index-1;
+                    break;
+                }
+            }
 		} else if (node.specification.type == "number") {
 			var input = this.popupContent.getElementsByTagName('input')[0];
 			if (node.mandatory == true && input.value.length == 0) {
@@ -914,6 +1008,43 @@ function interfacePopup() {
 				return;
 			}
 			node.response = input.value;
+            // Perform the conditional
+            for (var condition of node.specification.conditions) {
+                var pass = false;
+                switch(condition.check) {
+                    case "contains":
+                        console.log("Survey Element of type 'number' cannot interpret contains conditions. IGNORING");
+                        break;
+                    case "greaterThan":
+                        if (node.response > Number(condition.value)) {
+                            pass = true;
+                        }
+                        break;
+                    case "lessThan":
+                        if (node.response < Number(condition.value)) {
+                            pass = true;
+                        }
+                        break;
+                    case "equals":
+                        if (node.response == condition.value) {
+                            pass = true;
+                        }
+                        break;
+                }
+                var jumpID;
+                if (pass) {
+                    jumpID = condition.jumpToOnPass;
+                } else {
+                    jumpID = condition.jumpToOnFail;
+                }
+                if (jumpID != undefined) {
+                    var index = this.popupOptions.findIndex(function(item,index,element){
+                        if (item.specification.id == jumpID) {return true;} else {return false;}
+                    },this);
+                    this.currentIndex = index-1;
+                    break;
+                }
+            }
 		}
 		this.currentIndex++;
 		if (this.currentIndex < this.popupOptions.length) {
@@ -3190,6 +3321,10 @@ function Storage()
 				surveyresult.appendChild(child);
 				break;
 			case "checkbox":
+                if (node.response == undefined) {
+                    surveyresult.appendChild(this.parent.document.createElement('response'));
+                    break;
+                }
 				for (var i=0; i<node.response.length; i++)
 				{
 					var checkNode = this.parent.document.createElement('response');

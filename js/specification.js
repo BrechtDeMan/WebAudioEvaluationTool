@@ -214,6 +214,7 @@ function Specification() {
 			this.min = undefined;
 			this.max = undefined;
 			this.step = undefined;
+            this.conditions = [];
 			
 			this.decode = function(parent,child)
 			{
@@ -252,6 +253,17 @@ function Specification() {
 						}
 					}
 				}
+                var conditionElements = child.getElementsByTagName("conditional");
+                for (var i=0; i<conditionElements.length; i++) {
+                    var condition = conditionElements[i];
+                    var obj = {
+                        check: condition.getAttribute("check"),
+                        value: condition.getAttribute("value"),
+                        jumpToOnPass: condition.getAttribute("jumpToOnPass"),
+                        jumpToOnFail: condition.getAttribute("jumpToOnFail")
+                    }
+                    this.conditions.push(obj);
+                }
 			};
 			
 			this.exportXML = function(doc)
