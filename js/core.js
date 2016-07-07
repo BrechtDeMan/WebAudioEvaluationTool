@@ -3226,6 +3226,7 @@ function Storage()
             this.update();
 		}
 		this.state = 1;
+        this.root.setAttribute("state","complete");
 		return this.root;
 	};
 }
