@@ -18,6 +18,7 @@ var currentTrackOrder = []; // Hold the current XML tracks in their (randomised)
 var audioEngineContext; // The custome AudioEngine object
 var gReturnURL;
 var gSaveFilenamePrefix;
+var gRefKey;
 
 
 // Add a prototype to the bufferSourceNode to reference to the audioObject holding it
@@ -173,6 +174,9 @@ var onload = function() {
                 break;
             case "saveFilenamePrefix":
                 gSaveFilenamePrefix = value;
+                break;
+            case "refKey":
+                gRefKey = value;
                 break;
             }
         }
@@ -490,7 +494,7 @@ function createProjectSave(destURL) {
                     var file = response.getElementsByTagName("file")[0];
                     console.log("Save: OK, written "+file.getAttribute("bytes")+"B");
                     if (typeof specification.returnURL == "string" && specification.returnURL.length > 0) {
-                            window.location = specification.returnURL;
+                            window.location = specification.returnURL+"&refKey="+storage.SessionKey.key;
                     } else {
                         popup.popupContent.textContent = specification.exitText;
                     }
@@ -3180,6 +3184,7 @@ function Storage()
             this.root.appendChild(projectDocument);
             this.root.appendChild(interfaceContext.returnDateNode());
             this.root.appendChild(interfaceContext.returnNavigator());
+            this.root.setAttribute("ref",gRefKey);
         } else {
             this.document = existingStore;
             this.root = existingStore.firstChild;
