@@ -16,6 +16,7 @@ function loadInterface() {
 	title.className = "title";
 	title.align = "center";
 	var titleSpan = document.createElement('span');
+    titleSpan.id = "test-title";
 	
 	// Set title to that defined in XML, else set to default
 	if (titleAttr != undefined) {
@@ -126,6 +127,12 @@ function loadTest(page)
 		console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
 	}
 	interfaceObj = interfaceObj[0];
+    
+    // Set the page title
+    if (typeof page.title == "string" && page.title.length > 0) {
+        document.getElementById("test-title").textContent = page.title
+    }
+    
 	if(interfaceObj.title != null)
 	{
 		document.getElementById("pageTitle").textContent = interfaceObj.title;

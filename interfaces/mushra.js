@@ -22,6 +22,7 @@ function loadInterface() {
 	title.className = "title";
 	title.align = "center";
 	var titleSpan = document.createElement('span');
+    titleSpan.id = "test-title";
 	
 	// Set title to that defined in XML, else set to default
 	if (titleAttr != undefined) {
@@ -127,6 +128,12 @@ function loadTest(audioHolderObject)
 		console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
 	}
 	interfaceObj = interfaceObj[0];
+    
+    // Set the page title
+    if (typeof audioHolderObject.title == "string" && audioHolderObject.title.length > 0) {
+        document.getElementById("test-title").textContent = audioHolderObject.title
+    }
+    
 	if(interfaceObj.title != null)
 	{
 		document.getElementById("pageTitle").textContent = interfaceObj.title;

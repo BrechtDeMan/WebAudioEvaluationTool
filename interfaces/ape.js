@@ -220,6 +220,7 @@ function loadInterface() {
 	title.className = "title";
 	title.align = "center";
 	var titleSpan = document.createElement('span');
+    titleSpan.id = "test-title";
 	
 	// Set title to that defined in XML, else set to default
 	if (titleAttr != undefined) {
@@ -297,6 +298,12 @@ function loadTest(audioHolderObject)
 	var sliderHolder = document.getElementById('slider-holder');
 	feedbackHolder.innerHTML = "";
 	sliderHolder.innerHTML = "";
+    
+    // Set the page title
+    if (typeof audioHolderObject.title == "string" && audioHolderObject.title.length > 0) {
+        document.getElementById("test-title").textContent = audioHolderObject.title
+    }
+	
 	
 	// Delete outside reference
 	document.getElementById("outside-reference-holder").innerHTML = "";

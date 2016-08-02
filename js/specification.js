@@ -454,6 +454,7 @@ function Specification() {
 	this.page = function(specification) {
 		this.presentedId = undefined;
 		this.id = undefined;
+        this.title = undefined;
 		this.hostURL = undefined;
 		this.randomiseOrder = undefined;
 		this.loop = undefined;
@@ -491,6 +492,12 @@ function Specification() {
 					break;
 				}
 			}
+            
+            // Get the title
+            var title = xml.getElementsByTagName('title');
+            if (title.length != 0) {
+                this.title = title[0].textContent;
+            }
 			
 			// Get the Comment Box Prefix
 			var CBP = xml.getElementsByTagName('commentboxprefix');
