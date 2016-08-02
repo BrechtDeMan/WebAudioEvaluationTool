@@ -150,11 +150,6 @@ function loadTest(page)
 	}
 	var loopPlayback = page.loop;
 	
-	$(page.commentQuestions).each(function(index,element) {
-		var node = interfaceContext.createCommentQuestion(element);
-		feedbackHolder.appendChild(node.holder);
-	});
-	
 	// Find all the audioElements from the audioHolder
 	var index = 0;
 	var interfaceScales = testState.currentStateMap.interfaces[0].scales;
@@ -236,7 +231,7 @@ function loadTest(page)
     
     $(page.commentQuestions).each(function(index,element) {
 		var node = interfaceContext.createCommentQuestion(element);
-		commentHolder.appendChild(node.holder);
+		feedbackHolder.appendChild(node.holder);
 	});
     
 	// Auto-align
