@@ -207,7 +207,7 @@ function loadTest(audioHolderObject)
     
     $(audioHolderObject.commentQuestions).each(function(index,element) {
 		var node = interfaceContext.createCommentQuestion(element);
-		commentHolder.appendChild(node.holder);
+		document.getElementById('testContent').appendChild(node.holder);
 	});
     
 	resizeWindow(null);
