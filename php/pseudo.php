@@ -15,7 +15,7 @@
         $numtests = count( $files );
     }
 
-    $testID = ($numsaves % $numtests)-1;
+    $testID = ($numsaves % $numtests);
 
 	readfile($files[$testID]);
 ?>
