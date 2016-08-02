@@ -1,4 +1,7 @@
 <?php
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 // This checks the key sent by the JavaScript against the current bunch of saves
 // XML Saves location - assumes it will be saves/
 $saves = glob("../saves/*.xml");

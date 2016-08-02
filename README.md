@@ -13,7 +13,7 @@
 
 ## Instructions
 
-Please refer to the [Wiki](https://github.com/BrechtDeMan/WebAudioEvaluationTool/wiki) or the documentation in ['docs/Instructions/Instructions.pdf'](https://github.com/BrechtDeMan/WebAudioEvaluationTool/raw/master/docs/Instructions/Instructions.pdf).
+Please refer to the [Wiki](https://github.com/BrechtDeMan/WebAudioEvaluationTool/wiki). 
 
 ### Preview
 The video below shows you can set up a simple test from scratch in under five minutes (click to open): 

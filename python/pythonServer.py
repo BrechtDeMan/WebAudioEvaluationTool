@@ -28,6 +28,7 @@ os.chdir(scriptdir) # does this work?
 
 PSEUDO_PATH = '../tests/'
 pseudo_files = []
+pseudo_index = 0
 for filename in os.listdir(PSEUDO_PATH):
     print(filename)
     if filename.endswith('.xml'):
@@ -221,6 +222,7 @@ def http_do_HEAD(s):
     s.end_headers()
 
 def http_do_GET(request):
+    global pseudo_index
     if(request.client_address[0] == "127.0.0.1"):
         if (request.path == "/favicon.ico"):
             send404(request)
@@ -233,7 +235,7 @@ def http_do_GET(request):
             if (request.path == '/'):
                 request.path = '/index.html'
             elif (request.path == '/pseudo.xml'):
-                request.path = '/'+PSEUDO_PATH + pseudo_files[pseudo_index]
+                request.path = PSEUDO_PATH + pseudo_files[pseudo_index]
                 print(request.path)
                 pseudo_index += 1
                 pseudo_index %= len(pseudo_files)
