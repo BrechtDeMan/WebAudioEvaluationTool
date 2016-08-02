@@ -109,6 +109,10 @@ function loadInterface() {
 	submit.style.left = (window.innerWidth-250)/2 + 'px';
 		
 	feedbackHolder.appendChild(boxes);
+    
+    // Create holder for comment boxes
+    var comments = document.createElement("div");
+    comments.id = "comment-box-holder";
 	
 	// Inject into HTML
 	testContent.appendChild(title); // Insert the title
@@ -117,6 +121,7 @@ function loadInterface() {
     testContent.appendChild(outsideRef);
 	testContent.appendChild(feedbackHolder);
 	testContent.appendChild(submit);
+    testContent.appendChild(comments);
 	interfaceContext.insertPoint.appendChild(testContent);
 
 	// Load the full interface
@@ -133,6 +138,9 @@ function loadTest(audioHolderObject)
 		console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
 	}
 	interfaceObj = interfaceObj[0];
+    
+    var commentHolder = document.getElementById('comment-box-holder');
+    commentHolder.innerHTML = "";
     
     // Delete outside reference
 	var outsideReferenceHolder = document.getElementById("outside-reference-holder");
@@ -197,9 +205,6 @@ function loadTest(audioHolderObject)
                     }
                     break;
                 case "comments":
-                    var commentHolder = document.createElement('div');
-                    commentHolder.id = 'commentHolder';
-                    document.getElementById('testContent').appendChild(commentHolder);
                     // Generate one comment box per presented page
                     for (var element of audioEngineContext.audioObjects)
                     {
@@ -213,7 +218,7 @@ function loadTest(audioHolderObject)
     
     $(audioHolderObject.commentQuestions).each(function(index,element) {
 		var node = interfaceContext.createCommentQuestion(element);
-		document.getElementById('testContent').appendChild(node.holder);
+		commentHolder.appendChild(node.holder);
 	});
     
 	resizeWindow(null);
