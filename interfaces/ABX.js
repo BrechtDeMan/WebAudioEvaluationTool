@@ -140,6 +140,8 @@ function loadTest(page)
 		document.getElementById("pageTitle").textContent = interfaceObj.title;
 	}
     
+    interfaceContext.comparator = new comparator(page);
+    
     var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
     for (var option of interfaceOptions)
     {
@@ -175,11 +177,26 @@ function loadTest(page)
                         feedbackHolder.appendChild(interfaceContext.volume.object);
                     }
                     break;
+                case "comments":
+                    var commentHolder = document.createElement('div');
+                    commentHolder.id = 'commentHolder';
+                    document.getElementById('testContent').appendChild(commentHolder);
+                    // Generate one comment box per presented page
+                    for (var element of audioEngineContext.audioObjects)
+                    {
+                        interfaceContext.commentBoxes.createCommentBox(element);
+                    }
+                    interfaceContext.commentBoxes.showCommentBoxes(commentHolder,true);
+                    break;
             }
         }
     }
     
-    interfaceContext.comparator = new comparator(page);
+    $(page.commentQuestions).each(function(index,element) {
+		var node = interfaceContext.createCommentQuestion(element);
+		document.getElementById('testContent').appendChild(node.holder);
+	});
+    
     resizeWindow(null);
 }
 
