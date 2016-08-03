@@ -1,0 +1,43 @@
+div.timeline-element {
+    display: flex;
+    justify-content: center;
+}
+
+div.timeline-element-content {
+    max-width: 800px;
+    min-width: 200px;
+    border: 1px solid black;
+    margin: 10px 0px;
+    padding: 20px;
+}
+
+div.timeline-element-canvas-holder {
+    display: flex;
+    width: inherit;
+    height: 150px;
+    margin-left: 50px;
+}
+
+canvas.canvas-layer1{
+    position: absolute;
+}
+canvas.canvas-layer2 {
+    position: absolute;
+    z-index: -1;
+}
+canvas.canvas-layer3 {
+    position: absolute;
+    z-index: -2;
+}
+canvas.canvas-layer4 {
+    position: absolute;
+    z-index: -3;
+}
+
+canvas.timeline-element-canvas {
+    border: 1px solid black;
+}
+
+canvas.canvas-disabled {
+    background-color: gray;
+}

@@ -419,6 +419,15 @@ function loadProjectSpecCallback(response) {
 
             document.getElementsByTagName("head")[0].appendChild(css);
             break;
+        case "timeline":
+            interfaceJS.setAttribute("src","interfaces/timeline.js");
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.type = 'text/css';
+            css.href = 'interfaces/timeline.css';
+
+            document.getElementsByTagName("head")[0].appendChild(css);
+            break;
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
     
