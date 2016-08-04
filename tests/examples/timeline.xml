@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-	<setup interface="timeline" projectReturn="save.php" returnURL="http://localhost:8000/index.html?url=tests/test.xml">
+	<setup interface="timeline" projectReturn="save.php">
 		<metric>
 			<metricenable>testTimer</metricenable>
 			<metricenable>elementTimer</metricenable>
@@ -11,7 +11,7 @@
 			<metricenable>elementListenTracker</metricenable>
 		</metric>
 		<interface>
-			<interfaceoption type="check" name="fragmentMoved"/>
+			<interfaceoption type="check" name="fragmentPlayed"/>
 			<interfaceoption type="check" name="scalerange" min="25" max="75"/>
             <interfaceoption type="show" name="volume"/>
 			<interfaceoption type="show" name='playhead'/>
