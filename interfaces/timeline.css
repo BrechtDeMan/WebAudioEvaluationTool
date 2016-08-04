@@ -14,7 +14,7 @@ div.timeline-element-content {
 div.timeline-element-canvas-holder {
     display: flex;
     width: inherit;
-    height: 150px;
+    height: 160px;
     margin-left: 50px;
 }
 
@@ -40,4 +40,32 @@ canvas.timeline-element-canvas {
 
 canvas.canvas-disabled {
     background-color: gray;
+}
+
+div.timeline-element-comment-holder {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+div.comment-entry {
+    border: 1px solid #444444;
+    max-width: 600px;
+    min-width: 400px;
+    margin: 0px 0px 5px 5px;
+    padding: 5px;
+    height: 80px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+div.comment-entry-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+textarea.comment-entry-text {
+    resize: none;
+    margin: auto;
 }

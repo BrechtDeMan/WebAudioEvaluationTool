@@ -177,18 +177,32 @@ function interfaceObject(audioObject,labelstr)
             this.parent = parent;
             this.time = time;
             this.DOM = document.createElement("div");
-            this.DOM.className = "comment-div";
+            this.DOM.className = "comment-entry";
+            var titleHolder = document.createElement("div");
+            titleHolder.className = "comment-entry-header";
             this.title = document.createElement("span");
             if (str != undefined) {
                 this.title.textContent = str;
             } else {
                 this.title.textContent = "Time: "+time.toFixed(2)+"s";
             }
+            titleHolder.appendChild(this.title);
             this.textarea = document.createElement("textarea");
-            this.textarea.className = "trackComment";
-            this.DOM.appendChild(this.title);
-            this.DOM.appendChild(document.createElement("br"));
+            this.textarea.className = "comment-entry-text";
+            this.DOM.appendChild(titleHolder);
             this.DOM.appendChild(this.textarea);
+            
+            this.clear = {
+                DOM: document.createElement("button"),
+                parent: this,
+                handleEvent: function() {
+                    this.parent.parent.deleteComment(this.parent);
+                }
+            }
+            this.clear.DOM.textContent = "Delete";
+            this.clear.DOM.addEventListener("click",this.clear);
+            titleHolder.appendChild(this.clear.DOM);
+            
             this.resize = function() {
                 var w = window.innerWidth;
                 w = Math.min(w,800);
@@ -197,6 +211,18 @@ function interfaceObject(audioObject,labelstr)
                 elem_w = Math.max(elem_w,190);
                 this.DOM.style.width = elem_w+"px";
                 this.textarea.style.width = (elem_w-5)+"px";
+            }
+            this.buildXML = function(root) {
+                //storage.document.createElement();
+                var node = storage.document.createElement("comment");
+                var question = storage.document.createElement("question");
+                var comment = storage.document.createElement("response");
+                node.setAttribute("time",this.time);
+                question.textContent = this.title.textContent;
+                comment.textContent = this.textarea.value;
+                node.appendChild(question);
+                node.appendChild(comment);
+                root.appendChild(node);
             }
             this.resize();
         },
@@ -207,10 +233,21 @@ function interfaceObject(audioObject,labelstr)
             return node;
         },
         deleteComment: function(comment) {
-            
+            var index = this.list.findIndex(function(element,index,array){
+                if (element == comment) {return true;} return false;
+            },comment);
+            if (index == -1) {
+                return false;
+            }
+            var node = this.list.splice(index,1);
+            comment.DOM.remove();
+            this.parent.canvas.drawMarkers();
+            return true;
         },
         clearList: function() {
-            
+            while(this.list.length > 0) {
+                this.deleteComment(this.list[0]);
+            }
         }
     }
     
@@ -230,6 +267,8 @@ function interfaceObject(audioObject,labelstr)
             this.layer2.style.width = w+"px";
             this.layer3.style.width = w+"px";
             this.layer4.style.width = w+"px";
+            this.drawWaveform();
+            this.drawMarkers();
         },
         handleEvent: function(event) {
             switch(event.currentTarget) {
@@ -253,6 +292,9 @@ function interfaceObject(audioObject,labelstr)
             }
         },
         drawWaveform: function() {
+            if (this.parent.parent == undefined || this.parent.parent.buffer == undefined) {
+                return;
+            }
             var buffer = this.parent.parent.buffer.buffer;
             var context = this.layer4.getContext("2d");
             context.lineWidth = 1;
@@ -305,6 +347,9 @@ function interfaceObject(audioObject,labelstr)
             context.stroke();
         },
         drawMarkers: function() {
+            if (this.parent.parent == undefined || this.parent.parent.buffer == undefined) {
+                return;
+            }
             var context = this.layer3.getContext("2d");
             context.clearRect(0,0,this.layer3.width, this.layer3.height);
             context.strokeStyle = "#008";
@@ -359,20 +404,7 @@ function interfaceObject(audioObject,labelstr)
     this.playButton.DOM.disabled = true;
     this.playButton.DOM.textContent = "Wait";
     
-    this.clearButton = {
-        parent: this,
-        DOM: document.createElement("button"),
-        handleEvent: function(event) {
-            this.parent.comments.clearList();
-        }
-    }
-    this.clearButton.DOM.addEventListener("click",this.clearButton);
-    this.clearButton.DOM.className = "timeline-button";
-    this.clearButton.DOM.textContent = "Clear";
-    
-    
     buttonHolder.appendChild(this.playButton.DOM);
-    buttonHolder.appendChild(this.clearButton.DOM);
     
     this.resize = function() {
         var w = window.innerWidth;
@@ -452,6 +484,7 @@ function resizeWindow(event)
 
 function buttonSubmitClick()
 {
+    testState.advanceState();
 }
 
 function pageXMLSave(store, pageSpecification)
@@ -462,4 +495,13 @@ function pageXMLSave(store, pageSpecification)
 	// Get the current <page> information in store (remember to appendChild your data to it)
 	// pageSpecification is the current page node configuration
 	// To create new XML nodes, use storage.document.createElement();
+    
+    for (var i=0; i<audioEngineContext.audioObjects.length; i++) {
+        var id = audioEngineContext.audioObjects[i].specification.id;
+        var commentsList = audioEngineContext.audioObjects[i].interfaceDOM.comments.list;
+        var root = audioEngineContext.audioObjects[i].storeDOM;
+        for (var j=0; j<commentsList.length; j++) {
+            commentsList[j].buildXML(root);
+        }
+    }
 }
