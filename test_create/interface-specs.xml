@@ -205,6 +205,36 @@
                 <outsidereference min="0" max="0"/>
             </elements>
         </interface>
+        <interface name="timeline">
+            <metrics>
+                <entry name="testTimer" support="optional" default="on"/>
+                <entry name="elementTimer" support="optional" default="on"/>
+                <entry name="elementInitialPosition" support="none"/>
+                <entry name="elementTracker" support="none" default="off"/>
+                <entry name="elementFlagListenedTo" support="optional" default="on"/>
+                <entry name="elementFlagMoved" support="none"/>
+                <entry name="elementListenTracker" support="optional" default="on"/>
+            </metrics>
+            <checks>
+                <entry name="fragmentMoved" support="none"/>
+                <entry name="fragmentPlayed" support="optional" default="off"/>
+                <entry name="fragmentFullPlayback" support="optional" default="off"/>
+                <entry name="fragmentComments" support="optional" default="off"/>
+                <entry name="scalerange" support="none"/>
+            </checks>
+            <show>
+                <entry name="volume" support="optional" default="off"/>
+                <entry name="page-count" support="optional" default="off"/>
+                <entry name="playhead" support="none"/>
+                <entry name="comments" support="optional" default="off"/>
+            </show>
+            <elements>
+                <number min="1" max="undefined"/>
+                <anchor min="0" max="0"/>
+                <reference min="0" max="0"/>
+                <outsidereference min="0" max="undefined"/>
+            </elements>
+        </interface>
     </interfaces>
     <scaledefinitions>
         <scale name="(Blank)">
@@ -488,6 +518,15 @@
                 <outsidereference min="0" max="1"/>
             </elements>
         </test>
-        <test name="ABX" interface="ABX"/>
+        <test name="ABX" interface="ABX">
+            <descriptions>
+                <description lang="en">Each page has two audio fragments presented as A and B. The test duplicates one of the fragments and presents it as X. The user must choose which, out of A or B, is closest to X.</description>
+            </descriptions>
+        </test>
+        <test name="timeline" interface="timeline">
+            <descriptions>
+                <description lang="en">Each fragment is displayed with a clickable waveform of itself. The user must click on the waveform at the location that a specific event occured. Users can then enter in information about this event. This test is unit-/value-less.</description>
+            </descriptions>
+        </test>
     </tests>
 </root>
