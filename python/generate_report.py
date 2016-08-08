@@ -81,10 +81,11 @@ header = r'''\documentclass[11pt, oneside]{article}
           \usepackage{geometry}
           \geometry{a4paper}
           \usepackage[parfill]{parskip} % empty line instead of indent
-          \usepackage{graphicx}    % figures
-          \usepackage[space]{grffile} % include figures with spaces in paths
+          \usepackage{graphicx}         % figures
+          \usepackage[space]{grffile}   % include figures with spaces in paths
           \usepackage{hyperref}
-          \usepackage{tikz}           % pie charts
+          \usepackage{tikz}             % pie charts
+          \usepackage{float}            % place figures 'here'
           \title{Report}
           \author{'''+\
           user+\
@@ -102,7 +103,7 @@ header = r'''\documentclass[11pt, oneside]{article}
           
           '''
           
-footer = '\n\t\t'+r'''\begin{thebibliography}{9}
+footer = '\n\t\t'+r'''\begin{thebibliography}{1}
          \bibitem{WAET} % reference to accompanying publication
         Nicholas Jillings, Brecht De Man, David Moffat and Joshua D. Reiss, 
         ``Web Audio Evaluation Tool: A browser-based listening test environment,'' 
@@ -151,7 +152,7 @@ for file in files_list: # iterate over all files in files_list
         body = '\n\section{'+day+' '+month_array[int(month)]+' '+year+' '+hour+':'+minute+':'+second+'}\n'
 
         # file name
-        body += '\n'+file[:-4]+'\n \\\\'
+        body += '\t\t'+file[:-4]+'\\\\ \n'
 
         # reset for new subject
         total_duration = 0
@@ -313,7 +314,7 @@ for file in files_list: # iterate over all files in files_list
                   
                   '''
         # PRINT timeline plots
-        body += timeline_plots
+        body += timeline_plots+'\n'
 
         body_array.append(body)
 
@@ -343,10 +344,10 @@ body += r'Number of unplayed fragments: &' + str(total_not_played) +\
 body += r'Number of unmoved markers: &' + str(total_not_moved) +\
       " (" + str(round(100.0*total_not_moved/number_of_fragments,2)) + r"\%)\\"+'\n\t\t\t'
 body += r'Average time per page: &' + seconds2timestr(time_per_page_accum/number_of_pages) + r"\\"+'\n\t\t'
-body += '\\end{tabular} \\vspace{1.5cm} \\\\ \n'
+body += '\\end{tabular} \\\\ \n'
 
 # Average duration for first, second, ... page
-body += "\n\n\t\t\\subsection*{Average duration per page}\n See also Figure \\ref{fig:avgtimeperpage}. \\\\ \n\t\t"
+body += "\n\n\t\t\\subsection*{Average duration per ordered page}\n See also Figure \\ref{fig:avgtimeperorder}. \\\\ \n\t\t"
 body += r'''\begin{tabular}{lll}
                     \textbf{Page} & \textbf{Duration} & \textbf{\# subjects}\\'''
 tpp_averages = [] # store average time per page
@@ -364,7 +365,7 @@ plt.xlabel('Page order')
 plt.xlim(.8, len(duration_order)+1)
 plt.xticks(np.arange(1,len(duration_order)+1)+.4, range(1,len(duration_order)+1))
 plt.ylabel('Average time [minutes]')
-plt.savefig(folder_name+"time_per_page.pdf", bbox_inches='tight')
+plt.savefig(folder_name+"time_per_order.pdf", bbox_inches='tight')
 plt.close()
 #TODO add error bars
 
@@ -383,7 +384,8 @@ combined_list = [page_names, average_duration_page, fragments_per_page, number_o
 combined_list = sorted(zip(*combined_list), key=operator.itemgetter(1, 2)) # sort
 
 # Show average duration for all songs
-body += '\n\n\t\t'+r'''\subsection*{Average duration per page}\n See also Figure \\ref{fig:avgtimeperpage}.
+body += '\n\n\t\t'+r'''\subsection*{Average duration per page}
+                See also Figure \ref{fig:avgtimeperpage}. \\ 
                 \begin{tabular}{llll}
                         \textbf{Audioholder} & \textbf{Duration} & \textbf{\# subjects} & \textbf{\# fragments} \\'''
 page_names_ordered = []
@@ -423,59 +425,59 @@ plt.close()
 
 # SHOW both figures
 body += r'''
-         \begin{figure}[htbp]
-         \begin{center}
-         \includegraphics[width=.65\textwidth]{'''+\
-         folder_name+'time_per_page.pdf'+\
+        \begin{figure}[htbp]
+        \begin{center}
+        \includegraphics[width=.65\textwidth]{'''+\
+         folder_name+'time_per_order.pdf'+\
         r'''}
-        \caption{Average time spent per page.}
-        \label{fig:avgtimeperpage}
-         \end{center}
-         \end{figure}
+        \caption{Average time spent per page (order).}
+        \label{fig:avgtimeperorder}
+        \end{center}
+        \end{figure}
          
          '''
 body += r'''\begin{figure}[htbp]
-         \begin{center}
-         \includegraphics[width=.65\textwidth]{'''+\
+        \begin{center}
+        \includegraphics[width=.65\textwidth]{'''+\
          folder_name+'time_per_page.pdf'+\
         r'''}
-        \caption{Average time spent per page.}
+        \caption{Average time spent per page (content).}
         \label{fig:avgtimeperpage}
-         \end{center}
-         \end{figure}
+        \end{center}
+        \end{figure}
          
          '''
 body += r'''\begin{figure}[htbp]
-         \begin{center}
-         \includegraphics[width=.65\textwidth]{'''+\
+        \begin{center}
+        \includegraphics[width=.65\textwidth]{'''+\
          folder_name+'subjects_per_page.pdf'+\
         r'''}
         \caption{Number of subjects per page.}
         \label{fig:subjectsperpage}
-         \end{center}
-         \end{figure}
+        \end{center}
+        \end{figure}
 
          '''
 #TODO add error bars
 #TODO layout of figures
 
-# SHOW boxplot per page
-#TODO order in decreasing order of participants
-for page_name in page_names: # get each name
+# SHOW boxplot per page (in alphabetical order of page name)
+body += '\t\t\\clearpage \n\t\\subsection*{Ratings per page}\n'
+for page_name in sorted(page_names): # get each name
     # plot boxplot if exists (not so for the 'alt' names)
     if os.path.isfile(folder_name+'ratings/'+page_name+'-ratings-box.pdf'):
-        body += r'''\begin{figure}[htbp]
-             \begin{center}
-             \includegraphics[width=.65\textwidth]{'''+\
-             folder_name+"ratings/"+page_name+'-ratings-box.pdf'+\
-            r'''}
-            \caption{Box plot of ratings for page '''+\
-            page_name+' ('+str(subject_count[real_page_names.index(page_name)])+\
-            ''' participants).}
-            \label{fig:boxplot'''+page_name.replace(" ", "")+'''}
-             \end{center}
-             \end{figure}
-             
+        body += r'''\begin{figure}[H]
+        \begin{center}
+        \includegraphics[width=.65\textwidth]{'''+\
+         folder_name+"ratings/"+page_name+'-ratings-box.pdf'+\
+        r'''}
+        \caption{Box plot of ratings for page '''+\
+        page_name+' ('+str(subject_count[real_page_names.index(page_name)])+\
+        ''' participants).}
+        \label{fig:boxplot'''+page_name.replace(" ", "")+'''}
+        \end{center}
+        \end{figure}
+        
              '''
 
 # DEMO pie chart of gender distribution among subjects
