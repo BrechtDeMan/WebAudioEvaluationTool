@@ -72,6 +72,9 @@ for name in ('LOGNAME', 'USER', 'LNAME', 'USERNAME'):
     else:
         user = ''
 
+# Months
+month_array = ['January', 'February', 'March', 'April', 'May', 'June', \
+                'July', 'August', 'September', 'October', 'November', 'December']
 
 # begin LaTeX document
 header = r'''\documentclass[11pt, oneside]{article} 
@@ -107,8 +110,6 @@ footer = '\n\t\t'+r'''\begin{thebibliography}{9}
         \end{thebibliography}
         \end{document}'''
 
-body = ''
-
 # make sure folder_name ends in '/'
 folder_name = os.path.join(folder_name, '')
 
@@ -118,6 +119,10 @@ if render_figures:
     subprocess.call("python score_parser.py '"+folder_name+"'", shell=True)
     subprocess.call("python score_plot.py '"+folder_name+"ratings/'", shell=True)
 
+# make array of text and array of dates
+body_array = []
+date_array = []
+
 # get every XML file in folder
 files_list = os.listdir(folder_name)
 for file in files_list: # iterate over all files in files_list
@@ -126,9 +131,28 @@ for file in files_list: # iterate over all files in files_list
         tree = ET.parse(folder_name + file)
         root = tree.getroot()
         
-        # PRINT name as section
-        body+= '\n\section{'+file[:-4].capitalize()+'}\n' # make section header from name without extension
+        # get date
+          # <datetime>
+          #   <date year="2016" month="7" day="12"/>
+          #   <time hour="14" minute="12" secs="6"/>
+          # </datetime>
+        date_node = root.find("./datetime/date")
+        time_node = root.find("./datetime/time")
+        year   = date_node.get("year")
+        month  = date_node.get("month")
+        day    = date_node.get("day")
+        hour   = time_node.get("hour")
+        minute = time_node.get("minute")
+        second = time_node.get("secs")
+        date_array.append((int(year),int(month),int(day),\
+            int(hour),int(minute),int(second)))
         
+        # date as section title
+        body = '\n\section{'+day+' '+month_array[int(month)]+' '+year+' '+hour+':'+minute+':'+second+'}\n'
+
+        # file name
+        body += '\n'+file[:-4]+'\n \\\\'
+
         # reset for new subject
         total_duration = 0
         page_number = 0
@@ -291,6 +315,12 @@ for file in files_list: # iterate over all files in files_list
         # PRINT timeline plots
         body += timeline_plots
 
+        body_array.append(body)
+
+# put sections in order according to date
+body_array_ordered = [b for d,b in sorted(zip(date_array,body_array))]
+body = ''.join(body_array_ordered)
+
 # join to footer
 footer = body + footer
 
@@ -316,7 +346,7 @@ body += r'Average time per page: &' + seconds2timestr(time_per_page_accum/number
 body += '\\end{tabular} \\vspace{1.5cm} \\\\ \n'
 
 # Average duration for first, second, ... page
-body += "\t\t\\vspace{.5cm} \n\n\t\tAverage duration per page (see also Figure \\ref{fig:avgtimeperpage}): \\\\ \n\t\t"
+body += "\n\n\t\t\\subsection*{Average duration per page}\n See also Figure \\ref{fig:avgtimeperpage}. \\\\ \n\t\t"
 body += r'''\begin{tabular}{lll}
                     \textbf{Page} & \textbf{Duration} & \textbf{\# subjects}\\'''
 tpp_averages = [] # store average time per page
@@ -353,8 +383,7 @@ combined_list = [page_names, average_duration_page, fragments_per_page, number_o
 combined_list = sorted(zip(*combined_list), key=operator.itemgetter(1, 2)) # sort
 
 # Show average duration for all songs
-body += r'''\vspace{.5cm}
-                Average duration per page (see also Figure \ref{fig:avgtimeperpage}): \\
+body += '\n\n\t\t'+r'''\subsection*{Average duration per page}\n See also Figure \\ref{fig:avgtimeperpage}.
                 \begin{tabular}{llll}
                         \textbf{Audioholder} & \textbf{Duration} & \textbf{\# subjects} & \textbf{\# fragments} \\'''
 page_names_ordered = []
@@ -425,7 +454,7 @@ body += r'''\begin{figure}[htbp]
         \label{fig:subjectsperpage}
          \end{center}
          \end{figure}
-         
+
          '''
 #TODO add error bars
 #TODO layout of figures
