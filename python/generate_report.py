@@ -149,7 +149,7 @@ for file in files_list: # iterate over all files in files_list
             int(hour),int(minute),int(second)))
         
         # date as section title
-        body = '\n\section{'+day+' '+month_array[int(month)]+' '+year+' '+hour+':'+minute+':'+second+'}\n'
+        body = '\n\section{'+day+' '+month_array[int(month)-1]+' '+year+' '+hour+':'+minute+':'+second+'}\n'
 
         # file name
         body += '\t\tFile: '+file[:-4]+'\\\\ \n'

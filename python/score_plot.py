@@ -140,6 +140,9 @@ for file in os.listdir(rating_folder):
             print("WARNING: Just one subject for " + page_name + ". Moving on to next file.")
             break
 
+        if len(ratings.shape) <= 1: # if only single subject
+            ratings = [[r] for r in ratings] # turn into array of arrays
+
         # BOXPLOT
         if enable_boxplot:
             plt.boxplot(ratings)
