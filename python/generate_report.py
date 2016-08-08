@@ -83,7 +83,7 @@ header = r'''\documentclass[11pt, oneside]{article}
           \usepackage[parfill]{parskip} % empty line instead of indent
           \usepackage{graphicx}         % figures
           \usepackage[space]{grffile}   % include figures with spaces in paths
-          \usepackage{hyperref}
+          \usepackage[pdfpagelabels]{hyperref}
           \usepackage{tikz}             % pie charts
           \usepackage{float}            % place figures 'here'
           \title{Report}
@@ -98,7 +98,7 @@ header = r'''\documentclass[11pt, oneside]{article}
           \maketitle
           This is an automatically generated report using the `generate\_report.py' Python script 
           included with the Web Audio Evaluation Tool \cite{WAET} distribution which can be found 
-          at \texttt{code.soundsoftware.ac.uk/projects/webaudioevaluationtool}.
+          at \texttt{\href{https://github.com/BrechtDeMan/WebAudioEvaluationTool}{github.com/BrechtDeMan/WebAudioEvaluationTool}}.
           \tableofcontents
           
           '''
@@ -152,7 +152,7 @@ for file in files_list: # iterate over all files in files_list
         body = '\n\section{'+day+' '+month_array[int(month)]+' '+year+' '+hour+':'+minute+':'+second+'}\n'
 
         # file name
-        body += '\t\t'+file[:-4]+'\\\\ \n'
+        body += '\t\tFile: '+file[:-4]+'\\\\ \n'
 
         # reset for new subject
         total_duration = 0
@@ -163,16 +163,21 @@ for file in files_list: # iterate over all files in files_list
         
         # DEMO survey stats
         # get gender
-        this_subjects_gender = root.find("./posttest/radio/[@id='gender']")
+        post_survey = root.find("./survey/[@location='post']")
+        this_subjects_gender = post_survey.find("./surveyresult/[@ref='gender']/response")
         if this_subjects_gender is not None:
             gender.append(this_subjects_gender.get("name"))
         else:
             gender.append('UNAVAILABLE')
         # get age
-        this_subjects_age = root.find("./posttest/number/[@id='age']")
+        this_subjects_age = post_survey.find("./surveyresult/[@ref='age']/response")
         if this_subjects_age is not None:
             age.append(this_subjects_age.text)
-        #TODO add plot of age
+        if this_subjects_gender is not None:
+            body += 'Details: '+this_subjects_gender.get("name")
+            if this_subjects_age is not None:
+                body += ', ' + this_subjects_age.text
+            body += '\\\\ \n'
                 
         # get list of all page names
         for page in root.findall("./page"):   # iterate over pages
