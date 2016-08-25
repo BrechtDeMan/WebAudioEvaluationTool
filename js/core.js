@@ -810,7 +810,16 @@ function interfacePopup() {
 			this.popupResponse.appendChild(input);
             this.popupResponse.style.textAlign="center";
             this.popupResponse.style.left="0%";
-		}
+		} else if (node.specification.type == "video") {
+            var video = document.createElement("video");
+            video.src = node.specification.url;
+            this.popupResponse.appendChild(video);
+        } else if (node.specification.type == "youtube") {
+            var iframe = document.createElement("iframe");
+            iframe.className = "youtube";
+            iframe.src = node.specification.url;
+            this.popupResponse.appendChild(iframe);
+        }
 		if(this.currentIndex+1 == this.popupOptions.length) {
 			if (this.node.location == "pre") {
 				this.buttonProceed.textContent = 'Start';
