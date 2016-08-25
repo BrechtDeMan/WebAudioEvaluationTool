@@ -280,6 +280,8 @@
                                         <xs:enumeration value="number" />
                                         <xs:enumeration value="radio" />
                                         <xs:enumeration value="checkbox" />
+                                        <xs:enumeration value="video" />
+                                        <xs:enumeration value="youtube" />
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:attribute>
@@ -293,6 +295,7 @@
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:attribute>
+                            <xs:attribute name="url" type="xs:string" use="optional"/>
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>

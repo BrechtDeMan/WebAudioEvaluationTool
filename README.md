@@ -19,13 +19,14 @@ Please refer to the [Wiki](https://github.com/BrechtDeMan/WebAudioEvaluationTool
 The video below shows you can set up a simple test from scratch in under five minutes (click to open): 
 [![Web Audio Evaluation Tool test setup](https://img.youtube.com/vi/T_rwE6Gt9sI/0.jpg)](https://www.youtube.com/watch?v=T_rwE6Gt9sI)
 
-## Dependencies
+## Dependencies and compatibility
 
 Runs out of the box on any web server with PHP (tested on PHP 5.1<=), no third party software needed. 
 
 Alternatively, a local server (no web server or internet connection needed!) and optional Python analysis scripts run on Python 2.7 or 3.x. 
 Plots rendered using [matplotlib](http://matplotlib.org), [NumPy](http://matplotlib.org) and [SciPy](http://scipy.org). 
 
+As Microsoft Internet Explorer [does not support the Web Audio API](http://caniuse.com/#feat=audio-api), you will need another browser like Firefox, Chrome, Edge or Safari.
 
 ## Academic use
 

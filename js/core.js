@@ -423,6 +423,15 @@ function loadProjectSpecCallback(response) {
 
             document.getElementsByTagName("head")[0].appendChild(css);
             break;
+        case "timeline":
+            interfaceJS.setAttribute("src","interfaces/timeline.js");
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.type = 'text/css';
+            css.href = 'interfaces/timeline.css';
+
+            document.getElementsByTagName("head")[0].appendChild(css);
+            break;
 	}
 	document.getElementsByTagName("head")[0].appendChild(interfaceJS);
     
@@ -805,7 +814,16 @@ function interfacePopup() {
 			this.popupResponse.appendChild(input);
             this.popupResponse.style.textAlign="center";
             this.popupResponse.style.left="0%";
-		}
+		} else if (node.specification.type == "video") {
+            var video = document.createElement("video");
+            video.src = node.specification.url;
+            this.popupResponse.appendChild(video);
+        } else if (node.specification.type == "youtube") {
+            var iframe = document.createElement("iframe");
+            iframe.className = "youtube";
+            iframe.src = node.specification.url;
+            this.popupResponse.appendChild(iframe);
+        }
 		if(this.currentIndex+1 == this.popupOptions.length) {
 			if (this.node.location == "pre") {
 				this.buttonProceed.textContent = 'Start';
@@ -1055,6 +1073,7 @@ function interfacePopup() {
 			this.postNode();
 		} else {
 			// Reached the end of the popupOptions
+            this.popupContent.innerHTML = "";
 			this.hidePopup();
 			for (var node of this.popupOptions)
 			{

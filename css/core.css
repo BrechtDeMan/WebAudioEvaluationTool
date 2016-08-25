@@ -51,6 +51,12 @@ div#popupContent {
     overflow: auto;
 }
 
+div#popupContent iframe {
+    width: 100%;
+    border: 0px none;
+    height: 290px;
+}
+
 div#popupTitleHolder {
     width: inherit;
     min-height: 25px;

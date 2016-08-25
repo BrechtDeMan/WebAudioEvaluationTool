@@ -62,7 +62,7 @@ for file in os.listdir(folder_name):
         subject_id = file[:-4] # drop '.xml'
         
         previous_page_time = 0 # time spent before current page
-        time_offset = 0 # test starts at zero
+        #time_offset = 0 # test starts at zero
         
         # ONE TIMELINE PER PAGE - make new plot per page
 
@@ -125,8 +125,8 @@ for file in os.listdir(folder_name):
                     listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
                     for event in listen_events:
                         # get testtime: start and stop
-                        start_times_global.append(float(event.find('testtime').get('start'))-time_offset)
-                        stop_times_global.append(float(event.find('testtime').get('stop'))-time_offset)
+                        start_times_global.append(float(event.find('testtime').get('start')))#-time_offset)
+                        stop_times_global.append(float(event.find('testtime').get('stop')))#-time_offset)
                     
                     # display fragment name at start
                     plt.text(0,initial_position+0.02,audio_id,color=colormap[increment%len(colormap)]) #,rotation=45
@@ -279,7 +279,7 @@ for file in os.listdir(folder_name):
                 increment+=1 # to next audioelement
             
             last_page_duration = page_time #-time_offset
-            time_offset = page_time
+            #time_offset = page_time
             
             if not plot_empty: # if plot is not empty, show and/or store
                 # set plot parameters
@@ -298,4 +298,3 @@ for file in os.listdir(folder_name):
             
                 plt.savefig(timeline_folder+subject_id+"-"+page_name+".pdf", bbox_inches='tight')
                 plt.close()
-            
