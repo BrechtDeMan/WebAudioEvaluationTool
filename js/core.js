@@ -1069,6 +1069,7 @@ function interfacePopup() {
 			this.postNode();
 		} else {
 			// Reached the end of the popupOptions
+            this.popupContent.innerHTML = "";
 			this.hidePopup();
 			for (var node of this.popupOptions)
 			{
