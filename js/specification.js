@@ -290,12 +290,20 @@ function Specification() {
                             optionNode.textContent = option.text;
                             node.appendChild(optionNode);
                         }
+                        break;
                     case "number":
                         if (this.min != undefined) {node.setAttribute("min", this.min);}
                         if (this.max != undefined) {node.setAttribute("max", this.max);}
+                        break;
                     case "question":
                         if (this.boxsize != undefined) {node.setAttribute("boxsize",this.boxsize);}
                         if (this.mandatory != undefined) {node.setAttribute("mandatory",this.mandatory);}
+                        break;
+                    case "video":
+                        if (this.mandatory != undefined) {node.setAttribute("mandatory",this.mandatory);}
+                    case "youtube":
+                        if (this.url != undefined) {node.setAttribute("url",this.url);}
+                        break;
                     default:
                         break;
                 }

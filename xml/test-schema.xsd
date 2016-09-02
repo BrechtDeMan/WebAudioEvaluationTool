@@ -295,7 +295,7 @@
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:attribute>
-                            <xs:attribute name="url" type="xs:string" use="optional"/>
+                            <xs:attribute name="url" type="xs:string" use="optional" default=""/>
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>

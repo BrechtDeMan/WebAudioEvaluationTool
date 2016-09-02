@@ -855,6 +855,36 @@ function buildPage()
                         maximumEntry.value = this.option.max;
                         this.dynamic.appendChild(maximum);
                         break;
+                    case "video":
+                    case "youtube":
+                        this.dynamic.appendChild(id);
+                        
+                        var mandatory = document.createElement("div");
+                        var mandatoryInput = document.createElement("input");
+                        var mandatoryText = document.createElement("span");
+                        mandatoryText.textContent = "Mandatory: ";
+                        mandatory.appendChild(mandatoryText);
+                        mandatory.appendChild(mandatoryInput);
+                        mandatory.className = "survey-entry-attribute";
+                        mandatoryInput.type = "checkbox";
+                        if (this.option.mandatory) {mandatoryInput.checked = true;} else {mandatoryInput.checked = false;}
+                        mandatoryInput.setAttribute("name","mandatory");
+                        mandatoryInput.addEventListener("change",this,false);
+                        this.dynamic.appendChild(mandatory);
+                        
+                        var url = document.createElement("div");
+                        var urlInput = document.createElement("input");
+                        var urlText = document.createElement("span");
+                        urlText.textContent = "URL: ";
+                        url.appendChild(urlText);
+                        url.appendChild(urlInput);
+                        url.className = "survey-entry-attribute";
+                        urlInput.type = "text";
+                        if (this.option.mandatory) {urlInput.value = this.option.mandatory;} else {urlInput.value = "";}
+                        urlInput.setAttribute("name","url");
+                        urlInput.addEventListener("change",this,false);
+                        this.dynamic.appendChild(url);
+                        break;
                     case "checkbox":
                     case "radio":
                         this.dynamic.appendChild(id);
@@ -938,7 +968,7 @@ function buildPage()
                         this.dynamic.appendChild(optionHolder);
                 }
             }
-            this.handleEvent = function()
+            this.handleEvent = function(event)
             {
                 var name = event.currentTarget.getAttribute("name");
                 var nodeName = event.currentTarget.nodeName;
@@ -1888,6 +1918,8 @@ function SpecificationToHTML()
                         var max = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("max")[0]);
                         this.attributeDOM.appendChild(id.holder);
                         this.attributes.push(id);
+                        this.attributeDOM.appendChild(mandatory.holder);
+                        this.attributes.push(mandatory);
                         this.attributeDOM.appendChild(min.holder);
                         this.attributes.push(min);
                         this.attributeDOM.appendChild(max.holder);
@@ -1904,6 +1936,30 @@ function SpecificationToHTML()
                         var id = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("id")[0]);
                         this.attributeDOM.appendChild(id.holder);
                         this.attributes.push(id);
+                        break;
+                    case "video":
+                        this.titleDOM.textContent = "Video";
+                        var id = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("id")[0]);
+                        this.attributeDOM.appendChild(id.holder);
+                        this.attributes.push(id);
+                        var mandatory = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("mandatory")[0]);
+                        var url = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("url")[0]);
+                        this.attributeDOM.appendChild(mandatory.holder);
+                        this.attributes.push(mandatory);
+                        this.attributeDOM.appendChild(url.holder);
+                        this.attributes.push(url);
+                        break;
+                    case "youtube":
+                        this.titleDOM.textContent = "YouTube";
+                        var id = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("id")[0]);
+                        this.attributeDOM.appendChild(id.holder);
+                        this.attributes.push(id);
+                        var mandatory = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("mandatory")[0]);
+                        var url = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("url")[0]);
+                        this.attributeDOM.appendChild(mandatory.holder);
+                        this.attributes.push(mandatory);
+                        this.attributeDOM.appendChild(url.holder);
+                        this.attributes.push(url);
                         break;
                 }
             }
