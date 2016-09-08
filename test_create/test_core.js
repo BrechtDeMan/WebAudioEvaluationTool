@@ -2011,13 +2011,19 @@ function SpecificationToHTML()
                     root: document.createElement("button"),
                     parent: this,
                     handleEvent: function(event) {
-                        this.root.parentElement.removeChild(this.root);
+                        this.parent.parent.childrenDOM.removeChild(this.parent.rootDOM);
                         this.parent.parent.addConditional.root.disabled = false;
                         var index = this.parent.parent.children.findIndex(function(element){
                             if (this == element) {return true;} return false;
                         },this.parent);
                         if (index >= 0) {
                             this.parent.parent.children.splice(index,1);
+                        }
+                        index = this.parent.parent.specification.conditions.findIndex(function(element){
+                            if (this == element) {return true;} return false;
+                        },this.parent.specification);
+                        if (index >= 0) {
+                            this.parent.parent.specification.conditions.splice(index);
                         }
                     }
                 }
