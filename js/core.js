@@ -915,6 +915,32 @@ function interfacePopup() {
 			console.log("Checkbox: "+ node.specification.statement);
 			var inputs = this.popupResponse.getElementsByTagName('input');
 			node.response = [];
+            var numChecked = 0;
+            for (var i=0; i<node.specification.options.length; i++) {
+                if (inputs[i].checked) {numChecked++;}
+            }
+            if (node.specification.min != undefined) {
+                if (node.specification.max == undefined) {
+                    if (numChecked < node.specification.min) {
+                        var msg = "You must select at least "+node.specification.min+" option";
+                        if (node.specification.min > 1) {
+                            msg += "s";
+                        }
+                        interfaceContext.lightbox.post("Error",msg);
+                        return;
+                    }
+                }
+                else {
+                    if (numChecked < node.specification.min || numChecked > node.specification.max) {
+                        if (node.specification.min == node.specification.max) {
+                            interfaceContext.lightbox.post("Error","You must only select "+node.specification.min);
+                        } else {
+                            interfaceContext.lightbox.post("Error","You must select between "+node.specification.min+" and "+node.specification.max);
+                        }
+                        return;
+                    }
+                }
+            }
 			for (var i=0; i<node.specification.options.length; i++) {
 				node.response.push({
 					name: node.specification.options[i].name,

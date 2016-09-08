@@ -886,6 +886,31 @@ function buildPage()
                         this.dynamic.appendChild(url);
                         break;
                     case "checkbox":
+                        var minimum = document.createElement("div");
+                        var minimumEntry = document.createElement("input");
+                        var minimumText = document.createElement("span");
+                        minimumText.textContent = "Minimum: ";
+                        minimum.appendChild(minimumText);
+                        minimum.appendChild(minimumEntry);
+                        minimum.className = "survey-entry-attribute";
+                        minimumEntry.type = "number";
+                        minimumEntry.setAttribute("name","min");
+                        minimumEntry.addEventListener("change",this,false);
+                        minimumEntry.value = this.option.min;
+                        this.dynamic.appendChild(minimum);
+                        
+                        var maximum = document.createElement("div");
+                        var maximumEntry = document.createElement("input");
+                        var maximumText = document.createElement("span");
+                        maximumText.textContent = "Maximum: ";
+                        maximum.appendChild(maximumText);
+                        maximum.appendChild(maximumEntry);
+                        maximum.className = "survey-entry-attribute";
+                        maximumEntry.type = "number";
+                        maximumEntry.setAttribute("name","max");
+                        maximumEntry.addEventListener("change",this,false);
+                        maximumEntry.value = this.option.max;
+                        this.dynamic.appendChild(maximum);
                     case "radio":
                         this.dynamic.appendChild(id);
                         var optionHolder = document.createElement("div");
@@ -1928,8 +1953,14 @@ function SpecificationToHTML()
                     case "checkbox":
                         this.titleDOM.textContent = "Checkbox";
                         var id = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("id")[0]);
+                        var min = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("min")[0]);
+                        var max = convert.convertAttributeToDOM(this.specification,specification.schema.getAllElementsByName("max")[0]);
                         this.attributeDOM.appendChild(id.holder);
                         this.attributes.push(id);
+                        this.attributeDOM.appendChild(min.holder);
+                        this.attributes.push(min);
+                        this.attributeDOM.appendChild(max.holder);
+                        this.attributes.push(max);
                         break;
                     case "radio":
                         this.titleDOM.textContent = "Radio";

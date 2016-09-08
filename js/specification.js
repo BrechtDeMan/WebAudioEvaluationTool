@@ -281,6 +281,16 @@ function Specification() {
                 switch(this.type)
                 {
                     case "checkbox":
+                        if (this.min != undefined) {
+                            node.setAttribute("min", this.min);
+                        } else {
+                            node.setAttribute("min", "0");
+                        }
+                        if (this.max != undefined) {
+                            node.setAttribute("max", this.max);
+                        } else {
+                            node.setAttribute("max","undefined");
+                        }
                     case "radio":
                         for (var i=0; i<this.options.length; i++)
                         {
