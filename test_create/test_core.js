@@ -1965,6 +1965,88 @@ function SpecificationToHTML()
             }
             this.build();
             
+            var Conditional = function(parent, rootObject) {
+                this.type = "surveyEntryConditionalNode";
+                this.rootDOM = document.createElement("div");
+                this.titleDOM = document.createElement("span");
+                this.attributeDOM = document.createElement("div");
+                this.attributes = [];
+                this.childrenDOM = document.createElement("div");
+                this.children = [];
+                this.buttonDOM = document.createElement("div");
+                this.parent = parent;
+                this.specification = rootObject;
+                this.schema = specification.schema.getAllElementsByName("conditional")[0];
+
+                this.rootDOM.className = "node";
+                this.rootDOM.style.minWidth = "50%";
+
+                var titleDiv = document.createElement('div');
+                titleDiv.className = "node-title";
+                this.titleDOM.className = "node-title";
+                titleDiv.appendChild(this.titleDOM);
+
+                this.attributeDOM.className = "node-attributes";
+                this.childrenDOM.className = "node-children";
+                this.buttonDOM.className = "node-buttons";
+
+                this.rootDOM.appendChild(titleDiv);
+                this.rootDOM.appendChild(this.attributeDOM);
+                this.rootDOM.appendChild(this.childrenDOM);
+                this.rootDOM.appendChild(this.buttonDOM);
+                
+                var attributeList = this.schema.getAllElementsByTagName("xs:attribute");
+
+                for (var i=0; i<attributeList.length; i++) {
+                    var attributeName = attributeList[i].getAttribute("name");
+                    var attribute = convert.convertAttributeToDOM(this.specification,this.schema.getAllElementsByName(attributeName)[0]);
+                    this.attributes.push(attribute);
+                    this.attributeDOM.appendChild(attribute.holder);
+                }
+
+                this.build = function() {
+                }
+
+                this.deleteNode = {
+                    root: document.createElement("button"),
+                    parent: this,
+                    handleEvent: function(event) {
+                        this.root.parentElement.removeChild(this.root);
+                        this.parent.parent.addConditional.root.disabled = false;
+                        var index = this.parent.parent.children.findIndex(function(element){
+                            if (this == element) {return true;} return false;
+                        },this.parent);
+                        if (index >= 0) {
+                            this.parent.parent.children.splice(index,1);
+                        }
+                    }
+                }
+                this.deleteNode.root.textContent = "Delete";
+                this.deleteNode.root.addEventListener("click",this.deleteNode);
+
+                this.buttonDOM.appendChild(this.deleteNode.root);
+            }
+            
+            this.addConditional = {
+                root: document.createElement("button"),
+                parent: this,
+                handleEvent: function(event) {
+                    var spec = {
+                        check: null,
+                        value: null,
+                        jumpToOnPass: null,
+                        jumpToOnFail: null
+                    };
+                    this.parent.specification.conditions.push(spec);
+                    var condition = new Conditional(this.parent,spec);
+                    this.parent.children.push(condition);
+                    this.parent.childrenDOM.appendChild(condition.rootDOM);
+                }
+            }
+            this.addConditional.root.addEventListener("click",this.addConditional);
+            this.addConditional.root.textContent = "Add Condition";
+            this.buttonDOM.appendChild(this.addConditional.root);
+            
             this.editNode = {
                 root: document.createElement("button"),
                 parent: this,
@@ -2073,6 +2155,12 @@ function SpecificationToHTML()
             this.moveButtons.root_down.textContent = "Move Down";
             this.buttonDOM.appendChild(this.moveButtons.root_up);
             this.buttonDOM.appendChild(this.moveButtons.root_down);
+            
+            for (var condition of this.specification.conditions) {
+                var newNode = new Conditional(this,condition);
+                this.children.push(newNode);
+                this.childrenDOM.appendChild(newNode.rootDOM);
+            }
         }
         this.addNode = {
             root: document.createElement("button"),

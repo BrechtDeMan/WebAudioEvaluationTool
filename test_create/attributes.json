@@ -27,5 +27,9 @@
     "postSilence": "Post Silence",
     "poolSize": "Pool Size",
     "alwaysInclude": "Always Include",
-    "crossFade": "Cross Fade"
+    "crossFade": "Cross Fade",
+    "check": "Check",
+    "value": "Value",
+    "jumpToOnPass": "Jump To ID On Pass",
+    "jumpToOnFail": "Jump To ID On Fail"
 }
