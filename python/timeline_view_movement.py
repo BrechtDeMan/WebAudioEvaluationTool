@@ -124,9 +124,10 @@ for file in os.listdir(folder_name):
                     stop_times_global  = []
                     listen_events = audioelement.findall("./metric/metricresult/[@name='elementListenTracker']/event")
                     for event in listen_events:
-                        # get testtime: start and stop
-                        start_times_global.append(float(event.find('testtime').get('start')))#-time_offset)
-                        stop_times_global.append(float(event.find('testtime').get('stop')))#-time_offset)
+                        if event.find('testtime') is not None:
+                            # get testtime: start and stop
+                            start_times_global.append(float(event.find('testtime').get('start')))#-time_offset)
+                            stop_times_global.append(float(event.find('testtime').get('stop')))#-time_offset)
                     
                     # display fragment name at start
                     plt.text(0,initial_position+0.02,audio_id,color=colormap[increment%len(colormap)]) #,rotation=45
