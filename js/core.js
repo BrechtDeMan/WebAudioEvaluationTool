@@ -1840,7 +1840,13 @@ function audioObject(id) {
             } else {
                 this.outputGain.gain.setValueAtTime(0.0, startTime);
             }
-            this.bufferNode.start(startTime, this.specification.startTime || 0, this.specification.stopTime - this.specification.startTime || this.buffer.buffer.duration);
+            if (audioEngineContext.loopPlayback) {
+                this.bufferNode.loopStart = this.specification.startTime || 0;
+                this.bufferNode.loopEnd = this.specification.stopTime - this.specification.startTime || this.buffer.buffer.duration;
+                this.bufferNode.start(startTime);
+            } else {
+                this.bufferNode.start(startTime, this.specification.startTime || 0, this.specification.stopTime - this.specification.startTime || this.buffer.buffer.duration);
+            }
             this.bufferNode.playbackStartTime = audioEngineContext.timer.getTestTime();
         }
     };
