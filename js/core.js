@@ -1700,7 +1700,9 @@ function AudioEngine(specification) {
         // Extract the audio and zero-pad
         for (var ao of this.audioObjects) {
             var lengthDiff = length - ao.buffer.buffer.length;
-            ao.buffer = ao.buffer.copyBuffer(0, samplesToSeconds(lengthDiff, ao.buffer.buffer.sampleRate));
+            if (lengthDiff > 0) {
+                ao.buffer.buffer = ao.buffer.copyBuffer(0, samplesToSeconds(lengthDiff, ao.buffer.buffer.sampleRate));
+            }
         }
     };
 
@@ -1766,16 +1768,14 @@ function audioObject(id) {
         var startTime = this.specification.startTime;
         var stopTime = this.specification.stopTime;
         var copybuffer = new callee.constructor();
-        if (isFinite(startTime) || isFinite(stopTime)) {
-            copybuffer.buffer = callee.cropBuffer(startTime, stopTime);
-        }
+
+        copybuffer.buffer = callee.cropBuffer(startTime || 0, stopTime || callee.buffer.duration);
         if (preSilenceTime != 0 || postSilenceTime != 0) {
-            if (copybuffer.buffer == undefined) {
-                copybuffer.buffer = callee.copyBuffer(preSilenceTime, postSilenceTime);
-            } else {
-                copybuffer.buffer = copybuffer.copyBuffer(preSilenceTime, postSilenceTime);
-            }
+            copybuffer.buffer = copybuffer.copyBuffer(preSilenceTime, postSilenceTime);
         }
+
+        copybuffer.lufs = callee.buffer.lufs;
+        this.buffer = copybuffer;
 
         var targetLUFS = this.specification.parent.loudness || specification.loudness;
         if (typeof targetLUFS === "number" && isFinite(targetLUFS)) {
