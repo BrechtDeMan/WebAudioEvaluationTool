@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-	<setup interface="ABX" projectReturn="save.php" randomiseOrder='true' poolSize="2" loudness="-23" sampleRate="44100">
+	<setup interface="ABX" projectReturn="save.php" randomiseOrder='true' poolSize="2" loudness="-23">
 		<survey location="before">
 			<surveyentry type="question" id="sessionId" mandatory="true">
 				<statement>Please enter your name.</statement>
