@@ -495,13 +495,13 @@ function Specification() {
             
             // Get the title
             var title = xml.getElementsByTagName('title');
-            if (title.length != 0) {
+            if (title.length != 0 && title[0].parentElement == xml) {
                 this.title = title[0].textContent;
             }
 			
 			// Get the Comment Box Prefix
 			var CBP = xml.getElementsByTagName('commentboxprefix');
-			if (CBP.length != 0) {
+			if (CBP.length != 0 && CBP[0].parentElement == xml) {
 				this.commentBoxPrefix = CBP[0].textContent;
 			}
 			
