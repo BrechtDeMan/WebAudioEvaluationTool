@@ -1858,7 +1858,7 @@ function audioObject(id) {
             this.bufferNode.stop(stopTime);
             this.bufferNode = undefined;
         }
-        this.outputGain.gain.value = 0.0;
+        this.outputGain.gain.setValueAtTime(0.0, stopTime);
         this.interfaceDOM.stopPlayback();
     };
 
