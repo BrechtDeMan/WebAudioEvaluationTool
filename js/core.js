@@ -1533,7 +1533,7 @@ function AudioEngine(specification) {
                 } else {
                     var dst = copybuffer.getChannelData(c);
                     for (var n = 0; n < newLength; n++)
-                        dst[n] = src[n + start_sample];
+                        dst[n] = buffer[n + start_sample];
                 }
             }
             return copybuffer;
