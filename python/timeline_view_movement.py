@@ -290,12 +290,35 @@ for file in os.listdir(folder_name):
                 plt.ylabel('Rating') # default
                 plt.ylim(0, 1) # rating between 0 and 1
 
-                # TO DO: 
-                # Y axis title and tick labels as specified in 'setup' for corresponding page
+                # Y axis title and tick labels as specified in 'setup'
+                # for corresponding page
+                page_setup = root.find("./waet/page[@id='"+page_name+"']") 
+                    # 'ref' of page is 'id' in page setup
+
                 # Different plots for different axes
+                interfaces = page_setup.findall("./interface")
+                interface_title = interfaces[0].find("./title")
+                scales = interfaces[0].findall("./scales") # get first interface by default
+                scalelabels = scales[0].findall("./scalelabel") # get first scale by default
+
+                labelpos = [] # array of scalelabel positions
+                labelstr = [] # array of strings at labels
+                for scalelabel in scalelabels:
+                    labelpos.append(float(scalelabel.get('position'))/100.0)
+                    labelstr.append(scalelabel.text)
+
+                # use interface name as Y axis label
+                if interface_title is not None:
+                    plt.ylabel(interface_title.text)
+                else:
+                    plt.ylabel('Rating') # default
+
+                if len(labelpos):
+                    plt.yticks(labelpos, labelstr)
             
                 #plt.show() # uncomment to show plot; comment when just saving
                 #exit()
             
+                # save as PDF
                 plt.savefig(timeline_folder+subject_id+"-"+page_name+".pdf", bbox_inches='tight')
                 plt.close()
