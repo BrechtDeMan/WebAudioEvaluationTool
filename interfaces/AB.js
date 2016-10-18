@@ -315,13 +315,8 @@ function comparator(audioHolderObject) {
         this.startPlayback = function () {
             if (this.parent.specification.parent.playOne || specification.playOne) {
                 $('.comparator-button').text('Wait');
-<<<<<<< HEAD
-                $('.comparator-button').attr("disabled","true");
-                $(this.playback).removeAttr("disabled");
-=======
                 $('.comparator-button').attr("disabled", "true");
                 $(this.playback).css("disabled", "false");
->>>>>>> 0425ea2... Formatting of AB. WIP for #37
             } else {
                 $('.comparator-button').text('Listen');
             }
