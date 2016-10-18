@@ -1361,7 +1361,7 @@ function AudioEngine(specification) {
     // because web audio will optimise and any route which does not go to the destination gets ignored.
     this.outputGain = audioContext.createGain();
     this.fooGain = audioContext.createGain();
-    this.fooGain.gain = 0;
+    this.fooGain.gain.value = 0;
 
     // Use this to detect playback state: 0 - stopped, 1 - playing
     this.status = 0;
@@ -1380,6 +1380,14 @@ function AudioEngine(specification) {
     this.pageSpecification = null;
 
     this.pageStore = null;
+
+    // Chrome 53+ Error solution
+    // Empty buffer for keep-alive
+    var nullBuffer = audioContext.createBuffer(1, audioContext.sampleRate, audioContext.sampleRate);
+    this.nullBufferSource = audioContext.createBufferSource();
+    this.nullBufferSource.buffer = nullBuffer;
+    this.nullBufferSource.loop = true;
+    this.nullBufferSource.start(0);
 
     // Create store for new audioObjects
     this.audioObjects = [];
@@ -1745,6 +1753,7 @@ function audioObject(id) {
 
     // Connect buffer to the audio graph
     this.outputGain.connect(audioEngineContext.outputGain);
+    audioEngineContext.nullBufferSource.connect(this.outputGain);
 
     // the audiobuffer is not designed for multi-start playback
     // When stopeed, the buffer node is deleted and recreated with the stored buffer.
@@ -1833,9 +1842,10 @@ function audioObject(id) {
                     event.currentTarget.owner.stop(audioContext.currentTime + 1);
                 }
             };
+            this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
             if (!audioEngineContext.loopPlayback || !audioEngineContext.synchPlayback) {
                 this.metric.startListening(audioEngineContext.timer.getTestTime());
-                this.outputGain.gain.setValueAtTime(this.onplayGain, 0.0);
+                this.outputGain.gain.setValueAtTime(this.onplayGain, startTime);
                 this.interfaceDOM.startPlayback();
             } else {
                 this.outputGain.gain.setValueAtTime(0.0, startTime);
