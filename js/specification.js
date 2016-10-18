@@ -495,83 +495,88 @@ function Specification() {
 
         this.decode = function (parent, xml) {
             this.parent = parent;
-            var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
-            for (var i = 0; i < attributeMap.length; i++) {
-                var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
-                var projectAttr = xml.getAttribute(attributeName);
-                projectAttr = parent.processAttribute(projectAttr, attributeMap[i], parent.schema);
-                switch (typeof projectAttr) {
-                    case "number":
-                    case "boolean":
-                        eval('this.' + attributeName + ' = ' + projectAttr);
-                        break;
-                    case "string":
-                        eval('this.' + attributeName + ' = "' + projectAttr + '"');
-                        break;
-                }
-            }
-
+			var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
+			for (var i=0; i<attributeMap.length; i++)
+			{
+				var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
+				var projectAttr = xml.getAttribute(attributeName);
+				projectAttr = parent.processAttribute(projectAttr,attributeMap[i],parent.schema);
+				switch(typeof projectAttr)
+				{
+				case "number":
+				case "boolean":
+					eval('this.'+attributeName+' = '+projectAttr);
+					break;
+				case "string":
+					eval('this.'+attributeName+' = "'+projectAttr+'"');
+					break;
+				}
+			}
+            
             // Get the title
             var title = xml.getElementsByTagName('title');
-            if (title.length != 0) {
+            if (title.length != 0 && title[0].parentElement == xml) {
                 this.title = title[0].textContent;
             }
-
-            // Get the Comment Box Prefix
-            var CBP = xml.getElementsByTagName('commentboxprefix');
-            if (CBP.length != 0) {
-                this.commentBoxPrefix = CBP[0].textContent;
-            }
-
-            // Now decode the interfaces
-            var interfaceNode = xml.getElementsByTagName('interface');
-            for (var i = 0; i < interfaceNode.length; i++) {
-                var node = new parent.interfaceNode(this.specification);
-                node.decode(this, interfaceNode[i], parent.schema.getAllElementsByName('interface')[1]);
-                this.interfaces.push(node);
-            }
-
-            // Now process the survey node options
-            var survey = xml.getElementsByTagName('survey');
-            var surveySchema = parent.schema.getAllElementsByName('survey')[0];
-            for (var i = 0; i < survey.length; i++) {
-                var location = survey[i].getAttribute('location');
-                if (location == 'pre' || location == 'before') {
-                    if (this.preTest != null) {
-                        this.errors.push("Already a pre/before test survey defined! Ignoring second!!");
-                    } else {
-                        this.preTest = new parent.surveyNode(this.specification);
-                        this.preTest.decode(parent, survey[i], surveySchema);
-                    }
-                } else if (location == 'post' || location == 'after') {
-                    if (this.postTest != null) {
-                        this.errors.push("Already a post/after test survey defined! Ignoring second!!");
-                    } else {
-                        this.postTest = new parent.surveyNode(this.specification);
-                        this.postTest.decode(parent, survey[i], surveySchema);
-                    }
-                }
-            }
-
-            // Now process the audioelement tags
-            var audioElements = xml.getElementsByTagName('audioelement');
-            for (var i = 0; i < audioElements.length; i++) {
-                var node = new this.audioElementNode(this.specification);
-                node.decode(this, audioElements[i]);
-                this.audioElements.push(node);
-            }
-
-            // Now decode the commentquestions
-            var commentQuestions = xml.getElementsByTagName('commentquestion');
-            for (var i = 0; i < commentQuestions.length; i++) {
-                var node = new this.commentQuestionNode(this.specification);
-                node.decode(parent, commentQuestions[i]);
-                this.commentQuestions.push(node);
-            }
-        };
-
-        this.encode = function (root) {
-            var AHNode = root.createElement("page");
+			
+			// Get the Comment Box Prefix
+			var CBP = xml.getElementsByTagName('commentboxprefix');
+			if (CBP.length != 0 && CBP[0].parentElement == xml) {
+				this.commentBoxPrefix = CBP[0].textContent;
+			}
+			
+			// Now decode the interfaces
+			var interfaceNode = xml.getElementsByTagName('interface');
+			for (var i=0; i<interfaceNode.length; i++)
+			{
+				var node = new parent.interfaceNode(this.specification);
+				node.decode(this,interfaceNode[i],parent.schema.getAllElementsByName('interface')[1]);
+				this.interfaces.push(node);
+			}
+			
+			// Now process the survey node options
+			var survey = xml.getElementsByTagName('survey');
+			var surveySchema = parent.schema.getAllElementsByName('survey')[0];
+			for (var i=0; i<survey.length; i++){
+				var location = survey[i].getAttribute('location');
+				if (location == 'pre' || location == 'before')
+				{
+					if (this.preTest != null){this.errors.push("Already a pre/before test survey defined! Ignoring second!!");}
+					else {
+						this.preTest = new parent.surveyNode(this.specification);
+						this.preTest.decode(parent,survey[i],surveySchema);
+					}
+				} else if (location == 'post' || location == 'after') {
+					if (this.postTest != null){this.errors.push("Already a post/after test survey defined! Ignoring second!!");}
+					else {
+						this.postTest = new parent.surveyNode(this.specification);
+						this.postTest.decode(parent,survey[i],surveySchema);
+					}
+				}
+			}
+			
+			// Now process the audioelement tags
+			var audioElements = xml.getElementsByTagName('audioelement');
+			for (var i=0; i<audioElements.length; i++)
+			{
+				var node = new this.audioElementNode(this.specification);
+				node.decode(this,audioElements[i]);
+				this.audioElements.push(node);
+			}
+			
+			// Now decode the commentquestions
+			var commentQuestions = xml.getElementsByTagName('commentquestion');
+			for (var i=0; i<commentQuestions.length; i++)
+			{
+				var node = new this.commentQuestionNode(this.specification);
+				node.decode(parent,commentQuestions[i]);
+				this.commentQuestions.push(node);
+			}
+		};
+		
+		this.encode = function(root)
+		{
+			var AHNode = root.createElement("page");
             // First decode the attributes
             var attributes = this.schema.getAllElementsByTagName('xs:attribute');
             for (var i = 0; i < attributes.length; i++) {

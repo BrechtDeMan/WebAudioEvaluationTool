@@ -323,7 +323,7 @@ function comparator(page)
             if (this.parent.specification.parent.playOne || specification.playOne) {
                 $('.comparator-button').text('Wait');
                 $('.comparator-button').attr("disabled","true");
-                $(this.playback).css("disabled","false");
+                $(this.playback).removeAttr("disabled");
             } else {
                 $('.comparator-button').text('Listen');
             }
