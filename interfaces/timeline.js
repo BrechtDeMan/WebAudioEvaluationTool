@@ -506,7 +506,7 @@ function buttonSubmitClick() {
                     break;
             }
             if (checkState == false) {
-                canContinue == false;
+                canContinue = false;
             }
         }
         if (!canContinue) {
