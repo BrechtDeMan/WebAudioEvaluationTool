@@ -3256,8 +3256,10 @@ function Storage() {
                     break;
                 case "radio":
                     var child = this.parent.document.createElement('response');
-                    child.setAttribute('name', node.response.name);
-                    child.textContent = node.response.text;
+                    if (node.response !== null) {
+                        child.setAttribute('name', node.response.name);
+                        child.textContent = node.response.text;
+                    }
                     surveyresult.appendChild(child);
                     break;
                 case "checkbox":
