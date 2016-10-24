@@ -30,6 +30,7 @@ if (is_array($saves))
     $fileHandle = fopen($filename, 'w');
     if ($fileHandle == FALSE) {
         echo $xml_error;
+        return;
     }
     fclose($fileHandle);
     // TODO:
