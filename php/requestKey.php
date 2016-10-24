@@ -41,7 +41,7 @@ while ($key == "") {
     }
 }
 
-$filename = "saves/save-".$key.".xml";
+$filename = "../saves/save-".$key.".xml";
 $fileHandle = fopen($filename, 'w');
 if ($fileHandle == FALSE) {
     echo "<response><state>ERROR</state><key>".$key."</key></response>";

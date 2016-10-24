@@ -26,8 +26,8 @@ if (is_array($saves))
             }
         }
     }
-    $filename = "saves/save-".$key_requested.".xml";
-    $fileHandle = fopen($filename, 'w');
+    $filename = "../saves/save-".$key_requested.".xml";
+    $fileHandle = fopen($filename, 'c');
     if ($fileHandle == FALSE) {
         echo $xml_error;
         return;
