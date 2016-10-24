@@ -26,7 +26,12 @@ if (is_array($saves))
             }
         }
     }
-    echo $xml_good;
+    $filename = "saves/save-".$key_requested.".xml";
+    $fileHandle = fopen($filename, 'w');
+    if ($fileHandle == FALSE) {
+        echo $xml_error;
+    }
+    fclose($fileHandle);
     // TODO:
     //  Generate the XML Base file and save it
     $doc_struct = new SimpleXMLElement('<waetresult/>');
@@ -34,7 +39,8 @@ if (is_array($saves))
     //  Add start time
     //  Add IP Address information
     //  Save the file
-    $doc_struct->asXML("saves/save-".$key_requested.".xml");
+    $doc_struct->asXML($filename);
+    echo $xml_good;
     return;
 } else {
     echo $xml_error;

@@ -3101,7 +3101,7 @@ function Storage() {
     this.initialise = function (existingStore) {
         if (existingStore == undefined) {
             // We need to get the sessionKey
-            this.SessionKey.generateKey();
+            this.SessionKey.requestKey();
             this.document = document.implementation.createDocument(null, "waetresult", null);
             this.root = this.document.childNodes[0];
             var projectDocument = specification.projectXML;
@@ -3156,6 +3156,18 @@ function Storage() {
                 }
             }
             this.request.open("GET", returnURL + "php/keygen.php?key=" + temp_key, true);
+            this.request.addEventListener("load", this);
+            this.request.send();
+        },
+        requestKey: function () {
+            // For new servers, request a new key from the server
+            var returnURL = "";
+            if (typeof specification.projectReturn == "string") {
+                if (specification.projectReturn.substr(0, 4) == "http") {
+                    returnURL = specification.projectReturn;
+                }
+            }
+            this.request.open("GET", returnURL + "php/requestKey.php", true);
             this.request.addEventListener("load", this);
             this.request.send();
         },

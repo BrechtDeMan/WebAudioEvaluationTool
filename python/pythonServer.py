@@ -11,6 +11,8 @@ import datetime
 import operator
 import xml.etree.ElementTree as ET
 import copy
+import string
+import random
 
 if sys.version_info[0] == 2:
     # Version 2.x
@@ -130,6 +132,26 @@ def keygen(s):
 	file = open("../saves/save-"+key+".xml",'w')
 	file.write("<waetresult key="+key+"/>")
 	file.close();
+    
+def requestKey(s):
+    reply = ""
+    key = ''
+    while key == '':
+        tempKey = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32));
+        if (os.path.isfile("saves/save-"+tempKey+".xml") == False):
+            key = tempKey
+    s.send_response(200)
+    s.send_header("Content-type", "application/xml");
+    s.end_headers()
+    reply = "<response><state>OK</state><key>"+key+"</key></response>"
+    if sys.version_info[0] == 2:
+        s.wfile.write(reply)
+    elif sys.version_info[0] == 3:
+        s.wfile.write(bytes(reply, "utf-8"))
+    file = open("../saves/save-"+key+".xml",'w')
+    file.write("<waetresult key="+key+"/>")
+    file.close()
+    
 
 def saveFile(self):
     global curFileName
@@ -228,6 +250,8 @@ def http_do_GET(request):
             send404(request)
         elif (request.path.split('?',1)[0] == "/php/keygen.php"):
             keygen(request);
+        elif (request.path.split('?',1)[0] == "/php/requestKey.php"):
+            requestKey(request);
         elif (request.path.split('?',1)[0] == "/php/pool.php"):
             poolXML(request);
         else:
