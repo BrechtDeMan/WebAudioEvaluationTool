@@ -3139,6 +3139,7 @@ function Storage() {
                     this.key = xml.getAllElementsByTagName("key")[0].textContent;
                     this.parent.root.setAttribute("key", this.key);
                     this.parent.root.setAttribute("state", "empty");
+                    this.update();
                     return;
                 } else if (xml.getElementsByTagName("state")[0].textContent == "ERROR") {
                     this.key = null;
