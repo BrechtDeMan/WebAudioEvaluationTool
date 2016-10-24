@@ -3127,7 +3127,7 @@ function Storage() {
     this.initialise = function (existingStore) {
         if (existingStore == undefined) {
             // We need to get the sessionKey
-            this.SessionKey.generateKey();
+            this.SessionKey.requestKey();
             this.document = document.implementation.createDocument(null, "waetresult", null);
             this.root = this.document.childNodes[0];
             var projectDocument = specification.projectXML;
@@ -3156,9 +3156,8 @@ function Storage() {
         handleEvent: function () {
             var parse = new DOMParser();
             var xml = parse.parseFromString(this.request.response, "text/xml");
-            var shouldGenerateKey = true;
             if (this.request.response.length == 0) {
-                console.log("Error: Server did not respond");
+                console.error("An unspecified error occured, no server key could be generated");
                 return;
             }
             if (xml.getElementsByTagName("state").length > 0) {
@@ -3166,22 +3165,26 @@ function Storage() {
                     this.key = xml.getAllElementsByTagName("key")[0].textContent;
                     this.parent.root.setAttribute("key", this.key);
                     this.parent.root.setAttribute("state", "empty");
-                    shouldGenerateKey = false;
+                    this.update();
+                    return;
+                } else if (xml.getElementsByTagName("state")[0].textContent == "ERROR") {
+                    this.key = null;
+                    console.error("Could not generate server key. Server responded with error message: \"" + xml.getElementsByTagName("message")[0].textContent + "\"");
+                    return;
                 }
             }
-            if (shouldGenerateKey === true) {
-                this.generateKey();
-            }
+            this.key = null;
+            console.error("An unspecified error occured, no server key could be generated");
         },
-        generateKey: function () {
-            var temp_key = randomString(32);
+        requestKey: function () {
+            // For new servers, request a new key from the server
             var returnURL = "";
             if (typeof specification.projectReturn == "string") {
                 if (specification.projectReturn.substr(0, 4) == "http") {
                     returnURL = specification.projectReturn;
                 }
             }
-            this.request.open("GET", returnURL + "php/keygen.php?key=" + temp_key, true);
+            this.request.open("GET", returnURL + "php/requestKey.php", true);
             this.request.addEventListener("load", this);
             this.request.send();
         },
