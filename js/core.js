@@ -3141,6 +3141,9 @@ function Storage() {
                     this.parent.root.setAttribute("key", this.key);
                     this.parent.root.setAttribute("state", "empty");
                     shouldGenerateKey = false;
+                } else if (xml.getElementsByTagName("state")[0].textContent == "ERROR") {
+                    console.error("Could not generate server key. Server responded with error message: \"" + xml.getElementsByTagName("message")[0].textContent + "\"");
+                    shouldGenerateKey = false;
                 }
             }
             if (shouldGenerateKey === true) {
