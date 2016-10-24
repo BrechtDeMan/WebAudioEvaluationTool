@@ -111,27 +111,6 @@ def processFile(s):
         s.send_header("Content-Length", len(fileBytes))
         s.end_headers()
         s.wfile.write(fileBytes)
-
-def keygen(s):
-	reply = ""
-	options = s.path.rsplit('?')
-	options = options[1].rsplit('=')
-	key = options[1]
-	print("Registered key "+key)
-	if os.path.isfile("saves/save-"+key+".xml"):
-		reply = "<response><state>NO</state><key>"+key+"</key></response>"
-	else:
-		reply = "<response><state>OK</state><key>"+key+"</key></response>"
-	s.send_response(200)
-	s.send_header("Content-type", "application/xml")
-	s.end_headers()
-	if sys.version_info[0] == 2:
-		s.wfile.write(reply)
-	elif sys.version_info[0] == 3:
-		s.wfile.write(bytes(reply, "utf-8"))
-	file = open("../saves/save-"+key+".xml",'w')
-	file.write("<waetresult key="+key+"/>")
-	file.close();
     
 def requestKey(s):
     reply = ""
@@ -248,8 +227,6 @@ def http_do_GET(request):
     if(request.client_address[0] == "127.0.0.1"):
         if (request.path == "/favicon.ico"):
             send404(request)
-        elif (request.path.split('?',1)[0] == "/php/keygen.php"):
-            keygen(request);
         elif (request.path.split('?',1)[0] == "/php/requestKey.php"):
             requestKey(request);
         elif (request.path.split('?',1)[0] == "/php/pool.php"):
