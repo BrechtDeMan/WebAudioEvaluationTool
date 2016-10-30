@@ -2630,6 +2630,52 @@ function Interface(specificationObject) {
         this.resize();
     };
 
+    this.sliderBox = function (commentQuestion) {
+        this.specification = commentQuestion;
+        this.holder = document.createElement("div");
+        this.holder.className = 'comment-div';
+        this.string = document.createElement("span");
+        this.string.innerHTML = commentQuestion.statement;
+        this.slider = document.createElement("input");
+        this.slider.type = "range";
+        this.slider.min = commentQuestion.min;
+        this.slider.max = commentQuestion.max;
+        this.slider.step = commentQuestion.step;
+        this.slider.value = commentQuestion.value;
+        var br = document.createElement('br');
+
+        this.holder.appendChild(this.string);
+        this.holder.appendChild(br);
+        this.holder.appendChild(this.slider);
+
+        this.exportXMLDOM = function (storePoint) {
+            var root = storePoint.parent.document.createElement('comment');
+            root.id = this.specification.id;
+            root.setAttribute('type', this.specification.type);
+            console.log("Question: " + this.string.textContent);
+            console.log("Response: " + this.slider.value);
+            var question = storePoint.parent.document.createElement('question');
+            question.textContent = this.string.textContent;
+            var response = storePoint.parent.document.createElement('response');
+            response.textContent = this.slider.value;
+            root.appendChild(question);
+            root.appendChild(response);
+            storePoint.XMLDOM.appendChild(root);
+            return root;
+        };
+        this.resize = function () {
+            var boxwidth = (window.innerWidth - 100) / 2;
+            if (boxwidth >= 600) {
+                boxwidth = 600;
+            } else if (boxwidth < 400) {
+                boxwidth = 400;
+            }
+            this.holder.style.width = boxwidth + "px";
+            this.slider.style.width = boxwidth - 24 + "px";
+        };
+        this.resize();
+    };
+
     this.createCommentQuestion = function (element) {
         var node;
         if (element.type == 'question') {
@@ -2638,6 +2684,8 @@ function Interface(specificationObject) {
             node = new this.radioBox(element);
         } else if (element.type == 'checkbox') {
             node = new this.checkboxBox(element);
+        } else if (element.type == 'slider') {
+            node = new this.sliderBox(element);
         }
         this.commentQuestions.push(node);
         return node;

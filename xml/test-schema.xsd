@@ -75,7 +75,7 @@
                     <xs:element name="commentboxprefix" type="xs:string" minOccurs="0" maxOccurs="1" />
                     <xs:element ref="interface" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="audioelement" minOccurs="1" maxOccurs="unbounded" />
-                    <xs:element ref="commentquestion" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="commentquestions" minOccurs="0" maxOccurs="1" />
                     <xs:element ref="survey" minOccurs="0" maxOccurs="2" />
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
@@ -206,10 +206,21 @@
             </xs:complexType>
         </xs:element>
 
-        <xs:element name="commentquestion">
+        <xs:element name="commentquestions">
+            <xs:complexType>
+                <xs:choice maxOccurs="unbounded">
+                    <xs:element name="commentquestion" maxOccurs="unbounded" />
+                    <xs:element name="commentradio" maxOccurs="unbounded" />
+                    <xs:element name="commentcheckbox" maxOccurs="unbounded" />
+                    <xs:element name="commentslider" maxOccurs="unbounded" />
+                </xs:choice>
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="commentradio">
             <xs:complexType>
                 <xs:sequence>
-                    <xs:element ref="statement" minOccurs="0" maxOccurs="1" />
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
                     <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
                         <xs:complexType>
                             <xs:simpleContent>
@@ -222,15 +233,49 @@
                 </xs:sequence>
                 <xs:attribute ref="id" use="optional" />
                 <xs:attribute ref="name" use="optional" />
-                <xs:attribute name="type" default="question">
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            <xs:enumeration value="question" />
-                            <xs:enumeration value="radio" />
-                            <xs:enumeration value="checkbox" />
-                        </xs:restriction>
-                    </xs:simpleType>
-                </xs:attribute>
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="commentcheckbox">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute ref="name" />
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute ref="id" use="optional" />
+                <xs:attribute ref="name" use="optional" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="commentquestion">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="optional" />
+                <xs:attribute ref="name" use="optional" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="commentslider">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="optional" />
+                <xs:attribute ref="name" use="optional" />
+                <xs:attribute name="min" type="xs:decimal" use="required" />
+                <xs:attribute name="max" type="xs:decimal" use="required" />
+                <xs:attribute name="step" type="xs:decimal" use="optional" default="1" />
+                <xs:attribute name="value" type="xs:decimal" use="optional" />
             </xs:complexType>
         </xs:element>
 
