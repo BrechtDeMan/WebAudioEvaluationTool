@@ -2,6 +2,11 @@
     <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
         <setup interface="AB" projectReturn="save.php" randomiseOrder='true' poolSize="2" loudness="-23" playOne="true">
             <survey location="before">
+                <surveyslider id="sliders" max="100" min="0">
+                    <statement>Sliders!!</statement>
+                    <minText>Lefty</minText>
+                    <maxText>Righty</maxText>
+                </surveyslider>
                 <surveyquestion id="sessionId" mandatory="true">
                     <statement>Please enter your name.</statement>
                 </surveyquestion>

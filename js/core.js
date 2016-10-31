@@ -799,13 +799,13 @@ function interfacePopup() {
         } else if (node.specification.type == 'number') {
             var input = document.createElement('input');
             input.type = 'textarea';
-            if (node.min != null) {
+            if (node.specification.min != null) {
                 input.min = node.specification.min;
             }
-            if (node.max != null) {
+            if (node.specification.max != null) {
                 input.max = node.specification.max;
             }
-            if (node.step != null) {
+            if (node.specification.step != null) {
                 input.step = node.specification.step;
             }
             if (node.response != undefined) {
@@ -823,6 +823,30 @@ function interfacePopup() {
             iframe.className = "youtube";
             iframe.src = node.specification.url;
             this.popupResponse.appendChild(iframe);
+        } else if (node.specification.type == "slider") {
+            var hold = document.createElement('div');
+            var input = document.createElement('input');
+            input.type = 'range';
+            input.style.width = "90%";
+            if (node.specification.min != null) {
+                input.min = node.specification.min;
+            }
+            if (node.specification.max != null) {
+                input.max = node.specification.max;
+            }
+            if (node.response != undefined) {
+                input.value = node.response;
+            }
+            hold.className = "survey-slider-text-holder";
+            var minText = document.createElement('span');
+            var maxText = document.createElement('span');
+            minText.textContent = node.specification.leftText;
+            maxText.textContent = node.specification.rightText;
+            hold.appendChild(minText);
+            hold.appendChild(maxText);
+            this.popupResponse.appendChild(input);
+            this.popupResponse.appendChild(hold);
+            this.popupResponse.style.textAlign = "center";
         }
         if (this.currentIndex + 1 == this.popupOptions.length) {
             if (this.node.location == "pre") {
@@ -1067,6 +1091,49 @@ function interfacePopup() {
             }
             node.response = input.value;
             // Perform the conditional
+            for (var condition of node.specification.conditions) {
+                var pass = false;
+                switch (condition.check) {
+                    case "contains":
+                        console.log("Survey Element of type 'number' cannot interpret contains conditions. IGNORING");
+                        break;
+                    case "greaterThan":
+                        if (node.response > Number(condition.value)) {
+                            pass = true;
+                        }
+                        break;
+                    case "lessThan":
+                        if (node.response < Number(condition.value)) {
+                            pass = true;
+                        }
+                        break;
+                    case "equals":
+                        if (node.response == condition.value) {
+                            pass = true;
+                        }
+                        break;
+                }
+                var jumpID;
+                if (pass) {
+                    jumpID = condition.jumpToOnPass;
+                } else {
+                    jumpID = condition.jumpToOnFail;
+                }
+                if (jumpID != undefined) {
+                    var index = this.popupOptions.findIndex(function (item, index, element) {
+                        if (item.specification.id == jumpID) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }, this);
+                    this.currentIndex = index - 1;
+                    break;
+                }
+            }
+        } else if (node.specification.type == 'slider') {
+            var input = this.popupContent.getElementsByTagName('input')[0];
+            node.response = input.value;
             for (var condition of node.specification.conditions) {
                 var pass = false;
                 switch (condition.check) {
@@ -3327,6 +3394,7 @@ function Storage() {
             switch (node.specification.type) {
                 case "number":
                 case "question":
+                case "slider":
                     var child = this.parent.document.createElement('response');
                     child.textContent = node.response;
                     surveyresult.appendChild(child);

@@ -278,8 +278,7 @@ function Specification() {
             };
 
             this.exportXML = function (doc) {
-                var node = doc.createElement('surveyentry');
-                node.setAttribute('type', this.type);
+                var node = doc.createElement('survey' + this.type);
                 var statement = doc.createElement('statement');
                 statement.textContent = this.statement;
                 node.appendChild(statement);
@@ -340,6 +339,19 @@ function Specification() {
                             node.setAttribute("url", this.url);
                         }
                         break;
+                    case "slider":
+                        node.setAttribute("min", this.min);
+                        node.setAttribute("max", this.max);
+                        if (this.leftText) {
+                            var minText = doc.createElement("minText");
+                            minText.textContent = this.leftText;
+                            node.appendChild(minText);
+                        }
+                        if (this.rightText) {
+                            var maxText = doc.createElement("maxText");
+                            maxText.textContent = this.rightText;
+                            node.appendChild(maxText);
+                        }
                     default:
                         break;
                 }

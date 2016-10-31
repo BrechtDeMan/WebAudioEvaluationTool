@@ -400,7 +400,6 @@
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
-                <xs:attribute ref="mandatory" />
                 <xs:attribute name="min" use="required" type="xs:decimal" />
                 <xs:attribute name="max" use="required" type="xs:decimal" />
             </xs:complexType>

@@ -101,6 +101,12 @@ table.popup-option-list tr {
 table.popup-option-list tr td {
     padding: 5px;
 }
+div.survey-slider-text-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0px 15px;
+}
 button#popup-proceed {
     bottom: 10px;
     right: 10px;
