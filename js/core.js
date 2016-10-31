@@ -2644,9 +2644,20 @@ function Interface(specificationObject) {
         this.slider.value = commentQuestion.value;
         var br = document.createElement('br');
 
+        var textHolder = document.createElement("div");
+        textHolder.className = "comment-slider-text-holder";
+
+        this.leftText = document.createElement("span");
+        this.leftText.textContent = commentQuestion.leftText;
+        this.rightText = document.createElement("span");
+        this.rightText.textContent = commentQuestion.rightText;
+        textHolder.appendChild(this.leftText);
+        textHolder.appendChild(this.rightText);
+
         this.holder.appendChild(this.string);
         this.holder.appendChild(br);
         this.holder.appendChild(this.slider);
+        this.holder.appendChild(textHolder);
 
         this.exportXMLDOM = function (storePoint) {
             var root = storePoint.parent.document.createElement('comment');

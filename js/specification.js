@@ -663,6 +663,18 @@ function Specification() {
                     if (this.value == undefined) {
                         this.value = min;
                     }
+                    this.leftText = xml.getElementsByTagName("minText");
+                    if (this.leftText && this.leftText.length > 0) {
+                        this.leftText = this.leftText[0].textContent;
+                    } else {
+                        this.leftText = "";
+                    }
+                    this.rightText = xml.getElementsByTagName("maxText");
+                    if (this.rightText && this.rightText.length > 0) {
+                        this.rightText = this.rightText[0].textContent;
+                    } else {
+                        this.rightText = "";
+                    }
                 }
             };
 
@@ -707,6 +719,16 @@ function Specification() {
                     }
                     if (this.value !== this.min) {
                         node.setAttribute("value", this.value);
+                    }
+                    if (this.leftText.length > 0) {
+                        var leftText = root.createElement("minText");
+                        leftText.textContent = this.leftText;
+                        node.appendChild(leftText);
+                    }
+                    if (this.rightText.length > 0) {
+                        var rightText = root.createElement("maxText");
+                        rightText.textContent = this.rightText;
+                        node.appendChild(rightText);
                     }
                 }
                 return node;

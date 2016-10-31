@@ -63,6 +63,8 @@
             <commentquestions>
                 <commentslider id="slider" min="0" max="100">
                     <statement>Test</statement>
+                    <minText>Left</minText>
+                    <maxText>Right</maxText>
                 </commentslider>
             </commentquestions>
             <survey location="before">
