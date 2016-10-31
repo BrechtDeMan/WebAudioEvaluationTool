@@ -195,7 +195,7 @@ function Specification() {
 
         this.OptionNode = function (specification) {
             this.type = undefined;
-            this.schema = specification.schema.getAllElementsByName('surveyentry')[0];
+            this.schema = undefined;
             this.id = undefined;
             this.name = undefined;
             this.mandatory = undefined;
@@ -208,6 +208,7 @@ function Specification() {
             this.conditions = [];
 
             this.decode = function (parent, child) {
+                this.schema = specification.schema.getAllElementsByName(child.nodeName)[0];
                 var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
                 for (var i in attributeMap) {
                     if (isNaN(Number(i)) == true) {
@@ -226,6 +227,15 @@ function Specification() {
                             break;
                     }
                 }
+                if (child.nodeName == 'surveyentry') {
+                    console.log("NOTE - Use of <surveyelement> is now deprecated. Whilst these will still work, newer nodes and tighter error checking will not be enforced");
+                    console.log("Please use the newer, type specifc nodes");
+                    if (!this.type) {
+                        throw ("Type not specified");
+                    }
+                } else {
+                    this.type = child.nodeName.split('survey')[1];
+                }
                 this.statement = child.getElementsByTagName('statement')[0].textContent;
                 if (this.type == "checkbox" || this.type == "radio") {
                     var children = child.getElementsByTagName('option');
@@ -241,6 +251,17 @@ function Specification() {
                                 text: children[i].textContent
                             });
                         }
+                    }
+                } else if (this.type == "slider") {
+                    this.leftText = "";
+                    this.rightText = "";
+                    var minText = child.getElementsByTagName("minText");
+                    var maxText = child.getElementsByTagName("maxText");
+                    if (minText.length > 0) {
+                        this.leftText = minText[0].textContent;
+                    }
+                    if (maxText.length > 0) {
+                        this.rightText = maxText[0].textContent;
                     }
                 }
                 var conditionElements = child.getElementsByTagName("conditional");
@@ -341,11 +362,12 @@ function Specification() {
             } else if (this.location == 'after') {
                 this.location = 'post';
             }
-            var children = xml.getAllElementsByTagName('surveyentry');
-            for (var i = 0; i < children.length; i++) {
+            var child = xml.firstElementChild
+            while (child) {
                 var node = new this.OptionNode(this.specification);
-                node.decode(parent, children[i]);
+                node.decode(parent, child);
                 this.options.push(node);
+                child = child.nextElementSibling;
             }
             if (this.options.length == 0) {
                 console.log("Empty survey node");
