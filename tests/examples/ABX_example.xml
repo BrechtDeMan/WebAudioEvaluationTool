@@ -78,7 +78,6 @@
             </interface>
             <audioelement url="0.wav" id="track-2" />
             <audioelement url="1.wav" id="track-3" />
-            <survey location="before" />
             <survey location="after">
                 <surveyentry type="question" id="genre-1" mandatory="true">
                     <statement>Please enter the genre.</statement>
