@@ -50,9 +50,10 @@
 			<interfaceoption type="show" name='playhead'/>
 			<interfaceoption type="show" name="page-count"/>
             <interfaceoption type="show" name='volume'/>
+            <interfaceoption type="show" name="comments"/>
 		</interface>
 	</setup>
-	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' showElementComments='true' loudness="-12">
+	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
 		<commentboxprefix>Comment on fragment</commentboxprefix>
 		<interface>
 			<title>Depth</title>
@@ -70,14 +71,13 @@
 			</surveyentry>
 		</survey>
 	</page>
-	<page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='false' showElementComments='true' loudness="-12">
+	<page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='false' loudness="-12">
 		<commentboxprefix>Comment on fragment</commentboxprefix>
 		<interface>
 			<title>Depth</title>
 		</interface>
 		<audioelement url="0.wav" id="track-2"/>
 		<audioelement url="1.wav" id="track-3"/>
-		<survey location="before"/>
 		<survey location="after">
 			<surveyentry type="question" id="genre-1" mandatory="true">
 				<statement>Please enter the genre.</statement>
