@@ -94,13 +94,13 @@
 				<scalelabel position="20">20</scalelabel>
 			</scales>
 		</interface>
-		<audioelement url="0.wav" gain="-6" id="track-5" type="anchor" marker="20"/>
+		<audioelement url="0.wav" gain="-6.0" id="track-5" type="anchor" marker="20"/>
 		<audioelement url="1.wav" gain="0.0" id="track-6" type="reference" marker="80"/>
 		<audioelement url="2.wav" gain="0.0" id="track-7"/>
 		<audioelement url="3.wav" gain="0.0" id="track-8"/>
 		<audioelement url="4.wav" gain="0.0" id="track-9"/>
 		<audioelement url="5.wav" gain="0.0" id="track-10"/>
-		<audioelement url="6.wav" gain="0.0" id="track-11" type="outside-reference"/>
+		<audioelement url="1.wav" gain="0.0" id="track-11" type="outside-reference"/>
 		<commentquestion id='mixingExperience' type="question">
 			<statement>What is your general experience with numbers?</statement>
 		</commentquestion>
