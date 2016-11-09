@@ -64,6 +64,10 @@ fragments_per_page = []    # number of fragments for corresponding page
 gender = []
 age    = []
 
+# diagnostics
+browser  = []
+platform = []
+
 # get username if available
 for name in ('LOGNAME', 'USER', 'LNAME', 'USERNAME'):
     user = os.environ.get(name)
@@ -162,6 +166,20 @@ for file in files_list: # iterate over all files in files_list
         individual_table = '\n' # table with stats for this individual test file
         timeline_plots = '' # plots of timeline (movements and plays)
         
+        # diagnostics: browser
+        vendor = root.find("./navigator/vendor")
+        if vendor is not None and vendor.text is not None:
+            browser.append(vendor.text.replace(',',''))
+        else:
+            browser.append('UNAVAILABLE')
+
+        # diagnostics: platform
+        platform_tag = root.find("./navigator/platform")
+        if platform_tag is not None and platform_tag.text is not None:
+            platform.append(platform_tag.text.replace('_','\_'))
+        else:
+            platform_tag.append('UNAVAILABLE')
+
         # DEMO survey stats
         # get gender
         post_survey = root.find("./survey/[@location='post']")
@@ -534,6 +552,104 @@ body += r'''
         
         '''
 # problem: some people entered twice? 
+
+
+# pie chart of browser usage
+browsers = ['Google Inc.', 'Apple Computer Inc.', 'UNAVAILABLE']
+# TODO: get the above automatically
+browser_distribution = ''
+for item in browsers:
+    number = browser.count(item)
+    if number>0:
+        browser_distribution += str("{:.2f}".format((100.0*number)/len(browser)))+\
+                               '/'+item.capitalize()+' ('+str(number)+'),\n'
+
+body += r'''
+        % Pie chart of browser distribution
+        \def\angle{0}
+        \def\radius{3}
+        \def\cyclelist{{"orange","blue","red","green"}}
+        \newcount\cyclecount \cyclecount=-1
+        \newcount\ind \ind=-1
+        \begin{figure}[htbp]
+        \begin{center}\begin{tikzpicture}[nodes = {font=\sffamily}]
+        \foreach \percent/\name in {'''+\
+        browser_distribution+\
+        r'''} {\ifx\percent\empty\else               % If \percent is empty, do nothing
+        \global\advance\cyclecount by 1     % Advance cyclecount
+        \global\advance\ind by 1            % Advance list index
+        \ifnum6<\cyclecount                 % If cyclecount is larger than list
+          \global\cyclecount=0              %   reset cyclecount and
+          \global\ind=0                     %   reset list index
+        \fi
+        \pgfmathparse{\cyclelist[\the\ind]} % Get color from cycle list
+        \edef\color{\pgfmathresult}         %   and store as \color
+        % Draw angle and set labels
+        \draw[fill={\color!50},draw={\color}] (0,0) -- (\angle:\radius)
+          arc (\angle:\angle+\percent*3.6:\radius) -- cycle;
+        \node at (\angle+0.5*\percent*3.6:0.7*\radius) {\percent\,\%};
+        \node[pin=\angle+0.5*\percent*3.6:\name]
+          at (\angle+0.5*\percent*3.6:\radius) {};
+        \pgfmathparse{\angle+\percent*3.6}  % Advance angle
+        \xdef\angle{\pgfmathresult}         %   and store in \angle
+        \fi
+        };
+        \end{tikzpicture}
+        \caption{Representation of browsers across subjects}
+        \label{default}
+        \end{center}
+        \end{figure}
+        
+        '''
+
+# pie chart of platform usage
+platforms = ['Win32', 'Win64', 'MacIntel', 'Linux i686', 'Linux x86\_64', 'UNAVAILABLE']
+# TODO: get the above automatically # order alphabetically
+platform_distribution = ''
+for item in platforms:
+    number = platform.count(item)
+    if number>0:
+        platform_distribution += str("{:.2f}".format((100.0*number)/len(platform)))+\
+                               '/'+item.capitalize()+' ('+str(number)+'),\n'
+
+body += r'''
+        % Pie chart of browser distribution
+        \def\angle{0}
+        \def\radius{3}
+        \def\cyclelist{{"orange","blue","red","green","cyan"}}
+        \newcount\cyclecount \cyclecount=-1
+        \newcount\ind \ind=-1
+        \begin{figure}[htbp]
+        \begin{center}\begin{tikzpicture}[nodes = {font=\sffamily}]
+        \foreach \percent/\name in {'''+\
+        platform_distribution+\
+        r'''} {\ifx\percent\empty\else               % If \percent is empty, do nothing
+        \global\advance\cyclecount by 1     % Advance cyclecount
+        \global\advance\ind by 1            % Advance list index
+        \ifnum6<\cyclecount                 % If cyclecount is larger than list
+          \global\cyclecount=0              %   reset cyclecount and
+          \global\ind=0                     %   reset list index
+        \fi
+        \pgfmathparse{\cyclelist[\the\ind]} % Get color from cycle list
+        \edef\color{\pgfmathresult}         %   and store as \color
+        % Draw angle and set labels
+        \draw[fill={\color!50},draw={\color}] (0,0) -- (\angle:\radius)
+          arc (\angle:\angle+\percent*3.6:\radius) -- cycle;
+        \node at (\angle+0.5*\percent*3.6:0.7*\radius) {\percent\,\%};
+        \node[pin=\angle+0.5*\percent*3.6:\name]
+          at (\angle+0.5*\percent*3.6:\radius) {};
+        \pgfmathparse{\angle+\percent*3.6}  % Advance angle
+        \xdef\angle{\pgfmathresult}         %   and store in \angle
+        \fi
+        };
+        \end{tikzpicture}
+        \caption{Representation of platforms across subjects}
+        \label{default}
+        \end{center}
+        \end{figure}
+        
+        '''
+
 
 #TODO
 # time per page in function of number of fragments (plot)
