@@ -1584,22 +1584,21 @@ function AudioEngine(specification) {
             } else {
                 interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
             }
+            var setTime = audioContext.currentTime;
             if (this.synchPlayback && this.loopPlayback) {
                 // Traditional looped playback
-                var setTime = audioContext.currentTime + specification.crossFade;
                 for (var i = 0; i < this.audioObjects.length; i++) {
                     this.audioObjects[i].play(audioContext.currentTime);
                     if (id == i) {
                         this.audioObjects[i].loopStart(setTime);
                     } else {
-                        this.audioObjects[i].loopStop(setTime);
+                        this.audioObjects[i].loopStop(setTime + specification.crossFade);
                     }
                 }
             } else {
-                var setTime = audioContext.currentTime + specification.crossFade;
                 for (var i = 0; i < this.audioObjects.length; i++) {
                     if (i != id) {
-                        this.audioObjects[i].stop(setTime);
+                        this.audioObjects[i].stop(setTime + specification.crossFade);
                     } else if (i == id) {
                         this.audioObjects[id].play(setTime);
                     }
