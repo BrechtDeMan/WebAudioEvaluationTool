@@ -14,7 +14,7 @@
 				<option name="researcher">Research in the field of audio</option>
 			</surveyentry>
 			<surveyentry type="statement" id="test-intro">
-				<statement>This is an example of an 'AB'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
+				<statement>This is an example of an 'AB'-style test, with two pages, using the test stimuli in 'example_eval/'. The 'playOne' configuration option means a fragment has to be finished playing before another fragment can be auditioned. </statement>
 			</surveyentry>
 		</survey>
 		<survey location="after">
@@ -53,7 +53,7 @@
             <interfaceoption type="show" name='comments'/>
 		</interface>
 	</setup>
-	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
+	<page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='false' loudness="-12">
 		<commentboxprefix>Comment on fragment</commentboxprefix>
 		<interface>
 			<title>Depth</title>
