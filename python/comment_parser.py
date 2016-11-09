@@ -9,7 +9,7 @@ import sys
 # COMMAND LINE ARGUMENTS
 
 assert len(sys.argv)<3, "comment_parser takes at most 1 command line argument\n"+\
-                        "Use: python score_parser.py [rating_folder_location]"
+                        "Use: python comment_parser.py [rating_folder_location]"
 
 # XML results files location
 if len(sys.argv) == 1:
@@ -45,7 +45,7 @@ for file in os.listdir(folder_name):
             page_name = audioholder.get('ref')               # get page name
             
             if page_name is None: # ignore 'empty' audio_holders
-                print("WARNING: " + file + " contains empty page. (comment_parser.py)")
+                print("WARNING: " + file + " contains empty page.")
                 break
                 
             if audioholder.get("state") != "complete":
