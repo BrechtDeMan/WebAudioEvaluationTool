@@ -1844,10 +1844,10 @@ function audioObject(id) {
             this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
             if (!audioEngineContext.loopPlayback || !audioEngineContext.synchPlayback) {
                 this.metric.startListening(audioEngineContext.timer.getTestTime());
-                this.outputGain.gain.setValueAtTime(this.onplayGain, startTime);
+                this.outputGain.gain.linearRampToValueAtTime(this.onplayGain, startTime + specification.crossFade);
                 this.interfaceDOM.startPlayback();
             } else {
-                this.outputGain.gain.setValueAtTime(0.0, startTime);
+                this.outputGain.gain.linearRampToValueAtTime(0.0, startTime);
             }
             if (audioEngineContext.loopPlayback) {
                 this.bufferNode.loopStart = this.specification.startTime || 0;
@@ -1867,7 +1867,7 @@ function audioObject(id) {
             this.bufferNode.stop(stopTime);
             this.bufferNode = undefined;
         }
-        this.outputGain.gain.setValueAtTime(0.0, stopTime);
+        this.outputGain.gain.linearRampToValueAtTime(0.0, stopTime);
         this.interfaceDOM.stopPlayback();
     };
 
