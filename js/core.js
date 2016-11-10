@@ -3038,8 +3038,8 @@ function Interface(specificationObject) {
                 obj.input.value = obj.gain.gain.value;
                 obj.input.setAttribute('orient', 'vertical');
                 obj.input.type = "range";
-                obj.input.min = -6;
-                obj.input.max = 6;
+                obj.input.min = -12;
+                obj.input.max = 0;
                 obj.input.step = 0.25;
                 if (f0 != 1000) {
                     obj.input.value = (Math.random() * 12) - 6;
