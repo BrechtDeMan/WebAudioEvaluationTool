@@ -441,6 +441,7 @@
                                         </xs:simpleContent>
                                     </xs:complexType>
                                 </xs:element>
+                                <xs:element ref="conditional" minOccurs="0" maxOccurs="unbounded" />
                             </xs:sequence>
                             <xs:attribute ref="id" use="required" />
                             <xs:attribute ref="name" />
