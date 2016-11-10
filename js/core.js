@@ -3238,6 +3238,70 @@ function Interface(specificationObject) {
         node.textContent = errorMessage;
         testState.currentStore.XMLDOM.appendChild(node);
     };
+
+    this.getLabel = function (labelType, index, labelStart) {
+        /*
+            Get the correct label based on type, index and offset
+        */
+
+        function calculateLabel(labelType, index, offset) {
+            if (labelType == "none") {
+                return "";
+            }
+            switch (labelType) {
+                case "letter":
+                    return String.fromCharCode((index + offset) % 26 + 96);
+                case "capital":
+                    return String.fromCharCode((index + offset) % 26 + 65);
+                case "number":
+                    return String(index + offset);
+                default:
+                    return "";
+            }
+        }
+
+        if (typeof labelStart !== "string") {
+            labelStart = String.fromCharCode(0);
+        }
+
+        switch (labelType) {
+            case "letter":
+                labelStart = labelStart.charCodeAt(0);
+                if (labelStart.charCodeAt(0) < 97 || label.charCodeAt(0) > 122) {
+                    labelStart = 97;
+                }
+                labelStart -= 97;
+                break;
+            case "capital":
+                labelStart = labelStart.charCodeAt(0);
+                if (labelStart.charCodeAt(0) < 65 || label.charCodeAt(0) > 90) {
+                    labelStart = 65;
+                }
+                labelStart -= 65;
+                break;
+            case "number":
+                if (!isFinite(Number(label))) {
+                    labelStart = 1;
+                }
+                break;
+            case "none":
+            default:
+                labelStart = "";
+        }
+        if (typeof index == "number") {
+            return calculateLabel(labelType, index, labelStart);
+        } else if (index.length && index.length > 0) {
+            var a = [],
+                l = index.length,
+                i;
+            for (i = 0; i < l; i++) {
+                a[i] = calculateLabel(labelType, index[i], labelStart);
+            }
+            return a;
+        } else {
+            throw ("Invalid arguments");
+        }
+    }
 }
 
 function Storage() {
