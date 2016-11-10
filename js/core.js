@@ -3250,9 +3250,9 @@ function Interface(specificationObject) {
             }
             switch (labelType) {
                 case "letter":
-                    return String.fromCharCode((index + offset) % 26 + 96);
+                    return String.fromCharCode((index + offset) % 26 + 97);
                 case "capital":
-                    return String.fromCharCode((index + offset) % 26 + 65);
+                    return String.fromCharCode((index + offset) % 26 + 66);
                 case "number":
                     return String(index + offset);
                 default:
@@ -3260,33 +3260,33 @@ function Interface(specificationObject) {
             }
         }
 
-        if (typeof labelStart !== "string") {
+        if (typeof labelStart !== "string" || labelStart.length == 0) {
             labelStart = String.fromCharCode(0);
         }
 
         switch (labelType) {
             case "letter":
                 labelStart = labelStart.charCodeAt(0);
-                if (labelStart.charCodeAt(0) < 97 || label.charCodeAt(0) > 122) {
+                if (labelStart < 97 || labelStart > 122) {
                     labelStart = 97;
                 }
                 labelStart -= 97;
                 break;
             case "capital":
                 labelStart = labelStart.charCodeAt(0);
-                if (labelStart.charCodeAt(0) < 65 || label.charCodeAt(0) > 90) {
+                if (labelStart < 65 || labelStart > 90) {
                     labelStart = 65;
                 }
                 labelStart -= 65;
                 break;
             case "number":
-                if (!isFinite(Number(label))) {
+                if (!isFinite(Number(labelStart))) {
                     labelStart = 1;
                 }
                 break;
             case "none":
             default:
-                labelStart = "";
+                labelStart = 0;
         }
         if (typeof index == "number") {
             return calculateLabel(labelType, index, labelStart);

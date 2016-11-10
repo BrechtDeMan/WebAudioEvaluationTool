@@ -273,6 +273,11 @@ function loadTest(audioHolderObject) {
     feedbackHolder.innerHTML = "";
     sliderHolder.innerHTML = "";
 
+    // Set labelType if default to number
+    if (audioHolderObject.label == "default" || audioHolderObject.label == "") {
+        audioHolderObject.label = "number";
+    }
+
     // Set the page title
     if (typeof audioHolderObject.title == "string" && audioHolderObject.title.length > 0) {
         document.getElementById("test-title").textContent = audioHolderObject.title
@@ -592,22 +597,8 @@ function sliderObject(audioObject, interfaceObjects, index) {
     // Create a new slider object;
     this.parent = audioObject;
     this.trackSliderObjects = [];
-    this.label = null;
+    this.label = interfaceContext.getLabel(audioObject.specification.parent.label, index, audioObject.specification.parent.labelStart);
     this.playing = false;
-    switch (audioObject.specification.parent.label) {
-        case "letter":
-            this.label = String.fromCharCode(97 + index);
-            break;
-        case "capital":
-            this.label = String.fromCharCode(65 + index);
-            break;
-        case "none":
-            this.label = "";
-            break;
-        default:
-            this.label = "" + (index + 1);
-            break;
-    }
     for (var i = 0; i < interfaceContext.interfaceSliders.length; i++) {
         var trackObj = interfaceContext.interfaceSliders[i].createSliderObject(audioObject, this.label);
         this.trackSliderObjects.push(trackObj);
