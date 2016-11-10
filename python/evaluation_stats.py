@@ -69,8 +69,7 @@ for file in files_list: # iterate over all files in files_list
             not_played = 0 # for this page
             not_moved = 0 # for this page
             
-            # 'testTime' keeps total duration: subtract time so far for duration of this page
-            duration = float(page.find("./metric/metricresult[@id='testTime']").text) - total_duration
+            duration = float(page.find("./metric/metricresult[@id='testTime']").text) #- total_duration
             
             # total duration of test
             total_duration += duration
