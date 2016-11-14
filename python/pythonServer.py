@@ -75,9 +75,10 @@ def processFile(s):
             s.send_header("Content-type", 'application/javascript')
         else:
             s.send_header("Content-type", 'application/octet-stream')
-        s.send_header("Content-Length", size)
+        fileRead = fileDump.read()
+        s.send_header("Content-Length", len(fileRead))
         s.end_headers()
-        s.wfile.write(fileDump.read())
+        s.wfile.write(fileRead)
         fileDump.close()
     elif sys.version_info[0] == 3:
         s.path = s.path.rsplit('?')
