@@ -6,7 +6,7 @@
                     <statement>Please enter your name.</statement>
                     <conditional check="equals" value="John" jumpToOnPass="test-intro" jumpToOnFail="checkboxtest" />
                 </surveyentry>
-                <surveyentry type="checkbox" id="checkboxtest" mandatory="true" min="2" max="4">
+                <surveyentry type="checkbox" id="checkboxtest" mandatory="true">
                     <statement>Please select with which activities you have any experience (example checkbox question)</statement>
                     <option name="musician">Playing a musical instrument</option>
                     <option name="soundengineer">Recording or mixing audio</option>

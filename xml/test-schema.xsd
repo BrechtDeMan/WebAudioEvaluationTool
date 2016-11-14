@@ -96,7 +96,6 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
-                <xs:attribute name="labelStart" use="optional" type="xs:string" default="" />
                 <xs:attribute ref="poolSize" />
                 <xs:attribute ref="alwaysInclude" />
                 <xs:attribute ref="preSilence" />
@@ -296,7 +295,7 @@
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:attribute>
-                            <xs:attribute name="url" type="xs:string" use="optional" default="" />
+                            <xs:attribute name="url" type="xs:string" use="optional" />
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
