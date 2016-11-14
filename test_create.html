@@ -1,20 +1,31 @@
 <html>
+
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <!-- This defines the test creator tool for the Web Audio Evaluation Toolbox -->
-    <link rel='stylesheet' type="text/css" href="test_create/style.css"/>
-    <link rel='stylesheet' type="text/css" href="test_create/custom.css"/>
+    <link rel='stylesheet' type="text/css" href="test_create/style.css" />
+    <link rel='stylesheet' type="text/css" href="test_create/custom.css" />
     <script type="text/javascript">
-        window.onbeforeunload = function (e) {var message = 'If you leave the page now, any unsaved changes will be lost', e = e || window.event; if (e) { e.returnValue = message;}return message;};
+        window.onbeforeunload = function(e) {
+            var message = 'If you leave the page now, any unsaved changes will be lost',
+                e = e || window.event;
+            if (e) {
+                e.returnValue = message;
+            }
+            return message;
+        };
         // Copy of Specifiation node from Core.js
+
     </script>
     <script src="js/jquery-2.1.4.js"></script>
     <script type="text/javascript" src='js/specification.js'></script>
     <script type="text/javascript" src="test_create/test_core.js"></script>
 </head>
+
 <body>
     <div id="popupHolder"></div>
     <div id="blanket"></div>
     <div id="content"></div>
 </body>
+
 </html>

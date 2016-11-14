@@ -1,532 +1,532 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<root>
-    <global>
-        <metrics>
-            <list name="testTimer">Test Timer</list>
-            <list name="elementTimer">Element Playback Timer</list>
-            <list name="elementInitialPosition">Element Initial Position</list>
-            <list name="elementTracker">Element Movement Tracker</list>
-            <list name="elementFlagListenedTo">Element Listened to Flag</list>
-            <list name="elementFlagMoved">Element Moved Flag</list>
-            <list name="elementListenTracker">Element Listen Tracker</list>
-        </metrics>
-        <checks>
-            <list name="fragmentMoved">Check all moved</list>
-            <list name="fragmentPlayed">Check all played</list>
-            <list name="fragmentFullPlayback">Check all fully played (non-loop only)</list>
-            <list name="fragmentComments">Check comments entered</list>
-            <list name="scalerange">Enforce scale usage range</list>
-        </checks>
-        <show>
-            <list name="volume">Show master volume control</list>
-            <list name="page-count">Show test page count</list>
-            <list name="playhead">Show playhead</list>
-            <list name="comments">Show element comment boxes</list>
-        </show>
-    </global>
-    <interfaces>
-        <interface name="APE">
+    <root>
+        <global>
             <metrics>
-                <entry name="testTimer" support="optional" default="on"/>
-                <entry name="elementTimer" support="optional" default="on"/>
-                <entry name="elementInitialPosition" support="optional" default="on"/>
-                <entry name="elementTracker" support="optional" default="on"/>
-                <entry name="elementFlagListenedTo" support="optional" default="on"/>
-                <entry name="elementFlagMoved" support="optional" default="on"/>
-                <entry name="elementListenTracker" support="optional" default="on"/>
+                <list name="testTimer">Test Timer</list>
+                <list name="elementTimer">Element Playback Timer</list>
+                <list name="elementInitialPosition">Element Initial Position</list>
+                <list name="elementTracker">Element Movement Tracker</list>
+                <list name="elementFlagListenedTo">Element Listened to Flag</list>
+                <list name="elementFlagMoved">Element Moved Flag</list>
+                <list name="elementListenTracker">Element Listen Tracker</list>
             </metrics>
             <checks>
-                <entry name="fragmentMoved" support="optional" default="off"/>
-                <entry name="fragmentPlayed" support="optional" default="off"/>
-                <entry name="fragmentFullPlayback" support="optional" default="off"/>
-                <entry name="fragmentComments" support="optional" default="off"/>
-                <entry name="scalerange" support="optional" default="off"/>
+                <list name="fragmentMoved">Check all moved</list>
+                <list name="fragmentPlayed">Check all played</list>
+                <list name="fragmentFullPlayback">Check all fully played (non-loop only)</list>
+                <list name="fragmentComments">Check comments entered</list>
+                <list name="scalerange">Enforce scale usage range</list>
             </checks>
             <show>
-                <entry name="volume" support="optional" default="off"/>
-                <entry name="page-count" support="optional" default="off"/>
-                <entry name="playhead" support="optional" default="off"/>
-                <entry name="comments" support="optional" default="on"/>
+                <list name="volume">Show master volume control</list>
+                <list name="page-count">Show test page count</list>
+                <list name="playhead">Show playhead</list>
+                <list name="comments">Show element comment boxes</list>
             </show>
-            <elements>
-                <number min="1" max="undefined"/>
-                <anchor min="0" max="undefined"/>
-                <reference min="0" max="undefined"/>
-                <outsidereference min="0" max="1"/>
-            </elements>
-        </interface>
-        <interface name="MUSHRA">
-            <metrics>
-                <entry name="testTimer" support="optional" default="on"/>
-                <entry name="elementTimer" support="optional" default="on"/>
-                <entry name="elementInitialPosition" support="optional" default="on"/>
-                <entry name="elementTracker" support="optional" default="on"/>
-                <entry name="elementFlagListenedTo" support="optional" default="on"/>
-                <entry name="elementFlagMoved" support="optional" default="on"/>
-                <entry name="elementListenTracker" support="optional" default="on"/>
-            </metrics>
-            <checks>
-                <entry name="fragmentMoved" support="optional" default="off"/>
-                <entry name="fragmentPlayed" support="optional" default="off"/>
-                <entry name="fragmentFullPlayback" support="optional" default="off"/>
-                <entry name="fragmentComments" support="optional" default="off"/>
-                <entry name="scalerange" support="optional" default="off"/>
-            </checks>
-            <show>
-                <entry name="volume" support="optional" default="off"/>
-                <entry name="page-count" support="optional" default="off"/>
-                <entry name="playhead" support="optional" default="off"/>
-                <entry name="comments" support="optional" default="off"/>
-            </show>
-            <elements>
-                <number min="1" max="undefined"/>
-                <anchor min="0" max="undefined"/>
-                <reference min="0" max="undefined"/>
-                <outsidereference min="0" max="1"/>
-            </elements>
-        </interface>
-        <interface name="horizontal">
-            <metrics>
-                <entry name="testTimer" support="optional" default="on"/>
-                <entry name="elementTimer" support="optional" default="on"/>
-                <entry name="elementInitialPosition" support="optional" default="on"/>
-                <entry name="elementTracker" support="optional" default="on"/>
-                <entry name="elementFlagListenedTo" support="optional" default="on"/>
-                <entry name="elementFlagMoved" support="optional" default="on"/>
-                <entry name="elementListenTracker" support="optional" default="on"/>
-            </metrics>
-            <checks>
-                <entry name="fragmentMoved" support="optional" default="off"/>
-                <entry name="fragmentPlayed" support="optional" default="off"/>
-                <entry name="fragmentFullPlayback" support="optional" default="off"/>
-                <entry name="fragmentComments" support="optional" default="off"/>
-                <entry name="scalerange" support="optional" default="off"/>
-            </checks>
-            <show>
-                <entry name="volume" support="optional" default="off"/>
-                <entry name="page-count" support="optional" default="off"/>
-                <entry name="playhead" support="optional" default="off"/>
-                <entry name="comments" support="optional" default="off"/>
-            </show>
-            <elements>
-                <number min="1" max="undefined"/>
-                <anchor min="0" max="undefined"/>
-                <reference min="0" max="undefined"/>
-                <outsidereference min="0" max="1"/>
-            </elements>
-        </interface>
-        <interface name="discrete">
-            <metrics>
-                <entry name="testTimer" support="optional" default="on"/>
-                <entry name="elementTimer" support="optional" default="on"/>
-                <entry name="elementInitialPosition" support="none"/>
-                <entry name="elementTracker" support="optional" default="on"/>
-                <entry name="elementFlagListenedTo" support="optional" default="on"/>
-                <entry name="elementFlagMoved" support="optional" default="on"/>
-                <entry name="elementListenTracker" support="optional" default="on"/>
-            </metrics>
-            <checks>
-                <entry name="fragmentMoved" support="mandatory"/>
-                <entry name="fragmentPlayed" support="optional" default="off"/>
-                <entry name="fragmentFullPlayback" support="optional" default="off"/>
-                <entry name="fragmentComments" support="optional" default="off"/>
-                <entry name="scalerange" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="optional" default="off"/>
-                <entry name="page-count" support="optional" default="off"/>
-                <entry name="playhead" support="optional" default="off"/>
-                <entry name="comments" support="optional" default="off"/>
-            </show>
-            <elements>
-                <number min="1" max="undefined"/>
-                <anchor min="0" max="undefined"/>
-                <reference min="0" max="undefined"/>
-                <outsidereference min="0" max="1"/>
-            </elements>
-        </interface>
-        <interface name="AB">
-            <metrics>
-                <entry name="testTimer" support="optional" default="on"/>
-                <entry name="elementTimer" support="optional" default="on"/>
-                <entry name="elementInitialPosition" support="none"/>
-                <entry name="elementTracker" support="optional" default="on"/>
-                <entry name="elementFlagListenedTo" support="optional" default="on"/>
-                <entry name="elementFlagMoved" support="none"/>
-                <entry name="elementListenTracker" support="optional" default="on"/>
-            </metrics>
-            <checks>
-                <entry name="fragmentMoved" support="none"/>
-                <entry name="fragmentPlayed" support="optional" default="off"/>
-                <entry name="fragmentFullPlayback" support="optional" default="off"/>
-                <entry name="fragmentComments" support="optional" default="off"/>
-                <entry name="scalerange" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="optional" default="off"/>
-                <entry name="page-count" support="optional" default="off"/>
-                <entry name="playhead" support="optional" default="off"/>
-                <entry name="comments" support="optional" default="off"/>
-            </show>
-            <elements>
-                <number min="2" max="undefined"/>
-                <anchor min="0" max="undefined"/>
-                <reference min="0" max="undefined"/>
-                <outsidereference min="0" max="1"/>
-            </elements>
-        </interface>
-        <interface name="ABX">
-            <metrics>
-                <entry name="testTimer" support="optional" default="on"/>
-                <entry name="elementTimer" support="optional" default="on"/>
-                <entry name="elementInitialPosition" support="none"/>
-                <entry name="elementTracker" support="optional" default="on"/>
-                <entry name="elementFlagListenedTo" support="optional" default="on"/>
-                <entry name="elementFlagMoved" support="none"/>
-                <entry name="elementListenTracker" support="optional" default="on"/>
-            </metrics>
-            <checks>
-                <entry name="fragmentMoved" support="none"/>
-                <entry name="fragmentPlayed" support="optional" default="off"/>
-                <entry name="fragmentFullPlayback" support="optional" default="off"/>
-                <entry name="fragmentComments" support="optional" default="off"/>
-                <entry name="scalerange" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="optional" default="off"/>
-                <entry name="page-count" support="optional" default="off"/>
-                <entry name="playhead" support="optional" default="off"/>
-                <entry name="comments" support="optional" default="off"/>
-            </show>
-            <elements>
-                <number min="2" max="2"/>
-                <anchor min="0" max="0"/>
-                <reference min="0" max="0"/>
-                <outsidereference min="0" max="0"/>
-            </elements>
-        </interface>
-        <interface name="timeline">
-            <metrics>
-                <entry name="testTimer" support="optional" default="on"/>
-                <entry name="elementTimer" support="optional" default="on"/>
-                <entry name="elementInitialPosition" support="none"/>
-                <entry name="elementTracker" support="none" default="off"/>
-                <entry name="elementFlagListenedTo" support="optional" default="on"/>
-                <entry name="elementFlagMoved" support="none"/>
-                <entry name="elementListenTracker" support="optional" default="on"/>
-            </metrics>
-            <checks>
-                <entry name="fragmentMoved" support="none"/>
-                <entry name="fragmentPlayed" support="optional" default="off"/>
-                <entry name="fragmentFullPlayback" support="optional" default="off"/>
-                <entry name="fragmentComments" support="optional" default="off"/>
-                <entry name="scalerange" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="optional" default="off"/>
-                <entry name="page-count" support="optional" default="off"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="optional" default="off"/>
-            </show>
-            <elements>
-                <number min="1" max="undefined"/>
-                <anchor min="0" max="0"/>
-                <reference min="0" max="0"/>
-                <outsidereference min="0" max="undefined"/>
-            </elements>
-        </interface>
-    </interfaces>
-    <scaledefinitions>
-        <scale name="(Blank)">
-        </scale>
-        <scale name="Likert">
-            <scalelabel position="0">Strongly Disagree</scalelabel>
-            <scalelabel position="25">Disagree</scalelabel>
-            <scalelabel position="50">Neutral</scalelabel>
-            <scalelabel position="75">Agree</scalelabel>
-            <scalelabel position="100">Strongly Agree</scalelabel>
-        </scale>
-        <scale name="ABC">
-            <scalelabel position="100">Imperceptible</scalelabel>
-            <scalelabel position="75">Perceptible but not annoying</scalelabel>
-            <scalelabel position="50">Slightly annoying</scalelabel>
-            <scalelabel position="25">Annoying</scalelabel>
-            <scalelabel position="0">Very annoying</scalelabel>
-        </scale>
-        <scale name="Bipolar">
-            <scalelabel position="0">-50</scalelabel>
-            <scalelabel position="50">0</scalelabel>
-            <scalelabel position="100">50</scalelabel>
-        </scale>
-        <scale name="ACR">
-            <scalelabel position="0">Bad</scalelabel>
-            <scalelabel position="25">Poor</scalelabel>
-            <scalelabel position="50">Fair</scalelabel>
-            <scalelabel position="75">Good</scalelabel>
-            <scalelabel position="100">Excellent</scalelabel>
-        </scale>
-        <scale name="DCR">
-            <scalelabel position="0">(1) Very Annoying</scalelabel>
-            <scalelabel position="25">(2) Annoying</scalelabel>
-            <scalelabel position="50">(3) Slightly Annoying</scalelabel>
-            <scalelabel position="75">(4) Audible but not Annoying</scalelabel>
-            <scalelabel position="100">(5) Inaudible</scalelabel>
-        </scale>
-        <scale name="CCR">
-            <scalelabel position="12">Much Worse</scalelabel>
-            <scalelabel position="25">Worse</scalelabel>
-            <scalelabel position="38">Slightly Worse</scalelabel>
-            <scalelabel position="50">About the same</scalelabel>
-            <scalelabel position="62">Slightly Better</scalelabel>
-            <scalelabel position="75">Better</scalelabel>
-            <scalelabel position="88">Much Better</scalelabel>
-        </scale>
-        <scale name="HCRS">
-            <scalelabel position="10">Dislike Extremely</scalelabel>
-            <scalelabel position="20">Dislike Very Much</scalelabel>
-            <scalelabel position="30">Dislike Moderate</scalelabel>
-            <scalelabel position="40">Dislike Slightly</scalelabel>
-            <scalelabel position="50">Neither Like nor Dislike</scalelabel>
-            <scalelabel position="60">Like Slightly</scalelabel>
-            <scalelabel position="70">Like Moderate</scalelabel>
-            <scalelabel position="80">Like Very Much</scalelabel>
-            <scalelabel position="90">Like Extremely</scalelabel>
-        </scale>
-    </scaledefinitions>
-    <tests>
-        <test name="APE" interface="APE">
-            <descriptions>
-                <description lang="en">Audio Perceptual Evaluation. A multi-stimulus test where each audio fragment is shown on one continuous slider. Fragments are randomnly positioned along the slider. The user clicks a fragment to play and drags to move.</description>
-            </descriptions>
-        </test>
-        <test name="vertical-sliders" interface="MUSHRA">
-            <descriptions>
-                <description lang="en">Each element is given its own vertical slider with user defined scale markers.</description>
-            </descriptions>
-        </test>
-        <test name="horizontal-sliders" interface="horizontal">
-            <descriptions>
-                <description lang="en">Each element is given its own horizontal slider with user defined scale markers.</description>
-            </descriptions>
-        </test>
-        <test name="discrete" interface="discrete">
-            <descriptions>
-                <description lang="en">Each element is given a horizontal scale broken into a number of discrete choices. The number of choices is defined by the scale markers.</description>
-            </descriptions>
-        </test>
-        <test name="Comparison" interface="AB">
-            <descriptions>
-                <description lang="en">An N-way comparison test. Each element is given its own selector box. The user can select one element per page for submission.</description>
-            </descriptions>
-        </test>
-        <test name="MUSHRA" interface="MUSHRA">
-            <descriptions>
-                <description lang="en">Multi-stimulus with hidden reference and anchor. Each fragment is shown on its own vertical slider. One fragment must be labelled as a reference and another labelled as an anchor. One external reference must also be shown.</description>
-            </descriptions>
-            <checks>
-                <entry name="fragmentMoved" support="none"/>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-                <entry name="scalerange" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <elements>
-                <anchor min="1" max="undefined"/>
-                <reference min="1" max="undefined"/>
-                <outsidereference min="1" max="1"/>
-            </elements>
-            <scale name="ACR"/>
-        </test>
-        <test name="Rank" interface="discrete">
-            <descriptions>
-                <description lang="en">Each stimulus is placed on a discrete scale equalling the number of fragments. The fragments are then ranked based on the question posed. Only one element can occupy a rank position</description>
-            </descriptions>
-            <checks>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <scale name="undefined"/>
-        </test>
-        <test name="Likert" interface="discrete">
-            <descriptions>
-                <description lang="en">Each stimulus is placed on a discrete scale. The scale is fixed to the Likert scale options of 'Strongly Disagree', 'Disagree', 'Neutral', 'Agree' and 'Strongly Agree'</description>
-            </descriptions>
-            <checks>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <scale name="Likert"/>
-        </test>
-        <test name="ABC/HR" interface="MUSHRA">
-            <descriptions>
-                <description lang="en">Each stimulus is placed on a vertical slider. The scale is fixed with the labels 'Imperceptible' to 'Very Annoying'</description>
-            </descriptions>
-            <checks>
-                <entry name="fragmentMoved" support="none"/>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <scale name="ABC"/>
-        </test>
-        <test name="Bipolar" interface="horizontal">
-            <descriptions>
-                <description lang="en">Each stimulus is placed on a horizontal slider and initialised to the value '0'. The scale operates from -50 to +5-. In the results this is normalised, like all other interfaces, from 0 (-50) to 1 (+50).</description>
-            </descriptions>
-            <checks>
-                <entry name="fragmentMoved" support="mandatory"/>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <elements>
-                <outsidereference min="1" max="1"/>
-            </elements>
-            <scale name="Bipolar"/>
-        </test>
-        <test name="ACR" interface="discrete">
-            <descriptions>
-                <description lang="en">Absolute Category Rating. Each element is on a discrete scale of 'Bad', 'Poor', 'Fair', 'Good' and 'Excellent'. Each element must be given a rating.</description>
-            </descriptions>
-            <checks>
-                <entry name="fragmentMoved" support="mandatory"/>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <scale name="ACR"/>
-        </test>
-        <test name="DCR" interface="discrete">
-            <checks>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <scale name="DCR"/>
-        </test>
-        <test name="CCR" interface="discrete">
-            <checks>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <scale name="CCR"/>
-        </test>
-        <test name="HCRS" interface="MUSHRA">
-            <checks>
-                <entry name="fragmentMoved" support="mandatory"/>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <elements>
-                <outsidereference min="1" max="1"/>
-            </elements>
-            <scale name="HCRS"/>
-        </test>
-        <test name="ITUR5PCIS" interface="MUSHRA">
-            <checks>
-                <entry name="fragmentMoved" support="none"/>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <elements>
-                <outsidereference min="1" max="1"/>
-            </elements>
-            <scale name="ABC"/>
-        </test>
-        <test name="AB" interface="AB">
-            <descriptions>
-                <description lang="en">Each page has only two audio fragments. The user must select one of the two fragments to proceed. There can be one hidden reference.</description>
-            </descriptions>
-            <checks>
-                <entry name="fragmentPlayed" support="none"/>
-                <entry name="fragmentFullPlayback" support="none"/>
-                <entry name="fragmentComments" support="none"/>
-            </checks>
-            <show>
-                <entry name="volume" support="none"/>
-                <entry name="page-count" support="none"/>
-                <entry name="playhead" support="none"/>
-                <entry name="comments" support="none"/>
-            </show>
-            <elements>
-                <number min="2" max="2"/>
-                <outsidereference min="0" max="1"/>
-            </elements>
-        </test>
-        <test name="ABX" interface="ABX">
-            <descriptions>
-                <description lang="en">Each page has two audio fragments presented as A and B. The test duplicates one of the fragments and presents it as X. The user must choose which, out of A or B, is closest to X.</description>
-            </descriptions>
-        </test>
-        <test name="timeline" interface="timeline">
-            <descriptions>
-                <description lang="en">Each fragment is displayed with a clickable waveform of itself. The user must click on the waveform at the location that a specific event occured. Users can then enter in information about this event. This test is unit-/value-less.</description>
-            </descriptions>
-        </test>
-    </tests>
-</root>
+        </global>
+        <interfaces>
+            <interface name="APE">
+                <metrics>
+                    <entry name="testTimer" support="optional" default="on" />
+                    <entry name="elementTimer" support="optional" default="on" />
+                    <entry name="elementInitialPosition" support="optional" default="on" />
+                    <entry name="elementTracker" support="optional" default="on" />
+                    <entry name="elementFlagListenedTo" support="optional" default="on" />
+                    <entry name="elementFlagMoved" support="optional" default="on" />
+                    <entry name="elementListenTracker" support="optional" default="on" />
+                </metrics>
+                <checks>
+                    <entry name="fragmentMoved" support="optional" default="off" />
+                    <entry name="fragmentPlayed" support="optional" default="off" />
+                    <entry name="fragmentFullPlayback" support="optional" default="off" />
+                    <entry name="fragmentComments" support="optional" default="off" />
+                    <entry name="scalerange" support="optional" default="off" />
+                </checks>
+                <show>
+                    <entry name="volume" support="optional" default="off" />
+                    <entry name="page-count" support="optional" default="off" />
+                    <entry name="playhead" support="optional" default="off" />
+                    <entry name="comments" support="optional" default="on" />
+                </show>
+                <elements>
+                    <number min="1" max="undefined" />
+                    <anchor min="0" max="undefined" />
+                    <reference min="0" max="undefined" />
+                    <outsidereference min="0" max="1" />
+                </elements>
+            </interface>
+            <interface name="MUSHRA">
+                <metrics>
+                    <entry name="testTimer" support="optional" default="on" />
+                    <entry name="elementTimer" support="optional" default="on" />
+                    <entry name="elementInitialPosition" support="optional" default="on" />
+                    <entry name="elementTracker" support="optional" default="on" />
+                    <entry name="elementFlagListenedTo" support="optional" default="on" />
+                    <entry name="elementFlagMoved" support="optional" default="on" />
+                    <entry name="elementListenTracker" support="optional" default="on" />
+                </metrics>
+                <checks>
+                    <entry name="fragmentMoved" support="optional" default="off" />
+                    <entry name="fragmentPlayed" support="optional" default="off" />
+                    <entry name="fragmentFullPlayback" support="optional" default="off" />
+                    <entry name="fragmentComments" support="optional" default="off" />
+                    <entry name="scalerange" support="optional" default="off" />
+                </checks>
+                <show>
+                    <entry name="volume" support="optional" default="off" />
+                    <entry name="page-count" support="optional" default="off" />
+                    <entry name="playhead" support="optional" default="off" />
+                    <entry name="comments" support="optional" default="off" />
+                </show>
+                <elements>
+                    <number min="1" max="undefined" />
+                    <anchor min="0" max="undefined" />
+                    <reference min="0" max="undefined" />
+                    <outsidereference min="0" max="1" />
+                </elements>
+            </interface>
+            <interface name="horizontal">
+                <metrics>
+                    <entry name="testTimer" support="optional" default="on" />
+                    <entry name="elementTimer" support="optional" default="on" />
+                    <entry name="elementInitialPosition" support="optional" default="on" />
+                    <entry name="elementTracker" support="optional" default="on" />
+                    <entry name="elementFlagListenedTo" support="optional" default="on" />
+                    <entry name="elementFlagMoved" support="optional" default="on" />
+                    <entry name="elementListenTracker" support="optional" default="on" />
+                </metrics>
+                <checks>
+                    <entry name="fragmentMoved" support="optional" default="off" />
+                    <entry name="fragmentPlayed" support="optional" default="off" />
+                    <entry name="fragmentFullPlayback" support="optional" default="off" />
+                    <entry name="fragmentComments" support="optional" default="off" />
+                    <entry name="scalerange" support="optional" default="off" />
+                </checks>
+                <show>
+                    <entry name="volume" support="optional" default="off" />
+                    <entry name="page-count" support="optional" default="off" />
+                    <entry name="playhead" support="optional" default="off" />
+                    <entry name="comments" support="optional" default="off" />
+                </show>
+                <elements>
+                    <number min="1" max="undefined" />
+                    <anchor min="0" max="undefined" />
+                    <reference min="0" max="undefined" />
+                    <outsidereference min="0" max="1" />
+                </elements>
+            </interface>
+            <interface name="discrete">
+                <metrics>
+                    <entry name="testTimer" support="optional" default="on" />
+                    <entry name="elementTimer" support="optional" default="on" />
+                    <entry name="elementInitialPosition" support="none" />
+                    <entry name="elementTracker" support="optional" default="on" />
+                    <entry name="elementFlagListenedTo" support="optional" default="on" />
+                    <entry name="elementFlagMoved" support="optional" default="on" />
+                    <entry name="elementListenTracker" support="optional" default="on" />
+                </metrics>
+                <checks>
+                    <entry name="fragmentMoved" support="mandatory" />
+                    <entry name="fragmentPlayed" support="optional" default="off" />
+                    <entry name="fragmentFullPlayback" support="optional" default="off" />
+                    <entry name="fragmentComments" support="optional" default="off" />
+                    <entry name="scalerange" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="optional" default="off" />
+                    <entry name="page-count" support="optional" default="off" />
+                    <entry name="playhead" support="optional" default="off" />
+                    <entry name="comments" support="optional" default="off" />
+                </show>
+                <elements>
+                    <number min="1" max="undefined" />
+                    <anchor min="0" max="undefined" />
+                    <reference min="0" max="undefined" />
+                    <outsidereference min="0" max="1" />
+                </elements>
+            </interface>
+            <interface name="AB">
+                <metrics>
+                    <entry name="testTimer" support="optional" default="on" />
+                    <entry name="elementTimer" support="optional" default="on" />
+                    <entry name="elementInitialPosition" support="none" />
+                    <entry name="elementTracker" support="optional" default="on" />
+                    <entry name="elementFlagListenedTo" support="optional" default="on" />
+                    <entry name="elementFlagMoved" support="none" />
+                    <entry name="elementListenTracker" support="optional" default="on" />
+                </metrics>
+                <checks>
+                    <entry name="fragmentMoved" support="none" />
+                    <entry name="fragmentPlayed" support="optional" default="off" />
+                    <entry name="fragmentFullPlayback" support="optional" default="off" />
+                    <entry name="fragmentComments" support="optional" default="off" />
+                    <entry name="scalerange" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="optional" default="off" />
+                    <entry name="page-count" support="optional" default="off" />
+                    <entry name="playhead" support="optional" default="off" />
+                    <entry name="comments" support="optional" default="off" />
+                </show>
+                <elements>
+                    <number min="2" max="undefined" />
+                    <anchor min="0" max="undefined" />
+                    <reference min="0" max="undefined" />
+                    <outsidereference min="0" max="1" />
+                </elements>
+            </interface>
+            <interface name="ABX">
+                <metrics>
+                    <entry name="testTimer" support="optional" default="on" />
+                    <entry name="elementTimer" support="optional" default="on" />
+                    <entry name="elementInitialPosition" support="none" />
+                    <entry name="elementTracker" support="optional" default="on" />
+                    <entry name="elementFlagListenedTo" support="optional" default="on" />
+                    <entry name="elementFlagMoved" support="none" />
+                    <entry name="elementListenTracker" support="optional" default="on" />
+                </metrics>
+                <checks>
+                    <entry name="fragmentMoved" support="none" />
+                    <entry name="fragmentPlayed" support="optional" default="off" />
+                    <entry name="fragmentFullPlayback" support="optional" default="off" />
+                    <entry name="fragmentComments" support="optional" default="off" />
+                    <entry name="scalerange" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="optional" default="off" />
+                    <entry name="page-count" support="optional" default="off" />
+                    <entry name="playhead" support="optional" default="off" />
+                    <entry name="comments" support="optional" default="off" />
+                </show>
+                <elements>
+                    <number min="2" max="2" />
+                    <anchor min="0" max="0" />
+                    <reference min="0" max="0" />
+                    <outsidereference min="0" max="0" />
+                </elements>
+            </interface>
+            <interface name="timeline">
+                <metrics>
+                    <entry name="testTimer" support="optional" default="on" />
+                    <entry name="elementTimer" support="optional" default="on" />
+                    <entry name="elementInitialPosition" support="none" />
+                    <entry name="elementTracker" support="none" default="off" />
+                    <entry name="elementFlagListenedTo" support="optional" default="on" />
+                    <entry name="elementFlagMoved" support="none" />
+                    <entry name="elementListenTracker" support="optional" default="on" />
+                </metrics>
+                <checks>
+                    <entry name="fragmentMoved" support="none" />
+                    <entry name="fragmentPlayed" support="optional" default="off" />
+                    <entry name="fragmentFullPlayback" support="optional" default="off" />
+                    <entry name="fragmentComments" support="optional" default="off" />
+                    <entry name="scalerange" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="optional" default="off" />
+                    <entry name="page-count" support="optional" default="off" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="optional" default="off" />
+                </show>
+                <elements>
+                    <number min="1" max="undefined" />
+                    <anchor min="0" max="0" />
+                    <reference min="0" max="0" />
+                    <outsidereference min="0" max="undefined" />
+                </elements>
+            </interface>
+        </interfaces>
+        <scaledefinitions>
+            <scale name="(Blank)">
+            </scale>
+            <scale name="Likert">
+                <scalelabel position="0">Strongly Disagree</scalelabel>
+                <scalelabel position="25">Disagree</scalelabel>
+                <scalelabel position="50">Neutral</scalelabel>
+                <scalelabel position="75">Agree</scalelabel>
+                <scalelabel position="100">Strongly Agree</scalelabel>
+            </scale>
+            <scale name="ABC">
+                <scalelabel position="100">Imperceptible</scalelabel>
+                <scalelabel position="75">Perceptible but not annoying</scalelabel>
+                <scalelabel position="50">Slightly annoying</scalelabel>
+                <scalelabel position="25">Annoying</scalelabel>
+                <scalelabel position="0">Very annoying</scalelabel>
+            </scale>
+            <scale name="Bipolar">
+                <scalelabel position="0">-50</scalelabel>
+                <scalelabel position="50">0</scalelabel>
+                <scalelabel position="100">50</scalelabel>
+            </scale>
+            <scale name="ACR">
+                <scalelabel position="0">Bad</scalelabel>
+                <scalelabel position="25">Poor</scalelabel>
+                <scalelabel position="50">Fair</scalelabel>
+                <scalelabel position="75">Good</scalelabel>
+                <scalelabel position="100">Excellent</scalelabel>
+            </scale>
+            <scale name="DCR">
+                <scalelabel position="0">(1) Very Annoying</scalelabel>
+                <scalelabel position="25">(2) Annoying</scalelabel>
+                <scalelabel position="50">(3) Slightly Annoying</scalelabel>
+                <scalelabel position="75">(4) Audible but not Annoying</scalelabel>
+                <scalelabel position="100">(5) Inaudible</scalelabel>
+            </scale>
+            <scale name="CCR">
+                <scalelabel position="12">Much Worse</scalelabel>
+                <scalelabel position="25">Worse</scalelabel>
+                <scalelabel position="38">Slightly Worse</scalelabel>
+                <scalelabel position="50">About the same</scalelabel>
+                <scalelabel position="62">Slightly Better</scalelabel>
+                <scalelabel position="75">Better</scalelabel>
+                <scalelabel position="88">Much Better</scalelabel>
+            </scale>
+            <scale name="HCRS">
+                <scalelabel position="10">Dislike Extremely</scalelabel>
+                <scalelabel position="20">Dislike Very Much</scalelabel>
+                <scalelabel position="30">Dislike Moderate</scalelabel>
+                <scalelabel position="40">Dislike Slightly</scalelabel>
+                <scalelabel position="50">Neither Like nor Dislike</scalelabel>
+                <scalelabel position="60">Like Slightly</scalelabel>
+                <scalelabel position="70">Like Moderate</scalelabel>
+                <scalelabel position="80">Like Very Much</scalelabel>
+                <scalelabel position="90">Like Extremely</scalelabel>
+            </scale>
+        </scaledefinitions>
+        <tests>
+            <test name="APE" interface="APE">
+                <descriptions>
+                    <description lang="en">Audio Perceptual Evaluation. A multi-stimulus test where each audio fragment is shown on one continuous slider. Fragments are randomnly positioned along the slider. The user clicks a fragment to play and drags to move.</description>
+                </descriptions>
+            </test>
+            <test name="vertical-sliders" interface="MUSHRA">
+                <descriptions>
+                    <description lang="en">Each element is given its own vertical slider with user defined scale markers.</description>
+                </descriptions>
+            </test>
+            <test name="horizontal-sliders" interface="horizontal">
+                <descriptions>
+                    <description lang="en">Each element is given its own horizontal slider with user defined scale markers.</description>
+                </descriptions>
+            </test>
+            <test name="discrete" interface="discrete">
+                <descriptions>
+                    <description lang="en">Each element is given a horizontal scale broken into a number of discrete choices. The number of choices is defined by the scale markers.</description>
+                </descriptions>
+            </test>
+            <test name="Comparison" interface="AB">
+                <descriptions>
+                    <description lang="en">An N-way comparison test. Each element is given its own selector box. The user can select one element per page for submission.</description>
+                </descriptions>
+            </test>
+            <test name="MUSHRA" interface="MUSHRA">
+                <descriptions>
+                    <description lang="en">Multi-stimulus with hidden reference and anchor. Each fragment is shown on its own vertical slider. One fragment must be labelled as a reference and another labelled as an anchor. One external reference must also be shown.</description>
+                </descriptions>
+                <checks>
+                    <entry name="fragmentMoved" support="none" />
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                    <entry name="scalerange" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <elements>
+                    <anchor min="1" max="undefined" />
+                    <reference min="1" max="undefined" />
+                    <outsidereference min="1" max="1" />
+                </elements>
+                <scale name="ACR" />
+            </test>
+            <test name="Rank" interface="discrete">
+                <descriptions>
+                    <description lang="en">Each stimulus is placed on a discrete scale equalling the number of fragments. The fragments are then ranked based on the question posed. Only one element can occupy a rank position</description>
+                </descriptions>
+                <checks>
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <scale name="undefined" />
+            </test>
+            <test name="Likert" interface="discrete">
+                <descriptions>
+                    <description lang="en">Each stimulus is placed on a discrete scale. The scale is fixed to the Likert scale options of 'Strongly Disagree', 'Disagree', 'Neutral', 'Agree' and 'Strongly Agree'</description>
+                </descriptions>
+                <checks>
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <scale name="Likert" />
+            </test>
+            <test name="ABC/HR" interface="MUSHRA">
+                <descriptions>
+                    <description lang="en">Each stimulus is placed on a vertical slider. The scale is fixed with the labels 'Imperceptible' to 'Very Annoying'</description>
+                </descriptions>
+                <checks>
+                    <entry name="fragmentMoved" support="none" />
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <scale name="ABC" />
+            </test>
+            <test name="Bipolar" interface="horizontal">
+                <descriptions>
+                    <description lang="en">Each stimulus is placed on a horizontal slider and initialised to the value '0'. The scale operates from -50 to +5-. In the results this is normalised, like all other interfaces, from 0 (-50) to 1 (+50).</description>
+                </descriptions>
+                <checks>
+                    <entry name="fragmentMoved" support="mandatory" />
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <elements>
+                    <outsidereference min="1" max="1" />
+                </elements>
+                <scale name="Bipolar" />
+            </test>
+            <test name="ACR" interface="discrete">
+                <descriptions>
+                    <description lang="en">Absolute Category Rating. Each element is on a discrete scale of 'Bad', 'Poor', 'Fair', 'Good' and 'Excellent'. Each element must be given a rating.</description>
+                </descriptions>
+                <checks>
+                    <entry name="fragmentMoved" support="mandatory" />
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <scale name="ACR" />
+            </test>
+            <test name="DCR" interface="discrete">
+                <checks>
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <scale name="DCR" />
+            </test>
+            <test name="CCR" interface="discrete">
+                <checks>
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <scale name="CCR" />
+            </test>
+            <test name="HCRS" interface="MUSHRA">
+                <checks>
+                    <entry name="fragmentMoved" support="mandatory" />
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <elements>
+                    <outsidereference min="1" max="1" />
+                </elements>
+                <scale name="HCRS" />
+            </test>
+            <test name="ITUR5PCIS" interface="MUSHRA">
+                <checks>
+                    <entry name="fragmentMoved" support="none" />
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <elements>
+                    <outsidereference min="1" max="1" />
+                </elements>
+                <scale name="ABC" />
+            </test>
+            <test name="AB" interface="AB">
+                <descriptions>
+                    <description lang="en">Each page has only two audio fragments. The user must select one of the two fragments to proceed. There can be one hidden reference.</description>
+                </descriptions>
+                <checks>
+                    <entry name="fragmentPlayed" support="none" />
+                    <entry name="fragmentFullPlayback" support="none" />
+                    <entry name="fragmentComments" support="none" />
+                </checks>
+                <show>
+                    <entry name="volume" support="none" />
+                    <entry name="page-count" support="none" />
+                    <entry name="playhead" support="none" />
+                    <entry name="comments" support="none" />
+                </show>
+                <elements>
+                    <number min="2" max="2" />
+                    <outsidereference min="0" max="1" />
+                </elements>
+            </test>
+            <test name="ABX" interface="ABX">
+                <descriptions>
+                    <description lang="en">Each page has two audio fragments presented as A and B. The test duplicates one of the fragments and presents it as X. The user must choose which, out of A or B, is closest to X.</description>
+                </descriptions>
+            </test>
+            <test name="timeline" interface="timeline">
+                <descriptions>
+                    <description lang="en">Each fragment is displayed with a clickable waveform of itself. The user must click on the waveform at the location that a specific event occured. Users can then enter in information about this event. This test is unit-/value-less.</description>
+                </descriptions>
+            </test>
+        </tests>
+    </root>
