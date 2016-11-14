@@ -1,30 +1,27 @@
 div#blanket {
     z-index: 2;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     width: 100%;
     height: 100%;
     position: fixed;
     left: 0px;
     top: 0px;
 }
-
 div#popupHolder {
     z-index: 3;
-    background-color: rgba(255,255,255,1);
+    background-color: rgba(255, 255, 255, 1);
     width: 730px;
     height: 480px;
     position: fixed;
     border-radius: 10px;
-	box-shadow: 0px 0px 50px #000;
+    box-shadow: 0px 0px 50px #000;
     padding: 10px;
 }
-
 div#popup-title-holder {
     width: 100%;
     height: 50px;
     font-size: 2em;
 }
-
 button.popup-button {
     width: 60px;
     height: 27px;
@@ -32,15 +29,12 @@ button.popup-button {
     position: absolute;
     bottom: 10px;
 }
-
 button#popup-proceed {
     right: 10px;
 }
-
 button#popup-back {
     left: 10px;
 }
-
 div.drag-area {
     border: 3px black dashed;
 }
@@ -53,40 +47,30 @@ div.drag-dropped {
 div.drag-error {
     background-color: coral
 }
-
 div#project-drop {
     width: 99%;
     height: 50px;
     margin: 10px 0px;
 }
-
 div.popup-checkbox {
     padding: 5px;
 }
-
 div.popup-checkbox input {
     margin: 0px 5px;
 }
-
 div.popup-option-entry {
     padding: 5px 0px;
     border-bottom: 1px solid;
 }
-
-div.disabled{
-    color: rgb(100,100,100);
+div.disabled {
+    color: rgb(100, 100, 100);
 }
-
-
-div#page-holder > div.node{
-    background-color: rgb(200,228,151);
+div#page-holder > div.node {
+    background-color: rgb(200, 228, 151);
 }
-
-div#content > div#setup{
+div#content > div#setup {
     background-color: coral;
 }
-
-
 div.node {
     float: left;
     padding: 10px;
@@ -94,7 +78,7 @@ div.node {
     border-radius: 10px;
     margin: 10px;
     min-width: 92%;
-    background-color: rgba(255,255,255,0.5);
+    background-color: rgba(255, 255, 255, 0.5);
 }
 div.node-title {
     float: left;
@@ -127,13 +111,13 @@ div.attribute input {
 div.attribute input[type=number] {
     width: 80px;
 }
-div.attribute input[type=radio], div.attribute input[type=checkbox]{
+div.attribute input[type=radio],
+div.attribute input[type=checkbox] {
     width: 10px;
 }
-input:disabled+label{
+input:disabled+label {
     text-decoration: line-through;
 }
-
 div.survey-entry-attribute {
     margin: 10px 0px;
     border: 1px gray solid;
@@ -142,7 +126,6 @@ div.survey-entry-attribute {
     line-height: 40px;
     padding: 0px 10px;
 }
-
-div.survey-entry-attribute span{
+div.survey-entry-attribute span {
     margin-right: 10px;
 }

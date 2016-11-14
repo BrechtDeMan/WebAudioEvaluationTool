@@ -1,6 +1,6 @@
 // Script to load the relevant JS files if the system supports it
 
-window.onload = function() {
+window.onload = function () {
     // First check if the Web Audio API is supported
     if (window.AudioContext == undefined && window.webkitAudioContext == undefined) {
         // Display unsuported error message
@@ -16,7 +16,7 @@ window.onload = function() {
     } else {
         var head = document.getElementsByTagName("head")[0];
         var src_list = ['js/specification.js', 'js/core.js', 'js/loudness.js', 'js/xmllint.js', 'js/WAVE.js'];
-        for (var i=0; i<src_list.length; i++) {
+        for (var i = 0; i < src_list.length; i++) {
             var src = src_list[i];
             var script = document.createElement("script");
             script.type = "text/javascript";

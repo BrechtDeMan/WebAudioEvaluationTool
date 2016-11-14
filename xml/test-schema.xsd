@@ -26,8 +26,8 @@
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
-        
-        <xs:attribute name="playOne" type="xs:boolean" default="false"/>
+
+        <xs:attribute name="playOne" type="xs:boolean" default="false" />
 
         <!-- define complex elements-->
         <xs:element name="waet">
@@ -254,16 +254,16 @@
                                         <xs:attribute name="check" use="required">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
-                                                    <xs:enumeration value="equals"/>
-                                                    <xs:enumeration value="lessThan"/>
-                                                    <xs:enumeration value="greaterThan"/>
-                                                    <xs:enumeration value="stringContains"/>
+                                                    <xs:enumeration value="equals" />
+                                                    <xs:enumeration value="lessThan" />
+                                                    <xs:enumeration value="greaterThan" />
+                                                    <xs:enumeration value="stringContains" />
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:attribute>
-                                        <xs:attribute name="value" type="xs:string" use="optional"/>
-                                        <xs:attribute name="jumpToOnPass" type="xs:string" use="optional"/>
-                                        <xs:attribute name="jumpToOnFail" type="xs:string" use="optional"/>
+                                        <xs:attribute name="value" type="xs:string" use="optional" />
+                                        <xs:attribute name="jumpToOnPass" type="xs:string" use="optional" />
+                                        <xs:attribute name="jumpToOnFail" type="xs:string" use="optional" />
                                     </xs:complexType>
                                 </xs:element>
                             </xs:sequence>
@@ -295,7 +295,7 @@
                                     </xs:restriction>
                                 </xs:simpleType>
                             </xs:attribute>
-                            <xs:attribute name="url" type="xs:string" use="optional"/>
+                            <xs:attribute name="url" type="xs:string" use="optional" />
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>

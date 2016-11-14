@@ -5,12 +5,12 @@ div.chart-holder {
 div.code {
     margin: 5px;
     padding-left: 15px;
-    background-color: rgb(200,200,200);
+    background-color: rgb(200, 200, 200);
     border: 2px dashed black;
 }
-table td tr{
+table td tr {
     padding: 5px;
 }
-div.filter-entry{
+div.filter-entry {
     padding: 5px;
 }
