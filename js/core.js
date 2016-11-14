@@ -3296,7 +3296,8 @@ function Interface(specificationObject) {
                 labelStart -= 65;
                 break;
             case "number":
-                if (!isFinite(Number(labelStart))) {
+                labelStart = Number(labelStart);
+                if (!isFinite(labelStart)) {
                     labelStart = 1;
                 }
                 break;
