@@ -927,7 +927,7 @@ function buildPage() {
                         this.dynamic.appendChild(optionHolder);
                 }
             }
-            this.handleEvent = function () {
+            this.handleEvent = function (event) {
                 var name = event.currentTarget.getAttribute("name");
                 var nodeName = event.currentTarget.nodeName;
                 if (name == "type" && nodeName == "SELECT") {
