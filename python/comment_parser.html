@@ -1,72 +1,78 @@
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <script type="text/javascript">
-            function getXML()
-            {
-                var XMLHttp = new XMLHttpRequest();
-                XMLHttp.open("GET","comment_parser.php?format=XML",true);
-                XMLHttp.onload = function() {
-                    // Now we have the XML data, extract
-                    var parse = new DOMParser();
-                    var ajax = parse.parseFromString(XMLHttp.response,'text/xml');
-                    
-                    var parent = document.createElement("div");
-                    parent.appendChild(ajax.children[0]);
-                    var file = [parent.innerHTML];
-                    var bb = new Blob(file,{type : 'application/xml'});
-                    generateLink(bb,".xml");
-                }
-                XMLHttp.send();
+
+<head>
+    <meta charset="utf-8" />
+    <script type="text/javascript">
+        function getXML() {
+            var XMLHttp = new XMLHttpRequest();
+            XMLHttp.open("GET", "comment_parser.php?format=XML", true);
+            XMLHttp.onload = function() {
+                // Now we have the XML data, extract
+                var parse = new DOMParser();
+                var ajax = parse.parseFromString(XMLHttp.response, 'text/xml');
+
+                var parent = document.createElement("div");
+                parent.appendChild(ajax.children[0]);
+                var file = [parent.innerHTML];
+                var bb = new Blob(file, {
+                    type: 'application/xml'
+                });
+                generateLink(bb, ".xml");
             }
-            
-            function getJSON()
-            {
-                var XMLHttp = new XMLHttpRequest();
-                XMLHttp.open("GET","comment_parser.php?format=JSON",true);
-                XMLHttp.onload = function() {
-                    // Now we have the XML data, extract
-                    var file = [XMLHttp.response];
-                    var bb = new Blob(file,{type : 'application/json'});
-                    generateLink(bb,".json");
-                }
-                XMLHttp.send();
+            XMLHttp.send();
+        }
+
+        function getJSON() {
+            var XMLHttp = new XMLHttpRequest();
+            XMLHttp.open("GET", "comment_parser.php?format=JSON", true);
+            XMLHttp.onload = function() {
+                // Now we have the XML data, extract
+                var file = [XMLHttp.response];
+                var bb = new Blob(file, {
+                    type: 'application/json'
+                });
+                generateLink(bb, ".json");
             }
-            
-            function getCSV()
-            {
-                var XMLHttp = new XMLHttpRequest();
-                XMLHttp.open("GET","comment_parser.php?format=CSV",true);
-                XMLHttp.onload = function() {
-                    // Now we have the XML data, extract
-                    var file = [XMLHttp.response];
-                    var bb = new Blob(file,{type : 'text/csv'});
-                    generateLink(bb,".csv");
-                }
-                XMLHttp.send();
+            XMLHttp.send();
+        }
+
+        function getCSV() {
+            var XMLHttp = new XMLHttpRequest();
+            XMLHttp.open("GET", "comment_parser.php?format=CSV", true);
+            XMLHttp.onload = function() {
+                // Now we have the XML data, extract
+                var file = [XMLHttp.response];
+                var bb = new Blob(file, {
+                    type: 'text/csv'
+                });
+                generateLink(bb, ".csv");
             }
-            
-            function generateLink(blobfile,fmt)
-            {
-                var dnlk = window.URL.createObjectURL(blobfile);
-                var a = document.createElement("a");
-                a.hidden = '';
-                a.href = dnlk;
-                a.download = "save"+fmt;
-                a.textContent = "Save File";
-                document.getElementById("download").appendChild(a);
-            }
-        </script>
-    </head>
-    <body>
-        <h1>WAET Test Results Analysis</h1>
-        <h2>Comment Extraction</h2>
-        <p>All of the XMLs in the server 'saves/' directory are automatically parsed and downloaded, extracting only the comments. Simply select the comments you wish to extract below and your desired data format.</p>
-        <div id="download"></div>
-        <div>
-            <button onclick="getXML();">XML</button>
-            <button onclick="getJSON();">JSON</button>
-            <button onclick="getCSV();">CSV</button>
-        </div>
-    </body>
+            XMLHttp.send();
+        }
+
+        function generateLink(blobfile, fmt) {
+            var dnlk = window.URL.createObjectURL(blobfile);
+            var a = document.createElement("a");
+            a.hidden = '';
+            a.href = dnlk;
+            a.download = "save" + fmt;
+            a.textContent = "Save File";
+            document.getElementById("download").appendChild(a);
+        }
+
+    </script>
+</head>
+
+<body>
+    <h1>WAET Test Results Analysis</h1>
+    <h2>Comment Extraction</h2>
+    <p>All of the XMLs in the server 'saves/' directory are automatically parsed and downloaded, extracting only the comments. Simply select the comments you wish to extract below and your desired data format.</p>
+    <div id="download"></div>
+    <div>
+        <button onclick="getXML();">XML</button>
+        <button onclick="getJSON();">JSON</button>
+        <button onclick="getCSV();">CSV</button>
+    </div>
+</body>
+
 </html>

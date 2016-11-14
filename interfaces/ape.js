@@ -277,7 +277,6 @@ function loadTest(audioHolderObject) {
     if (audioHolderObject.label == "default" || audioHolderObject.label == "") {
         audioHolderObject.label = "number";
     }
-
     // Set the page title
     if (typeof audioHolderObject.title == "string" && audioHolderObject.title.length > 0) {
         document.getElementById("test-title").textContent = audioHolderObject.title
