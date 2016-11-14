@@ -1,55 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
 
-		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+    <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
 		Remove this if you use the .htaccess -->
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-		<title>Web Audio Evaluation Tool</title>
-		<meta name="description" content="" />
-		<meta name="author" content="" />
-		
-		<!-- Load up the default core JS and CSS files-->
-		<link rel='stylesheet' type='text/css' href='css/core.css'>
-		<!-- Use jQuery hosted from Google CDN -->
-		<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>-->
-		<script type="text/javascript" src="js/jquery-2.1.4.js"></script>
-        <script type="text/javascript" src="js/loader.js"></script>
-	</head>
+    <title>Web Audio Evaluation Tool</title>
+    <meta name="description" content="" />
+    <meta name="author" content="" />
 
-	<body>
-		<div id='topLevelBody'>
-			<h1>Web Audio Evaluation Tool</h1>
-			<h2>Start menu </h2>
-			<ul>
-				<li><a href="test.html?url=tests/examples/project.xml" target="_blank">APE interface test example</a></li>
-				<li><a href="test.html?url=tests/examples/mushra_example.xml" target="_blank">MUSHRA interface test example</a></li>
-				<li><a href="test.html?url=tests/examples/AB_example.xml" target="_blank">AB interface test example</a></li>
-				<li><a href="test.html?url=tests/examples/horizontal_example.xml" target="_blank">Horizontal interface test example</a></li>
-				<li><a href="test.html?url=tests/examples/radio_example.xml" target="_blank">Radio interface test example</a></li>
-				<li><a href="test_create.html" target="_blank">Test creator</a></li>
-				<li><a href="analyse.html" target="_blank">Analysis and diagnostics of results</a></li>
-			</ul>
-			<br>
-			<ul>
-				<li><a href="LICENSE.txt" target="_blank">License</a></li>
-				<li><a href="CITING.txt" target="_blank">Citing</a></li>
-				<li><a href="docs/Instructions/Instructions.pdf" target="_blank">Instructions</a></li>
-			</ul>
-		</div>
-        <div id="popupHolder" class="popupHolder" style="visibility: hidden">
-            <div id="popupContent">
-                <div id="popupTitleHolder">
-                    <span id="popupTitle"></span>
-                </div>
-                <div id="popupResponse"></div>
+    <!-- Load up the default core JS and CSS files-->
+    <link rel='stylesheet' type='text/css' href='css/core.css'>
+    <!-- Use jQuery hosted from Google CDN -->
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>-->
+    <script type="text/javascript" src="js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="js/loader.js"></script>
+</head>
+
+<body>
+    <div id='topLevelBody'>
+        <h1>Web Audio Evaluation Tool</h1>
+        <h2>Start menu </h2>
+        <ul>
+            <li><a href="test.html?url=tests/examples/project.xml" target="_blank">APE interface test example</a></li>
+            <li><a href="test.html?url=tests/examples/mushra_example.xml" target="_blank">MUSHRA interface test example</a></li>
+            <li><a href="test.html?url=tests/examples/AB_example.xml" target="_blank">AB interface test example</a></li>
+            <li><a href="test.html?url=tests/examples/horizontal_example.xml" target="_blank">Horizontal interface test example</a></li>
+            <li><a href="test.html?url=tests/examples/radio_example.xml" target="_blank">Radio interface test example</a></li>
+            <li><a href="test_create.html" target="_blank">Test creator</a></li>
+            <li><a href="analyse.html" target="_blank">Analysis and diagnostics of results</a></li>
+        </ul>
+        <br>
+        <ul>
+            <li><a href="LICENSE.txt" target="_blank">License</a></li>
+            <li><a href="CITING.txt" target="_blank">Citing</a></li>
+            <li><a href="docs/Instructions/Instructions.pdf" target="_blank">Instructions</a></li>
+        </ul>
+    </div>
+    <div id="popupHolder" class="popupHolder" style="visibility: hidden">
+        <div id="popupContent">
+            <div id="popupTitleHolder">
+                <span id="popupTitle"></span>
             </div>
-            <button id="popup-proceed" class="popupButton">Next</button>
-            <button id="popup-previous" class="popupButton">Back</button>
+            <div id="popupResponse"></div>
         </div>
-        <div class="testHalt" style="visibility: hidden"></div>
-	</body>
+        <button id="popup-proceed" class="popupButton">Next</button>
+        <button id="popup-previous" class="popupButton">Back</button>
+    </div>
+    <div class="testHalt" style="visibility: hidden"></div>
+</body>
+
 </html>

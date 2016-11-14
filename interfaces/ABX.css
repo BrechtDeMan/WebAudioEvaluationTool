@@ -1,80 +1,66 @@
 body {
-	/* Set the background colour (note US English spelling) to grey*/
-	background-color: #fff
+    /* Set the background colour (note US English spelling) to grey*/
+    background-color: #fff
 }
-
 div.pageTitle {
-	width: auto;
-	height: 20px;
-	margin-top: 20px;
+    width: auto;
+    height: 20px;
+    margin-top: 20px;
 }
-
-div.pageTitle span{
-	font-size: 1.5em;
+div.pageTitle span {
+    font-size: 1.5em;
 }
-
 button {
-	/* Specify any button structure or style */
-	min-width: 20px;
-	background-color: #ddd
+    /* Specify any button structure or style */
+    min-width: 20px;
+    background-color: #ddd
 }
-
 button.big-button {
-	width: 250px;
-	height: 40px;
-	font-size: 1.2em;
+    width: 250px;
+    height: 40px;
+    font-size: 1.2em;
 }
-
 div.comparator-holder {
-	width: 260px;
-	height: 300px;
-	border:  black 1px solid;
+    width: 260px;
+    height: 300px;
+    border: black 1px solid;
     float: left;
-	padding-top: 5px;
+    padding-top: 5px;
     margin: 25px;
 }
-
 div.comparator-selector {
-	width: 248px;
-	height: 250px;
-	border: black 1px solid;
-	position: relative;
-	background-color: #FF0000;
+    width: 248px;
+    height: 250px;
+    border: black 1px solid;
+    position: relative;
+    background-color: #FF0000;
     border-radius: 20px;
 }
-
 div.disabled {
-	background-color: #AAA;
+    background-color: #AAA;
 }
-
 div.selected {
-	background-color: #008000;
+    background-color: #008000;
 }
-
-div.comparator-selector.inactive{
-	background-color: yellow !important;
+div.comparator-selector.inactive {
+    background-color: yellow !important;
 }
-
 div.comparator-selector span {
-	font-size: 4em;
+    font-size: 4em;
 }
-
 button.comparator-button {
-	width: 250px;
-	height: 38px;
-	position: relative;
-	margin-top: 5px;
+    width: 250px;
+    height: 38px;
+    position: relative;
+    margin-top: 5px;
 }
-
 div.playhead {
     margin: 5px;
 }
-
 div#page-count {
     float: left;
     margin: 0px 5px;
 }
-
 div#master-volume-holder {
     position: absolute;
     top: 10px;

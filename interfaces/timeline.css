@@ -2,7 +2,6 @@ div.timeline-element {
     display: flex;
     justify-content: center;
 }
-
 div.timeline-element-content {
     max-width: 800px;
     min-width: 200px;
@@ -10,15 +9,13 @@ div.timeline-element-content {
     margin: 10px 0px;
     padding: 20px;
 }
-
 div.timeline-element-canvas-holder {
     display: flex;
     width: inherit;
     height: 160px;
     margin-left: 50px;
 }
-
-canvas.canvas-layer1{
+canvas.canvas-layer1 {
     position: absolute;
 }
 canvas.canvas-layer2 {
@@ -33,21 +30,17 @@ canvas.canvas-layer4 {
     position: absolute;
     z-index: -3;
 }
-
 canvas.timeline-element-canvas {
     border: 1px solid black;
 }
-
 canvas.canvas-disabled {
     background-color: gray;
 }
-
 div.timeline-element-comment-holder {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 }
-
 div.comment-entry {
     border: 1px solid #444444;
     max-width: 600px;
@@ -59,12 +52,10 @@ div.comment-entry {
     display: flex;
     flex-direction: column;
 }
-
 div.comment-entry-header {
     display: flex;
     justify-content: space-between;
 }
-
 textarea.comment-entry-text {
     resize: none;
     margin: auto;
