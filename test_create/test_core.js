@@ -975,7 +975,7 @@ function buildPage() {
                 handleEvent: function (event) {
                     this.parent.scaleRoot.scales = [];
                     var protoScale = interfaceSpecs.getAllElementsByTagName('scaledefinitions')[0].getAllElementsByName(event.currentTarget.value)[0];
-                    var protoMarkers = protoScale.getElementsByTagName("scale");
+                    var protoMarkers = protoScale.getElementsByTagName("scalelabel");
                     for (var i = 0; i < protoMarkers.length; i++) {
                         var marker = {
                             position: protoMarkers[i].getAttribute("position"),
