@@ -1594,7 +1594,7 @@ function SpecificationToHTML() {
                         this.parent.specification.title = event.currentTarget.value;
                     }
                 }
-                this.titleNode.label.textContent = "Axis Title:";
+                this.titleNode.label.textContent = "Presented Axis Title:";
                 this.titleNode.root.className = "node-children";
                 this.titleNode.root.appendChild(this.titleNode.label);
                 this.titleNode.root.appendChild(this.titleNode.input);
@@ -1602,6 +1602,24 @@ function SpecificationToHTML() {
                 this.titleNode.input.value = this.specification.title;
                 this.children.push(this.titleNode);
                 this.childrenDOM.appendChild(this.titleNode.root);
+                // Set the interface-name attribute
+                this.axisName = {
+                    root: document.createElement("div"),
+                    label: document.createElement("span"),
+                    input: document.createElement("input"),
+                    parent: this,
+                    handleEvent: function (event) {
+                        this.parent.specification.name = event.currentTarget.value;
+                    }
+                }
+                this.axisName.label.textContent = "Saved Axis Name (no spaces):";
+                this.axisName.root.className = "node-children";
+                this.axisName.root.appendChild(this.axisName.label);
+                this.axisName.root.appendChild(this.axisName.input);
+                this.axisName.input.addEventListener("change", this.axisName, false);
+                this.axisName.input.value = this.specification.name;
+                this.children.push(this.axisName);
+                this.childrenDOM.appendChild(this.axisName.root);
             }
 
             // Put in the check / show options as individual children
