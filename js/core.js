@@ -3047,6 +3047,22 @@ function Interface(specificationObject) {
         this.storeErrorNode(str);
         return false;
     };
+    this.checkAllCommented = function () {
+        var str = "You have not commented on all the fragments.";
+        var cont = true,
+            boxes = this.commentBoxes.boxes,
+            numBoxes = boxes.length,
+            i;
+        for (i = 0; i < numBoxes; i++) {
+            if (boxes[i].trackCommentBox.value === "") {
+                interfaceContext.lightbox.post("Error", str);
+                console.log(str);
+                this.storeErrorNode(str);
+                return false;
+            }
+        }
+        return true;
+    }
     this.checkScaleRange = function (min, max) {
         var page = testState.getCurrentTestPage();
         var audioObjects = audioEngineContext.audioObjects;
