@@ -96,6 +96,7 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute name="labelStart" type="xs:string" use="optional" default="" />
                 <xs:attribute ref="poolSize" />
                 <xs:attribute ref="alwaysInclude" />
                 <xs:attribute ref="preSilence" />

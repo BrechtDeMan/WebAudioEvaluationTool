@@ -364,19 +364,10 @@ function comparator(page) {
         }
         var audioObject = audioEngineContext.newTrack(element);
         var label;
-        switch (audioObject.specification.parent.label) {
-            case "none":
-                label = "";
-                break;
-            case "number":
-                label = "" + index;
-                break;
-            case "letter":
-                label = String.fromCharCode(97 + index);
-                break;
-            default:
-                label = String.fromCharCode(65 + index);
-                break;
+        if (index == 0) {
+            label = "A";
+        } else {
+            label = "B";
         }
         var node = new this.interfaceObject(audioObject, label);
         audioObject.bindInterface(node);

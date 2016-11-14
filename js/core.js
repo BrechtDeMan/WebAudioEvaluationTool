@@ -3268,7 +3268,7 @@ function Interface(specificationObject) {
                 case "letter":
                     return String.fromCharCode((index + offset) % 26 + 97);
                 case "capital":
-                    return String.fromCharCode((index + offset) % 26 + 66);
+                    return String.fromCharCode((index + offset) % 26 + 65);
                 case "number":
                     return String(index + offset);
                 default:

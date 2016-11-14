@@ -155,7 +155,12 @@ function loadTest(audioHolderObject) {
 
     // Find all the audioElements from the audioHolder
     var index = 0;
-    $(audioHolderObject.audioElements).each(function (index, element) {
+    var interfaceScales = testState.currentStateMap.interfaces[0].scales;
+    var labelType = page.label;
+    if (labelType == "default") {
+        labelType = "number";
+    }
+    $(audioHolderObject.audioElements).each(function (pageIndex, element) {
         // Find URL of track
         // In this jQuery loop, variable 'this' holds the current audioElement.
 
@@ -166,20 +171,7 @@ function loadTest(audioHolderObject) {
             audioObject.bindInterface(orNode);
         } else {
             // Create a slider per track
-            switch (audioObject.specification.parent.label) {
-                case "none":
-                    label = "";
-                    break;
-                case "letter":
-                    label = String.fromCharCode(97 + index);
-                    break;
-                case "capital":
-                    label = String.fromCharCode(65 + index);
-                    break;
-                default:
-                    label = "" + index;
-                    break;
-            }
+            var label = interfaceContext.getLabel(labelType, index, page.labelStart);
             var sliderObj = new sliderObject(audioObject, label);
 
             if (typeof audioHolderObject.initialPosition === "number") {

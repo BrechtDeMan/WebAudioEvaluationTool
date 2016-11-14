@@ -106,27 +106,19 @@ function loadTest(page) {
     if (interfaceObj.commentBoxPrefix != undefined) {
         commentBoxPrefix = interfaceObj.commentBoxPrefix;
     }
-
-    $(page.audioElements).each(function (index, element) {
+    var index = 0;
+    var interfaceScales = testState.currentStateMap.interfaces[0].scales;
+    var labelType = page.label;
+    if (labelType == "default") {
+        labelType = "number";
+    }
+    $(page.audioElements).each(function (pageIndex, element) {
         var audioObject = audioEngineContext.newTrack(element);
         if (page.audioElements.type == 'outside-reference') {
             var refNode = interfaceContext.outsideReferenceDOM(audioObject, index, outsideReferenceHolder);
             audioObject.bindInterface(orNode);
         } else {
-            switch (audioObject.specification.parent.label) {
-                case "none":
-                    label = "";
-                    break;
-                case "letter":
-                    label = String.fromCharCode(97 + index);
-                    break;
-                case "capital":
-                    label = String.fromCharCode(65 + index);
-                    break;
-                default:
-                    label = "" + index;
-                    break;
-            }
+            var label = interfaceContext.getLabel(labelType, index, page.labelStart);
             var node = new interfaceObject(audioObject, label);
 
             content.appendChild(node.DOM);

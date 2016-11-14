@@ -351,47 +351,12 @@ function comparator(audioHolderObject) {
     this.comparators = [];
     this.selected = null;
 
-    // First generate the Audio Objects for the Audio Engine
-    var label = audioHolderObject.labelStart;
-    if (label == "") {
-        switch (audioHolderObject.label) {
-            case "number":
-                label = "1";
-                break;
-            case "letter":
-                label = "a";
-                break;
-            case "none":
-                label = "";
-                break;
-            case "capital":
-            default:
-                label = "A";
-                break;
-        }
-    } else {
-        switch (audioHolderObject.label) {
-            case "number":
-                if (!isFinite(Number(label))) {
-                    label = "1";
-                }
-                break;
-            case "letter":
-                if (label.charCodeAt(0) < 97 || label.charCodeAt(0) > 122) {
-                    label = "a";
-                }
-                break;
-            case "none":
-                label = "";
-                break;
-            case "capital":
-            default:
-                if (label.charCodeAt(0) < 65 || label.charCodeAt(0) > 90) {
-                    label = "A";
-                }
-                break;
-        }
+    var labelType = audioHolderObject.label;
+    if (labelType == "default") {
+        labelType = "capital";
     }
+
+    // First generate the Audio Objects for the Audio Engine
     for (var index = 0; index < audioHolderObject.audioElements.length; index++) {
         var element = audioHolderObject.audioElements[index];
         var audioObject = audioEngineContext.newTrack(element);
@@ -399,22 +364,8 @@ function comparator(audioHolderObject) {
             var orNode = new interfaceContext.outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
             audioObject.bindInterface(orNode);
         } else {
+            var label = interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
             var node = new this.comparatorBox(audioObject, index, label);
-            switch (audioHolderObject.label) {
-                case "none":
-                    label = "";
-                    break;
-                case "number":
-                    label = (Number(label) + 1).toString(10);
-                    break;
-                case "letter":
-                    label = String.fromCharCode((label.charCodeAt(0) - 96) % 26 + 97);
-                    break;
-                case "capital":
-                default:
-                    label = String.fromCharCode((label.charCodeAt(0) - 64) % 26 + 65);
-                    break;
-            }
             audioObject.bindInterface(node);
             this.comparators.push(node);
             this.boxHolders.appendChild(node.box);
