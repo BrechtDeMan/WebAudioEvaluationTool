@@ -1488,10 +1488,9 @@ function AudioEngine(specification) {
 
     this.buffers = [];
     this.bufferObj = function () {
-        this.url = null;
+        var currentUrlIndex = 0;
+        this.urls = [];
         this.buffer = null;
-        this.xmlRequest = new XMLHttpRequest();
-        this.xmlRequest.parent = this;
         this.users = [];
         this.progress = 0;
         this.status = 0;
@@ -1506,30 +1505,52 @@ function AudioEngine(specification) {
                 }
             }
         };
-        this.getMedia = function (url) {
-            this.url = url;
-            this.xmlRequest.open('GET', this.url, true);
-            this.xmlRequest.responseType = 'arraybuffer';
+        this.getMedia = function (urls) {
+            var self = this;
 
-            var bufferObj = this;
+            function get(fqurl) {
+                return new Promise(function (resolve, reject) {
+                    var req = new XMLHttpRequest();
+                    req.open('GET', fqurl, true);
+                    req.responseType = 'arraybuffer';
+                    req.onload = function () {
+                        if (req.status == 200) {
+                            resolve(req.response);
+                        }
+                    };
+                    req.onerror = function () {
+                        reject(new Error(req.statusText));
+                    };
+
+                    req.addEventListener("progress", progressCallback.bind(self));
+                    req.send();
+                });
+            }
+
+            function getNextURL() {
+                currentUrlIndex++;
+                var self = this;
+                if (currentURLIndex == this.urls.length) {
+                    processError();
+                } else {
+                    return get(this.urls[currentUrlIndex]).then(processAudio.bind(self)).catch(getNextURL.bind(self));
+                }
+            }
 
             // Create callback to decode the data asynchronously
-            this.xmlRequest.onloadend = function () {
-                // Use inbuilt WAVE decoder first
-                if (this.status == -1) {
-                    return;
-                }
-                var waveObj = new WAVE();
-                audioContext.decodeAudioData(bufferObj.xmlRequest.response, function (decodedData) {
-                    bufferObj.buffer = decodedData;
-                    bufferObj.status = 2;
-                    calculateLoudness(bufferObj, "I");
+            function processAudio(response) {
+                var self = this;
+                return audioContext.decodeAudioData(response, function (decodedData) {
+                    self.buffer = decodedData;
+                    self.status = 2;
+                    calculateLoudness(self, "I");
+                    return true;
                 }, function (e) {
                     var waveObj = new WAVE();
-                    if (waveObj.open(bufferObj.xmlRequest.response) == 0) {
-                        bufferObj.buffer = audioContext.createBuffer(waveObj.num_channels, waveObj.num_samples, waveObj.sample_rate);
+                    if (waveObj.open(response) == 0) {
+                        self.buffer = audioContext.createBuffer(waveObj.num_channels, waveObj.num_samples, waveObj.sample_rate);
                         for (var c = 0; c < waveObj.num_channels; c++) {
-                            var buffer_ptr = bufferObj.buffer.getChannelData(c);
+                            var buffer_ptr = self.buffer.getChannelData(c);
                             for (var n = 0; n < waveObj.num_samples; n++) {
                                 buffer_ptr[n] = waveObj.decoded_data[c][n];
                             }
@@ -1537,41 +1558,46 @@ function AudioEngine(specification) {
 
                         delete waveObj;
                     }
-                    if (bufferObj.buffer != undefined) {
-                        bufferObj.status = 2;
-                        calculateLoudness(bufferObj, "I");
+                    if (self.buffer != undefined) {
+                        self.status = 2;
+                        calculateLoudness(self, "I");
+                        return true;
                     }
+                    return false;
                 });
-            };
-
-            // Create callback for any error in loading
-            this.xmlRequest.onerror = function () {
-                this.parent.status = -1;
-                for (var i = 0; i < this.parent.users.length; i++) {
-                    this.parent.users[i].state = -1;
-                    if (this.parent.users[i].interfaceDOM != null) {
-                        this.parent.users[i].bufferLoaded(this);
-                    }
-                }
-                interfaceContext.lightbox.post("Error", "Could not load resource " + this.parent.url);
             }
 
-            this.progress = 0;
-            this.progressCallback = function (event) {
+            // Create callback for any error in loading
+            function processError() {
+                this.status = -1;
+                for (var i = 0; i < this.users.length; i++) {
+                    this.users[i].state = -1;
+                    if (this.users[i].interfaceDOM != null) {
+                        this.users[i].bufferLoaded(this);
+                    }
+                }
+                interfaceContext.lightbox.post("Error", "Could not load resource " + this.url);
+            }
+
+            function progressCallback(event) {
                 if (event.lengthComputable) {
-                    this.parent.progress = event.loaded / event.total;
-                    for (var i = 0; i < this.parent.users.length; i++) {
-                        if (this.parent.users[i].interfaceDOM != null) {
-                            if (typeof this.parent.users[i].interfaceDOM.updateLoading === "function") {
-                                this.parent.users[i].interfaceDOM.updateLoading(this.parent.progress * 100);
+                    this.progress = event.loaded / event.total;
+                    for (var i = 0; i < this.users.length; i++) {
+                        if (this.users[i].interfaceDOM != null) {
+                            if (typeof this.users[i].interfaceDOM.updateLoading === "function") {
+                                this.users[i].interfaceDOM.updateLoading(this.progress * 100);
                             }
                         }
                     }
                 }
             };
-            this.xmlRequest.addEventListener("progress", this.progressCallback);
+
+            this.urls = urls;
+            currentUrlIndex = 0;
+
+            this.progress = 0;
             this.status = 1;
-            this.xmlRequest.send();
+            get(this.urls[currentUrlIndex]).then(processAudio.bind(self)).catch(getNextURL.bind(self));
         };
 
         this.registerAudioObject = function (audioObject) {
@@ -1655,7 +1681,11 @@ function AudioEngine(specification) {
             }
             if (buffer == null) {
                 buffer = new this.bufferObj();
-                buffer.getMedia(URL);
+                var urls = [URL];
+                element.alternatives.forEach(function (e) {
+                    urls.push(e.url);
+                });
+                buffer.getMedia(urls);
                 this.buffers.push(buffer);
             }
         }
@@ -1725,7 +1755,7 @@ function AudioEngine(specification) {
         var URL = testState.currentStateMap.hostURL + element.url;
         var buffer = null;
         for (var i = 0; i < this.buffers.length; i++) {
-            if (URL == this.buffers[i].url) {
+            if (this.buffers[i].urls.includes(URL)) {
                 buffer = this.buffers[i];
                 break;
             }
