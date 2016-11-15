@@ -162,6 +162,20 @@
 
         <xs:element name="audioelement">
             <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="alternative" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:attribute name="url" type="xs:anyURI" use="required" />
+                            <xs:attribute name="sampleRate" use="optional">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:decimal">
+                                        <xs:minInclusive value="1" />
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute name="url" type="xs:anyURI" use="required" />
                 <xs:attribute name="gain" type="xs:decimal" default="0" />
@@ -200,6 +214,13 @@
                     <xs:simpleType>
                         <xs:restriction base="xs:decimal">
                             <xs:minInclusive value="0" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="sampleRate" use="optional">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:decimal">
+                            <xs:minInclusive value="1" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
