@@ -1488,7 +1488,7 @@ function AudioEngine(specification) {
 
     this.buffers = [];
     this.bufferObj = function () {
-        this.urls = [];
+        var urls = [];
         this.buffer = null;
         this.users = [];
         this.progress = 0;
@@ -1504,7 +1504,31 @@ function AudioEngine(specification) {
                 }
             }
         };
-        this.getMedia = function (urls) {
+        this.setUrls = function (obj) {
+            // Obj must be an array of pairs:
+            // [{sampleRate, url}]
+            var localFs = audioContext.sampleRate,
+                list = [],
+                i;
+            for (i = 0; i < obj.length; i++) {
+                if (obj[i].sampleRate == localFs) {
+                    list.push(obj.splice(i, 1)[0]);
+                }
+            }
+            list = list.concat(obj);
+            urls = list;
+        };
+        this.hasUrl = function (checkUrl) {
+            var l = urls.length,
+                i;
+            for (i = 0; i < l; i++) {
+                if (urls[i].url == checkUrl) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        this.getMedia = function () {
             var self = this;
             var currentUrlIndex = 0;
 
@@ -1530,10 +1554,10 @@ function AudioEngine(specification) {
             function getNextURL() {
                 currentUrlIndex++;
                 var self = this;
-                if (currentUrlIndex == this.urls.length) {
+                if (currentUrlIndex >= urls.length) {
                     processError();
                 } else {
-                    return get(this.urls[currentUrlIndex]).then(processAudio.bind(self)).catch(getNextURL.bind(self));
+                    return get(urls[currentUrlIndex].url).then(processAudio.bind(self)).catch(getNextURL.bind(self));
                 }
             }
 
@@ -1576,7 +1600,7 @@ function AudioEngine(specification) {
                         this.users[i].bufferLoaded(this);
                     }
                 }
-                interfaceContext.lightbox.post("Error", "Could not load resource " + this.url);
+                interfaceContext.lightbox.post("Error", "Could not load resource " + urls[currentUrlIndex].url);
             }
 
             function progressCallback(event) {
@@ -1592,11 +1616,10 @@ function AudioEngine(specification) {
                 }
             };
 
-            this.urls = urls;
-
             this.progress = 0;
             this.status = 1;
-            get(this.urls[currentUrlIndex]).then(processAudio.bind(self)).catch(getNextURL.bind(self));
+            currentUrlIndex = 0;
+            get(urls[0].url).then(processAudio.bind(self)).catch(getNextURL.bind(self));
         };
 
         this.registerAudioObject = function (audioObject) {
@@ -1673,18 +1696,25 @@ function AudioEngine(specification) {
             var URL = page.hostURL + element.url;
             var buffer = null;
             for (var buffObj of this.buffers) {
-                if (URL == buffObj.url) {
+                if (buffObj.hasUrl(URL)) {
                     buffer = buffObj;
                     break;
                 }
             }
             if (buffer == null) {
                 buffer = new this.bufferObj();
-                var urls = [URL];
+                var urls = [{
+                    url: URL,
+                    sampleRate: element.sampleRate
+                }];
                 element.alternatives.forEach(function (e) {
-                    urls.push(e.url);
+                    urls.push({
+                        url: e.url,
+                        sampleRate: e.sampleRate
+                    });
                 });
-                buffer.getMedia(urls);
+                buffer.setUrls(urls);
+                buffer.getMedia();
                 this.buffers.push(buffer);
             }
         }
@@ -1754,7 +1784,7 @@ function AudioEngine(specification) {
         var URL = testState.currentStateMap.hostURL + element.url;
         var buffer = null;
         for (var i = 0; i < this.buffers.length; i++) {
-            if (this.buffers[i].urls.includes(URL)) {
+            if (this.buffers[i].hasUrl(URL)) {
                 buffer = this.buffers[i];
                 break;
             }
