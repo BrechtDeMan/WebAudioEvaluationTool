@@ -163,7 +163,7 @@
         <xs:element name="audioelement">
             <xs:complexType>
                 <xs:sequence>
-                    <xs:element name="alternative" maxOccurs="unbounded">
+                    <xs:element name="alternative" minOccurs="0" maxOccurs="unbounded">
                         <xs:complexType>
                             <xs:attribute name="url" type="xs:anyURI" use="required" />
                             <xs:attribute name="sampleRate" use="optional">
