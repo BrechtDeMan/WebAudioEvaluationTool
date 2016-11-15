@@ -781,6 +781,8 @@ function Specification() {
             this.label = null;
             this.startTime = undefined;
             this.stopTime = undefined;
+            this.sampleRate = undefined;
+            this.alternatives = [];
             this.schema = specification.schema.getAllElementsByName('audioelement')[0];;
             this.parent = null;
             this.decode = function (parent, xml) {
@@ -800,6 +802,17 @@ function Specification() {
                             break;
                     }
                 }
+                // Get the alternative nodes
+                var child = xml.firstElementChild;
+                while (child) {
+                    if (child.nodeName == "alternative") {
+                        this.alternatives.push({
+                            'url': child.getAttribute("url"),
+                            'sampleRate': child.getAttribute("sampleRate")
+                        });
+                    }
+                    child = child.nextElementSibling;
+                }
 
             };
             this.encode = function (root) {
@@ -814,6 +827,12 @@ function Specification() {
                         eval("AENode.setAttribute('" + name + "',this." + name + ")");
                     }
                 }
+                this.alternatives.forEach(function (alt) {
+                    var node = root.createElement("alternative");
+                    node.setAttribute("url", alt.url);
+                    node.setAttribute("sampleRate", alt.sampleRate);
+                    AENode.appendChild(node);
+                });
                 return AENode;
             };
         };
