@@ -1488,7 +1488,6 @@ function AudioEngine(specification) {
 
     this.buffers = [];
     this.bufferObj = function () {
-        var currentUrlIndex = 0;
         this.urls = [];
         this.buffer = null;
         this.users = [];
@@ -1507,6 +1506,7 @@ function AudioEngine(specification) {
         };
         this.getMedia = function (urls) {
             var self = this;
+            var currentUrlIndex = 0;
 
             function get(fqurl) {
                 return new Promise(function (resolve, reject) {
@@ -1530,7 +1530,7 @@ function AudioEngine(specification) {
             function getNextURL() {
                 currentUrlIndex++;
                 var self = this;
-                if (currentURLIndex == this.urls.length) {
+                if (currentUrlIndex == this.urls.length) {
                     processError();
                 } else {
                     return get(this.urls[currentUrlIndex]).then(processAudio.bind(self)).catch(getNextURL.bind(self));
@@ -1593,7 +1593,6 @@ function AudioEngine(specification) {
             };
 
             this.urls = urls;
-            currentUrlIndex = 0;
 
             this.progress = 0;
             this.status = 1;
