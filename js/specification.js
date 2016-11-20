@@ -453,7 +453,7 @@ function Specification() {
 
         this.encode = function (doc) {
             var node = doc.createElement("interface");
-            if (typeof name == "string")
+            if (typeof name == "string" && name.length > 0)
                 node.setAttribute("name", this.name);
             if (typeof this.title == "string") {
                 var titleNode = doc.createElement("title");
