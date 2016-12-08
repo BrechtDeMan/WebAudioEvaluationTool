@@ -102,6 +102,7 @@
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
                 <xs:attribute ref="playOne" />
+                <xs:attribute name="restrictMovement" type="xs:boolean" default="fase" use="optional" />
             </xs:complexType>
         </xs:element>
 

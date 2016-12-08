@@ -520,6 +520,7 @@ function Specification() {
         this.postTest = null;
         this.interfaces = [];
         this.playOne = null;
+        this.restrictMovement = null;
         this.commentBoxPrefix = "Comment on track";
         this.audioElements = [];
         this.commentQuestions = [];
