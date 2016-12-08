@@ -156,7 +156,7 @@ function loadTest(audioHolderObject) {
     // Find all the audioElements from the audioHolder
     var index = 0;
     var interfaceScales = testState.currentStateMap.interfaces[0].scales;
-    var labelType = page.label;
+    var labelType = audioHolderObject.label;
     if (labelType == "default") {
         labelType = "number";
     }
@@ -171,7 +171,7 @@ function loadTest(audioHolderObject) {
             audioObject.bindInterface(orNode);
         } else {
             // Create a slider per track
-            var label = interfaceContext.getLabel(labelType, index, page.labelStart);
+            var label = interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
             var sliderObj = new sliderObject(audioObject, label);
 
             if (typeof audioHolderObject.initialPosition === "number") {
@@ -188,6 +188,13 @@ function loadTest(audioHolderObject) {
         }
 
     });
+
+    if (testState.currentStateMap.restrictMovement) {
+        $(".track-slider-range").addClass("track-slider-range-disabled");
+        $(".track-slider-range").each(function (i, e) {
+            e.disabled = true
+        });
+    }
 
 
     var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
@@ -237,6 +244,7 @@ function loadTest(audioHolderObject) {
 
 function sliderObject(audioObject, label) {
     // Constructs the slider object. We use the HTML5 slider object
+    var page = testState.currentStateMap;
     this.parent = audioObject;
     this.holder = document.createElement('div');
     this.title = document.createElement('span');
@@ -302,6 +310,7 @@ function sliderObject(audioObject, label) {
         return node;
     };
     this.startPlayback = function () {
+        var self = this;
         // Called when playback has begun
         this.play.setAttribute("playstate", "playing");
         $(".track-slider").removeClass('track-slider-playing');
@@ -311,12 +320,32 @@ function sliderObject(audioObject, label) {
             $(outsideReference).removeClass('track-slider-playing');
         }
         this.play.textContent = "Stop";
+        if (page.restrictMovement) {
+            if (page.loop) {
+                $(this.slider).removeClass("track-slider-range-disabled");
+                this.slider.removeAttribute("disabled");
+            } else {
+                $(".track-slider-range").addClass("track-slider-range-disabled");
+                $(this.slider).removeClass("track-slider-range-disabled");
+                $(".track-slider-range").each(function (i, m) {
+                    if (m == self.slider) {
+                        m.removeAttribute("disabled");
+                    } else {
+                        m.setAttribute("disabled", "true");
+                    }
+                });
+            }
+        }
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
         this.play.setAttribute("playstate", "ready");
         $(this.holder).removeClass('track-slider-playing');
         this.play.textContent = "Play";
+        if (page.restrictMovement && page.loop) {
+            $(this.slider).addClass("track-slider-range-disabled");
+            this.slider.setAttribute("disabled", "true");
+        }
     };
     this.getValue = function () {
         return this.slider.value;
