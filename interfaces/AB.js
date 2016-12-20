@@ -370,6 +370,15 @@ function comparator(audioHolderObject) {
                 case "letter":
                     label = String.fromCharCode(97 + index);
                     break;
+                case "samediff":
+                    console.log("index = " + index); 
+                    if(index == 0){
+                        label = "same";
+                    }
+                    else if (index == 1){
+                        label = "different";
+                    }
+                    break;
                 default:
                     label = String.fromCharCode(65 + index);
                     break;
