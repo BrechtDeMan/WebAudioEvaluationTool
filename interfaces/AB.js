@@ -378,6 +378,9 @@ function comparator(audioHolderObject) {
                     else if (index == 1){
                         label = "different";
                     }
+                    else{
+                        label = "";
+                    }
                     break;
                 default:
                     label = String.fromCharCode(65 + index);
