@@ -331,98 +331,40 @@ function loadProjectSpecCallback(response) {
         }
     }
 
-    // Detect the interface to use and load the relevant javascripts.
-    var interfaceJS = document.createElement('script');
-    interfaceJS.setAttribute("type", "text/javascript");
-    switch (specification.interface) {
-        case "APE":
-            interfaceJS.setAttribute("src", "interfaces/ape.js");
-
-            // APE comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/ape.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-
-        case "MUSHRA":
-            interfaceJS.setAttribute("src", "interfaces/mushra.js");
-
-            // MUSHRA comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/mushra.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-
-        case "AB":
-            interfaceJS.setAttribute("src", "interfaces/AB.js");
-
-            // AB comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/AB.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-
-        case "ABX":
-            interfaceJS.setAttribute("src", "interfaces/ABX.js");
-
-            // AB comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/ABX.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-
-        case "Bipolar":
-        case "ACR":
-        case "DCR":
-        case "CCR":
-        case "ABC":
-            // Above enumerate to horizontal sliders
-            interfaceJS.setAttribute("src", "interfaces/horizontal-sliders.js");
-
-            // horizontal-sliders comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/horizontal-sliders.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-        case "discrete":
-        case "likert":
-            // Above enumerate to horizontal discrete radios
-            interfaceJS.setAttribute("src", "interfaces/discrete.js");
-
-            // horizontal-sliders comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/discrete.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-        case "timeline":
-            interfaceJS.setAttribute("src", "interfaces/timeline.js");
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/timeline.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
+    var getInterfaces = new XMLHttpRequest();
+    getInterfaces.open("GET", "interfaces/interfaces.json");
+    getInterfaces.onerror = function (e) {
+        throw (e);
     }
-    document.getElementsByTagName("head")[0].appendChild(interfaceJS);
+    getInterfaces.onload = function () {
+        if (getInterfaces.status !== 200) {
+            throw (new Error(getInterfaces.status));
+        }
+        // Get the current interface
+        var name = specification.interface,
+            head = document.getElementsByTagName("head")[0],
+            data = JSON.parse(getInterfaces.responseText),
+            interfaceObject = data.interfaces.find(function (e) {
+                return e.name == name;
+            });
+        if (!interfaceObject) {
+            throw ("Cannot load desired interface");
+        }
+        interfaceObject.scripts.forEach(function (v) {
+            var script = document.createElement("script");
+            script.setAttribute("type", "text/javascript");
+            script.setAttribute("src", v);
+            head.appendChild(script);
+        });
+        interfaceObject.css.forEach(function (v) {
+            var css = document.createElement("link");
+            css.setAttribute("rel", "stylesheet");
+            css.setAttribute("type", "text/css");
+            css.setAttribute("href", v);
+            head.appendChild(css);
+        });
+    }
+    getInterfaces.send();
 
     if (gReturnURL != undefined) {
         console.log("returnURL Overide from " + specification.returnURL + " to " + gReturnURL);
