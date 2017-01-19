@@ -125,7 +125,7 @@ if ($n1->length > 0) {
 }
 
 // Iterate through new doc
-$wbytes = $doc_struct->save($filename);
+$wbytes = $doc->save($filename);
 
 // Return XML confirmation data
 $xml = '<response state="OK"><message>OK</message><file bytes="'.$wbytes.'">"'.$filename.'"</file></response>';
