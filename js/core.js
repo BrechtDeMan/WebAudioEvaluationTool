@@ -1192,7 +1192,7 @@ function stateMachine() {
                 var elemInclude = [];
                 var elemPool = [];
                 for (var elem of pageInclude[i].audioElements) {
-                    if (elem.include || elem.type != "normal") {
+                    if (elem.alwaysInclude || elem.type != "normal") {
                         elemInclude.push(elem);
                     } else {
                         elemPool.push(elem);
