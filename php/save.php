@@ -117,7 +117,7 @@ if ($n1->length > 0) {
                 $pn2 = 0;
             }
             if ($pn2 == 0) {
-                $pn1 = $doc->importNode($page->item(0), true);
+                $pn1 = $doc->importNode($page, true);
                 $docRoot->appendChild($pn1);
             }
         }
