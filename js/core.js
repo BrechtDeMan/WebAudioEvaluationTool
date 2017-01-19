@@ -595,7 +595,7 @@ function interfacePopup() {
 
         this.popupContent = document.getElementById('popupContent');
 
-        this.popupTitle = document.getElementById('popupTitle');
+        this.popupTitle = document.getElementById('popupTitleHolder');
 
         this.popupResponse = document.getElementById('popupResponse');
 
@@ -634,9 +634,10 @@ function interfacePopup() {
 
     this.postNode = function () {
         // This will take the node from the popupOptions and display it
-        var node = this.popupOptions[this.currentIndex];
+        var node = this.popupOptions[this.currentIndex],
+            converter = new showdown.Converter();
         this.popupResponse.innerHTML = "";
-        this.popupTitle.textContent = node.specification.statement;
+        this.popupTitle = converter.makeHtml(node.specification.statement);
         if (node.specification.type == 'question') {
             var textArea = document.createElement('textarea');
             switch (node.specification.boxsize) {
@@ -1122,7 +1123,7 @@ function interfacePopup() {
             this.postNode();
         } else {
             // Reached the end of the popupOptions
-            this.popupTitle.textContent = "";
+            this.popupTitle.innerHTML = "";
             this.popupResponse.innerHTML = "";
             this.hidePopup();
             for (var node of this.popupOptions) {
