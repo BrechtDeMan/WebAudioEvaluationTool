@@ -1,7 +1,7 @@
 <?php
 
 function findNodeByAttribute($nodeList, $attributeName, $attributeValue) {
-    if (empty($attributeName) || empty($attributeValue) || empty($nodelist)) {
+    if (empty($attributeName) || empty($attributeValue)) {
         die("Error: Empty findNodeByAttribute");
     }
     
