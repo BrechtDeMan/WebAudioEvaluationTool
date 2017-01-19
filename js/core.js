@@ -3270,6 +3270,14 @@ function Interface(specificationObject) {
                     return String.fromCharCode((index + offset) % 26 + 97);
                 case "capital":
                     return String.fromCharCode((index + offset) % 26 + 65);
+                case "samediff":
+                    if (index == 0) {
+                        return "Same";
+                    } else if (index == 1) {
+                        return "Difference";
+                    } else {
+                        return "";
+                    }
                 case "number":
                     return String(index + offset);
                 default:

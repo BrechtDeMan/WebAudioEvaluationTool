@@ -55,8 +55,8 @@ function loadInterface() {
     submit.id = 'submit-button';
     submit.style.float = 'left';
     // Append the interface buttons into the interfaceButtons object.
-    interfaceButtons.appendChild(playback);
     interfaceButtons.appendChild(submit);
+    interfaceButtons.appendChild(playback);
 
     // Create outside reference holder
     var outsideRef = document.createElement("div");
