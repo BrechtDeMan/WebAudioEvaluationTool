@@ -121,7 +121,7 @@ function loadTest(audioHolderObject) {
 
     var feedbackHolder = document.getElementById('feedbackHolder');
     feedbackHolder.innerHTML = "";
-    var interfaceObj = audioHolderObject.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -197,7 +197,7 @@ function loadTest(audioHolderObject) {
     }
 
 
-    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    var interfaceOptions = interfaceObj.options;
     for (var option of interfaceOptions) {
         if (option.type == "show") {
             switch (option.name) {
@@ -208,7 +208,7 @@ function loadTest(audioHolderObject) {
                         playbackHolder.style.width = "100%";
                         playbackHolder.align = 'center';
                         playbackHolder.appendChild(interfaceContext.playhead.object);
-                        feedbackHolder.appendChild(playbackHolder);
+                        feedbackHolder.insertBefore(playbackHolder, feedbackHolder.firstElementChild);
                     }
                     break;
                 case "page-count":
@@ -451,10 +451,8 @@ function drawScale() {
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
     // Check that the anchor and reference objects are correctly placed
     if (interfaceContext.checkHiddenAnchor() == false) {
