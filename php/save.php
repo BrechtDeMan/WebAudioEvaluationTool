@@ -110,14 +110,16 @@ if ($n1->length > 0) {
     }
     foreach($n1 as $page) {
         $ref = $page->getAttribute("ref");
-        $pn2 = findNodeByAttribute($n2, "ref", $ref);
-        if ($pn2 != 0 && $pn2.getAttribute("state") != "complete") {
-            $saved_root->removeChild($pn2);
-            $pn2 = 0;
-        }
-        if ($pn2 == 0) {
-            $pn1 = $doc->importNode($page->item(0), true);
-            $docRoot->appendChild($pn1);
+        if (!empty($ref)) {
+            $pn2 = findNodeByAttribute($n2, "ref", $ref);
+            if ($pn2 != 0 && $pn2.getAttribute("state") != "complete") {
+                $saved_root->removeChild($pn2);
+                $pn2 = 0;
+            }
+            if ($pn2 == 0) {
+                $pn1 = $doc->importNode($page->item(0), true);
+                $docRoot->appendChild($pn1);
+            }
         }
     }
 }
