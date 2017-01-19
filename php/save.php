@@ -51,7 +51,7 @@ $docRoot = $doc->documentElement;
 // <datetime>
 $n1 = $docRoot->getElementsByTagName("datetime");
 $n2 = $saved_root->getElementsByTagName("datetime");
-if ($n1->length > 0 && $n2.length == 0) {
+if ($n1->length > 0 && $n2->length == 0) {
     $n1 = $doc->importNode($n1->item(0), true);
     $docRoot->appendChild($n1);
 }
@@ -59,7 +59,7 @@ if ($n1->length > 0 && $n2.length == 0) {
 //<navigator>
 $n1 = $docRoot->getElementsByTagName("navigator");
 $n2 = $saved_root->getElementsByTagName("navigator");
-if ($n1->length > 0 && $n2.length == 0) {
+if ($n1->length > 0 && $n2->length == 0) {
     $n1 = $doc->importNode($n1->item(0), true);
     $docRoot->appendChild($n1);
 }
