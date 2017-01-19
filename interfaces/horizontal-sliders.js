@@ -120,7 +120,7 @@ function loadTest(page) {
     var feedbackHolder = document.getElementById('feedbackHolder');
     feedbackHolder.innerHTML = "";
 
-    var interfaceObj = page.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(page);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -186,8 +186,7 @@ function loadTest(page) {
         }
 
     });
-    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
-    for (var option of interfaceOptions) {
+    for (var option of interfaceObj.options) {
         if (option.type == "show") {
             switch (option.name) {
                 case "playhead":
@@ -395,10 +394,8 @@ function drawScale() {
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
     // Check that the anchor and reference objects are correctly placed
     if (interfaceContext.checkHiddenAnchor() == false) {

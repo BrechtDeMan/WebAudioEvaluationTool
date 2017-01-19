@@ -83,7 +83,7 @@ function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
     var content = document.getElementById("timeline-test-content");
     content.innerHTML = "";
-    var interfaceObj = page.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(page);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -474,10 +474,8 @@ function buttonSubmitClick() {
         interfaceContext.lightbox.post("Warning", 'You have not started the test! Please click play on a sample to begin the test!');
         return;
     }
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0],
+        canContinue = true;
     for (var i = 0; i < checks.length; i++) {
         var checkState = true;
         if (checks[i].type == 'check') {

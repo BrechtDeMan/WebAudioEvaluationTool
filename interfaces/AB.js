@@ -135,7 +135,7 @@ function loadInterface() {
 
 function loadTest(audioHolderObject) {
     var feedbackHolder = document.getElementById('feedbackHolder');
-    var interfaceObj = audioHolderObject.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -157,7 +157,7 @@ function loadTest(audioHolderObject) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
-    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    var interfaceOptions = interfaceObj.options;
     // Clear the interfaceElements
     {
         var node = document.getElementById('playback-holder');
@@ -395,10 +395,8 @@ function resizeWindow(event) {
 }
 
 function buttonSubmitClick() {
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
     for (var i = 0; i < checks.length; i++) {
         if (checks[i].type == 'check') {

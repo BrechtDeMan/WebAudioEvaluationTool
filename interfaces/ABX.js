@@ -137,7 +137,7 @@ function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
     document.getElementById('box-holders').innerHTML = "";
 
-    var interfaceObj = page.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(page);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -157,7 +157,7 @@ function loadTest(page) {
 
     interfaceContext.comparator = new comparator(page);
 
-    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    var interfaceOptions = interfaceObj.options;
     for (var option of interfaceOptions) {
         if (option.type == "show") {
             switch (option.name) {
@@ -430,10 +430,8 @@ function resizeWindow(event) {
 }
 
 function buttonSubmitClick() {
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
     for (var i = 0; i < checks.length; i++) {
         if (checks[i].type == 'check') {
