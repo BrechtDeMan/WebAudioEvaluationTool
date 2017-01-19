@@ -55,16 +55,20 @@ if ($fileHandle == FALSE) {
 fclose($fileHandle);
 // TODO:
 //  Generate the XML Base file and save it
-$doc_struct = new SimpleXMLElement('<waetresult/>');
-$doc_struct->addAttribute("key",$key);
+$doc_struct = new DOMDocument;
+$doc_struct->preserveWhiteSpace = false;
+$doc_struct->formatOutput = true;
+$doc_struct->loadXML("<waetresult/>");
 // Add the root
 if (file_exists($testURL)) {
-    $test_proto = simplexml_load_string(file_get_contents($testURL, FILE_TEXT));
-    $doc_struct->addChild($test_proto);
+    $test_proto = new DOMDocument;
+    $test_proto->loadXML(file_get_contents($testURL, FILE_TEXT));
+    $test_proto = $doc_struct->importNode($test_proto, true);
+    $doc_struct->documentElement->appendChild($test_proto);
 }
 //  Add start time
 //  Add IP Address information
 //  Save the file
-$doc_struct->asXML($filename);
+$newdoc->saveXML($filename);
 echo "<response><state>OK</state><key>".$key."</key></response>";
 ?>
