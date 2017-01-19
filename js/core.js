@@ -1507,22 +1507,6 @@ function AudioEngine(specification) {
             function processAudio(response) {
                 var self = this;
                 return audioContext.decodeAudioData(response, function (decodedData) {
-                    if (decodedData.sampleRate !== audioContext.sampleRate) {
-                        // Resample
-                        var num_channels = decodedData.numberOfChannels,
-                            num_samples = decodedData.length,
-                            r = audioContext.sampleRate / decodedData.sampleRate,
-                            new_buffer = audioContext.createBuffer(num_channels, Math.floor(num_samples * r), audioContext.sampleRate),
-                            channel;
-                        for (channel = 0; channel < num_channels; channel++) {
-                            var buffer = new Float32Array(decodedData.length);
-                            decodedData.copyFromChannel(buffer, channel);
-                            buffer = xtract_resample(buffer, audioContext.sampleRate, decodedData.sampleRate);
-                            new_buffer.copyToChannel(buffer, channel);
-                        }
-                        decodedData = new_buffer;
-                        buffer = new_buffer = undefined;
-                    }
                     self.buffer = decodedData;
                     self.status = 2;
                     calculateLoudness(self, "I");
