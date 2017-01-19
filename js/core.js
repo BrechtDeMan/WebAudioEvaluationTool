@@ -638,7 +638,7 @@ function interfacePopup() {
             converter = new showdown.Converter(),
             p = new DOMParser();
         this.popupResponse.innerHTML = "";
-        this.popupTitle = p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild;
+        this.popupTitle.appendChild(p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild);
         if (node.specification.type == 'question') {
             var textArea = document.createElement('textarea');
             switch (node.specification.boxsize) {
