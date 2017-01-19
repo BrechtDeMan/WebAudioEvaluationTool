@@ -61,8 +61,9 @@ $doc_struct->formatOutput = true;
 $doc_struct->loadXML("<waetresult/>");
 // Add the root
 if (file_exists($testURL)) {
-    $test_proto = new DOMDocument;
-    $test_proto->loadXML(file_get_contents($testURL, FILE_TEXT));
+    $test_proto_doc = new DOMDocument;
+    $test_proto_doc->loadXML(file_get_contents($testURL, FILE_TEXT));
+    $test_proto = $test_proto_doc->documentElement;
     $test_proto = $doc_struct->importNode($test_proto, true);
     $doc_struct->documentElement->appendChild($test_proto);
 }
