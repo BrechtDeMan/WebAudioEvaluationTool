@@ -600,11 +600,12 @@ function Specification() {
             var cqNode = xml.getElementsByTagName('commentquestions');
             if (cqNode.length != 0) {
                 cqNode = cqNode[0];
-                var commentQuestions = cqNode.children;
-                for (var i = 0; i < commentQuestions.length; i++) {
+                var commentQuestion = cqNode.firstElementChild;
+                while (commentQuestion) {
                     var node = new this.commentQuestionNode(this.specification);
-                    node.decode(parent, commentQuestions[i]);
+                    node.decode(parent, commentQuestion);
                     this.commentQuestions.push(node);
+                    commentQuestion = commentQuestion.nextElementSibling;
                 }
             }
         };
