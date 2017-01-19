@@ -70,6 +70,6 @@ if (file_exists($testURL)) {
 //  Add start time
 //  Add IP Address information
 //  Save the file
-$doc_struct->saveXML($filename);
+$doc_struct->save($filename);
 echo "<response><state>OK</state><key>".$key."</key></response>";
 ?>
