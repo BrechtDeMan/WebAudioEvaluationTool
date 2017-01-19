@@ -19,7 +19,7 @@ header("Pragma: no-cache");
 // Get the current test URL
 $testURL = "";
 if (isset($_GET['url'])) {
-    $testURL = $_GET["url"];
+    $testURL = "../".$_GET["url"];
 }
 
 $saves = glob("../saves/*.xml");
@@ -58,7 +58,7 @@ fclose($fileHandle);
 $doc_struct = new SimpleXMLElement('<waetresult/>');
 $doc_struct->addAttribute("key",$key);
 // Add the root
-if (file_exists("../".$testURL)) {
+if (file_exists($testURL)) {
     $test_proto = new SimpleXMLElement(file_get_contents($testURL, FILE_TEXT));
     $doc_struct->addChild($test_proto);
 }
