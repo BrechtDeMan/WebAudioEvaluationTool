@@ -4,7 +4,9 @@ function findNodeByAttribute($nodeList, $attributeName, $attributeValue) {
     if (empty($attributeName) || empty($attributeValue)) {
         die("Error: Empty findNodeByAttribute");
     }
-    
+    if (empty($nodeList)) {
+        return 0;
+    }
     foreach($nodeList as $item) {
         if ($item->hasAttribute($attributeName)) {
             if ($item->getAttribute($attributeValue) == $attributeValue) {
