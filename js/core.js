@@ -635,9 +635,10 @@ function interfacePopup() {
     this.postNode = function () {
         // This will take the node from the popupOptions and display it
         var node = this.popupOptions[this.currentIndex],
-            converter = new showdown.Converter();
+            converter = new showdown.Converter(),
+            p = new DOMParser();
         this.popupResponse.innerHTML = "";
-        this.popupTitle = converter.makeHtml(node.specification.statement);
+        this.popupTitle = p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild;
         if (node.specification.type == 'question') {
             var textArea = document.createElement('textarea');
             switch (node.specification.boxsize) {
