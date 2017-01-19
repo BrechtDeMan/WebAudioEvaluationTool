@@ -3331,6 +3331,31 @@ function Interface(specificationObject) {
             throw ("Invalid arguments");
         }
     }
+
+    this.getCombinedInterfaces = function (page) {
+        // Combine the interfaces with the global interface nodes
+        var global = specification.interfaces,
+            local = page.interfaces;
+        local.forEach(function (locInt) {
+            // Iterate through the options nodes
+            var addList = [];
+            global.options.forEach(function (gopt) {
+                var lopt = locInt.options.find(function (lopt) {
+                    return (lopt.name == gopt.name) && (lopt.type == gopt.type);
+                });
+                if (!lopt) {
+                    // Global option doesn't exist locally
+                    addList.push(gopt);
+                }
+            });
+            locInt.options = locInt.options.concat(addList);
+            if (!locInt.scales && global.scales) {
+                // Use the global default scales
+                locInt.scales = global.scales;
+            }
+        });
+        return local;
+    }
 }
 
 function Storage() {

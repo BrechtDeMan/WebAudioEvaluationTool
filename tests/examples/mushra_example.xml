@@ -51,6 +51,15 @@
                 <interfaceoption type="show" name='playhead' />
                 <interfaceoption type="show" name="page-count" />
                 <interfaceoption type="show" name="volume" />
+                <scales>
+                    <scalelabel position="12">Much Worse</scalelabel>
+                    <scalelabel position="25">Worse</scalelabel>
+                    <scalelabel position="38">Slightly Worse</scalelabel>
+                    <scalelabel position="50">About the same</scalelabel>
+                    <scalelabel position="62">Slightly Better</scalelabel>
+                    <scalelabel position="75">Better</scalelabel>
+                    <scalelabel position="88">Much Better</scalelabel>
+                </scales>
             </interface>
         </setup>
         <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12" restrictMovement="true">
