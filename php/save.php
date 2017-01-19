@@ -20,7 +20,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header('Access-Control-Allow-Origin: *');
 header("Content-type: text/xml");
-error_reporting(0);
+//error_reporting(0);
 
 // Load up the parameters
 $saveFilenamePrefix = '';
