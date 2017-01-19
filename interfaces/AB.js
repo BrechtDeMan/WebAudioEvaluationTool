@@ -360,31 +360,33 @@ function comparator(audioHolderObject) {
             audioObject.bindInterface(orNode);
         } else {
             var label;
-            switch (audioObject.specification.parent.label) {
-                case "none":
-                    label = "";
-                    break;
-                case "number":
-                    label = "" + index;
-                    break;
-                case "letter":
-                    label = String.fromCharCode(97 + index);
-                    break;
-                case "samediff":
-                    console.log("index = " + index); 
-                    if(index == 0){
-                        label = "same";
-                    }
-                    else if (index == 1){
-                        label = "different";
-                    }
-                    else{
+            if (audioObject.specification.label && audioObject.specification.label.length > 0) {
+                label = audioObject.specification.label;
+            } else {
+                switch (audioObject.specification.parent.label) {
+                    case "none":
                         label = "";
-                    }
-                    break;
-                default:
-                    label = String.fromCharCode(65 + index);
-                    break;
+                        break;
+                    case "number":
+                        label = "" + index;
+                        break;
+                    case "letter":
+                        label = String.fromCharCode(97 + index);
+                        break;
+                    case "samediff":
+                        console.log("index = " + index);
+                        if (index == 0) {
+                            label = "same";
+                        } else if (index == 1) {
+                            label = "different";
+                        } else {
+                            label = "";
+                        }
+                        break;
+                    default:
+                        label = String.fromCharCode(65 + index);
+                        break;
+                }
             }
             var node = new this.comparatorBox(audioObject, index, label);
             audioObject.bindInterface(node);
