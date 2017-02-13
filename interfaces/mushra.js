@@ -121,7 +121,7 @@ function loadTest(audioHolderObject) {
 
     var feedbackHolder = document.getElementById('feedbackHolder');
     feedbackHolder.innerHTML = "";
-    var interfaceObj = audioHolderObject.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -155,7 +155,12 @@ function loadTest(audioHolderObject) {
 
     // Find all the audioElements from the audioHolder
     var index = 0;
-    $(audioHolderObject.audioElements).each(function (index, element) {
+    var interfaceScales = testState.currentStateMap.interfaces[0].scales;
+    var labelType = audioHolderObject.label;
+    if (labelType == "default") {
+        labelType = "number";
+    }
+    $(audioHolderObject.audioElements).each(function (pageIndex, element) {
         // Find URL of track
         // In this jQuery loop, variable 'this' holds the current audioElement.
 
@@ -166,20 +171,7 @@ function loadTest(audioHolderObject) {
             audioObject.bindInterface(orNode);
         } else {
             // Create a slider per track
-            switch (audioObject.specification.parent.label) {
-                case "none":
-                    label = "";
-                    break;
-                case "letter":
-                    label = String.fromCharCode(97 + index);
-                    break;
-                case "capital":
-                    label = String.fromCharCode(65 + index);
-                    break;
-                default:
-                    label = "" + index;
-                    break;
-            }
+            var label = interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
             var sliderObj = new sliderObject(audioObject, label);
 
             if (typeof audioHolderObject.initialPosition === "number") {
@@ -197,8 +189,15 @@ function loadTest(audioHolderObject) {
 
     });
 
+    if (testState.currentStateMap.restrictMovement) {
+        $(".track-slider-range").addClass("track-slider-range-disabled");
+        $(".track-slider-range").each(function (i, e) {
+            e.disabled = true
+        });
+    }
 
-    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+
+    var interfaceOptions = interfaceObj.options;
     for (var option of interfaceOptions) {
         if (option.type == "show") {
             switch (option.name) {
@@ -209,7 +208,7 @@ function loadTest(audioHolderObject) {
                         playbackHolder.style.width = "100%";
                         playbackHolder.align = 'center';
                         playbackHolder.appendChild(interfaceContext.playhead.object);
-                        feedbackHolder.appendChild(playbackHolder);
+                        feedbackHolder.insertBefore(playbackHolder, feedbackHolder.firstElementChild);
                     }
                     break;
                 case "page-count":
@@ -245,6 +244,7 @@ function loadTest(audioHolderObject) {
 
 function sliderObject(audioObject, label) {
     // Constructs the slider object. We use the HTML5 slider object
+    var page = testState.currentStateMap;
     this.parent = audioObject;
     this.holder = document.createElement('div');
     this.title = document.createElement('span');
@@ -310,6 +310,7 @@ function sliderObject(audioObject, label) {
         return node;
     };
     this.startPlayback = function () {
+        var self = this;
         // Called when playback has begun
         this.play.setAttribute("playstate", "playing");
         $(".track-slider").removeClass('track-slider-playing');
@@ -319,12 +320,32 @@ function sliderObject(audioObject, label) {
             $(outsideReference).removeClass('track-slider-playing');
         }
         this.play.textContent = "Stop";
+        if (page.restrictMovement) {
+            if (page.loop) {
+                $(this.slider).removeClass("track-slider-range-disabled");
+                this.slider.removeAttribute("disabled");
+            } else {
+                $(".track-slider-range").addClass("track-slider-range-disabled");
+                $(this.slider).removeClass("track-slider-range-disabled");
+                $(".track-slider-range").each(function (i, m) {
+                    if (m == self.slider) {
+                        m.removeAttribute("disabled");
+                    } else {
+                        m.setAttribute("disabled", "true");
+                    }
+                });
+            }
+        }
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
         this.play.setAttribute("playstate", "ready");
         $(this.holder).removeClass('track-slider-playing');
         this.play.textContent = "Play";
+        if (page.restrictMovement && page.loop) {
+            $(this.slider).addClass("track-slider-range-disabled");
+            this.slider.setAttribute("disabled", "true");
+        }
     };
     this.getValue = function () {
         return this.slider.value;
@@ -430,10 +451,8 @@ function drawScale() {
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
     // Check that the anchor and reference objects are correctly placed
     if (interfaceContext.checkHiddenAnchor() == false) {

@@ -120,9 +120,10 @@ folder_name = os.path.join(folder_name, '')
 
 # generate images for later use
 if render_figures:
-    subprocess.call("python timeline_view_movement.py '"+folder_name+"'", shell=True)
-    subprocess.call("python score_parser.py '"+folder_name+"'", shell=True)
-    subprocess.call("python score_plot.py '"+folder_name+"ratings/'", shell=True)
+    script_path = os.path.dirname(os.path.realpath(__file__)) # where is generate_report.py?
+    subprocess.call("python " +script_path+"/timeline_view_movement.py '"+folder_name+"'", shell=True)
+    subprocess.call("python " +script_path+"/score_parser.py '"+folder_name+"'", shell=True)
+    subprocess.call("python " +script_path+"/score_plot.py '"+folder_name+"ratings/'", shell=True)
 
 # make array of text and array of dates
 body_array = []

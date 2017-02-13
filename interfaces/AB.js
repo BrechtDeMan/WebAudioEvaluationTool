@@ -135,7 +135,7 @@ function loadInterface() {
 
 function loadTest(audioHolderObject) {
     var feedbackHolder = document.getElementById('feedbackHolder');
-    var interfaceObj = audioHolderObject.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -157,7 +157,7 @@ function loadTest(audioHolderObject) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
-    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
+    var interfaceOptions = interfaceObj.options;
     // Clear the interfaceElements
     {
         var node = document.getElementById('playback-holder');
@@ -316,7 +316,7 @@ function comparator(audioHolderObject) {
             if (this.parent.specification.parent.playOne || specification.playOne) {
                 $('.comparator-button').text('Wait');
                 $('.comparator-button').attr("disabled", "true");
-                $(this.playback).removeAttr("disabled");
+                $(this.playback).css("disabled", "false");
             } else {
                 $('.comparator-button').text('Listen');
             }
@@ -351,6 +351,11 @@ function comparator(audioHolderObject) {
     this.comparators = [];
     this.selected = null;
 
+    var labelType = audioHolderObject.label;
+    if (labelType == "default") {
+        labelType = "capital";
+    }
+
     // First generate the Audio Objects for the Audio Engine
     for (var index = 0; index < audioHolderObject.audioElements.length; index++) {
         var element = audioHolderObject.audioElements[index];
@@ -359,35 +364,7 @@ function comparator(audioHolderObject) {
             var orNode = new interfaceContext.outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
             audioObject.bindInterface(orNode);
         } else {
-            var label;
-            if (audioObject.specification.label && audioObject.specification.label.length > 0) {
-                label = audioObject.specification.label;
-            } else {
-                switch (audioObject.specification.parent.label) {
-                    case "none":
-                        label = "";
-                        break;
-                    case "number":
-                        label = "" + index;
-                        break;
-                    case "letter":
-                        label = String.fromCharCode(97 + index);
-                        break;
-                    case "samediff":
-                        console.log("index = " + index);
-                        if (index == 0) {
-                            label = "same";
-                        } else if (index == 1) {
-                            label = "different";
-                        } else {
-                            label = "";
-                        }
-                        break;
-                    default:
-                        label = String.fromCharCode(65 + index);
-                        break;
-                }
-            }
+            var label = interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
             var node = new this.comparatorBox(audioObject, index, label);
             audioObject.bindInterface(node);
             this.comparators.push(node);
@@ -418,10 +395,8 @@ function resizeWindow(event) {
 }
 
 function buttonSubmitClick() {
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
     for (var i = 0; i < checks.length; i++) {
         if (checks[i].type == 'check') {

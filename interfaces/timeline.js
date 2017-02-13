@@ -83,7 +83,7 @@ function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
     var content = document.getElementById("timeline-test-content");
     content.innerHTML = "";
-    var interfaceObj = page.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(page);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -106,27 +106,19 @@ function loadTest(page) {
     if (interfaceObj.commentBoxPrefix != undefined) {
         commentBoxPrefix = interfaceObj.commentBoxPrefix;
     }
-
-    $(page.audioElements).each(function (index, element) {
+    var index = 0;
+    var interfaceScales = testState.currentStateMap.interfaces[0].scales;
+    var labelType = page.label;
+    if (labelType == "default") {
+        labelType = "number";
+    }
+    $(page.audioElements).each(function (pageIndex, element) {
         var audioObject = audioEngineContext.newTrack(element);
         if (page.audioElements.type == 'outside-reference') {
             var refNode = interfaceContext.outsideReferenceDOM(audioObject, index, outsideReferenceHolder);
             audioObject.bindInterface(orNode);
         } else {
-            switch (audioObject.specification.parent.label) {
-                case "none":
-                    label = "";
-                    break;
-                case "letter":
-                    label = String.fromCharCode(97 + index);
-                    break;
-                case "capital":
-                    label = String.fromCharCode(65 + index);
-                    break;
-                default:
-                    label = "" + index;
-                    break;
-            }
+            var label = interfaceContext.getLabel(labelType, index, page.labelStart);
             var node = new interfaceObject(audioObject, label);
 
             content.appendChild(node.DOM);
@@ -482,10 +474,8 @@ function buttonSubmitClick() {
         interfaceContext.lightbox.post("Warning", 'You have not started the test! Please click play on a sample to begin the test!');
         return;
     }
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0],
+        canContinue = true;
     for (var i = 0; i < checks.length; i++) {
         var checkState = true;
         if (checks[i].type == 'check') {
@@ -506,7 +496,7 @@ function buttonSubmitClick() {
                     break;
             }
             if (checkState == false) {
-                canContinue == false;
+                canContinue = false;
             }
         }
         if (!canContinue) {

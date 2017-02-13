@@ -75,7 +75,7 @@
                     <xs:element name="commentboxprefix" type="xs:string" minOccurs="0" maxOccurs="1" />
                     <xs:element ref="interface" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="audioelement" minOccurs="1" maxOccurs="unbounded" />
-                    <xs:element ref="commentquestion" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="commentquestions" minOccurs="0" maxOccurs="1" />
                     <xs:element ref="survey" minOccurs="0" maxOccurs="2" />
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
@@ -97,11 +97,13 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute name="labelStart" type="xs:string" use="optional" default="" />
                 <xs:attribute ref="poolSize" />
                 <xs:attribute ref="alwaysInclude" />
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
                 <xs:attribute ref="playOne" />
+                <xs:attribute name="restrictMovement" type="xs:boolean" default="false" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -162,6 +164,20 @@
 
         <xs:element name="audioelement">
             <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="alternative" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:attribute name="url" type="xs:anyURI" use="required" />
+                            <xs:attribute name="sampleRate" use="optional">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:decimal">
+                                        <xs:minInclusive value="1" />
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute name="url" type="xs:anyURI" use="required" />
                 <xs:attribute name="gain" type="xs:decimal" default="0" />
@@ -203,13 +219,31 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute name="sampleRate" use="optional">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:decimal">
+                            <xs:minInclusive value="1" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
             </xs:complexType>
         </xs:element>
 
-        <xs:element name="commentquestion">
+        <xs:element name="commentquestions">
+            <xs:complexType>
+                <xs:choice maxOccurs="unbounded">
+                    <xs:element name="commentquestion" maxOccurs="unbounded" />
+                    <xs:element name="commentradio" maxOccurs="unbounded" />
+                    <xs:element name="commentcheckbox" maxOccurs="unbounded" />
+                    <xs:element name="commentslider" maxOccurs="unbounded" />
+                </xs:choice>
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="commentradio">
             <xs:complexType>
                 <xs:sequence>
-                    <xs:element ref="statement" minOccurs="0" maxOccurs="1" />
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
                     <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
                         <xs:complexType>
                             <xs:simpleContent>
@@ -222,22 +256,202 @@
                 </xs:sequence>
                 <xs:attribute ref="id" use="optional" />
                 <xs:attribute ref="name" use="optional" />
-                <xs:attribute name="type" default="question">
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="commentcheckbox">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute ref="name" />
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute ref="id" use="optional" />
+                <xs:attribute ref="name" use="optional" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="commentquestion">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="optional" />
+                <xs:attribute ref="name" use="optional" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="commentslider">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="minText" minOccurs="0" maxOccurs="1" type="xs:string" />
+                    <xs:element name="maxText" minOccurs="0" maxOccurs="1" type="xs:string" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="optional" />
+                <xs:attribute ref="name" use="optional" />
+                <xs:attribute name="min" type="xs:decimal" use="required" />
+                <xs:attribute name="max" type="xs:decimal" use="required" />
+                <xs:attribute name="step" type="xs:decimal" use="optional" default="1" />
+                <xs:attribute name="value" type="xs:decimal" use="optional" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="conditional">
+            <xs:complexType>
+                <xs:attribute name="check" use="required">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:enumeration value="question" />
-                            <xs:enumeration value="radio" />
-                            <xs:enumeration value="checkbox" />
+                            <xs:enumeration value="equals" />
+                            <xs:enumeration value="lessThan" />
+                            <xs:enumeration value="greaterThan" />
+                            <xs:enumeration value="stringContains" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="value" type="xs:string" use="optional" />
+                <xs:attribute name="jumpToOnPass" type="xs:string" use="optional" />
+                <xs:attribute name="jumpToOnFail" type="xs:string" use="optional" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="surveyquestion">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                    <xs:element ref="conditional" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="name" />
+                <xs:attribute ref="mandatory" />
+                <xs:attribute name="boxsize" default="normal">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="normal" />
+                            <xs:enumeration value="large" />
+                            <xs:enumeration value="small" />
+                            <xs:enumeration value="huge" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
             </xs:complexType>
         </xs:element>
 
-        <xs:element name="survey">
+        <xs:element name="surveyradio">
             <xs:complexType>
                 <xs:sequence>
-                    <xs:element name="surveyentry" minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute ref="name" />
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element ref="conditional" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="name" />
+                <xs:attribute ref="mandatory" />
+                <xs:attribute name="min" type="xs:decimal" />
+                <xs:attribute name="max" type="xs:decimal" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="surveycheckbox">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute ref="name" />
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element ref="conditional" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="name" />
+                <xs:attribute ref="mandatory" />
+                <xs:attribute name="min" type="xs:decimal" />
+                <xs:attribute name="max" type="xs:decimal" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="surveystatement">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="required" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="surveynumber">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                    <xs:element ref="conditional" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="name" />
+                <xs:attribute ref="mandatory" />
+                <xs:attribute name="min" type="xs:decimal" />
+                <xs:attribute name="max" type="xs:decimal" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="surveyslider">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="minText" minOccurs="0" maxOccurs="1" type="xs:string" />
+                    <xs:element name="maxText" minOccurs="0" maxOccurs="1" type="xs:string" />
+                    <xs:element ref="conditional" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="name" />
+                <xs:attribute name="min" use="required" type="xs:decimal" />
+                <xs:attribute name="max" use="required" type="xs:decimal" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="surveyvideo">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="required" />
+                <xs:attribute name="url" use="required" type="xs:string" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="surveyyoutube">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+                <xs:attribute ref="id" use="required" />
+                <xs:attribute name="url" use="required" type="xs:string" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="survey">
+            <xs:complexType>
+                <xs:choice maxOccurs="unbounded">
+                    <xs:element name="surveyentry" maxOccurs="unbounded">
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
@@ -250,23 +464,7 @@
                                         </xs:simpleContent>
                                     </xs:complexType>
                                 </xs:element>
-                                <xs:element name="conditional" minOccurs="0" maxOccurs="unbounded">
-                                    <xs:complexType>
-                                        <xs:attribute name="check" use="required">
-                                            <xs:simpleType>
-                                                <xs:restriction base="xs:string">
-                                                    <xs:enumeration value="equals" />
-                                                    <xs:enumeration value="lessThan" />
-                                                    <xs:enumeration value="greaterThan" />
-                                                    <xs:enumeration value="stringContains" />
-                                                </xs:restriction>
-                                            </xs:simpleType>
-                                        </xs:attribute>
-                                        <xs:attribute name="value" type="xs:string" use="optional" />
-                                        <xs:attribute name="jumpToOnPass" type="xs:string" use="optional" />
-                                        <xs:attribute name="jumpToOnFail" type="xs:string" use="optional" />
-                                    </xs:complexType>
-                                </xs:element>
+                                <xs:element ref="conditional" minOccurs="0" maxOccurs="unbounded" />
                             </xs:sequence>
                             <xs:attribute ref="id" use="required" />
                             <xs:attribute ref="name" />
@@ -299,7 +497,15 @@
                             <xs:attribute name="url" type="xs:string" use="optional" />
                         </xs:complexType>
                     </xs:element>
-                </xs:sequence>
+                    <xs:element name="surveyquestion" maxOccurs="unbounded" />
+                    <xs:element name="surveyradio" maxOccurs="unbounded" />
+                    <xs:element name="surveycheckbox" maxOccurs="unbounded" />
+                    <xs:element name="surveystatement" maxOccurs="unbounded" />
+                    <xs:element name="surveynumber" maxOccurs="unbounded" />
+                    <xs:element name="surveyslider" maxOccurs="unbounded" />
+                    <xs:element name="surveyvideo" maxOccurs="unbounded" />
+                    <xs:element name="surveyyoutube" maxOccurs="unbounded" />
+                </xs:choice>
                 <xs:attribute name="location">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">

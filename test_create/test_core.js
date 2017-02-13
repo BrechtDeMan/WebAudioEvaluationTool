@@ -975,7 +975,7 @@ function buildPage() {
                 handleEvent: function (event) {
                     this.parent.scaleRoot.scales = [];
                     var protoScale = interfaceSpecs.getAllElementsByTagName('scaledefinitions')[0].getAllElementsByName(event.currentTarget.value)[0];
-                    var protoMarkers = protoScale.getElementsByTagName("scale");
+                    var protoMarkers = protoScale.getElementsByTagName("scalelabel");
                     for (var i = 0; i < protoMarkers.length; i++) {
                         var marker = {
                             position: protoMarkers[i].getAttribute("position"),
@@ -992,6 +992,22 @@ function buildPage() {
             optionHolder.className = 'node';
             optionHolder.id = 'popup-option-holder';
             this.content.appendChild(optionHolder);
+            this.addMarker = {
+                root: document.createElement("button"),
+                parent: this,
+                handleEvent: function () {
+                    var marker = {
+                        position: 0,
+                        text: "text"
+                    };
+                    this.parent.scaleRoot.scales.push(marker);
+                    var markerNode = new this.parent.buildMarkerNode(this.parent, marker);
+                    document.getElementById("popup-option-holder").appendChild(markerNode.root);
+                    this.parent.markerNodes.push(markerNode);
+                }
+            };
+            this.addMarker.root.textContent = "Add Marker";
+            this.addMarker.root.addEventListener("click", this.addMarker);
             this.generate = function (scaleRoot, parent) {
                 this.scaleRoot = scaleRoot;
                 this.parent = parent;
@@ -1007,23 +1023,6 @@ function buildPage() {
                     selectOption.textContent = scaleName;
                     this.preset.input.appendChild(selectOption);
                 }
-
-                this.addMarker = {
-                    root: document.createElement("button"),
-                    parent: this,
-                    handleEvent: function () {
-                        var marker = {
-                            position: 0,
-                            text: "text"
-                        };
-                        this.parent.scaleRoot.scales.push(marker);
-                        var markerNode = new this.parent.buildMarkerNode(this.parent, marker);
-                        document.getElementById("popup-option-holder").appendChild(markerNode.root);
-                        this.parent.markerNodes.push(markerNode);
-                    }
-                };
-                this.addMarker.root.textContent = "Add Marker";
-                this.addMarker.root.addEventListener("click", this.addMarker);
                 this.content.appendChild(this.addMarker.root);
 
                 // Create Marker List

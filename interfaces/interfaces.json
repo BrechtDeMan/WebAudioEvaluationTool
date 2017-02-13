@@ -1,0 +1,35 @@
+{
+    "interfaces": [
+        {
+            "name": "APE",
+            "scripts": ["interfaces/ape.js"],
+            "css": ["interfaces/ape.css"]
+        },
+        {
+            "name": "MUSHRA",
+            "scripts": ["interfaces/mushra.js"],
+            "css": ["interfaces/mushra.css"]
+        },
+        {
+            "name": "horizontal",
+            "scripts": ["interfaces/horizontal-sliders.js"],
+            "css": ["interfaces/horizontal-sliders.css"]
+        }, {
+            "name": "discrete",
+            "scripts": ["interfaces/discrete.js"],
+            "css": ["interfaces/discrete.css"]
+        }, {
+            "name": "AB",
+            "scripts": ["interfaces/AB.js"],
+            "css": ["interfaces/AB.css"]
+        }, {
+            "name": "ABX",
+            "scripts": ["interfaces/ABX.js"],
+            "css": ["interfaces/ABX.css"]
+        }, {
+            "name": "timeline",
+            "scripts": ["interfaces/timeline.js"],
+            "css": ["interfaces/timeline.css"]
+        }
+    ]
+}

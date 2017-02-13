@@ -331,98 +331,40 @@ function loadProjectSpecCallback(response) {
         }
     }
 
-    // Detect the interface to use and load the relevant javascripts.
-    var interfaceJS = document.createElement('script');
-    interfaceJS.setAttribute("type", "text/javascript");
-    switch (specification.interface) {
-        case "APE":
-            interfaceJS.setAttribute("src", "interfaces/ape.js");
-
-            // APE comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/ape.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-
-        case "MUSHRA":
-            interfaceJS.setAttribute("src", "interfaces/mushra.js");
-
-            // MUSHRA comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/mushra.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-
-        case "AB":
-            interfaceJS.setAttribute("src", "interfaces/AB.js");
-
-            // AB comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/AB.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-
-        case "ABX":
-            interfaceJS.setAttribute("src", "interfaces/ABX.js");
-
-            // AB comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/ABX.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-
-        case "Bipolar":
-        case "ACR":
-        case "DCR":
-        case "CCR":
-        case "ABC":
-            // Above enumerate to horizontal sliders
-            interfaceJS.setAttribute("src", "interfaces/horizontal-sliders.js");
-
-            // horizontal-sliders comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/horizontal-sliders.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-        case "discrete":
-        case "likert":
-            // Above enumerate to horizontal discrete radios
-            interfaceJS.setAttribute("src", "interfaces/discrete.js");
-
-            // horizontal-sliders comes with a css file
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/discrete.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
-        case "timeline":
-            interfaceJS.setAttribute("src", "interfaces/timeline.js");
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.type = 'text/css';
-            css.href = 'interfaces/timeline.css';
-
-            document.getElementsByTagName("head")[0].appendChild(css);
-            break;
+    var getInterfaces = new XMLHttpRequest();
+    getInterfaces.open("GET", "interfaces/interfaces.json");
+    getInterfaces.onerror = function (e) {
+        throw (e);
     }
-    document.getElementsByTagName("head")[0].appendChild(interfaceJS);
+    getInterfaces.onload = function () {
+        if (getInterfaces.status !== 200) {
+            throw (new Error(getInterfaces.status));
+        }
+        // Get the current interface
+        var name = specification.interface,
+            head = document.getElementsByTagName("head")[0],
+            data = JSON.parse(getInterfaces.responseText),
+            interfaceObject = data.interfaces.find(function (e) {
+                return e.name == name;
+            });
+        if (!interfaceObject) {
+            throw ("Cannot load desired interface");
+        }
+        interfaceObject.scripts.forEach(function (v) {
+            var script = document.createElement("script");
+            script.setAttribute("type", "text/javascript");
+            script.setAttribute("src", v);
+            head.appendChild(script);
+        });
+        interfaceObject.css.forEach(function (v) {
+            var css = document.createElement("link");
+            css.setAttribute("rel", "stylesheet");
+            css.setAttribute("type", "text/css");
+            css.setAttribute("href", v);
+            head.appendChild(css);
+        });
+    }
+    getInterfaces.send();
 
     if (gReturnURL != undefined) {
         console.log("returnURL Overide from " + specification.returnURL + " to " + gReturnURL);
@@ -653,7 +595,7 @@ function interfacePopup() {
 
         this.popupContent = document.getElementById('popupContent');
 
-        this.popupTitle = document.getElementById('popupTitle');
+        this.popupTitle = document.getElementById('popupTitleHolder');
 
         this.popupResponse = document.getElementById('popupResponse');
 
@@ -692,9 +634,12 @@ function interfacePopup() {
 
     this.postNode = function () {
         // This will take the node from the popupOptions and display it
-        var node = this.popupOptions[this.currentIndex];
+        var node = this.popupOptions[this.currentIndex],
+            converter = new showdown.Converter(),
+            p = new DOMParser();
         this.popupResponse.innerHTML = "";
-        this.popupTitle.textContent = node.specification.statement;
+        this.popupTitle.innerHTML = "";
+        this.popupTitle.appendChild(p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild);
         if (node.specification.type == 'question') {
             var textArea = document.createElement('textarea');
             switch (node.specification.boxsize) {
@@ -799,13 +744,13 @@ function interfacePopup() {
         } else if (node.specification.type == 'number') {
             var input = document.createElement('input');
             input.type = 'textarea';
-            if (node.min != null) {
+            if (node.specification.min != null) {
                 input.min = node.specification.min;
             }
-            if (node.max != null) {
+            if (node.specification.max != null) {
                 input.max = node.specification.max;
             }
-            if (node.step != null) {
+            if (node.specification.step != null) {
                 input.step = node.specification.step;
             }
             if (node.response != undefined) {
@@ -823,6 +768,30 @@ function interfacePopup() {
             iframe.className = "youtube";
             iframe.src = node.specification.url;
             this.popupResponse.appendChild(iframe);
+        } else if (node.specification.type == "slider") {
+            var hold = document.createElement('div');
+            var input = document.createElement('input');
+            input.type = 'range';
+            input.style.width = "90%";
+            if (node.specification.min != null) {
+                input.min = node.specification.min;
+            }
+            if (node.specification.max != null) {
+                input.max = node.specification.max;
+            }
+            if (node.response != undefined) {
+                input.value = node.response;
+            }
+            hold.className = "survey-slider-text-holder";
+            var minText = document.createElement('span');
+            var maxText = document.createElement('span');
+            minText.textContent = node.specification.leftText;
+            maxText.textContent = node.specification.rightText;
+            hold.appendChild(minText);
+            hold.appendChild(maxText);
+            this.popupResponse.appendChild(input);
+            this.popupResponse.appendChild(hold);
+            this.popupResponse.style.textAlign = "center";
         }
         if (this.currentIndex + 1 == this.popupOptions.length) {
             if (this.node.location == "pre") {
@@ -922,6 +891,33 @@ function interfacePopup() {
             console.log("Checkbox: " + node.specification.statement);
             var inputs = this.popupResponse.getElementsByTagName('input');
             node.response = [];
+            var numChecked = 0;
+            for (var i = 0; i < node.specification.options.length; i++) {
+                if (inputs[i].checked) {
+                    numChecked++;
+                }
+            }
+            if (node.specification.min != undefined) {
+                if (node.specification.max == undefined) {
+                    if (numChecked < node.specification.min) {
+                        var msg = "You must select at least " + node.specification.min + " option";
+                        if (node.specification.min > 1) {
+                            msg += "s";
+                        }
+                        interfaceContext.lightbox.post("Error", msg);
+                        return;
+                    }
+                } else {
+                    if (numChecked < node.specification.min || numChecked > node.specification.max) {
+                        if (node.specification.min == node.specification.max) {
+                            interfaceContext.lightbox.post("Error", "You must only select " + node.specification.min);
+                        } else {
+                            interfaceContext.lightbox.post("Error", "You must select between " + node.specification.min + " and " + node.specification.max);
+                        }
+                        return;
+                    }
+                }
+            }
             for (var i = 0; i < node.specification.options.length; i++) {
                 node.response.push({
                     name: node.specification.options[i].name,
@@ -1080,13 +1076,56 @@ function interfacePopup() {
                     break;
                 }
             }
+        } else if (node.specification.type == 'slider') {
+            var input = this.popupContent.getElementsByTagName('input')[0];
+            node.response = input.value;
+            for (var condition of node.specification.conditions) {
+                var pass = false;
+                switch (condition.check) {
+                    case "contains":
+                        console.log("Survey Element of type 'number' cannot interpret contains conditions. IGNORING");
+                        break;
+                    case "greaterThan":
+                        if (node.response > Number(condition.value)) {
+                            pass = true;
+                        }
+                        break;
+                    case "lessThan":
+                        if (node.response < Number(condition.value)) {
+                            pass = true;
+                        }
+                        break;
+                    case "equals":
+                        if (node.response == condition.value) {
+                            pass = true;
+                        }
+                        break;
+                }
+                var jumpID;
+                if (pass) {
+                    jumpID = condition.jumpToOnPass;
+                } else {
+                    jumpID = condition.jumpToOnFail;
+                }
+                if (jumpID != undefined) {
+                    var index = this.popupOptions.findIndex(function (item, index, element) {
+                        if (item.specification.id == jumpID) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }, this);
+                    this.currentIndex = index - 1;
+                    break;
+                }
+            }
         }
         this.currentIndex++;
         if (this.currentIndex < this.popupOptions.length) {
             this.postNode();
         } else {
             // Reached the end of the popupOptions
-            this.popupTitle.textContent = "";
+            this.popupTitle.innerHTML = "";
             this.popupResponse.innerHTML = "";
             this.hidePopup();
             for (var node of this.popupOptions) {
@@ -1394,10 +1433,8 @@ function AudioEngine(specification) {
 
     this.buffers = [];
     this.bufferObj = function () {
-        this.url = null;
+        var urls = [];
         this.buffer = null;
-        this.xmlRequest = new XMLHttpRequest();
-        this.xmlRequest.parent = this;
         this.users = [];
         this.progress = 0;
         this.status = 0;
@@ -1412,30 +1449,77 @@ function AudioEngine(specification) {
                 }
             }
         };
-        this.getMedia = function (url) {
-            this.url = url;
-            this.xmlRequest.open('GET', this.url, true);
-            this.xmlRequest.responseType = 'arraybuffer';
+        this.setUrls = function (obj) {
+            // Obj must be an array of pairs:
+            // [{sampleRate, url}]
+            var localFs = audioContext.sampleRate,
+                list = [],
+                i;
+            for (i = 0; i < obj.length; i++) {
+                if (obj[i].sampleRate == localFs) {
+                    list.push(obj.splice(i, 1)[0]);
+                }
+            }
+            list = list.concat(obj);
+            urls = list;
+        };
+        this.hasUrl = function (checkUrl) {
+            var l = urls.length,
+                i;
+            for (i = 0; i < l; i++) {
+                if (urls[i].url == checkUrl) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        this.getMedia = function () {
+            var self = this;
+            var currentUrlIndex = 0;
 
-            var bufferObj = this;
+            function get(fqurl) {
+                return new Promise(function (resolve, reject) {
+                    var req = new XMLHttpRequest();
+                    req.open('GET', fqurl, true);
+                    req.responseType = 'arraybuffer';
+                    req.onload = function () {
+                        if (req.status == 200) {
+                            resolve(req.response);
+                        }
+                    };
+                    req.onerror = function () {
+                        reject(new Error(req.statusText));
+                    };
+
+                    req.addEventListener("progress", progressCallback.bind(self));
+                    req.send();
+                });
+            }
+
+            function getNextURL() {
+                currentUrlIndex++;
+                var self = this;
+                if (currentUrlIndex >= urls.length) {
+                    processError();
+                } else {
+                    return get(urls[currentUrlIndex].url).then(processAudio.bind(self)).catch(getNextURL.bind(self));
+                }
+            }
 
             // Create callback to decode the data asynchronously
-            this.xmlRequest.onloadend = function () {
-                // Use inbuilt WAVE decoder first
-                if (this.status == -1) {
-                    return;
-                }
-                var waveObj = new WAVE();
-                audioContext.decodeAudioData(bufferObj.xmlRequest.response, function (decodedData) {
-                    bufferObj.buffer = decodedData;
-                    bufferObj.status = 2;
-                    calculateLoudness(bufferObj, "I");
+            function processAudio(response) {
+                var self = this;
+                return audioContext.decodeAudioData(response, function (decodedData) {
+                    self.buffer = decodedData;
+                    self.status = 2;
+                    calculateLoudness(self, "I");
+                    return true;
                 }, function (e) {
                     var waveObj = new WAVE();
-                    if (waveObj.open(bufferObj.xmlRequest.response) == 0) {
-                        bufferObj.buffer = audioContext.createBuffer(waveObj.num_channels, waveObj.num_samples, waveObj.sample_rate);
+                    if (waveObj.open(response) == 0) {
+                        self.buffer = audioContext.createBuffer(waveObj.num_channels, waveObj.num_samples, waveObj.sample_rate);
                         for (var c = 0; c < waveObj.num_channels; c++) {
-                            var buffer_ptr = bufferObj.buffer.getChannelData(c);
+                            var buffer_ptr = self.buffer.getChannelData(c);
                             for (var n = 0; n < waveObj.num_samples; n++) {
                                 buffer_ptr[n] = waveObj.decoded_data[c][n];
                             }
@@ -1443,41 +1527,44 @@ function AudioEngine(specification) {
 
                         delete waveObj;
                     }
-                    if (bufferObj.buffer != undefined) {
-                        bufferObj.status = 2;
-                        calculateLoudness(bufferObj, "I");
+                    if (self.buffer != undefined) {
+                        self.status = 2;
+                        calculateLoudness(self, "I");
+                        return true;
                     }
+                    return false;
                 });
-            };
-
-            // Create callback for any error in loading
-            this.xmlRequest.onerror = function () {
-                this.parent.status = -1;
-                for (var i = 0; i < this.parent.users.length; i++) {
-                    this.parent.users[i].state = -1;
-                    if (this.parent.users[i].interfaceDOM != null) {
-                        this.parent.users[i].bufferLoaded(this);
-                    }
-                }
-                interfaceContext.lightbox.post("Error", "Could not load resource " + this.parent.url);
             }
 
-            this.progress = 0;
-            this.progressCallback = function (event) {
+            // Create callback for any error in loading
+            function processError() {
+                this.status = -1;
+                for (var i = 0; i < this.users.length; i++) {
+                    this.users[i].state = -1;
+                    if (this.users[i].interfaceDOM != null) {
+                        this.users[i].bufferLoaded(this);
+                    }
+                }
+                interfaceContext.lightbox.post("Error", "Could not load resource " + urls[currentUrlIndex].url);
+            }
+
+            function progressCallback(event) {
                 if (event.lengthComputable) {
-                    this.parent.progress = event.loaded / event.total;
-                    for (var i = 0; i < this.parent.users.length; i++) {
-                        if (this.parent.users[i].interfaceDOM != null) {
-                            if (typeof this.parent.users[i].interfaceDOM.updateLoading === "function") {
-                                this.parent.users[i].interfaceDOM.updateLoading(this.parent.progress * 100);
+                    this.progress = event.loaded / event.total;
+                    for (var i = 0; i < this.users.length; i++) {
+                        if (this.users[i].interfaceDOM != null) {
+                            if (typeof this.users[i].interfaceDOM.updateLoading === "function") {
+                                this.users[i].interfaceDOM.updateLoading(this.progress * 100);
                             }
                         }
                     }
                 }
             };
-            this.xmlRequest.addEventListener("progress", this.progressCallback);
+
+            this.progress = 0;
             this.status = 1;
-            this.xmlRequest.send();
+            currentUrlIndex = 0;
+            get(urls[0].url).then(processAudio.bind(self)).catch(getNextURL.bind(self));
         };
 
         this.registerAudioObject = function (audioObject) {
@@ -1554,14 +1641,25 @@ function AudioEngine(specification) {
             var URL = page.hostURL + element.url;
             var buffer = null;
             for (var buffObj of this.buffers) {
-                if (URL == buffObj.url) {
+                if (buffObj.hasUrl(URL)) {
                     buffer = buffObj;
                     break;
                 }
             }
             if (buffer == null) {
                 buffer = new this.bufferObj();
-                buffer.getMedia(URL);
+                var urls = [{
+                    url: URL,
+                    sampleRate: element.sampleRate
+                }];
+                element.alternatives.forEach(function (e) {
+                    urls.push({
+                        url: e.url,
+                        sampleRate: e.sampleRate
+                    });
+                });
+                buffer.setUrls(urls);
+                buffer.getMedia();
                 this.buffers.push(buffer);
             }
         }
@@ -1631,7 +1729,7 @@ function AudioEngine(specification) {
         var URL = testState.currentStateMap.hostURL + element.url;
         var buffer = null;
         for (var i = 0; i < this.buffers.length; i++) {
-            if (URL == this.buffers[i].url) {
+            if (this.buffers[i].hasUrl(URL)) {
                 buffer = this.buffers[i];
                 break;
             }
@@ -1694,21 +1792,20 @@ function AudioEngine(specification) {
     };
 
     this.setSynchronousLoop = function () {
-        // Pads the signals so they are all exactly the same length
-        // Get the length of the longest signal.
-        var length = 0;
+        // Pads the signals so they are all exactly the same duration
+        // Get the duration of the longest signal.
+        var duration = 0;
         var maxId;
         for (var i = 0; i < this.audioObjects.length; i++) {
-            if (length < this.audioObjects[i].buffer.buffer.length) {
-                length = this.audioObjects[i].buffer.buffer.length;
+            if (duration < this.audioObjects[i].buffer.buffer.duration) {
+                duration = this.audioObjects[i].buffer.buffer.duration;
                 maxId = i;
             }
         }
         // Extract the audio and zero-pad
         for (var ao of this.audioObjects) {
-            var lengthDiff = length - ao.buffer.buffer.length;
-            if (lengthDiff > 0) {
-                ao.buffer.buffer = ao.buffer.copyBuffer(0, samplesToSeconds(lengthDiff, ao.buffer.buffer.sampleRate));
+            if (ao.buffer.buffer.duration !== duration) {
+                ao.buffer.buffer = ao.buffer.copyBuffer(0, duration - ao.buffer.buffer.duration);
             }
         }
     };
@@ -2603,6 +2700,63 @@ function Interface(specificationObject) {
         this.resize();
     };
 
+    this.sliderBox = function (commentQuestion) {
+        this.specification = commentQuestion;
+        this.holder = document.createElement("div");
+        this.holder.className = 'comment-div';
+        this.string = document.createElement("span");
+        this.string.innerHTML = commentQuestion.statement;
+        this.slider = document.createElement("input");
+        this.slider.type = "range";
+        this.slider.min = commentQuestion.min;
+        this.slider.max = commentQuestion.max;
+        this.slider.step = commentQuestion.step;
+        this.slider.value = commentQuestion.value;
+        var br = document.createElement('br');
+
+        var textHolder = document.createElement("div");
+        textHolder.className = "comment-slider-text-holder";
+
+        this.leftText = document.createElement("span");
+        this.leftText.textContent = commentQuestion.leftText;
+        this.rightText = document.createElement("span");
+        this.rightText.textContent = commentQuestion.rightText;
+        textHolder.appendChild(this.leftText);
+        textHolder.appendChild(this.rightText);
+
+        this.holder.appendChild(this.string);
+        this.holder.appendChild(br);
+        this.holder.appendChild(this.slider);
+        this.holder.appendChild(textHolder);
+
+        this.exportXMLDOM = function (storePoint) {
+            var root = storePoint.parent.document.createElement('comment');
+            root.id = this.specification.id;
+            root.setAttribute('type', this.specification.type);
+            console.log("Question: " + this.string.textContent);
+            console.log("Response: " + this.slider.value);
+            var question = storePoint.parent.document.createElement('question');
+            question.textContent = this.string.textContent;
+            var response = storePoint.parent.document.createElement('response');
+            response.textContent = this.slider.value;
+            root.appendChild(question);
+            root.appendChild(response);
+            storePoint.XMLDOM.appendChild(root);
+            return root;
+        };
+        this.resize = function () {
+            var boxwidth = (window.innerWidth - 100) / 2;
+            if (boxwidth >= 600) {
+                boxwidth = 600;
+            } else if (boxwidth < 400) {
+                boxwidth = 400;
+            }
+            this.holder.style.width = boxwidth + "px";
+            this.slider.style.width = boxwidth - 24 + "px";
+        };
+        this.resize();
+    };
+
     this.createCommentQuestion = function (element) {
         var node;
         if (element.type == 'question') {
@@ -2611,6 +2765,8 @@ function Interface(specificationObject) {
             node = new this.radioBox(element);
         } else if (element.type == 'checkbox') {
             node = new this.checkboxBox(element);
+        } else if (element.type == 'slider') {
+            node = new this.sliderBox(element);
         }
         this.commentQuestions.push(node);
         return node;
@@ -2886,8 +3042,8 @@ function Interface(specificationObject) {
                 obj.input.value = obj.gain.gain.value;
                 obj.input.setAttribute('orient', 'vertical');
                 obj.input.type = "range";
-                obj.input.min = -6;
-                obj.input.max = 6;
+                obj.input.min = -12;
+                obj.input.max = 0;
                 obj.input.step = 0.25;
                 if (f0 != 1000) {
                     obj.input.value = (Math.random() * 12) - 6;
@@ -3102,6 +3258,104 @@ function Interface(specificationObject) {
         node.textContent = errorMessage;
         testState.currentStore.XMLDOM.appendChild(node);
     };
+
+    this.getLabel = function (labelType, index, labelStart) {
+        /*
+            Get the correct label based on type, index and offset
+        */
+
+        function calculateLabel(labelType, index, offset) {
+            if (labelType == "none") {
+                return "";
+            }
+            switch (labelType) {
+                case "letter":
+                    return String.fromCharCode((index + offset) % 26 + 97);
+                case "capital":
+                    return String.fromCharCode((index + offset) % 26 + 65);
+                case "samediff":
+                    if (index == 0) {
+                        return "Same";
+                    } else if (index == 1) {
+                        return "Difference";
+                    } else {
+                        return "";
+                    }
+                case "number":
+                    return String(index + offset);
+                default:
+                    return "";
+            }
+        }
+
+        if (typeof labelStart !== "string" || labelStart.length == 0) {
+            labelStart = String.fromCharCode(0);
+        }
+
+        switch (labelType) {
+            case "letter":
+                labelStart = labelStart.charCodeAt(0);
+                if (labelStart < 97 || labelStart > 122) {
+                    labelStart = 97;
+                }
+                labelStart -= 97;
+                break;
+            case "capital":
+                labelStart = labelStart.charCodeAt(0);
+                if (labelStart < 65 || labelStart > 90) {
+                    labelStart = 65;
+                }
+                labelStart -= 65;
+                break;
+            case "number":
+                labelStart = Number(labelStart);
+                if (!isFinite(labelStart)) {
+                    labelStart = 1;
+                }
+                break;
+            case "none":
+            default:
+                labelStart = 0;
+        }
+        if (typeof index == "number") {
+            return calculateLabel(labelType, index, labelStart);
+        } else if (index.length && index.length > 0) {
+            var a = [],
+                l = index.length,
+                i;
+            for (i = 0; i < l; i++) {
+                a[i] = calculateLabel(labelType, index[i], labelStart);
+            }
+            return a;
+        } else {
+            throw ("Invalid arguments");
+        }
+    }
+
+    this.getCombinedInterfaces = function (page) {
+        // Combine the interfaces with the global interface nodes
+        var global = specification.interfaces,
+            local = page.interfaces;
+        local.forEach(function (locInt) {
+            // Iterate through the options nodes
+            var addList = [];
+            global.options.forEach(function (gopt) {
+                var lopt = locInt.options.find(function (lopt) {
+                    return (lopt.name == gopt.name) && (lopt.type == gopt.type);
+                });
+                if (!lopt) {
+                    // Global option doesn't exist locally
+                    addList.push(gopt);
+                }
+            });
+            locInt.options = locInt.options.concat(addList);
+            if (!locInt.scales && global.scales) {
+                // Use the global default scales
+                locInt.scales = global.scales;
+            }
+        });
+        return local;
+    }
 }
 
 function Storage() {
@@ -3257,14 +3511,17 @@ function Storage() {
             switch (node.specification.type) {
                 case "number":
                 case "question":
+                case "slider":
                     var child = this.parent.document.createElement('response');
                     child.textContent = node.response;
                     surveyresult.appendChild(child);
                     break;
                 case "radio":
                     var child = this.parent.document.createElement('response');
-                    child.setAttribute('name', node.response.name);
-                    child.textContent = node.response.text;
+                    if (node.response !== null) {
+                        child.setAttribute('name', node.response.name);
+                        child.textContent = node.response.text;
+                    }
                     surveyresult.appendChild(child);
                     break;
                 case "checkbox":

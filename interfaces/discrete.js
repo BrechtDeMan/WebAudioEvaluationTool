@@ -120,7 +120,7 @@ function loadTest(page) {
 
     var feedbackHolder = document.getElementById('feedbackHolder');
     feedbackHolder.innerHTML = "";
-    var interfaceObj = page.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(page);
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -147,45 +147,7 @@ function loadTest(page) {
     }
     var loopPlayback = page.loop;
 
-    // Find all the audioElements from the audioHolder
-    var index = 0;
-    var interfaceScales = testState.currentStateMap.interfaces[0].scales;
-    $(page.audioElements).each(function (index, element) {
-        // Find URL of track
-        // In this jQuery loop, variable 'this' holds the current audioElement.
-
-        var audioObject = audioEngineContext.newTrack(element);
-        if (element.type == 'outside-reference') {
-            // Construct outside reference;
-            var orNode = new interfaceContext.outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
-            audioObject.bindInterface(orNode);
-        } else {
-            // Create a slider per track
-            switch (audioObject.specification.parent.label) {
-                case "none":
-                    label = "";
-                    break;
-                case "letter":
-                    label = String.fromCharCode(97 + index);
-                    break;
-                case "capital":
-                    label = String.fromCharCode(65 + index);
-                    break;
-                default:
-                    label = "" + index;
-                    break;
-            }
-            var sliderObj = new discreteObject(audioObject, label, interfaceScales);
-            sliderBox.appendChild(sliderObj.holder);
-            audioObject.bindInterface(sliderObj);
-            interfaceContext.commentBoxes.createCommentBox(audioObject);
-            index += 1;
-        }
-
-    });
-
-    var interfaceOptions = specification.interfaces.options.concat(interfaceObj.options);
-    for (var option of interfaceOptions) {
+    for (var option of interfaceObj.options) {
         if (option.type == "show") {
             switch (option.name) {
                 case "playhead":
@@ -219,6 +181,34 @@ function loadTest(page) {
             }
         }
     }
+
+    // Find all the audioElements from the audioHolder
+    var index = 0;
+    var interfaceScales = page.interfaces[0].scales;
+    var labelType = page.label;
+    if (labelType == "default") {
+        labelType = "number";
+    }
+    $(page.audioElements).each(function (pageIndex, element) {
+        // Find URL of track
+        // In this jQuery loop, variable 'this' holds the current audioElement.
+
+        var audioObject = audioEngineContext.newTrack(element);
+        if (element.type == 'outside-reference') {
+            // Construct outside reference;
+            var orNode = new interfaceContext.outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
+            audioObject.bindInterface(orNode);
+        } else {
+            // Create a slider per track
+            var label = interfaceContext.getLabel(labelType, index, page.labelStart);
+            var sliderObj = new discreteObject(audioObject, label, interfaceScales);
+            sliderBox.appendChild(sliderObj.holder);
+            audioObject.bindInterface(sliderObj);
+            interfaceContext.commentBoxes.createCommentBox(audioObject);
+            index += 1;
+        }
+
+    });
 
     $(page.commentQuestions).each(function (index, element) {
         var node = interfaceContext.createCommentQuestion(element);
@@ -452,10 +442,8 @@ function drawScale() {
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
 {
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
     // Check that the anchor and reference objects are correctly placed
     if (interfaceContext.checkHiddenAnchor() == false) {

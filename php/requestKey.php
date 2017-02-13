@@ -16,6 +16,12 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+// Get the current test URL
+$testURL = "";
+if (isset($_GET['url'])) {
+    $testURL = "../".$_GET["url"];
+}
+
 $saves = glob("../saves/*.xml");
 
 $key = "";
@@ -44,18 +50,26 @@ while ($key == "") {
 $filename = "../saves/save-".$key.".xml";
 $fileHandle = fopen($filename, 'w');
 if ($fileHandle == FALSE) {
-    echo "<response><state>ERROR</state><key>".$key."</key><message>Could not open file for writing</message></response>";
-    return;
+    die("<response><state>ERROR</state><key>".$key."</key><message>Could not open file for writing</message></response>");
 }
 fclose($fileHandle);
 // TODO:
 //  Generate the XML Base file and save it
-$doc_struct = new SimpleXMLElement('<waetresult/>');
-$doc_struct->addAttribute("key",$key);
+$doc_struct = new DOMDocument;
+$doc_struct->preserveWhiteSpace = false;
+$doc_struct->formatOutput = true;
+$doc_struct->loadXML("<waetresult/>");
+// Add the root
+if (file_exists($testURL)) {
+    $test_proto_doc = new DOMDocument;
+    $test_proto_doc->loadXML(file_get_contents($testURL, FILE_TEXT));
+    $test_proto = $test_proto_doc->documentElement;
+    $test_proto = $doc_struct->importNode($test_proto, true);
+    $doc_struct->documentElement->appendChild($test_proto);
+}
 //  Add start time
 //  Add IP Address information
 //  Save the file
-$doc_struct->asXML($filename);
+$doc_struct->save($filename);
 echo "<response><state>OK</state><key>".$key."</key></response>";
-return;
 ?>

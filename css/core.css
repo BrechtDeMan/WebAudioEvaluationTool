@@ -101,6 +101,12 @@ table.popup-option-list tr {
 table.popup-option-list tr td {
     padding: 5px;
 }
+div.survey-slider-text-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0px 15px;
+}
 button#popup-proceed {
     bottom: 10px;
     right: 10px;
@@ -244,4 +250,15 @@ div.calibration-slider input[type=range][orient=vertical] {
     width: 8px;
     padding: 0 5px;
     height: 290px;
+}
+
+/*  Comment Boxes */
+
+div.comment-slider-text-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+div.comment-slider-text-holder span {
+    margin: 0px 5px;
 }

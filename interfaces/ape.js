@@ -273,6 +273,10 @@ function loadTest(audioHolderObject) {
     feedbackHolder.innerHTML = "";
     sliderHolder.innerHTML = "";
 
+    // Set labelType if default to number
+    if (audioHolderObject.label == "default" || audioHolderObject.label == "") {
+        audioHolderObject.label = "number";
+    }
     // Set the page title
     if (typeof audioHolderObject.title == "string" && audioHolderObject.title.length > 0) {
         document.getElementById("test-title").textContent = audioHolderObject.title
@@ -282,46 +286,47 @@ function loadTest(audioHolderObject) {
     // Delete outside reference
     document.getElementById("outside-reference-holder").innerHTML = "";
 
-    var interfaceObj = audioHolderObject.interfaces;
+    var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
     for (var k = 0; k < interfaceObj.length; k++) {
         // Create the div box to center align
         interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObj[k]));
     }
-
-    var interfaceList = audioHolderObject.interfaces.concat(specification.interfaces);
-    for (var k = 0; k < interfaceList.length; k++) {
-        for (var i = 0; i < interfaceList[k].options.length; i++) {
-            if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'playhead') {
-                var playbackHolder = document.getElementById('playback-holder');
-                if (playbackHolder == null) {
-                    playbackHolder = document.createElement('div');
-                    playbackHolder.style.width = "100%";
-                    playbackHolder.align = 'center';
-                    playbackHolder.appendChild(interfaceContext.playhead.object);
-                    feedbackHolder.appendChild(playbackHolder);
+    interfaceObj.forEach(function (interface) {
+        for (var option of interface.options) {
+            if (option.type == "show") {
+                switch (option.name) {
+                    case "playhead":
+                        var playbackHolder = document.getElementById('playback-holder');
+                        if (playbackHolder == null) {
+                            playbackHolder = document.createElement('div');
+                            playbackHolder.style.width = "100%";
+                            playbackHolder.align = 'center';
+                            playbackHolder.appendChild(interfaceContext.playhead.object);
+                            feedbackHolder.insertBefore(playbackHolder, feedbackHolder.firstElementChild);
+                        }
+                        break;
+                    case "page-count":
+                        var pagecountHolder = document.getElementById('page-count');
+                        if (pagecountHolder == null) {
+                            pagecountHolder = document.createElement('div');
+                            pagecountHolder.id = 'page-count';
+                        }
+                        pagecountHolder.innerHTML = '<span>Page ' + (testState.stateIndex + 1) + ' of ' + testState.stateMap.length + '</span>';
+                        var inject = document.getElementById('interface-buttons');
+                        inject.appendChild(pagecountHolder);
+                        break;
+                    case "volume":
+                        if (document.getElementById('master-volume-holder') == null) {
+                            feedbackHolder.appendChild(interfaceContext.volume.object);
+                        }
+                        break;
+                    case "comments":
+                        interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder, true);
+                        break;
                 }
-            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'page-count') {
-                var pagecountHolder = document.getElementById('page-count');
-                if (pagecountHolder == null) {
-                    pagecountHolder = document.createElement('div');
-                    pagecountHolder.id = 'page-count';
-                }
-                pagecountHolder.innerHTML = '<span>Page ' + (testState.stateIndex + 1) + ' of ' + testState.stateMap.length + '</span>';
-                var inject = document.getElementById('interface-buttons');
-                inject.appendChild(pagecountHolder);
-            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'volume') {
-                if (document.getElementById('master-volume-holder') == null) {
-                    feedbackHolder.appendChild(interfaceContext.volume.object);
-                }
-            } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'comments') {
-                var commentHolder = document.createElement('div');
-                commentHolder.id = 'commentHolder';
-                document.getElementById('testContent').appendChild(commentHolder);
-                interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder, true);
-                break;
             }
         }
-    }
+    });
 
     var commentBoxPrefix = "Comment on fragment";
 
@@ -592,22 +597,8 @@ function sliderObject(audioObject, interfaceObjects, index) {
     // Create a new slider object;
     this.parent = audioObject;
     this.trackSliderObjects = [];
-    this.label = null;
+    this.label = interfaceContext.getLabel(audioObject.specification.parent.label, index, audioObject.specification.parent.labelStart);
     this.playing = false;
-    switch (audioObject.specification.parent.label) {
-        case "letter":
-            this.label = String.fromCharCode(97 + index);
-            break;
-        case "capital":
-            this.label = String.fromCharCode(65 + index);
-            break;
-        case "none":
-            this.label = "";
-            break;
-        default:
-            this.label = "" + (index + 1);
-            break;
-    }
     for (var i = 0; i < interfaceContext.interfaceSliders.length; i++) {
         var trackObj = interfaceContext.interfaceSliders[i].createSliderObject(audioObject, this.label);
         this.trackSliderObjects.push(trackObj);
@@ -746,10 +737,8 @@ function outsideReferenceDOM(audioObject, index, inject) {
 }
 
 function buttonSubmitClick() {
-    var checks = [];
-    checks = checks.concat(testState.currentStateMap.interfaces[0].options);
-    checks = checks.concat(specification.interfaces.options);
-    var canContinue = true;
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
     // Check that the anchor and reference objects are correctly placed
     if (interfaceContext.checkHiddenAnchor() == false) {

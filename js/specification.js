@@ -195,7 +195,7 @@ function Specification() {
 
         this.OptionNode = function (specification) {
             this.type = undefined;
-            this.schema = specification.schema.getAllElementsByName('surveyentry')[0];
+            this.schema = undefined;
             this.id = undefined;
             this.name = undefined;
             this.mandatory = undefined;
@@ -208,6 +208,7 @@ function Specification() {
             this.conditions = [];
 
             this.decode = function (parent, child) {
+                this.schema = specification.schema.getAllElementsByName(child.nodeName)[0];
                 var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
                 for (var i in attributeMap) {
                     if (isNaN(Number(i)) == true) {
@@ -226,6 +227,15 @@ function Specification() {
                             break;
                     }
                 }
+                if (child.nodeName == 'surveyentry') {
+                    console.log("NOTE - Use of <surveyelement> is now deprecated. Whilst these will still work, newer nodes and tighter error checking will not be enforced");
+                    console.log("Please use the newer, type specifc nodes");
+                    if (!this.type) {
+                        throw ("Type not specified");
+                    }
+                } else {
+                    this.type = child.nodeName.split('survey')[1];
+                }
                 this.statement = child.getElementsByTagName('statement')[0].textContent;
                 if (this.type == "checkbox" || this.type == "radio") {
                     var children = child.getElementsByTagName('option');
@@ -242,6 +252,17 @@ function Specification() {
                             });
                         }
                     }
+                } else if (this.type == "slider") {
+                    this.leftText = "";
+                    this.rightText = "";
+                    var minText = child.getElementsByTagName("minText");
+                    var maxText = child.getElementsByTagName("maxText");
+                    if (minText.length > 0) {
+                        this.leftText = minText[0].textContent;
+                    }
+                    if (maxText.length > 0) {
+                        this.rightText = maxText[0].textContent;
+                    }
                 }
                 var conditionElements = child.getElementsByTagName("conditional");
                 for (var i = 0; i < conditionElements.length; i++) {
@@ -257,8 +278,7 @@ function Specification() {
             };
 
             this.exportXML = function (doc) {
-                var node = doc.createElement('surveyentry');
-                node.setAttribute('type', this.type);
+                var node = doc.createElement('survey' + this.type);
                 var statement = doc.createElement('statement');
                 statement.textContent = this.statement;
                 node.appendChild(statement);
@@ -275,6 +295,16 @@ function Specification() {
                 }
                 switch (this.type) {
                     case "checkbox":
+                        if (this.min != undefined) {
+                            node.setAttribute("min", this.min);
+                        } else {
+                            node.setAttribute("min", "0");
+                        }
+                        if (this.max != undefined) {
+                            node.setAttribute("max", this.max);
+                        } else {
+                            node.setAttribute("max", "undefined");
+                        }
                     case "radio":
                         for (var i = 0; i < this.options.length; i++) {
                             var option = this.options[i];
@@ -283,6 +313,7 @@ function Specification() {
                             optionNode.textContent = option.text;
                             node.appendChild(optionNode);
                         }
+                        break;
                     case "number":
                         if (this.min != undefined) {
                             node.setAttribute("min", this.min);
@@ -290,12 +321,36 @@ function Specification() {
                         if (this.max != undefined) {
                             node.setAttribute("max", this.max);
                         }
+                        break;
                     case "question":
                         if (this.boxsize != undefined) {
                             node.setAttribute("boxsize", this.boxsize);
                         }
                         if (this.mandatory != undefined) {
                             node.setAttribute("mandatory", this.mandatory);
+                        }
+                        break;
+                    case "video":
+                        if (this.mandatory != undefined) {
+                            node.setAttribute("mandatory", this.mandatory);
+                        }
+                    case "youtube":
+                        if (this.url != undefined) {
+                            node.setAttribute("url", this.url);
+                        }
+                        break;
+                    case "slider":
+                        node.setAttribute("min", this.min);
+                        node.setAttribute("max", this.max);
+                        if (this.leftText) {
+                            var minText = doc.createElement("minText");
+                            minText.textContent = this.leftText;
+                            node.appendChild(minText);
+                        }
+                        if (this.rightText) {
+                            var maxText = doc.createElement("maxText");
+                            maxText.textContent = this.rightText;
+                            node.appendChild(maxText);
                         }
                     default:
                         break;
@@ -319,11 +374,12 @@ function Specification() {
             } else if (this.location == 'after') {
                 this.location = 'post';
             }
-            var children = xml.getAllElementsByTagName('surveyentry');
-            for (var i = 0; i < children.length; i++) {
+            var child = xml.firstElementChild
+            while (child) {
                 var node = new this.OptionNode(this.specification);
-                node.decode(parent, children[i]);
+                node.decode(parent, child);
                 this.options.push(node);
+                child = child.nextElementSibling;
             }
             if (this.options.length == 0) {
                 console.log("Empty survey node");
@@ -459,10 +515,12 @@ function Specification() {
         this.outsideReference = null;
         this.loudness = null;
         this.label = null;
+        this.labelStart = "";
         this.preTest = null;
         this.postTest = null;
         this.interfaces = [];
         this.playOne = null;
+        this.restrictMovement = null;
         this.commentBoxPrefix = "Comment on track";
         this.audioElements = [];
         this.commentQuestions = [];
@@ -539,11 +597,16 @@ function Specification() {
             }
 
             // Now decode the commentquestions
-            var commentQuestions = xml.getElementsByTagName('commentquestion');
-            for (var i = 0; i < commentQuestions.length; i++) {
-                var node = new this.commentQuestionNode(this.specification);
-                node.decode(parent, commentQuestions[i]);
-                this.commentQuestions.push(node);
+            var cqNode = xml.getElementsByTagName('commentquestions');
+            if (cqNode.length != 0) {
+                cqNode = cqNode[0];
+                var commentQuestion = cqNode.firstElementChild;
+                while (commentQuestion) {
+                    var node = new this.commentQuestionNode(this.specification);
+                    node.decode(parent, commentQuestion);
+                    this.commentQuestions.push(node);
+                    commentQuestion = commentQuestion.nextElementSibling;
+                }
             }
         };
 
@@ -589,26 +652,85 @@ function Specification() {
             this.id = null;
             this.name = undefined;
             this.type = undefined;
-            this.options = [];
             this.statement = undefined;
             this.schema = specification.schema.getAllElementsByName('commentquestion')[0];
             this.decode = function (parent, xml) {
                 this.id = xml.id;
                 this.name = xml.getAttribute('name');
-                this.type = xml.getAttribute('type');
+                switch (xml.nodeName) {
+                    case "commentradio":
+                        this.type = "radio";
+                        this.options = [];
+                        break;
+                    case "commentcheckbox":
+                        this.type = "checkbox";
+                        this.options = [];
+                        break;
+                    case "commentslider":
+                        this.type = "slider";
+                        this.min = undefined;
+                        this.max = undefined;
+                        this.step = undefined;
+                        break;
+                    case "commentquestion":
+                    default:
+                        this.type = "question";
+                        break;
+                }
                 this.statement = xml.getElementsByTagName('statement')[0].textContent;
-                var optNodes = xml.getElementsByTagName('option');
-                for (var i = 0; i < optNodes.length; i++) {
-                    var optNode = optNodes[i];
-                    this.options.push({
-                        name: optNode.getAttribute('name'),
-                        text: optNode.textContent
-                    });
+                if (this.type == "radio" || this.type == "checkbox") {
+                    var optNodes = xml.getElementsByTagName('option');
+                    for (var i = 0; i < optNodes.length; i++) {
+                        var optNode = optNodes[i];
+                        this.options.push({
+                            name: optNode.getAttribute('name'),
+                            text: optNode.textContent
+                        });
+                    }
+                }
+                if (this.type == "slider") {
+                    this.min = Number(xml.getAttribute("min"));
+                    this.max = Number(xml.getAttribute("max"));
+                    this.step = Number(xml.getAttribute("step"));
+                    if (this.step == undefined) {
+                        this.step = 1;
+                    }
+                    this.value = Number(xml.getAttribute("value"));
+                    if (this.value == undefined) {
+                        this.value = min;
+                    }
+                    this.leftText = xml.getElementsByTagName("minText");
+                    if (this.leftText && this.leftText.length > 0) {
+                        this.leftText = this.leftText[0].textContent;
+                    } else {
+                        this.leftText = "";
+                    }
+                    this.rightText = xml.getElementsByTagName("maxText");
+                    if (this.rightText && this.rightText.length > 0) {
+                        this.rightText = this.rightText[0].textContent;
+                    } else {
+                        this.rightText = "";
+                    }
                 }
             };
 
             this.encode = function (root) {
-                var node = root.createElement("commentquestion");
+                var node;
+                switch (this.type) {
+                    case "radio":
+                        node = root.createElement("commentradio");
+                        break;
+                    case "checkbox":
+                        node = root.createElement("commentcheckbox");
+                        break;
+                    case "slider":
+                        node = root.createElement("commentslider");
+                        break;
+                    case "question":
+                    default:
+                        node = root.createElement("commentquestion");
+                        break;
+                }
                 node.id = this.id;
                 node.setAttribute("type", this.type);
                 if (this.name != undefined) {
@@ -617,11 +739,33 @@ function Specification() {
                 var statement = root.createElement("statement");
                 statement.textContent = this.statement;
                 node.appendChild(statement);
-                for (var option of this.options) {
-                    var child = root.createElement("option");
-                    child.setAttribute("name", option.name);
-                    child.textContent = option.text;
-                    node.appendChild(child);
+                if (this.type == "radio" || this.type == "checkbox") {
+                    for (var option of this.options) {
+                        var child = root.createElement("option");
+                        child.setAttribute("name", option.name);
+                        child.textContent = option.text;
+                        node.appendChild(child);
+                    }
+                }
+                if (this.type == "slider") {
+                    node.setAttribute("min", this.min);
+                    node.setAttribute("max", this.max);
+                    if (this.step !== 1) {
+                        node.setAttribute("step", this.step);
+                    }
+                    if (this.value !== this.min) {
+                        node.setAttribute("value", this.value);
+                    }
+                    if (this.leftText.length > 0) {
+                        var leftText = root.createElement("minText");
+                        leftText.textContent = this.leftText;
+                        node.appendChild(leftText);
+                    }
+                    if (this.rightText.length > 0) {
+                        var rightText = root.createElement("maxText");
+                        rightText.textContent = this.rightText;
+                        node.appendChild(rightText);
+                    }
                 }
                 return node;
             };
@@ -639,6 +783,8 @@ function Specification() {
             this.label = null;
             this.startTime = undefined;
             this.stopTime = undefined;
+            this.sampleRate = undefined;
+            this.alternatives = [];
             this.schema = specification.schema.getAllElementsByName('audioelement')[0];;
             this.parent = null;
             this.decode = function (parent, xml) {
@@ -658,6 +804,17 @@ function Specification() {
                             break;
                     }
                 }
+                // Get the alternative nodes
+                var child = xml.firstElementChild;
+                while (child) {
+                    if (child.nodeName == "alternative") {
+                        this.alternatives.push({
+                            'url': child.getAttribute("url"),
+                            'sampleRate': child.getAttribute("sampleRate")
+                        });
+                    }
+                    child = child.nextElementSibling;
+                }
 
             };
             this.encode = function (root) {
@@ -672,6 +829,12 @@ function Specification() {
                         eval("AENode.setAttribute('" + name + "',this." + name + ")");
                     }
                 }
+                this.alternatives.forEach(function (alt) {
+                    var node = root.createElement("alternative");
+                    node.setAttribute("url", alt.url);
+                    node.setAttribute("sampleRate", alt.sampleRate);
+                    AENode.appendChild(node);
+                });
                 return AENode;
             };
         };
