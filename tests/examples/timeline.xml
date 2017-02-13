@@ -32,21 +32,23 @@
             </interface>
             <audioelement url="0.wav" id="track-1" />
             <audioelement url="1.wav" id="track-2" />
-            <commentquestion id="preference" type="radio">
-                <statement>Please enter your overall preference</statement>
-                <option name="worst">Very Bad</option>
-                <option name="bad"></option>
-                <option name="OK">OK</option>
-                <option name="Good"></option>
-                <option name="Great">Great</option>
-            </commentquestion>
-            <commentquestion id="character" type="checkbox">
-                <statement>Please describe the overall character</statement>
-                <option name="funky">Funky</option>
-                <option name="mellow">Mellow</option>
-                <option name="laidback">Laid back</option>
-                <option name="heavy">Heavy</option>
-            </commentquestion>
+            <commentquestions>
+                <commentradio id="preference">
+                    <statement>Please enter your overall preference</statement>
+                    <option name="worst">Very Bad</option>
+                    <option name="bad"></option>
+                    <option name="OK">OK</option>
+                    <option name="Good"></option>
+                    <option name="Great">Great</option>
+                </commentradio>
+                <commentcheckbox id="character">
+                    <statement>Please describe the overall character</statement>
+                    <option name="funky">Funky</option>
+                    <option name="mellow">Mellow</option>
+                    <option name="laidback">Laid back</option>
+                    <option name="heavy">Heavy</option>
+                </commentcheckbox>
+            </commentquestions>
         </page>
         <page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' loudness="-23">
             <title>My Test</title>
@@ -61,20 +63,22 @@
             </interface>
             <audioelement url="0.wav" id="track-3" />
             <audioelement url="1.wav" id="track-4" />
-            <commentquestion id="preference1" type="radio">
-                <statement>Please enter your overall preference</statement>
-                <option name="worst">Very Bad</option>
-                <option name="bad"></option>
-                <option name="OK">OK</option>
-                <option name="Good"></option>
-                <option name="Great">Great</option>
-            </commentquestion>
-            <commentquestion id="character1" type="checkbox">
-                <statement>Please describe the overall character</statement>
-                <option name="funky">Funky</option>
-                <option name="mellow">Mellow</option>
-                <option name="laidback">Laid back</option>
-                <option name="heavy">Heavy</option>
-            </commentquestion>
+            <commentquestions>
+                <commentradio id="preference1">
+                    <statement>Please enter your overall preference</statement>
+                    <option name="worst">Very Bad</option>
+                    <option name="bad"></option>
+                    <option name="OK">OK</option>
+                    <option name="Good"></option>
+                    <option name="Great">Great</option>
+                </commentradio>
+                <commentcheckbox id="character1">
+                    <statement>Please describe the overall character</statement>
+                    <option name="funky">Funky</option>
+                    <option name="mellow">Mellow</option>
+                    <option name="laidback">Laid back</option>
+                    <option name="heavy">Heavy</option>
+                </commentcheckbox>
+            </commentquestions>
         </page>
     </waet>

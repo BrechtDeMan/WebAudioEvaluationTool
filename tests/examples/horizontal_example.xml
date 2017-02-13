@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
     <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-        <setup interface="ABC" projectReturn="save.php">
+        <setup interface="horizontal" projectReturn="save.php">
             <metric>
                 <metricenable>testTimer</metricenable>
                 <metricenable>elementTimer</metricenable>
