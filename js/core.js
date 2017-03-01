@@ -1214,7 +1214,8 @@ function stateMachine() {
         // Get the data from Specification
         var pagePool = [];
         var pageInclude = [];
-        for (var page of specification.pages) {
+        for (var i = 0; i < specification.pages.length; i++) {
+            var page = specification.pages[i];
             if (page.alwaysInclude) {
                 pageInclude.push(page);
             } else {
@@ -1228,7 +1229,7 @@ function stateMachine() {
             console.log("WARNING - You have specified more pages in <setup poolSize> than you have created!!");
             numPages = specification.pages.length;
         }
-        if (specification.poolSize == 0) {
+        if (specification.poolSize === 0) {
             numPages = specification.pages.length;
         }
         numPages -= pageInclude.length;
@@ -1254,7 +1255,7 @@ function stateMachine() {
             pageInclude[i].presentedId = i;
             this.stateMap.push(pageInclude[i]);
             // For each selected page, we must get the sub pool
-            if (pageInclude[i].poolSize != 0 && pageInclude[i].poolSize != pageInclude[i].audioElements.length) {
+            if (pageInclude[i].poolSize !== 0 && pageInclude[i].poolSize !== pageInclude[i].audioElements.length) {
                 var elemInclude = [];
                 var elemPool = [];
                 for (var elem of pageInclude[i].audioElements) {
@@ -1271,15 +1272,15 @@ function stateMachine() {
             audioEngineContext.loadPageData(pageInclude[i]);
         }
 
-        if (specification.preTest != null) {
+        if (specification.preTest !== null) {
             this.preTestSurvey = specification.preTest;
         }
-        if (specification.postTest != null) {
+        if (specification.postTest !== null) {
             this.postTestSurvey = specification.postTest;
         }
 
         if (this.stateMap.length > 0) {
-            if (this.stateIndex != null) {
+            if (this.stateIndex !== null) {
                 console.log('NOTE - State already initialise');
             }
             this.stateIndex = -2;
@@ -1289,7 +1290,7 @@ function stateMachine() {
         }
     };
     this.advanceState = function () {
-        if (this.stateIndex == null) {
+        if (this.stateIndex === null) {
             this.initialise();
         }
         if (this.stateIndex > -2) {
@@ -1297,7 +1298,7 @@ function stateMachine() {
         }
         if (this.stateIndex == -2) {
             this.stateIndex++;
-            if (this.preTestSurvey != null) {
+            if (this.preTestSurvey !== null) {
                 popup.initState(this.preTestSurvey, storage.globalPreTest);
             } else {
                 this.advanceState();
@@ -1317,7 +1318,7 @@ function stateMachine() {
             // All test pages complete, post test
             console.log('Ending test ...');
             this.stateIndex++;
-            if (this.postTestSurvey == null) {
+            if (this.postTestSurvey === null) {
                 this.advanceState();
             } else {
                 popup.initState(this.postTestSurvey, storage.globalPostTest);
@@ -1326,7 +1327,7 @@ function stateMachine() {
             createProjectSave(specification.projectReturn);
         } else {
             popup.hidePopup();
-            if (this.currentStateMap == null) {
+            if (this.currentStateMap === null) {
                 this.currentStateMap = this.stateMap[this.stateIndex];
                 // Find and extract the outside reference
                 var elements = [],
@@ -1346,7 +1347,7 @@ function stateMachine() {
                 this.currentStateMap.audioElements = elements.concat(ref);
 
                 this.currentStore = storage.testPages[this.stateIndex];
-                if (this.currentStateMap.preTest != null) {
+                if (this.currentStateMap.preTest !== null) {
                     this.currentStatePosition = 'pre';
                     popup.initState(this.currentStateMap.preTest, storage.testPages[this.stateIndex].preTest);
                 } else {
@@ -1363,7 +1364,7 @@ function stateMachine() {
                     this.currentStatePosition = 'post';
                     // Save the data
                     this.testPageCompleted();
-                    if (this.currentStateMap.postTest == null) {
+                    if (this.currentStateMap.postTest === null) {
                         this.advanceState();
                         return;
                     } else {
@@ -1375,7 +1376,7 @@ function stateMachine() {
                     this.currentStateMap = null;
                     this.advanceState();
                     break;
-            };
+            }
         }
     };
 
@@ -1409,14 +1410,14 @@ function stateMachine() {
         } else {
             return null;
         }
-    }
+    };
     this.getCurrentTestPageStore = function () {
         if (this.stateIndex >= 0 && this.stateIndex < this.stateMap.length) {
             return this.currentStore;
         } else {
             return null;
         }
-    }
+    };
 }
 
 function AudioEngine(specification) {
@@ -1471,7 +1472,7 @@ function AudioEngine(specification) {
             }
             for (var i = 0; i < this.users.length; i++) {
                 this.users[i].state = 1;
-                if (this.users[i].interfaceDOM != null) {
+                if (this.users[i].interfaceDOM !== null) {
                     this.users[i].bufferLoaded(this);
                 }
             }
@@ -1499,7 +1500,7 @@ function AudioEngine(specification) {
                 }
             }
             return false;
-        }
+        };
         this.getMedia = function () {
             var self = this;
             var currentUrlIndex = 0;
@@ -1543,7 +1544,7 @@ function AudioEngine(specification) {
                     return true;
                 }, function (e) {
                     var waveObj = new WAVE();
-                    if (waveObj.open(response) == 0) {
+                    if (waveObj.open(response) === 0) {
                         self.buffer = audioContext.createBuffer(waveObj.num_channels, waveObj.num_samples, waveObj.sample_rate);
                         for (var c = 0; c < waveObj.num_channels; c++) {
                             var buffer_ptr = self.buffer.getChannelData(c);
@@ -1551,14 +1552,13 @@ function AudioEngine(specification) {
                                 buffer_ptr[n] = waveObj.decoded_data[c][n];
                             }
                         }
-
-                        delete waveObj;
                     }
-                    if (self.buffer != undefined) {
+                    if (self.buffer !== undefined) {
                         self.status = 2;
                         calculateLoudness(self, "I");
                         return true;
                     }
+                    waveObj = undefined;
                     return false;
                 });
             }
@@ -1568,7 +1568,7 @@ function AudioEngine(specification) {
                 this.status = -1;
                 for (var i = 0; i < this.users.length; i++) {
                     this.users[i].state = -1;
-                    if (this.users[i].interfaceDOM != null) {
+                    if (this.users[i].interfaceDOM !== null) {
                         this.users[i].bufferLoaded(this);
                     }
                 }
@@ -1579,7 +1579,7 @@ function AudioEngine(specification) {
                 if (event.lengthComputable) {
                     this.progress = event.loaded / event.total;
                     for (var i = 0; i < this.users.length; i++) {
-                        if (this.users[i].interfaceDOM != null) {
+                        if (this.users[i].interfaceDOM !== null) {
                             if (typeof this.users[i].interfaceDOM.updateLoading === "function") {
                                 this.users[i].interfaceDOM.updateLoading(this.progress * 100);
                             }
@@ -1611,10 +1611,10 @@ function AudioEngine(specification) {
 
         this.copyBuffer = function (preSilenceTime, postSilenceTime) {
             // Copies the entire bufferObj.
-            if (preSilenceTime == undefined) {
+            if (preSilenceTime === undefined) {
                 preSilenceTime = 0;
             }
-            if (postSilenceTime == undefined) {
+            if (postSilenceTime === undefined) {
                 postSilenceTime = 0;
             }
             var preSilenceSamples = secondsToSamples(preSilenceTime, this.buffer.sampleRate);
@@ -1622,7 +1622,7 @@ function AudioEngine(specification) {
             var newLength = this.buffer.length + preSilenceSamples + postSilenceSamples;
             var copybuffer = audioContext.createBuffer(this.buffer.numberOfChannels, newLength, this.buffer.sampleRate);
             // Now we can use some efficient background copy schemes if we are just padding the end
-            if (preSilenceSamples == 0 && typeof copybuffer.copyToChannel == "function") {
+            if (preSilenceSamples === 0 && typeof copybuffer.copyToChannel === "function") {
                 for (var c = 0; c < this.buffer.numberOfChannels; c++) {
                     copybuffer.copyToChannel(this.buffer.getChannelData(c), c);
                 }
@@ -1638,7 +1638,7 @@ function AudioEngine(specification) {
             copybuffer.lufs = this.buffer.lufs;
             copybuffer.playbackGain = this.buffer.playbackGain;
             return copybuffer;
-        }
+        };
 
         this.cropBuffer = function (startTime, stopTime) {
             // Copy and return the cropped buffer
@@ -1659,7 +1659,7 @@ function AudioEngine(specification) {
                 }
             }
             return copybuffer;
-        }
+        };
     };
 
     this.loadPageData = function (page) {
@@ -1673,7 +1673,7 @@ function AudioEngine(specification) {
                     break;
                 }
             }
-            if (buffer == null) {
+            if (buffer === null) {
                 buffer = new this.bufferObj();
                 var urls = [{
                     url: URL,
@@ -1694,15 +1694,15 @@ function AudioEngine(specification) {
 
     this.play = function (id) {
         // Start the timer and set the audioEngine state to playing (1)
-        if (this.status == 0) {
+        if (this.status === 0) {
             // Check if all audioObjects are ready
             this.bufferReady(id);
         } else {
             this.status = 1;
         }
-        if (this.status == 1) {
+        if (this.status === 1) {
             this.timer.startTest();
-            if (id == undefined) {
+            if (id === undefined) {
                 id = -1;
                 console.error('FATAL - Passed id was undefined - AudioEngineContext.play(id)');
                 return;
@@ -1761,7 +1761,7 @@ function AudioEngine(specification) {
                 break;
             }
         }
-        if (buffer == null) {
+        if (buffer === null) {
             console.log("[WARN]: Buffer was not loaded in pre-test! " + URL);
             buffer = new this.bufferObj();
             this.buffers.push(buffer);
@@ -1799,7 +1799,7 @@ function AudioEngine(specification) {
     this.checkAllPlayed = function () {
         arr = [];
         for (var id = 0; id < this.audioObjects.length; id++) {
-            if (this.audioObjects[id].metric.wasListenedTo == false) {
+            if (this.audioObjects[id].metric.wasListenedTo === false) {
                 arr.push(this.audioObjects[id].id);
             }
         }
@@ -1809,11 +1809,11 @@ function AudioEngine(specification) {
     this.checkAllReady = function () {
         var ready = true;
         for (var i = 0; i < this.audioObjects.length; i++) {
-            if (this.audioObjects[i].state == 0) {
+            if (this.audioObjects[i].state === 0) {
                 // Track not ready
                 console.log('WAIT -- audioObject ' + i + ' not ready yet!');
                 ready = false;
-            };
+            }
         }
         return ready;
     };
@@ -1846,7 +1846,7 @@ function AudioEngine(specification) {
             return true;
         }
         return false;
-    }
+    };
 
     this.exportXML = function () {
 
@@ -1888,7 +1888,7 @@ function audioObject(id) {
         if (callee.status == -1) {
             // ERROR
             this.state = -1;
-            if (this.interfaceDOM != null) {
+            if (this.interfaceDOM !== null) {
                 this.interfaceDOM.error();
             }
             this.buffer = callee;
@@ -1902,7 +1902,7 @@ function audioObject(id) {
         var copybuffer = new callee.constructor();
 
         copybuffer.buffer = callee.cropBuffer(startTime || 0, stopTime || callee.buffer.duration);
-        if (preSilenceTime != 0 || postSilenceTime != 0) {
+        if (preSilenceTime !== 0 || postSilenceTime !== 0) {
             copybuffer.buffer = copybuffer.copyBuffer(preSilenceTime, postSilenceTime);
         }
 
@@ -1915,7 +1915,7 @@ function audioObject(id) {
         } else {
             this.buffer.buffer.playbackGain = 1.0;
         }
-        if (this.interfaceDOM != null) {
+        if (this.interfaceDOM !== null) {
             this.interfaceDOM.enable();
         }
         this.onplayGain = decibelToLinear(this.specification.gain) * (this.buffer.buffer.playbackGain || 1.0);
@@ -1944,7 +1944,7 @@ function audioObject(id) {
     };
 
     this.loopStop = function (setTime) {
-        if (this.outputGain.gain.value != 0.0) {
+        if (this.outputGain.gain.value !== 0.0) {
             this.outputGain.gain.linearRampToValueAtTime(0.0, setTime);
             this.metric.stopListening(audioEngineContext.timer.getTestTime());
         }
@@ -1952,7 +1952,7 @@ function audioObject(id) {
     };
 
     this.play = function (startTime) {
-        if (this.bufferNode == undefined && this.buffer.buffer != undefined) {
+        if (this.bufferNode === undefined && this.buffer.buffer !== undefined) {
             this.bufferNode = audioContext.createBufferSource();
             this.bufferNode.owner = this;
             this.bufferNode.connect(this.outputGain);
@@ -1961,7 +1961,7 @@ function audioObject(id) {
             this.bufferNode.onended = function (event) {
                 // Safari does not like using 'this' to reference the calling object!
                 //event.currentTarget.owner.metric.stopListening(audioEngineContext.timer.getTestTime(),event.currentTarget.owner.getCurrentPosition());
-                if (event.currentTarget != null) {
+                if (event.currentTarget !== null) {
                     event.currentTarget.owner.stop(audioContext.currentTime + 1);
                 }
             };
@@ -1986,7 +1986,7 @@ function audioObject(id) {
 
     this.stop = function (stopTime) {
         this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
-        if (this.bufferNode != undefined) {
+        if (this.bufferNode !== undefined) {
             this.metric.stopListening(audioEngineContext.timer.getTestTime(), this.getCurrentPosition());
             this.bufferNode.stop(stopTime);
             this.bufferNode = undefined;
@@ -1997,7 +1997,7 @@ function audioObject(id) {
 
     this.getCurrentPosition = function () {
         var time = audioEngineContext.timer.getTestTime();
-        if (this.bufferNode != undefined) {
+        if (this.bufferNode !== undefined) {
             var position = (time - this.bufferNode.playbackStartTime) % this.buffer.buffer.duration;
             if (isNaN(position)) {
                 return 0;
@@ -2017,8 +2017,8 @@ function audioObject(id) {
         this.storeDOM.appendChild(file);
         if (this.specification.type != 'outside-reference') {
             var interfaceXML = this.interfaceDOM.exportXMLDOM(this);
-            if (interfaceXML != null) {
-                if (interfaceXML.length == undefined) {
+            if (interfaceXML !== null) {
+                if (interfaceXML.length === undefined) {
                     this.storeDOM.appendChild(interfaceXML);
                 } else {
                     for (var i = 0; i < interfaceXML.length; i++) {
@@ -2026,7 +2026,7 @@ function audioObject(id) {
                     }
                 }
             }
-            if (this.commentDOM != null) {
+            if (this.commentDOM !== null) {
                 this.storeDOM.appendChild(this.commentDOM.exportXMLDOM(this));
             }
         }
@@ -2047,7 +2047,7 @@ function timer() {
     this.testDuration = 0;
     this.minimumTestTime = 0; // No minimum test time
     this.startTest = function () {
-        if (this.testStarted == false) {
+        if (this.testStarted === false) {
             this.testStartTime = audioContext.currentTime;
             this.testStarted = true;
             this.updateTestTime();
@@ -2155,7 +2155,7 @@ function metricTracker(caller) {
     };
 
     this.startListening = function (time) {
-        if (this.listenHold == false) {
+        if (this.listenHold === false) {
             this.wasListenedTo = true;
             this.listenStart = time;
             this.listenHold = true;
@@ -2174,7 +2174,7 @@ function metricTracker(caller) {
     };
 
     this.stopListening = function (time, bufferStopTime) {
-        if (this.listenHold == true) {
+        if (this.listenHold === true) {
             var diff = time - this.listenStart;
             this.listenedTimer += (diff);
             this.listenStart = 0;
@@ -2184,7 +2184,7 @@ function metricTracker(caller) {
             var testTime = evnt.getElementsByTagName('testTime')[0];
             var bufferTime = evnt.getElementsByTagName('bufferTime')[0];
             testTime.setAttribute('stop', time);
-            if (bufferStopTime == undefined) {
+            if (bufferStopTime === undefined) {
                 bufferTime.setAttribute('stop', this.parent.getCurrentPosition());
             } else {
                 bufferTime.setAttribute('stop', bufferStopTime);
@@ -2241,9 +2241,9 @@ function metricTracker(caller) {
         if (audioEngineContext.metric.enableFlagComments) {
             var flagComments = storage.document.createElement('metricresult');
             flagComments.setAttribute('name', 'elementFlagComments');
-            if (this.parent.commentDOM == null) {
+            if (this.parent.commentDOM === null) {
                 flag.textContent = 'false';
-            } else if (this.parent.commentDOM.textContent.length == 0) {
+            } else if (this.parent.commentDOM.textContent.length === 0) {
                 flag.textContent = 'false';
             } else {
                 flag.textContet = 'true';
@@ -2330,7 +2330,7 @@ function Interface(specificationObject) {
         hold.appendChild(time);
         return hold;
 
-    }
+    };
 
     this.lightbox = {
         parent: this,
@@ -2372,7 +2372,7 @@ function Interface(specificationObject) {
         resize: function (event) {
             this.root.style.left = (window.innerWidth / 2) - 250 + 'px';
         }
-    }
+    };
 
     this.lightbox.root.appendChild(this.lightbox.content);
     this.lightbox.root.appendChild(this.lightbox.accept);
@@ -2461,7 +2461,7 @@ function Interface(specificationObject) {
         };
 
         this.deleteCommentBoxes = function () {
-            if (this.injectPoint != null) {
+            if (this.injectPoint !== null) {
                 for (var box of this.boxes) {
                     this.injectPoint.removeChild(box.trackComment);
                 }
@@ -2469,7 +2469,7 @@ function Interface(specificationObject) {
             }
             this.boxes = [];
         };
-    }
+    };
 
     this.commentQuestions = [];
 
@@ -2579,7 +2579,7 @@ function Interface(specificationObject) {
             question.textContent = this.string.textContent;
             var response = document.createElement('response');
             var i = 0;
-            while (this.options[i].checked == false) {
+            while (this.options[i].checked === false) {
                 i++;
                 if (i >= this.options.length) {
                     break;
@@ -2616,7 +2616,7 @@ function Interface(specificationObject) {
             options.style.marginLeft = spanMargin;
             text.style.marginRight = spanMargin;
             text.style.marginLeft = spanMargin;
-            while (options.nextSibling != undefined) {
+            while (options.nextSibling !== undefined) {
                 options = options.nextSibling;
                 text = text.nextSibling;
                 options.style.marginRight = spanMargin;
@@ -2715,7 +2715,7 @@ function Interface(specificationObject) {
             options.style.marginLeft = spanMargin;
             text.style.marginRight = spanMargin;
             text.style.marginLeft = spanMargin;
-            while (options.nextSibling != undefined) {
+            while (options.nextSibling !== undefined) {
                 options = options.nextSibling;
                 text = text.nextSibling;
                 options.style.marginRight = spanMargin;
@@ -2855,8 +2855,8 @@ function Interface(specificationObject) {
             // audioObject has an error!!
             this.outsideReferenceHolder.textContent = "Error";
             this.outsideReferenceHolder.style.backgroundColor = "#F00";
-        }
-    }
+        };
+    };
 
     this.playhead = new function () {
         this.object = document.createElement('div');
@@ -2927,7 +2927,7 @@ function Interface(specificationObject) {
         this.interval = undefined;
 
         this.start = function () {
-            if (this.playbackObject != undefined && this.interval == undefined) {
+            if (this.playbackObject !== undefined && this.interval === undefined) {
                 if (this.maxTime < 60) {
                     this.interval = setInterval(function () {
                         interfaceContext.playhead.update();
@@ -2978,10 +2978,10 @@ function Interface(specificationObject) {
             interfaceContext.volume.valueLin = decibelToLinear(interfaceContext.volume.valueDB);
             interfaceContext.volume.valueText.textContent = interfaceContext.volume.valueDB + 'dB';
             audioEngineContext.outputGain.gain.value = interfaceContext.volume.valueLin;
-        }
+        };
         this.slider.onmouseup = function (event) {
             var storePoint = testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].getAllElementsByName('volumeTracker');
-            if (storePoint.length == 0) {
+            if (storePoint.length === 0) {
                 storePoint = storage.document.createElement('metricresult');
                 storePoint.setAttribute('name', 'volumeTracker');
                 testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].appendChild(storePoint);
@@ -2993,7 +2993,7 @@ function Interface(specificationObject) {
             node.setAttribute('volume', interfaceContext.volume.valueDB);
             node.setAttribute('format', 'dBFS');
             storePoint.appendChild(node);
-        }
+        };
 
         var title = document.createElement('div');
         title.innerHTML = '<span>Master Volume Control</span>';
@@ -3007,12 +3007,12 @@ function Interface(specificationObject) {
 
         this.resize = function (event) {
             if (window.innerWidth < 1000) {
-                this.object.className = "master-volume-holder-inline"
+                this.object.className = "master-volume-holder-inline";
             } else {
                 this.object.className = 'master-volume-holder-float';
             }
-        }
-    }
+        };
+    };
 
     this.calibrationModuleObject = null;
     this.calibrationModule = function () {
@@ -3052,7 +3052,7 @@ function Interface(specificationObject) {
                                     audioEngineContext.outputGain.gain.value = value;
                                     interfaceContext.volume.slider.value = this.input.value;
                                 } else {
-                                    this.gain.gain.value = value
+                                    this.gain.gain.value = value;
                                 }
                                 break;
                         }
@@ -3060,7 +3060,7 @@ function Interface(specificationObject) {
                     disconnect: function () {
                         this.gain.disconnect();
                     }
-                }
+                };
                 obj.root.className = "calibration-slider";
                 obj.root.appendChild(obj.input);
                 obj.oscillator.connect(obj.gain);
@@ -3088,7 +3088,7 @@ function Interface(specificationObject) {
                 f0 *= 2;
             }
             inject.appendChild(this.holder);
-        }
+        };
         this.collect = function () {
             for (var obj of this.calibrationNodes) {
                 var node = storage.document.createElement("calibrationresult");
@@ -3098,8 +3098,8 @@ function Interface(specificationObject) {
                 node.setAttribute("gain-lin", obj.gain.gain.value);
                 this.storeDOM.appendChild(node);
             }
-        }
-    }
+        };
+    };
 
 
     // Global Checkers
@@ -3158,13 +3158,13 @@ function Interface(specificationObject) {
                     break;
                 }
             }
-            if (passed == false) {
+            if (passed === false) {
                 check_pass = false;
                 console.log("Continue listening to track-" + object.interfaceDOM.getPresentedId());
                 error_obj.push(object.interfaceDOM.getPresentedId());
             }
         }
-        if (check_pass == false) {
+        if (check_pass === false) {
             var str_start = "You have not completely listened to fragments ";
             for (var i = 0; i < error_obj.length; i++) {
                 str_start += error_obj[i];
@@ -3184,11 +3184,11 @@ function Interface(specificationObject) {
         var str = "You have not moved ";
         var failed = [];
         for (var ao of audioEngineContext.audioObjects) {
-            if (ao.metric.wasMoved == false && ao.interfaceDOM.canMove() == true) {
+            if (ao.metric.wasMoved === false && ao.interfaceDOM.canMove() === true) {
                 failed.push(ao.interfaceDOM.getPresentedId());
             }
         }
-        if (failed.length == 0) {
+        if (failed.length === 0) {
             return true;
         } else if (failed.length == 1) {
             str += 'track ' + failed[0];
@@ -3209,11 +3209,11 @@ function Interface(specificationObject) {
         var str = "You have not played ";
         var failed = [];
         for (var ao of audioEngineContext.audioObjects) {
-            if (ao.metric.wasListenedTo == false) {
+            if (ao.metric.wasListenedTo === false) {
                 failed.push(ao.interfaceDOM.getPresentedId());
             }
         }
-        if (failed.length == 0) {
+        if (failed.length === 0) {
             return true;
         } else if (failed.length == 1) {
             str += 'track ' + failed[0];
@@ -3245,7 +3245,7 @@ function Interface(specificationObject) {
             }
         }
         return true;
-    }
+    };
     this.checkScaleRange = function (min, max) {
         var page = testState.getCurrentTestPage();
         var audioObjects = audioEngineContext.audioObjects;
@@ -3267,7 +3267,7 @@ function Interface(specificationObject) {
             state = false;
         }
         if (maxRanking * 100 < max) {
-            str += "At least one fragment must be above the " + max + " mark."
+            str += "At least one fragment must be above the " + max + " mark.";
             state = false;
         }
         if (!state) {
@@ -3276,7 +3276,7 @@ function Interface(specificationObject) {
             interfaceContext.lightbox.post("Error", str);
         }
         return state;
-    }
+    };
 
     this.storeErrorNode = function (errorMessage) {
         var time = audioEngineContext.timer.getTestTime();
@@ -3301,13 +3301,12 @@ function Interface(specificationObject) {
                 case "capital":
                     return String.fromCharCode((index + offset) % 26 + 65);
                 case "samediff":
-                    if (index == 0) {
+                    if (index === 0) {
                         return "Same";
                     } else if (index == 1) {
                         return "Difference";
-                    } else {
-                        return "";
                     }
+                    return "";
                 case "number":
                     return String(index + offset);
                 default:
@@ -3315,7 +3314,7 @@ function Interface(specificationObject) {
             }
         }
 
-        if (typeof labelStart !== "string" || labelStart.length == 0) {
+        if (typeof labelStart !== "string" || labelStart.length === 0) {
             labelStart = String.fromCharCode(0);
         }
 
@@ -3357,7 +3356,7 @@ function Interface(specificationObject) {
         } else {
             throw ("Invalid arguments");
         }
-    }
+    };
 
     this.getCombinedInterfaces = function (page) {
         // Combine the interfaces with the global interface nodes
@@ -3382,7 +3381,7 @@ function Interface(specificationObject) {
             }
         });
         return local;
-    }
+    };
 }
 
 function Storage() {
@@ -3395,7 +3394,7 @@ function Storage() {
     this.state = 0;
 
     this.initialise = function (existingStore) {
-        if (existingStore == undefined) {
+        if (existingStore === undefined) {
             // We need to get the sessionKey
             this.SessionKey.requestKey();
             this.document = document.implementation.createDocument(null, "waetresult", null);
@@ -3411,10 +3410,10 @@ function Storage() {
             this.root = existingStore.firstChild;
             this.SessionKey.key = this.root.getAttribute("key");
         }
-        if (specification.preTest != undefined) {
+        if (specification.preTest !== undefined) {
             this.globalPreTest = new this.surveyNode(this, this.root, specification.preTest);
         }
-        if (specification.postTest != undefined) {
+        if (specification.postTest !== undefined) {
             this.globalPostTest = new this.surveyNode(this, this.root, specification.postTest);
         }
     };
@@ -3426,7 +3425,7 @@ function Storage() {
         handleEvent: function () {
             var parse = new DOMParser();
             var xml = parse.parseFromString(this.request.response, "text/xml");
-            if (this.request.response.length == 0) {
+            if (this.request.response.length === 0) {
                 console.error("An unspecified error occured, no server key could be generated");
                 return;
             }
@@ -3459,7 +3458,7 @@ function Storage() {
             this.request.send();
         },
         update: function () {
-            if (this.key == null) {
+            if (this.key === null) {
                 console.log("Cannot save as key == null");
                 return;
             }
@@ -3494,10 +3493,10 @@ function Storage() {
                         console.log("Intermediate save: Error! " + message.textContent);
                     }
                 }
-            }
+            };
             xmlhttp.send([hold.innerHTML]);
         }
-    }
+    };
 
     this.createTestPageStore = function (specification) {
         var store = new this.pageNode(this, specification);
@@ -3529,7 +3528,7 @@ function Storage() {
                 return;
             }
             var surveyresult = this.XMLDOM.firstChild;
-            while (surveyresult != null) {
+            while (surveyresult !== null) {
                 if (surveyresult.getAttribute("ref") == node.specification.id) {
                     break;
                 }
@@ -3552,7 +3551,7 @@ function Storage() {
                     surveyresult.appendChild(child);
                     break;
                 case "checkbox":
-                    if (node.response == undefined) {
+                    if (node.response === undefined) {
                         surveyresult.appendChild(this.parent.document.createElement('response'));
                         break;
                     }
@@ -3568,7 +3567,7 @@ function Storage() {
         this.complete = function () {
             this.state = "complete";
             this.XMLDOM.setAttribute("state", this.state);
-        }
+        };
     };
 
     this.pageNode = function (parent, specification) {
@@ -3580,10 +3579,10 @@ function Storage() {
         this.XMLDOM.setAttribute('ref', specification.id);
         this.XMLDOM.setAttribute('presentedId', specification.presentedId);
         this.XMLDOM.setAttribute("state", this.state);
-        if (specification.preTest != undefined) {
+        if (specification.preTest !== undefined) {
             this.preTest = new this.parent.surveyNode(this.parent, this.XMLDOM, this.specification.preTest);
         }
-        if (specification.postTest != undefined) {
+        if (specification.postTest !== undefined) {
             this.postTest = new this.parent.surveyNode(this.parent, this.XMLDOM, this.specification.postTest);
         }
 
@@ -3595,9 +3594,9 @@ function Storage() {
         for (var element of this.specification.audioElements) {
             var aeNode = this.parent.document.createElement('audioelement');
             aeNode.setAttribute('ref', element.id);
-            if (element.name != undefined) {
-                aeNode.setAttribute('name', element.name)
-            };
+            if (element.name !== undefined) {
+                aeNode.setAttribute('name', element.name);
+            }
             aeNode.setAttribute('type', element.type);
             aeNode.setAttribute('url', element.url);
             aeNode.setAttribute('fqurl', qualifyURL(element.url));
@@ -3617,13 +3616,13 @@ function Storage() {
         this.complete = function () {
             this.state = "complete";
             this.XMLDOM.setAttribute("state", "complete");
-        }
+        };
     };
     this.update = function () {
         this.SessionKey.update();
-    }
+    };
     this.finish = function () {
-        if (this.state == 0) {
+        if (this.state === 0) {
             this.update();
         }
         this.state = 1;
