@@ -48,13 +48,13 @@ XMLDocument.prototype.getAllElementsByName = function (name) {
     name = String(name);
     var selected = this.documentElement.getAllElementsByName(name);
     return selected;
-}
+};
 
 Element.prototype.getAllElementsByName = function (name) {
     name = String(name);
     var selected = [];
     var node = this.firstElementChild;
-    while (node != null) {
+    while (node !== null) {
         if (node.getAttribute('name') == name) {
             selected.push(node);
         }
@@ -64,19 +64,19 @@ Element.prototype.getAllElementsByName = function (name) {
         node = node.nextElementSibling;
     }
     return selected;
-}
+};
 
 XMLDocument.prototype.getAllElementsByTagName = function (name) {
     name = String(name);
     var selected = this.documentElement.getAllElementsByTagName(name);
     return selected;
-}
+};
 
 Element.prototype.getAllElementsByTagName = function (name) {
     name = String(name);
     var selected = [];
     var node = this.firstElementChild;
-    while (node != null) {
+    while (node !== null) {
         if (node.nodeName == name) {
             selected.push(node);
         }
@@ -86,7 +86,7 @@ Element.prototype.getAllElementsByTagName = function (name) {
         node = node.nextElementSibling;
     }
     return selected;
-}
+};
 
 // Firefox does not have an XMLDocument.prototype.getElementsByName
 if (typeof XMLDocument.prototype.getElementsByName != "function") {
@@ -94,14 +94,14 @@ if (typeof XMLDocument.prototype.getElementsByName != "function") {
         name = String(name);
         var node = this.documentElement.firstElementChild;
         var selected = [];
-        while (node != null) {
+        while (node !== null) {
             if (node.getAttribute('name') == name) {
                 selected.push(node);
             }
             node = node.nextElementSibling;
         }
         return selected;
-    }
+    };
 }
 
 var check_dependancies = function () {
@@ -122,7 +122,7 @@ var check_dependancies = function () {
         return false;
     }
     return true;
-}
+};
 
 var onload = function () {
     // Function called once the browser has loaded all files.
@@ -131,7 +131,7 @@ var onload = function () {
     // Create a web audio API context
     // Fixed for cross-browser support
     var AudioContext = window.AudioContext || window.webkitAudioContext;
-    audioContext = new AudioContext;
+    audioContext = new AudioContext();
 
     // Create test state
     testState = new stateMachine();
@@ -152,7 +152,7 @@ var onload = function () {
         interfaceContext.resizeWindow(event);
     };
 
-    if (window.location.search.length != 0) {
+    if (window.location.search.length !== 0) {
         var search = window.location.search.split('?')[1];
         // Now split the requests into pairs
         var searchQueries = search.split('&');
@@ -204,11 +204,11 @@ function loadProjectSpec(url) {
             span.textContent = "There was an error when loading your XML file. Please check your path in the URL. After the path to this page, there should be '?url=path/to/your/file.xml'. Check the spelling of your filename as well. If you are still having issues, check the log of the python server or your webserver distribution for 404 codes for your file.";
             document.getElementsByTagName('body')[0].appendChild(msg);
             document.getElementsByTagName('body')[0].appendChild(span);
-        }
+        };
         r.send();
     };
     xmlhttp.send();
-};
+}
 
 function loadProjectSpecCallback(response) {
     // Function called after asynchronous download of XML project specification
@@ -219,10 +219,11 @@ function loadProjectSpecCallback(response) {
     var parse = new DOMParser();
     var responseDocument = parse.parseFromString(response, 'text/xml');
     var errorNode = responseDocument.getElementsByTagName('parsererror');
+    var msg, span;
     if (errorNode.length >= 1) {
-        var msg = document.createElement("h3");
+        msg = document.createElement("h3");
         msg.textContent = "FATAL ERROR";
-        var span = document.createElement("span");
+        span = document.createElement("span");
         span.textContent = "The XML parser returned the following errors when decoding your XML file";
         document.getElementsByTagName('body')[0].innerHTML = null;
         document.getElementsByTagName('body')[0].appendChild(msg);
@@ -230,10 +231,10 @@ function loadProjectSpecCallback(response) {
         document.getElementsByTagName('body')[0].appendChild(errorNode[0]);
         return;
     }
-    if (responseDocument == undefined || responseDocument.firstChild == undefined) {
-        var msg = document.createElement("h3");
+    if (responseDocument === undefined || responseDocument.firstChild === undefined) {
+        msg = document.createElement("h3");
         msg.textContent = "FATAL ERROR";
-        var span = document.createElement("span");
+        span = document.createElement("span");
         span.textContent = "The project XML was not decoded properly, try refreshing your browser and clearing caches. If the problem persists, contact the test creator.";
         document.getElementsByTagName('body')[0].innerHTML = null;
         document.getElementsByTagName('body')[0].appendChild(msg);
@@ -254,16 +255,16 @@ function loadProjectSpecCallback(response) {
         console.log(xmllint);
         if (xmllint != 'document.xml validates\n') {
             document.getElementsByTagName('body')[0].innerHTML = null;
-            var msg = document.createElement("h3");
+            msg = document.createElement("h3");
             msg.textContent = "FATAL ERROR";
-            var span = document.createElement("h4");
+            span = document.createElement("h4");
             span.textContent = "The XML validator returned the following errors when decoding your XML file";
             document.getElementsByTagName('body')[0].appendChild(msg);
             document.getElementsByTagName('body')[0].appendChild(span);
             xmllint = xmllint.split('\n');
             for (var i in xmllint) {
                 document.getElementsByTagName('body')[0].appendChild(document.createElement('br'));
-                var span = document.createElement("span");
+                span = document.createElement("span");
                 span.textContent = xmllint[i];
                 document.getElementsByTagName('body')[0].appendChild(span);
             }
@@ -278,15 +279,16 @@ function loadProjectSpecCallback(response) {
         // document is a result
         projectXML = document.implementation.createDocument(null, "waet");
         projectXML.firstChild.appendChild(responseDocument.getElementsByTagName('waet')[0].getElementsByTagName("setup")[0].cloneNode(true));
-        var child = responseDocument.firstChild.firstChild;
-        while (child != null) {
+        var child = responseDocument.firstChild.firstChild,
+            copy;
+        while (child !== null) {
             if (child.nodeName == "survey") {
                 // One of the global survey elements
                 if (child.getAttribute("state") == "complete") {
                     // We need to remove this survey from <setup>
                     var location = child.getAttribute("location");
                     var globalSurveys = projectXML.getElementsByTagName("setup")[0].getElementsByTagName("survey")[0];
-                    while (globalSurveys != null) {
+                    while (globalSurveys !== null) {
                         if (location == "pre" || location == "before") {
                             if (globalSurveys.getAttribute("location") == "pre" || globalSurveys.getAttribute("location") == "before") {
                                 projectXML.getElementsByTagName("setup")[0].removeChild(globalSurveys);
@@ -302,7 +304,7 @@ function loadProjectSpecCallback(response) {
                     }
                 } else {
                     // We need to complete this, so it must be regenerated by store
-                    var copy = child;
+                    copy = child;
                     child = child.previousElementSibling;
                     responseDocument.firstChild.removeChild(copy);
                 }
@@ -310,7 +312,7 @@ function loadProjectSpecCallback(response) {
                 if (child.getAttribute("state") == "empty") {
                     // We need to complete this page
                     projectXML.firstChild.appendChild(responseDocument.getElementById(child.getAttribute("ref")).cloneNode(true));
-                    var copy = child;
+                    copy = child;
                     child = child.previousElementSibling;
                     responseDocument.firstChild.removeChild(copy);
                 }
@@ -323,7 +325,7 @@ function loadProjectSpecCallback(response) {
         storage.initialise(responseDocument);
     }
     /// CHECK FOR SAMPLE RATE COMPATIBILITY
-    if (specification.sampleRate != undefined) {
+    if (specification.sampleRate !== undefined) {
         if (Number(specification.sampleRate) != audioContext.sampleRate) {
             var errStr = 'Sample rates do not match! Requested ' + Number(specification.sampleRate) + ', got ' + audioContext.sampleRate + '. Please set the sample rate to match before completing this test.';
             interfaceContext.lightbox.post("Error", errStr);
@@ -335,7 +337,7 @@ function loadProjectSpecCallback(response) {
     getInterfaces.open("GET", "interfaces/interfaces.json");
     getInterfaces.onerror = function (e) {
         throw (e);
-    }
+    };
     getInterfaces.onload = function () {
         if (getInterfaces.status !== 200) {
             throw (new Error(getInterfaces.status));
@@ -363,14 +365,14 @@ function loadProjectSpecCallback(response) {
             css.setAttribute("href", v);
             head.appendChild(css);
         });
-    }
+    };
     getInterfaces.send();
 
-    if (gReturnURL != undefined) {
+    if (gReturnURL !== undefined) {
         console.log("returnURL Overide from " + specification.returnURL + " to " + gReturnURL);
         specification.returnURL = gReturnURL;
     }
-    if (gSaveFilenamePrefix != undefined) {
+    if (gSaveFilenamePrefix !== undefined) {
         specification.saveFilenamePrefix = gSaveFilenamePrefix;
     }
 
@@ -415,7 +417,7 @@ function createProjectSave(destURL) {
             }
         }
         var saveURL = projectReturn + "php/save.php?key=" + storage.SessionKey.key + saveUrlSuffix;
-        var xmlhttp = new XMLHttpRequest;
+        var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("POST", saveURL, true);
         xmlhttp.setRequestHeader('Content-Type', 'text/xml');
         xmlhttp.onerror = function () {
@@ -517,7 +519,7 @@ function samplesToSeconds(samples, fs) {
 }
 
 function randomString(length) {
-    var str = ""
+    var str = "";
     for (var i = 0; i < length; i += 2) {
         var num = Math.floor(Math.random() * 1295);
         str += num.toString(36);
@@ -532,7 +534,7 @@ function randomiseOrder(input) {
 
     var inputSequence = []; // For safety purposes: keep track of randomisation
     for (var counter = 0; counter < N; ++counter)
-        inputSequence.push(counter) // Fill array
+        inputSequence.push(counter); // Fill array
     var inputSequenceClone = inputSequence.slice(0);
 
     var holdArr = [];
@@ -584,6 +586,437 @@ function interfacePopup() {
             e.preventDefault();
         }
     });
+    // Generators & Processors //
+
+    function processConditional(node, value) {
+        function jumpToId(jumpID) {
+            var index = this.popupOptions.findIndex(function (item, index, element) {
+                if (item.specification.id == jumpID) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }, this);
+            this.currentIndex = index - 1;
+        }
+        var conditionFunction;
+        if (node.specification.type === "question") {
+            conditionFunction = processQuestionConditional;
+        } else if (node.specification.type === "checkbox") {
+            conditionFunction = processCheckboxConditional;
+        } else if (node.specification.type === "radio") {
+            conditionFunction = processRadioConditional;
+        } else if (node.specifiication.type === "number") {
+            conditionFunction = processNumberConditional;
+        } else if (node.specification.type === "slider") {
+            conditionFunction = processSliderConditional;
+        } else {
+            return;
+        }
+        for (var i = 0; i < node.specification.conditions; i++) {
+            var condition = node.specification.conditions[i];
+            var pass = conditionFunction(condition, value);
+            var jumpID;
+            if (pass) {
+                jumpID = condition.jumpToOnPass;
+            } else {
+                jumpID = condition.jumpToOnFail;
+            }
+            if (jumpID !== undefined) {
+                jumpToId(jumpID);
+                break;
+            }
+        }
+    }
+
+    function postQuestion(node) {
+        var textArea = document.createElement('textarea');
+        switch (node.specification.boxsize) {
+            case 'small':
+                textArea.cols = "20";
+                textArea.rows = "1";
+                break;
+            case 'normal':
+                textArea.cols = "30";
+                textArea.rows = "2";
+                break;
+            case 'large':
+                textArea.cols = "40";
+                textArea.rows = "5";
+                break;
+            case 'huge':
+                textArea.cols = "50";
+                textArea.rows = "10";
+                break;
+        }
+        if (node.response === undefined) {
+            node.response = "";
+        } else {
+            textArea.value = node.response;
+        }
+        this.popupResponse.appendChild(textArea);
+        textArea.focus();
+        this.popupResponse.style.textAlign = "center";
+        this.popupResponse.style.left = "0%";
+    }
+
+    function processQuestionConditional(condition, value) {
+        switch (condition.check) {
+            case "equals":
+                // Deliberately loose check
+                if (value == condition.value) {
+                    return true;
+                }
+                break;
+            case "greaterThan":
+            case "lessThan":
+                console.log("Survey Element of type 'question' cannot interpret greaterThan/lessThan conditions. IGNORING");
+                break;
+            case "contains":
+                if (textArea.value.includes(condition.value)) {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+
+    function processQuestion(node) {
+        var textArea = this.popupResponse.getAllElementsByTagName("textarea")[0];
+        if (node.specification.mandatory === true && textArea.value.length === 0) {
+            interfaceContext.lightbox.post("Error", "This question is mandatory");
+            return;
+        } else {
+            // Save the text content
+            console.log("Question: " + node.specification.statement);
+            console.log("Question Response: " + textArea.value);
+            node.response = textArea.value;
+        }
+        processConditional(node, textArea.value);
+    }
+
+    function postCheckbox(node) {
+        if (node.response === undefined) {
+            node.response = Array(node.specification.options.length);
+        }
+        var index = 0;
+        var table = document.createElement("table");
+        table.className = "popup-option-list";
+        table.border = "0";
+        node.specification.options.forEach(function (option) {
+            var tr = document.createElement("tr");
+            table.appendChild(tr);
+            var td = document.createElement("td");
+            tr.appendChild(td);
+            var input = document.createElement('input');
+            input.id = option.name;
+            input.type = 'checkbox';
+            td.appendChild(input);
+
+            td = document.createElement("td");
+            tr.appendChild(td);
+            var span = document.createElement('span');
+            span.textContent = option.text;
+            td.appendChild(span);
+            tr = document.createElement('div');
+            tr.setAttribute('name', 'option');
+            tr.className = "popup-option-checbox";
+            if (node.response[index] !== undefined) {
+                if (node.response[index].checked === true) {
+                    input.checked = "true";
+                }
+            }
+            index++;
+        });
+        this.popupResponse.appendChild(table);
+    }
+
+    function processCheckbox(node) {
+        console.log("Checkbox: " + node.specification.statement);
+        var inputs = this.popupResponse.getElementsByTagName('input');
+        node.response = [];
+        var numChecked = 0,
+            i;
+        for (i = 0; i < node.specification.options.length; i++) {
+            if (inputs[i].checked) {
+                numChecked++;
+            }
+        }
+        if (node.specification.min !== undefined) {
+            if (node.specification.max === undefined) {
+                if (numChecked < node.specification.min) {
+                    var msg = "You must select at least " + node.specification.min + " option";
+                    if (node.specification.min > 1) {
+                        msg += "s";
+                    }
+                    interfaceContext.lightbox.post("Error", msg);
+                    return;
+                }
+            } else {
+                if (numChecked < node.specification.min || numChecked > node.specification.max) {
+                    if (node.specification.min == node.specification.max) {
+                        interfaceContext.lightbox.post("Error", "You must only select " + node.specification.min);
+                    } else {
+                        interfaceContext.lightbox.post("Error", "You must select between " + node.specification.min + " and " + node.specification.max);
+                    }
+                    return;
+                }
+            }
+        }
+        for (i = 0; i < node.specification.options.length; i++) {
+            node.response.push({
+                name: node.specification.options[i].name,
+                text: node.specification.options[i].text,
+                checked: inputs[i].checked
+            });
+            console.log(node.specification.options[i].name + ": " + inputs[i].checked);
+        }
+        processConditional(node, node.response);
+    }
+
+    function processCheckboxConditional(condition, response) {
+        switch (condition.check) {
+            case "contains":
+                for (var i = 0; i < response.length; i++) {
+                    var value = response[i];
+                    if (value.name === condition.value && value.checked) {
+                        return true;
+                    }
+                }
+                break;
+            case "equals":
+            case "greaterThan":
+            case "lessThan":
+                console.log("Survey Element of type 'checkbox' cannot interpret equals/greaterThan/lessThan conditions. IGNORING");
+                break;
+            default:
+                console.log("Unknown condition. IGNORING");
+                break;
+        }
+        return false;
+    }
+
+    function postRadio(node) {
+        if (node.response === undefined) {
+            node.response = {
+                name: "",
+                text: ""
+            };
+        }
+        var index = 0;
+        var table = document.createElement("table");
+        table.className = "popup-option-list";
+        table.border = "0";
+        node.specification.options.forEach(function (option) {
+            var tr = document.createElement("tr");
+            table.appendChild(tr);
+            var td = document.createElement("td");
+            tr.appendChild(td);
+            var input = document.createElement('input');
+            input.id = option.name;
+            input.type = 'radio';
+            input.name = node.specification.id;
+            td.appendChild(input);
+
+            td = document.createElement("td");
+            tr.appendChild(td);
+            var span = document.createElement('span');
+            span.textContent = option.text;
+            td.appendChild(span);
+            tr = document.createElement('div');
+            tr.setAttribute('name', 'option');
+            tr.className = "popup-option-checbox";
+            if (node.response[index] !== undefined) {
+                if (node.response[index].checked === true) {
+                    input.checked = "true";
+                }
+            }
+            index++;
+        });
+        this.popupResponse.appendChild(table);
+    }
+
+    function processRadio(node) {
+        var optHold = this.popupResponse;
+        console.log("Radio: " + node.specification.statement);
+        node.response = null;
+        var i = 0;
+        var inputs = optHold.getElementsByTagName('input');
+        while (node.response === null) {
+            if (i == inputs.length) {
+                if (node.specification.mandatory === true) {
+                    interfaceContext.lightbox.post("Error", "Please select one option");
+                    return;
+                }
+                break;
+            }
+            if (inputs[i].checked === true) {
+                node.response = node.specification.options[i];
+                console.log("Selected: " + node.specification.options[i].name);
+            }
+            i++;
+        }
+        processConditional(node, node.response);
+    }
+
+    function processRadioConditional(condition, response) {
+        switch (condition.check) {
+            case "equals":
+                if (node.response === condition.value) {
+                    return true;
+                }
+                break;
+            case "contains":
+            case "greaterThan":
+            case "lessThan":
+                console.log("Survey Element of type 'radio' cannot interpret contains/greaterThan/lessThan conditions. IGNORING");
+                break;
+            default:
+                console.log("Unknown condition. IGNORING");
+                break;
+        }
+        return false;
+    }
+
+    function postNumber(node) {
+        var input = document.createElement('input');
+        input.type = 'textarea';
+        if (node.specification.min !== null) {
+            input.min = node.specification.min;
+        }
+        if (node.specification.max !== null) {
+            input.max = node.specification.max;
+        }
+        if (node.specification.step !== null) {
+            input.step = node.specification.step;
+        }
+        if (node.response !== undefined) {
+            input.value = node.response;
+        }
+        this.popupResponse.appendChild(input);
+        this.popupResponse.style.textAlign = "center";
+        this.popupResponse.style.left = "0%";
+    }
+
+    function processNumber(node) {
+        var input = this.popupContent.getElementsByTagName('input')[0];
+        if (node.mandatory === true && input.value.length === 0) {
+            interfaceContext.lightbox.post("Error", 'This question is mandatory. Please enter a number');
+            return;
+        }
+        var enteredNumber = Number(input.value);
+        if (isNaN(enteredNumber)) {
+            interfaceContext.lightbox.post("Error", 'Please enter a valid number');
+            return;
+        }
+        if (enteredNumber < node.min && node.min !== null) {
+            interfaceContext.lightbox.post("Error", 'Number is below the minimum value of ' + node.min);
+            return;
+        }
+        if (enteredNumber > node.max && node.max !== null) {
+            interfaceContext.lightbox.post("Error", 'Number is above the maximum value of ' + node.max);
+            return;
+        }
+        node.response = input.value;
+    }
+
+    function processNumberConditional(condtion, value) {
+        switch (condition.check) {
+            case "greaterThan":
+                if (node.response > Number(condition.value)) {
+                    return true;
+                }
+                break;
+            case "lessThan":
+                if (node.response < Number(condition.value)) {
+                    return true;
+                }
+                break;
+            case "equals":
+                if (node.response == condition.value) {
+                    return true;
+                }
+                break;
+            case "contains":
+                console.log("Survey Element of type 'number' cannot interpret \"contains\" conditions. IGNORING");
+                break;
+            default:
+                console.log("Unknown condition. IGNORING");
+                break;
+        }
+        return false;
+    }
+
+    function postVideo(node) {
+        var video = document.createElement("video");
+        video.src = node.specification.url;
+        this.popupResponse.appendChild(video);
+    }
+
+    function postYoutube(node) {
+        var iframe = document.createElement("iframe");
+        iframe.className = "youtube";
+        iframe.src = node.specification.url;
+        this.popupResponse.appendChild(iframe);
+    }
+
+    function postSlider(node) {
+        var hold = document.createElement('div');
+        var input = document.createElement('input');
+        input.type = 'range';
+        input.style.width = "90%";
+        if (node.specification.min !== null) {
+            input.min = node.specification.min;
+        }
+        if (node.specification.max !== null) {
+            input.max = node.specification.max;
+        }
+        if (node.response !== undefined) {
+            input.value = node.response;
+        }
+        hold.className = "survey-slider-text-holder";
+        var minText = document.createElement('span');
+        var maxText = document.createElement('span');
+        minText.textContent = node.specification.leftText;
+        maxText.textContent = node.specification.rightText;
+        hold.appendChild(minText);
+        hold.appendChild(maxText);
+        this.popupResponse.appendChild(input);
+        this.popupResponse.appendChild(hold);
+        this.popupResponse.style.textAlign = "center";
+    }
+
+    function processSlider(node) {
+        var input = this.popupContent.getElementsByTagName('input')[0];
+        node.response = input.value;
+    }
+
+    function processSliderConditional(condition, value) {
+        switch (condition.check) {
+            case "contains":
+                console.log("Survey Element of type 'number' cannot interpret contains conditions. IGNORING");
+                break;
+            case "greaterThan":
+                if (node.response > Number(condition.value)) {
+                    return true;
+                }
+                break;
+            case "lessThan":
+                if (node.response < Number(condition.value)) {
+                    return true;
+                }
+                break;
+            case "equals":
+                if (node.response == condition.value) {
+                    return true;
+                }
+                break;
+            default:
+                console.log("Unknown condition. IGNORING");
+                break;
+        }
+        return false;
+    }
 
     this.createPopup = function () {
         // Create popup window interface
@@ -614,7 +1047,7 @@ function interfacePopup() {
     };
 
     this.showPopup = function () {
-        if (this.popup == null) {
+        if (this.popup === null) {
             this.createPopup();
         }
         this.popup.style.visibility = 'visible';
@@ -641,157 +1074,19 @@ function interfacePopup() {
         this.popupTitle.innerHTML = "";
         this.popupTitle.appendChild(p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild);
         if (node.specification.type == 'question') {
-            var textArea = document.createElement('textarea');
-            switch (node.specification.boxsize) {
-                case 'small':
-                    textArea.cols = "20";
-                    textArea.rows = "1";
-                    break;
-                case 'normal':
-                    textArea.cols = "30";
-                    textArea.rows = "2";
-                    break;
-                case 'large':
-                    textArea.cols = "40";
-                    textArea.rows = "5";
-                    break;
-                case 'huge':
-                    textArea.cols = "50";
-                    textArea.rows = "10";
-                    break;
-            }
-            if (node.response == undefined) {
-                node.response = "";
-            } else {
-                textArea.value = node.response;
-            }
-            this.popupResponse.appendChild(textArea);
-            textArea.focus();
-            this.popupResponse.style.textAlign = "center";
-            this.popupResponse.style.left = "0%";
+            postQuestion(node);
         } else if (node.specification.type == 'checkbox') {
-            if (node.response == undefined) {
-                node.response = Array(node.specification.options.length);
-            }
-            var index = 0;
-            var table = document.createElement("table");
-            table.className = "popup-option-list";
-            table.border = "0";
-            for (var option of node.specification.options) {
-                var tr = document.createElement("tr");
-                table.appendChild(tr);
-                var td = document.createElement("td");
-                tr.appendChild(td);
-                var input = document.createElement('input');
-                input.id = option.name;
-                input.type = 'checkbox';
-                td.appendChild(input);
-
-                td = document.createElement("td");
-                tr.appendChild(td);
-                var span = document.createElement('span');
-                span.textContent = option.text;
-                td.appendChild(span);
-                var tr = document.createElement('div');
-                tr.setAttribute('name', 'option');
-                tr.className = "popup-option-checbox";
-                if (node.response[index] != undefined) {
-                    if (node.response[index].checked == true) {
-                        input.checked = "true";
-                    }
-                }
-                index++;
-            }
-            this.popupResponse.appendChild(table);
+            postCheckbox(node);
         } else if (node.specification.type == 'radio') {
-            if (node.response == undefined) {
-                node.response = {
-                    name: "",
-                    text: ""
-                };
-            }
-            var index = 0;
-            var table = document.createElement("table");
-            table.className = "popup-option-list";
-            table.border = "0";
-            for (var option of node.specification.options) {
-                var tr = document.createElement("tr");
-                table.appendChild(tr);
-                var td = document.createElement("td");
-                tr.appendChild(td);
-                var input = document.createElement('input');
-                input.id = option.name;
-                input.type = 'radio';
-                input.name = node.specification.id;
-                td.appendChild(input);
-
-                td = document.createElement("td");
-                tr.appendChild(td);
-                var span = document.createElement('span');
-                span.textContent = option.text;
-                td.appendChild(span);
-                var tr = document.createElement('div');
-                tr.setAttribute('name', 'option');
-                tr.className = "popup-option-checbox";
-                if (node.response[index] != undefined) {
-                    if (node.response[index].checked == true) {
-                        input.checked = "true";
-                    }
-                }
-                index++;
-            }
-            this.popupResponse.appendChild(table);
+            postRadio(node);
         } else if (node.specification.type == 'number') {
-            var input = document.createElement('input');
-            input.type = 'textarea';
-            if (node.specification.min != null) {
-                input.min = node.specification.min;
-            }
-            if (node.specification.max != null) {
-                input.max = node.specification.max;
-            }
-            if (node.specification.step != null) {
-                input.step = node.specification.step;
-            }
-            if (node.response != undefined) {
-                input.value = node.response;
-            }
-            this.popupResponse.appendChild(input);
-            this.popupResponse.style.textAlign = "center";
-            this.popupResponse.style.left = "0%";
+            postNumber(node);
         } else if (node.specification.type == "video") {
-            var video = document.createElement("video");
-            video.src = node.specification.url;
-            this.popupResponse.appendChild(video);
+            postVideo(node);
         } else if (node.specification.type == "youtube") {
-            var iframe = document.createElement("iframe");
-            iframe.className = "youtube";
-            iframe.src = node.specification.url;
-            this.popupResponse.appendChild(iframe);
+            postYoutube(node);
         } else if (node.specification.type == "slider") {
-            var hold = document.createElement('div');
-            var input = document.createElement('input');
-            input.type = 'range';
-            input.style.width = "90%";
-            if (node.specification.min != null) {
-                input.min = node.specification.min;
-            }
-            if (node.specification.max != null) {
-                input.max = node.specification.max;
-            }
-            if (node.response != undefined) {
-                input.value = node.response;
-            }
-            hold.className = "survey-slider-text-holder";
-            var minText = document.createElement('span');
-            var maxText = document.createElement('span');
-            minText.textContent = node.specification.leftText;
-            maxText.textContent = node.specification.rightText;
-            hold.appendChild(minText);
-            hold.appendChild(maxText);
-            this.popupResponse.appendChild(input);
-            this.popupResponse.appendChild(hold);
-            this.popupResponse.style.textAlign = "center";
+            postSlider(node);
         }
         if (this.currentIndex + 1 == this.popupOptions.length) {
             if (this.node.location == "pre") {
@@ -815,12 +1110,12 @@ function interfacePopup() {
             this.popupOptions = [];
             this.node = node;
             this.store = store;
-            for (var opt of node.options) {
+            node.options.forEach(function (opt) {
                 this.popupOptions.push({
                     specification: opt,
                     response: null
                 });
-            }
+            }, this);
             this.currentIndex = 0;
             this.showPopup();
             this.postNode();
@@ -831,7 +1126,7 @@ function interfacePopup() {
 
     this.proceedClicked = function () {
         // Each time the popup button is clicked!
-        if (testState.stateIndex == 0 && specification.calibration) {
+        if (testState.stateIndex === 0 && specification.calibration) {
             interfaceContext.calibrationModuleObject.collect();
             advanceState();
             return;
@@ -839,286 +1134,18 @@ function interfacePopup() {
         var node = this.popupOptions[this.currentIndex];
         if (node.specification.type == 'question') {
             // Must extract the question data
-            var textArea = $(popup.popupContent).find('textarea')[0];
-            if (node.specification.mandatory == true && textArea.value.length == 0) {
-                interfaceContext.lightbox.post("Error", "This question is mandatory");
-                return;
-            } else {
-                // Save the text content
-                console.log("Question: " + node.specification.statement);
-                console.log("Question Response: " + textArea.value);
-                node.response = textArea.value;
-            }
-            // Perform the conditional
-            for (var condition of node.specification.conditions) {
-                var pass = false;
-                switch (condition.check) {
-                    case "equals":
-                        if (textArea.value == condition.value) {
-                            pass = true;
-                        }
-                        break;
-                    case "greaterThan":
-                    case "lessThan":
-                        console.log("Survey Element of type 'question' cannot interpret greaterThan/lessThan conditions. IGNORING");
-                        break;
-                    case "contains":
-                        if (textArea.value.includes(condition.value)) {
-                            pass = true;
-                        }
-                        break;
-                }
-                var jumpID;
-                if (pass) {
-                    jumpID = condition.jumpToOnPass;
-                } else {
-                    jumpID = condition.jumpToOnFail;
-                }
-                if (jumpID != undefined) {
-                    var index = this.popupOptions.findIndex(function (item, index, element) {
-                        if (item.specification.id == jumpID) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }, this);
-                    this.currentIndex = index - 1;
-                    break;
-                }
-            }
+            processQuestion(node);
         } else if (node.specification.type == 'checkbox') {
             // Must extract checkbox data
-            console.log("Checkbox: " + node.specification.statement);
-            var inputs = this.popupResponse.getElementsByTagName('input');
-            node.response = [];
-            var numChecked = 0;
-            for (var i = 0; i < node.specification.options.length; i++) {
-                if (inputs[i].checked) {
-                    numChecked++;
-                }
-            }
-            if (node.specification.min != undefined) {
-                if (node.specification.max == undefined) {
-                    if (numChecked < node.specification.min) {
-                        var msg = "You must select at least " + node.specification.min + " option";
-                        if (node.specification.min > 1) {
-                            msg += "s";
-                        }
-                        interfaceContext.lightbox.post("Error", msg);
-                        return;
-                    }
-                } else {
-                    if (numChecked < node.specification.min || numChecked > node.specification.max) {
-                        if (node.specification.min == node.specification.max) {
-                            interfaceContext.lightbox.post("Error", "You must only select " + node.specification.min);
-                        } else {
-                            interfaceContext.lightbox.post("Error", "You must select between " + node.specification.min + " and " + node.specification.max);
-                        }
-                        return;
-                    }
-                }
-            }
-            for (var i = 0; i < node.specification.options.length; i++) {
-                node.response.push({
-                    name: node.specification.options[i].name,
-                    text: node.specification.options[i].text,
-                    checked: inputs[i].checked
-                });
-                console.log(node.specification.options[i].name + ": " + inputs[i].checked);
-            }
-            // Perform the conditional
-            for (var condition of node.specification.conditions) {
-                var pass = false;
-                switch (condition.check) {
-                    case "equals":
-                    case "greaterThan":
-                    case "lessThan":
-                        console.log("Survey Element of type 'checkbox' cannot interpret equals/greaterThan/lessThan conditions. IGNORING");
-                        break;
-                    case "contains":
-                        for (var response of node.response) {
-                            if (response.name == condition.value && response.checked) {
-                                pass = true;
-                                break;
-                            }
-                        }
-                        break;
-                }
-                var jumpID;
-                if (pass) {
-                    jumpID = condition.jumpToOnPass;
-                } else {
-                    jumpID = condition.jumpToOnFail;
-                }
-                if (jumpID != undefined) {
-                    var index = this.popupOptions.findIndex(function (item, index, element) {
-                        if (item.specification.id == jumpID) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }, this);
-                    this.currentIndex = index - 1;
-                    break;
-                }
-            }
+            processCheckbox(node);
         } else if (node.specification.type == "radio") {
-            var optHold = this.popupResponse;
-            console.log("Radio: " + node.specification.statement);
-            node.response = null;
-            var i = 0;
-            var inputs = optHold.getElementsByTagName('input');
-            while (node.response == null) {
-                if (i == inputs.length) {
-                    if (node.specification.mandatory == true) {
-                        interfaceContext.lightbox.post("Error", "Please select one option");
-                        return;
-                    }
-                    break;
-                }
-                if (inputs[i].checked == true) {
-                    node.response = node.specification.options[i];
-                    console.log("Selected: " + node.specification.options[i].name);
-                }
-                i++;
-            }
             // Perform the conditional
-            for (var condition of node.specification.conditions) {
-                var pass = false;
-                switch (condition.check) {
-                    case "contains":
-                    case "greaterThan":
-                    case "lessThan":
-                        console.log("Survey Element of type 'radio' cannot interpret contains/greaterThan/lessThan conditions. IGNORING");
-                        break;
-                    case "equals":
-                        if (node.response == condition.value) {
-                            pass = true;
-                        }
-                        break;
-                }
-                var jumpID;
-                if (pass) {
-                    jumpID = condition.jumpToOnPass;
-                } else {
-                    jumpID = condition.jumpToOnFail;
-                }
-                if (jumpID != undefined) {
-                    var index = this.popupOptions.findIndex(function (item, index, element) {
-                        if (item.specification.id == jumpID) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }, this);
-                    this.currentIndex = index - 1;
-                    break;
-                }
-            }
+            processRadio(node);
         } else if (node.specification.type == "number") {
-            var input = this.popupContent.getElementsByTagName('input')[0];
-            if (node.mandatory == true && input.value.length == 0) {
-                interfaceContext.lightbox.post("Error", 'This question is mandatory. Please enter a number');
-                return;
-            }
-            var enteredNumber = Number(input.value);
-            if (isNaN(enteredNumber)) {
-                interfaceContext.lightbox.post("Error", 'Please enter a valid number');
-                return;
-            }
-            if (enteredNumber < node.min && node.min != null) {
-                interfaceContext.lightbox.post("Error", 'Number is below the minimum value of ' + node.min);
-                return;
-            }
-            if (enteredNumber > node.max && node.max != null) {
-                interfaceContext.lightbox.post("Error", 'Number is above the maximum value of ' + node.max);
-                return;
-            }
-            node.response = input.value;
             // Perform the conditional
-            for (var condition of node.specification.conditions) {
-                var pass = false;
-                switch (condition.check) {
-                    case "contains":
-                        console.log("Survey Element of type 'number' cannot interpret contains conditions. IGNORING");
-                        break;
-                    case "greaterThan":
-                        if (node.response > Number(condition.value)) {
-                            pass = true;
-                        }
-                        break;
-                    case "lessThan":
-                        if (node.response < Number(condition.value)) {
-                            pass = true;
-                        }
-                        break;
-                    case "equals":
-                        if (node.response == condition.value) {
-                            pass = true;
-                        }
-                        break;
-                }
-                var jumpID;
-                if (pass) {
-                    jumpID = condition.jumpToOnPass;
-                } else {
-                    jumpID = condition.jumpToOnFail;
-                }
-                if (jumpID != undefined) {
-                    var index = this.popupOptions.findIndex(function (item, index, element) {
-                        if (item.specification.id == jumpID) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }, this);
-                    this.currentIndex = index - 1;
-                    break;
-                }
-            }
+            processNumber(node);
         } else if (node.specification.type == 'slider') {
-            var input = this.popupContent.getElementsByTagName('input')[0];
-            node.response = input.value;
-            for (var condition of node.specification.conditions) {
-                var pass = false;
-                switch (condition.check) {
-                    case "contains":
-                        console.log("Survey Element of type 'number' cannot interpret contains conditions. IGNORING");
-                        break;
-                    case "greaterThan":
-                        if (node.response > Number(condition.value)) {
-                            pass = true;
-                        }
-                        break;
-                    case "lessThan":
-                        if (node.response < Number(condition.value)) {
-                            pass = true;
-                        }
-                        break;
-                    case "equals":
-                        if (node.response == condition.value) {
-                            pass = true;
-                        }
-                        break;
-                }
-                var jumpID;
-                if (pass) {
-                    jumpID = condition.jumpToOnPass;
-                } else {
-                    jumpID = condition.jumpToOnFail;
-                }
-                if (jumpID != undefined) {
-                    var index = this.popupOptions.findIndex(function (item, index, element) {
-                        if (item.specification.id == jumpID) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }, this);
-                    this.currentIndex = index - 1;
-                    break;
-                }
-            }
+            processSlider(node);
         }
         this.currentIndex++;
         if (this.currentIndex < this.popupOptions.length) {
@@ -1128,9 +1155,9 @@ function interfacePopup() {
             this.popupTitle.innerHTML = "";
             this.popupResponse.innerHTML = "";
             this.hidePopup();
-            for (var node of this.popupOptions) {
+            this.popupOptions.forEach(function (node) {
                 this.store.postResult(node);
-            }
+            }, this);
             this.store.complete();
             advanceState();
         }
@@ -1146,7 +1173,7 @@ function interfacePopup() {
 
     this.resize = function (event) {
         // Called on window resize;
-        if (this.popup != null) {
+        if (this.popup !== null) {
             this.popup.style.left = (window.innerWidth / 2) - 250 + 'px';
             this.popup.style.top = (window.innerHeight / 2) - 125 + 'px';
             var blank = document.getElementsByClassName('testHalt')[0];
@@ -1156,16 +1183,16 @@ function interfacePopup() {
     };
     this.hideNextButton = function () {
         this.buttonProceed.style.visibility = "hidden";
-    }
+    };
     this.hidePreviousButton = function () {
         this.buttonPrevious.style.visibility = "hidden";
-    }
+    };
     this.showNextButton = function () {
         this.buttonProceed.style.visibility = "visible";
-    }
+    };
     this.showPreviousButton = function () {
         this.buttonPrevious.style.visibility = "visible";
-    }
+    };
 }
 
 function advanceState() {
