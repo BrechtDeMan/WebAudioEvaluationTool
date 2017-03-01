@@ -1,8 +1,8 @@
 // Script to load the relevant JS files if the system supports it
-
+/*globals window, document */
 window.onload = function () {
     // First check if the Web Audio API is supported
-    if (window.AudioContext == undefined && window.webkitAudioContext == undefined) {
+    if (window.AudioContext === undefined && window.webkitAudioContext === undefined) {
         // Display unsuported error message
         var body = document.getElementsByTagName("body")[0];
         body.innerHTML = "<h1>Sorry! Your browser is not supported :(</h1><p>Your browser does not support the HTML5 Web Audio API. Please use one of the following supported browsers instead.<p>";
@@ -26,4 +26,4 @@ window.onload = function () {
             head.appendChild(script);
         }
     }
-}
+};
