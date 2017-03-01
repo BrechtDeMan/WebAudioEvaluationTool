@@ -325,7 +325,7 @@ function loadProjectSpecCallback(response) {
         storage.initialise(responseDocument);
     }
     /// CHECK FOR SAMPLE RATE COMPATIBILITY
-    if (specification.sampleRate !== undefined) {
+    if (specification.sampleRate !== null) {
         if (Number(specification.sampleRate) != audioContext.sampleRate) {
             var errStr = 'Sample rates do not match! Requested ' + Number(specification.sampleRate) + ', got ' + audioContext.sampleRate + '. Please set the sample rate to match before completing this test.';
             interfaceContext.lightbox.post("Error", errStr);
@@ -613,7 +613,7 @@ function interfacePopup() {
         } else {
             return;
         }
-        for (var i = 0; i < node.specification.conditions; i++) {
+        for (var i = 0; i < node.specification.conditions.length; i++) {
             var condition = node.specification.conditions[i];
             var pass = conditionFunction(condition, value);
             var jumpID;
@@ -623,7 +623,7 @@ function interfacePopup() {
                 jumpID = condition.jumpToOnFail;
             }
             if (jumpID !== undefined) {
-                jumpToId(jumpID);
+                jumpToId.call(this, jumpID);
                 break;
             }
         }
@@ -682,28 +682,28 @@ function interfacePopup() {
     }
 
     function processQuestion(node) {
-        var textArea = this.popupResponse.getAllElementsByTagName("textarea")[0];
+        var textArea = this.popupResponse.getElementsByTagName("textarea")[0];
         if (node.specification.mandatory === true && textArea.value.length === 0) {
             interfaceContext.lightbox.post("Error", "This question is mandatory");
-            return;
-        } else {
-            // Save the text content
-            console.log("Question: " + node.specification.statement);
-            console.log("Question Response: " + textArea.value);
-            node.response = textArea.value;
+            return false;
         }
-        processConditional(node, textArea.value);
+        // Save the text content
+        console.log("Question: " + node.specification.statement);
+        console.log("Question Response: " + textArea.value);
+        node.response = textArea.value;
+        processConditional.call(this, node, textArea.value);
+        return true;
     }
 
     function postCheckbox(node) {
         if (node.response === undefined) {
             node.response = Array(node.specification.options.length);
         }
-        var index = 0;
         var table = document.createElement("table");
         table.className = "popup-option-list";
         table.border = "0";
-        node.specification.options.forEach(function (option) {
+        node.response = [];
+        node.specification.options.forEach(function (option, index) {
             var tr = document.createElement("tr");
             table.appendChild(tr);
             var td = document.createElement("td");
@@ -759,7 +759,7 @@ function interfacePopup() {
                     } else {
                         interfaceContext.lightbox.post("Error", "You must select between " + node.specification.min + " and " + node.specification.max);
                     }
-                    return;
+                    return false;
                 }
             }
         }
@@ -771,7 +771,8 @@ function interfacePopup() {
             });
             console.log(node.specification.options[i].name + ": " + inputs[i].checked);
         }
-        processConditional(node, node.response);
+        processConditional.call(this, node, node.response);
+        return true;
     }
 
     function processCheckboxConditional(condition, response) {
@@ -846,7 +847,7 @@ function interfacePopup() {
             if (i == inputs.length) {
                 if (node.specification.mandatory === true) {
                     interfaceContext.lightbox.post("Error", "Please select one option");
-                    return;
+                    return false;
                 }
                 break;
             }
@@ -856,7 +857,8 @@ function interfacePopup() {
             }
             i++;
         }
-        processConditional(node, node.response);
+        processConditional.call(this, node, node.response);
+        return true;
     }
 
     function processRadioConditional(condition, response) {
@@ -902,22 +904,24 @@ function interfacePopup() {
         var input = this.popupContent.getElementsByTagName('input')[0];
         if (node.mandatory === true && input.value.length === 0) {
             interfaceContext.lightbox.post("Error", 'This question is mandatory. Please enter a number');
-            return;
+            return false;
         }
         var enteredNumber = Number(input.value);
         if (isNaN(enteredNumber)) {
             interfaceContext.lightbox.post("Error", 'Please enter a valid number');
-            return;
+            return false;
         }
         if (enteredNumber < node.min && node.min !== null) {
             interfaceContext.lightbox.post("Error", 'Number is below the minimum value of ' + node.min);
-            return;
+            return false;
         }
         if (enteredNumber > node.max && node.max !== null) {
             interfaceContext.lightbox.post("Error", 'Number is above the maximum value of ' + node.max);
-            return;
+            return false;
         }
         node.response = input.value;
+        processConditional.call(this, node, node.response);
+        return true;
     }
 
     function processNumberConditional(condtion, value) {
@@ -989,6 +993,8 @@ function interfacePopup() {
     function processSlider(node) {
         var input = this.popupContent.getElementsByTagName('input')[0];
         node.response = input.value;
+        processConditional.call(this, node, node.response);
+        return true;
     }
 
     function processSliderConditional(condition, value) {
@@ -1074,19 +1080,19 @@ function interfacePopup() {
         this.popupTitle.innerHTML = "";
         this.popupTitle.appendChild(p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild);
         if (node.specification.type == 'question') {
-            postQuestion(node);
+            postQuestion.call(this, node);
         } else if (node.specification.type == 'checkbox') {
-            postCheckbox(node);
+            postCheckbox.call(this, node);
         } else if (node.specification.type == 'radio') {
-            postRadio(node);
+            postRadio.call(this, node);
         } else if (node.specification.type == 'number') {
-            postNumber(node);
+            postNumber.call(this, node);
         } else if (node.specification.type == "video") {
-            postVideo(node);
+            postVideo.call(this, node);
         } else if (node.specification.type == "youtube") {
-            postYoutube(node);
+            postYoutube.call(this, node);
         } else if (node.specification.type == "slider") {
-            postSlider(node);
+            postSlider.call(this, node);
         }
         if (this.currentIndex + 1 == this.popupOptions.length) {
             if (this.node.location == "pre") {
@@ -1131,21 +1137,25 @@ function interfacePopup() {
             advanceState();
             return;
         }
-        var node = this.popupOptions[this.currentIndex];
+        var node = this.popupOptions[this.currentIndex],
+            pass = true;
         if (node.specification.type == 'question') {
             // Must extract the question data
-            processQuestion(node);
+            pass = processQuestion.call(this, node);
         } else if (node.specification.type == 'checkbox') {
             // Must extract checkbox data
-            processCheckbox(node);
+            pass = processCheckbox.call(this, node);
         } else if (node.specification.type == "radio") {
             // Perform the conditional
-            processRadio(node);
+            pass = processRadio.call(this, node);
         } else if (node.specification.type == "number") {
             // Perform the conditional
-            processNumber(node);
+            pass = processNumber.call(this, node);
         } else if (node.specification.type == 'slider') {
-            processSlider(node);
+            pass = processSlider.call(this, node);
+        }
+        if (pass === false) {
+            return;
         }
         this.currentIndex++;
         if (this.currentIndex < this.popupOptions.length) {
