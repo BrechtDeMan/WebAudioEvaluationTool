@@ -5,6 +5,10 @@
  * Also contains all global variables.
  */
 
+/*globals window, document, XMLDocument, Element, XMLHttpRequest, DOMParser, console, Blob, $, Promise, navigator */
+/*globals AudioBuffer, AudioBufferSourceNode */
+/*globals Specification, calculateLoudness, WAVE, validateXML, showdown, pageXMLSave, loadTest, resizeWindow */
+
 /* create the web audio API context and store in audioContext*/
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
@@ -156,7 +160,7 @@ var onload = function () {
         var search = window.location.search.split('?')[1];
         // Now split the requests into pairs
         var searchQueries = search.split('&');
-
+        var url;
         for (var i in searchQueries) {
             // Split each key-value pair
             searchQueries[i] = searchQueries[i].split('=');
@@ -165,6 +169,7 @@ var onload = function () {
             switch (key) {
                 case "url":
                     url = value;
+                    specification.url = url;
                     break;
                 case "returnURL":
                     gReturnURL = value;
@@ -673,7 +678,7 @@ function interfacePopup() {
                 console.log("Survey Element of type 'question' cannot interpret greaterThan/lessThan conditions. IGNORING");
                 break;
             case "contains":
-                if (textArea.value.includes(condition.value)) {
+                if (value.includes(condition.value)) {
                     return true;
                 }
                 break;
@@ -864,7 +869,7 @@ function interfacePopup() {
     function processRadioConditional(condition, response) {
         switch (condition.check) {
             case "equals":
-                if (node.response === condition.value) {
+                if (response === condition.value) {
                     return true;
                 }
                 break;
@@ -925,19 +930,20 @@ function interfacePopup() {
     }
 
     function processNumberConditional(condtion, value) {
+        var condition = condition;
         switch (condition.check) {
             case "greaterThan":
-                if (node.response > Number(condition.value)) {
+                if (value > Number(condition.value)) {
                     return true;
                 }
                 break;
             case "lessThan":
-                if (node.response < Number(condition.value)) {
+                if (value < Number(condition.value)) {
                     return true;
                 }
                 break;
             case "equals":
-                if (node.response == condition.value) {
+                if (value == condition.value) {
                     return true;
                 }
                 break;
@@ -1003,17 +1009,17 @@ function interfacePopup() {
                 console.log("Survey Element of type 'number' cannot interpret contains conditions. IGNORING");
                 break;
             case "greaterThan":
-                if (node.response > Number(condition.value)) {
+                if (value > Number(condition.value)) {
                     return true;
                 }
                 break;
             case "lessThan":
-                if (node.response < Number(condition.value)) {
+                if (value < Number(condition.value)) {
                     return true;
                 }
                 break;
             case "equals":
-                if (node.response == condition.value) {
+                if (value == condition.value) {
                     return true;
                 }
                 break;
@@ -1611,7 +1617,7 @@ function AudioEngine(specification) {
             // Called by an audioObject to register to the buffer for use
             // First check if already in the register pool
             this.users.forEach(function (object) {
-                if (audioObject.id == objects.id) {
+                if (audioObject.id == object.id) {
                     return 0;
                 }
             });
@@ -1766,7 +1772,7 @@ function AudioEngine(specification) {
         // URLs must either be from the same source OR be setup to 'Access-Control-Allow-Origin'
 
         // Create the audioObject with ID of the new track length;
-        audioObjectId = this.audioObjects.length;
+        var audioObjectId = this.audioObjects.length;
         this.audioObjects[audioObjectId] = new audioObject(audioObjectId);
 
         // Check if audioObject buffer is currently stored by full URL
@@ -1810,7 +1816,7 @@ function AudioEngine(specification) {
     };
 
     this.checkAllPlayed = function () {
-        arr = [];
+        var arr = [];
         for (var id = 0; id < this.audioObjects.length; id++) {
             if (this.audioObjects[id].metric.wasListenedTo === false) {
                 arr.push(this.audioObjects[id].id);
@@ -2039,11 +2045,7 @@ function audioObject(id) {
                 this.storeDOM.appendChild(this.commentDOM.exportXMLDOM(this));
             }
         }
-        var nodes = this.metric.exportXMLDOM();
-        var mroot = this.storeDOM.getElementsByTagName('metric')[0];
-        for (var i = 0; i < nodes.length; i++) {
-            mroot.appendChild(nodes[i]);
-        }
+        this.metric.exportXMLDOM(this.storeDOM.getElementsByTagName('metric')[0]);
     };
 }
 
@@ -2202,64 +2204,90 @@ function metricTracker(caller) {
         }
     };
 
-    this.exportXMLDOM = function () {
-        var storeDOM = [];
+    function exportElementTimer(parentElement) {
+        var mElementTimer = storage.document.createElement('metricresult');
+        mElementTimer.setAttribute('name', 'enableElementTimer');
+        mElementTimer.textContent = this.listenedTimer;
+        parentElement.appendChild(mElementTimer);
+    }
+
+    function exportElementTrack(parentElement) {
+        var elementTrackerFull = storage.document.createElement('metricresult');
+        elementTrackerFull.setAttribute('name', 'elementTrackerFull');
+        for (var k = 0; k < this.movementTracker.length; k++) {
+            var timePos = storage.document.createElement('movement');
+            timePos.setAttribute("time", this.movementTracker[k][0]);
+            timePos.setAttribute("value", this.movementTracker[k][1]);
+            elementTrackerFull.appendChild(timePos);
+        }
+        parentElement.appendChild(elementTrackerFull);
+    }
+
+    function exportElementListenTracker(parentElement) {
+        var elementListenTracker = storage.document.createElement('metricresult');
+        elementListenTracker.setAttribute('name', 'elementListenTracker');
+        for (var k = 0; k < this.listenTracker.length; k++) {
+            elementListenTracker.appendChild(this.listenTracker[k]);
+        }
+        parentElement.appendChild(elementListenTracker);
+    }
+
+    function exportElementInitialPosition(parentElement) {
+        var elementInitial = storage.document.createElement('metricresult');
+        elementInitial.setAttribute('name', 'elementInitialPosition');
+        elementInitial.textContent = this.initialPosition;
+        parentElement.appendChild(elementInitial);
+    }
+
+    function exportFlagListenedTo(parentElement) {
+        var flagListenedTo = storage.document.createElement('metricresult');
+        flagListenedTo.setAttribute('name', 'elementFlagListenedTo');
+        flagListenedTo.textContent = this.wasListenedTo;
+        parentElement.appendChild(flagListenedTo);
+    }
+
+    function exportFlagMoved(parentElement) {
+        var flagMoved = storage.document.createElement('metricresult');
+        flagMoved.setAttribute('name', 'elementFlagMoved');
+        flagMoved.textContent = this.wasMoved;
+        parentElement.appendChild(flagMoved);
+    }
+
+    function exportFlagComments(parentElement) {
+        var flagComments = storage.document.createElement('metricresult');
+        flagComments.setAttribute('name', 'elementFlagComments');
+        if (this.parent.commentDOM === null) {
+            flagComments.textContent = 'false';
+        } else if (this.parent.commentDOM.textContent.length === 0) {
+            flagComments.textContent = 'false';
+        } else {
+            flagComments.textContet = 'true';
+        }
+        parentElement.appendChild(flagComments);
+    }
+
+    this.exportXMLDOM = function (parentElement) {
         if (audioEngineContext.metric.enableElementTimer) {
-            var mElementTimer = storage.document.createElement('metricresult');
-            mElementTimer.setAttribute('name', 'enableElementTimer');
-            mElementTimer.textContent = this.listenedTimer;
-            storeDOM.push(mElementTimer);
+            exportElementTimer.call(this, parentElement);
         }
         if (audioEngineContext.metric.enableElementTracker) {
-            var elementTrackerFull = storage.document.createElement('metricresult');
-            elementTrackerFull.setAttribute('name', 'elementTrackerFull');
-            for (var k = 0; k < this.movementTracker.length; k++) {
-                var timePos = storage.document.createElement('movement');
-                timePos.setAttribute("time", this.movementTracker[k][0]);
-                timePos.setAttribute("value", this.movementTracker[k][1]);
-                elementTrackerFull.appendChild(timePos);
-            }
-            storeDOM.push(elementTrackerFull);
+            exportElementTrack.call(this, parentElement);
         }
         if (audioEngineContext.metric.enableElementListenTracker) {
-            var elementListenTracker = storage.document.createElement('metricresult');
-            elementListenTracker.setAttribute('name', 'elementListenTracker');
-            for (var k = 0; k < this.listenTracker.length; k++) {
-                elementListenTracker.appendChild(this.listenTracker[k]);
-            }
-            storeDOM.push(elementListenTracker);
+            exportElementListenTracker.call(this, parentElement);
         }
         if (audioEngineContext.metric.enableElementInitialPosition) {
-            var elementInitial = storage.document.createElement('metricresult');
-            elementInitial.setAttribute('name', 'elementInitialPosition');
-            elementInitial.textContent = this.initialPosition;
-            storeDOM.push(elementInitial);
+            exportElementInitialPosition.call(this, parentElement);
         }
         if (audioEngineContext.metric.enableFlagListenedTo) {
-            var flagListenedTo = storage.document.createElement('metricresult');
-            flagListenedTo.setAttribute('name', 'elementFlagListenedTo');
-            flagListenedTo.textContent = this.wasListenedTo;
-            storeDOM.push(flagListenedTo);
+            exportFlagListenedTo.call(this, parentElement);
         }
         if (audioEngineContext.metric.enableFlagMoved) {
-            var flagMoved = storage.document.createElement('metricresult');
-            flagMoved.setAttribute('name', 'elementFlagMoved');
-            flagMoved.textContent = this.wasMoved;
-            storeDOM.push(flagMoved);
+            exportFlagMoved.call(this, parentElement);
         }
         if (audioEngineContext.metric.enableFlagComments) {
-            var flagComments = storage.document.createElement('metricresult');
-            flagComments.setAttribute('name', 'elementFlagComments');
-            if (this.parent.commentDOM === null) {
-                flag.textContent = 'false';
-            } else if (this.parent.commentDOM.textContent.length === 0) {
-                flag.textContent = 'false';
-            } else {
-                flag.textContet = 'true';
-            }
-            storeDOM.push(flagComments);
+            exportFlagComments.call(this, parentElement);
         }
-        return storeDOM;
     };
 }
 
@@ -2285,12 +2313,12 @@ function Interface(specificationObject) {
         popup.resize(event);
         this.volume.resize();
         this.lightbox.resize();
-        for (var i = 0; i < this.commentBoxes.length; i++) {
-            this.commentBoxes[i].resize();
-        }
-        for (var i = 0; i < this.commentQuestions.length; i++) {
-            this.commentQuestions[i].resize();
-        }
+        this.commentBoxes.forEach(function (elem) {
+            elem.resize();
+        });
+        this.commentQuestions.forEach(function (elem) {
+            elem.resize();
+        });
         try {
             resizeWindow(event);
         } catch (err) {
@@ -2464,16 +2492,16 @@ function Interface(specificationObject) {
             if (sort) {
                 this.sortCommentBoxes();
             }
-            for (var box of this.boxes) {
+            this.boxes.forEach(function (box) {
                 inject.appendChild(box.trackComment);
-            }
+            });
         };
 
         this.deleteCommentBoxes = function () {
             if (this.injectPoint !== null) {
-                for (var box of this.boxes) {
+                this.boxes.forEach(function (box) {
                     this.injectPoint.removeChild(box.trackComment);
-                }
+                }, this);
                 this.injectPoint = null;
             }
             this.boxes = [];
@@ -2553,7 +2581,7 @@ function Interface(specificationObject) {
         this.span.className = "comment-radio-span-holder";
 
         var optCount = commentQuestion.options.length;
-        for (var optNode of commentQuestion.options) {
+        commentQuestion.options.forEach(function (optNode) {
             var div = document.createElement('div');
             div.style.width = '80px';
             div.style.float = 'left';
@@ -2576,7 +2604,7 @@ function Interface(specificationObject) {
             div.appendChild(span);
             this.span.appendChild(div);
             this.options.push(input);
-        }
+        }, this);
         this.holder.appendChild(this.span);
         this.holder.appendChild(this.inputs);
 
@@ -2619,8 +2647,8 @@ function Interface(specificationObject) {
             var options = this.holder.getElementsByClassName("comment-radio-inputs-holder")[0];
             var optCount = options.childElementCount;
             var spanMargin = Math.floor(((boxwidth - 20 - (optCount * 80)) / (optCount)) / 2) + 'px';
-            var options = options.firstChild;
-            var text = text.firstChild;
+            options = options.firstChild;
+            text = text.firstChild;
             options.style.marginRight = spanMargin;
             options.style.marginLeft = spanMargin;
             text.style.marginRight = spanMargin;
@@ -2718,8 +2746,8 @@ function Interface(specificationObject) {
             var options = this.holder.getElementsByClassName("comment-checkbox-inputs-holder")[0];
             var optCount = options.childElementCount;
             var spanMargin = Math.floor(((boxwidth - 20 - (optCount * 80)) / (optCount)) / 2) + 'px';
-            var options = options.firstChild;
-            var text = text.firstChild;
+            options = options.firstChild;
+            text = text.firstChild;
             options.style.marginRight = spanMargin;
             options.style.marginLeft = spanMargin;
             text.style.marginRight = spanMargin;
@@ -2888,7 +2916,7 @@ function Interface(specificationObject) {
         this.timePerPixel = 0;
         this.maxTime = 0;
 
-        this.playbackObject;
+        this.playbackObject = undefined;
 
         this.setTimePerPixel = function (audioObject) {
             //maxTime must be in seconds
@@ -2938,18 +2966,18 @@ function Interface(specificationObject) {
         this.start = function () {
             if (this.playbackObject !== undefined && this.interval === undefined) {
                 if (this.maxTime < 60) {
-                    this.interval = setInterval(function () {
+                    this.interval = window.setInterval(function () {
                         interfaceContext.playhead.update();
                     }, 10);
                 } else {
-                    this.interval = setInterval(function () {
+                    this.interval = window.setInterval(function () {
                         interfaceContext.playhead.update();
                     }, 100);
                 }
             }
         };
         this.stop = function () {
-            clearInterval(this.interval);
+            window.clearInterval(this.interval);
             this.interval = undefined;
             this.scrubberHead.style.left = '0px';
             if (this.maxTime < 60) {
@@ -3099,14 +3127,14 @@ function Interface(specificationObject) {
             inject.appendChild(this.holder);
         };
         this.collect = function () {
-            for (var obj of this.calibrationNodes) {
+            this.calibrationNodes.forEach(function (obj) {
                 var node = storage.document.createElement("calibrationresult");
                 node.setAttribute("frequency", obj.f);
                 node.setAttribute("range-min", obj.input.min);
                 node.setAttribute("range-max", obj.input.max);
                 node.setAttribute("gain-lin", obj.gain.gain.value);
                 this.storeDOM.appendChild(node);
-            }
+            }, this);
         };
     };
 
@@ -3114,8 +3142,8 @@ function Interface(specificationObject) {
     // Global Checkers
     // These functions will help enforce the checkers
     this.checkHiddenAnchor = function () {
-        for (var ao of audioEngineContext.audioObjects) {
-            if (ao.specification.type == "anchor") {
+        audioEngineContext.audioObjects.forEach(function (ao) {
+            if (ao.specification.type === "anchor") {
                 if (ao.interfaceDOM.getValue() > (ao.specification.marker / 100) && ao.specification.marker > 0) {
                     // Anchor is not set below
                     console.log('Anchor node not below marker value');
@@ -3124,12 +3152,12 @@ function Interface(specificationObject) {
                     return false;
                 }
             }
-        }
+        }, this);
         return true;
     };
 
     this.checkHiddenReference = function () {
-        for (var ao of audioEngineContext.audioObjects) {
+        audioEngineContext.audioObjects.forEach(function (ao) {
             if (ao.specification.type == "reference") {
                 if (ao.interfaceDOM.getValue() < (ao.specification.marker / 100) && ao.specification.marker > 0) {
                     // Anchor is not set below
@@ -3139,7 +3167,7 @@ function Interface(specificationObject) {
                     return false;
                 }
             }
-        }
+        }, this);
         return true;
     };
 
@@ -3151,8 +3179,9 @@ function Interface(specificationObject) {
             return true;
         }
         var check_pass = true;
-        var error_obj = [];
-        for (var i = 0; i < audioEngineContext.audioObjects.length; i++) {
+        var error_obj = [],
+            i;
+        for (i = 0; i < audioEngineContext.audioObjects.length; i++) {
             var object = audioEngineContext.audioObjects[i];
             var time = object.buffer.buffer.duration;
             var metric = object.metric;
@@ -3175,7 +3204,7 @@ function Interface(specificationObject) {
         }
         if (check_pass === false) {
             var str_start = "You have not completely listened to fragments ";
-            for (var i = 0; i < error_obj.length; i++) {
+            for (i = 0; i < error_obj.length; i++) {
                 str_start += error_obj[i];
                 if (i != error_obj.length - 1) {
                     str_start += ', ';
@@ -3192,11 +3221,11 @@ function Interface(specificationObject) {
     this.checkAllMoved = function () {
         var str = "You have not moved ";
         var failed = [];
-        for (var ao of audioEngineContext.audioObjects) {
+        audioEngineContext.audioObjects.forEach(function (ao) {
             if (ao.metric.wasMoved === false && ao.interfaceDOM.canMove() === true) {
                 failed.push(ao.interfaceDOM.getPresentedId());
             }
-        }
+        }, this);
         if (failed.length === 0) {
             return true;
         } else if (failed.length == 1) {
@@ -3217,11 +3246,11 @@ function Interface(specificationObject) {
     this.checkAllPlayed = function () {
         var str = "You have not played ";
         var failed = [];
-        for (var ao of audioEngineContext.audioObjects) {
+        audioEngineContext.audioObjects.forEach(function (ao) {
             if (ao.metric.wasListenedTo === false) {
                 failed.push(ao.interfaceDOM.getPresentedId());
             }
-        }
+        }, this);
         if (failed.length === 0) {
             return true;
         } else if (failed.length == 1) {
@@ -3262,7 +3291,7 @@ function Interface(specificationObject) {
         var str = "Please keep listening. ";
         var minRanking = Infinity;
         var maxRanking = -Infinity;
-        for (var ao of audioObjects) {
+        audioEngineContext.audioObjects.forEach(function (ao) {
             var rank = ao.interfaceDOM.getValue();
             if (rank < minRanking) {
                 minRanking = rank;
@@ -3270,7 +3299,7 @@ function Interface(specificationObject) {
             if (rank > maxRanking) {
                 maxRanking = rank;
             }
-        }
+        }, this);
         if (minRanking * 100 > min) {
             str += "At least one fragment must be below the " + min + " mark.";
             state = false;
@@ -3348,7 +3377,6 @@ function Interface(specificationObject) {
                     labelStart = 1;
                 }
                 break;
-            case "none":
             default:
                 labelStart = 0;
         }
@@ -3409,8 +3437,8 @@ function Storage() {
             this.document = document.implementation.createDocument(null, "waetresult", null);
             this.root = this.document.childNodes[0];
             var projectDocument = specification.projectXML;
-            projectDocument.setAttribute('file-name', url);
-            projectDocument.setAttribute('url', qualifyURL(url));
+            projectDocument.setAttribute('file-name', specification.url);
+            projectDocument.setAttribute('url', qualifyURL(specification.url));
             this.root.appendChild(projectDocument);
             this.root.appendChild(interfaceContext.returnDateNode());
             this.root.appendChild(interfaceContext.returnNavigator());
@@ -3520,17 +3548,38 @@ function Storage() {
         this.XMLDOM = this.parent.document.createElement('survey');
         this.XMLDOM.setAttribute('location', this.specification.location);
         this.XMLDOM.setAttribute("state", this.state);
-        for (var optNode of this.specification.options) {
+        this.specification.options.forEach(function (optNode) {
             if (optNode.type != 'statement') {
                 var node = this.parent.document.createElement('surveyresult');
                 node.setAttribute("ref", optNode.id);
                 node.setAttribute('type', optNode.type);
                 this.XMLDOM.appendChild(node);
             }
-        }
+        }, this);
         root.appendChild(this.XMLDOM);
 
         this.postResult = function (node) {
+            function postNumber(doc, value) {
+                var child = doc.createElement("response");
+                child.textContent = value;
+                return child;
+            }
+
+            function postRadio(doc, node) {
+                var child = doc.createElement('response');
+                if (node.response !== null) {
+                    child.setAttribute('name', node.response.name);
+                    child.textContent = node.response.text;
+                }
+                return child;
+            }
+
+            function postCheckbox(doc, node) {
+                var checkNode = doc.createElement('response');
+                checkNode.setAttribute('name', node.name);
+                checkNode.setAttribute('checked', node.checked);
+                return checkNode;
+            }
             // From popup: node is the popupOption node containing both spec. and results
             // ID is the position
             if (node.specification.type == 'statement') {
@@ -3547,17 +3596,10 @@ function Storage() {
                 case "number":
                 case "question":
                 case "slider":
-                    var child = this.parent.document.createElement('response');
-                    child.textContent = node.response;
-                    surveyresult.appendChild(child);
+                    surveyresult.appendChild(postNumber(this.parent.document, node.response));
                     break;
                 case "radio":
-                    var child = this.parent.document.createElement('response');
-                    if (node.response !== null) {
-                        child.setAttribute('name', node.response.name);
-                        child.textContent = node.response.text;
-                    }
-                    surveyresult.appendChild(child);
+                    surveyresult.appendChild(postRadio(this.parent.document, node));
                     break;
                 case "checkbox":
                     if (node.response === undefined) {
@@ -3565,10 +3607,7 @@ function Storage() {
                         break;
                     }
                     for (var i = 0; i < node.response.length; i++) {
-                        var checkNode = this.parent.document.createElement('response');
-                        checkNode.setAttribute('name', node.response[i].name);
-                        checkNode.setAttribute('checked', node.response[i].checked);
-                        surveyresult.appendChild(checkNode);
+                        surveyresult.appendChild(postCheckbox(this.parent.document, node.response[i]));
                     }
                     break;
             }
@@ -3600,7 +3639,7 @@ function Storage() {
         this.XMLDOM.appendChild(page_metric);
 
         // Add the audioelement
-        for (var element of this.specification.audioElements) {
+        this.specification.audioElements.forEach(function (element) {
             var aeNode = this.parent.document.createElement('audioelement');
             aeNode.setAttribute('ref', element.id);
             if (element.name !== undefined) {
@@ -3618,7 +3657,7 @@ function Storage() {
             var ae_metric = this.parent.document.createElement('metric');
             aeNode.appendChild(ae_metric);
             this.XMLDOM.appendChild(aeNode);
-        }
+        }, this);
 
         this.parent.root.appendChild(this.XMLDOM);
 
