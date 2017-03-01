@@ -1879,7 +1879,7 @@ function audioObject(id) {
             copybuffer.buffer = copybuffer.copyBuffer(preSilenceTime, postSilenceTime);
         }
 
-        copybuffer.lufs = callee.buffer.lufs;
+        copybuffer.buffer.lufs = callee.buffer.lufs;
         this.buffer = copybuffer;
 
         var targetLUFS = this.specification.parent.loudness || specification.loudness;
