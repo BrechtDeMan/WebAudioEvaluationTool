@@ -1882,7 +1882,7 @@ function audioObject(id) {
         copybuffer.buffer.lufs = callee.buffer.lufs;
         this.buffer = copybuffer;
 
-        var targetLUFS = this.specification.parent.loudness || specification.loudness;
+        var targetLUFS = this.specification.loudness || this.specification.parent.loudness || specification.loudness;
         if (typeof targetLUFS === "number" && isFinite(targetLUFS)) {
             this.buffer.buffer.playbackGain = decibelToLinear(targetLUFS - this.buffer.buffer.lufs);
         } else {
