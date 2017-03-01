@@ -1224,7 +1224,8 @@ function stateMachine() {
         // Get the data from Specification
         var pagePool = [];
         var pageInclude = [];
-        for (var i = 0; i < specification.pages.length; i++) {
+        var i;
+        for (i = 0; i < specification.pages.length; i++) {
             var page = specification.pages[i];
             if (page.alwaysInclude) {
                 pageInclude.push(page);
@@ -1261,14 +1262,15 @@ function stateMachine() {
         if (specification.randomiseOrder) {
             pageInclude = randomiseOrder(pageInclude);
         }
-        for (var i = 0; i < pageInclude.length; i++) {
+        for (i = 0; i < pageInclude.length; i++) {
             pageInclude[i].presentedId = i;
             this.stateMap.push(pageInclude[i]);
             // For each selected page, we must get the sub pool
             if (pageInclude[i].poolSize !== 0 && pageInclude[i].poolSize !== pageInclude[i].audioElements.length) {
                 var elemInclude = [];
                 var elemPool = [];
-                for (var elem of pageInclude[i].audioElements) {
+                for (var j = 0; j < pageInclude[i].audioElements.length; j++) {
+                    var elem = pageInclude[i].audioElements[j];
                     if (elem.alwaysInclude || elem.type != "normal") {
                         elemInclude.push(elem);
                     } else {
@@ -1342,13 +1344,14 @@ function stateMachine() {
                 // Find and extract the outside reference
                 var elements = [],
                     ref = [];
-                var elem;
-                while (elem = this.currentStateMap.audioElements.pop()) {
+                var elem = this.currentStateMap.audioElements.pop();
+                while (elem) {
                     if (elem.type == "outside-reference") {
                         ref.push(elem);
                     } else {
                         elements.push(elem);
                     }
+                    elem = this.currentStateMap.audioElements.pop();
                 }
                 elements = elements.reverse();
                 if (this.currentStateMap.randomiseOrder) {
@@ -1404,12 +1407,12 @@ function stateMachine() {
         }
 
         var audioObjects = audioEngineContext.audioObjects;
-        for (var ao of audioEngineContext.audioObjects) {
+        audioEngineContext.audioObjects.forEach(function (ao) {
             ao.exportXMLDOM();
-        }
-        for (var element of interfaceContext.commentQuestions) {
+        });
+        interfaceContext.commentQuestions.forEach(function (element) {
             element.exportXMLDOM(storePoint);
-        }
+        });
         pageXMLSave(storePoint.XMLDOM, this.currentStateMap);
         storePoint.complete();
     };
@@ -1596,7 +1599,7 @@ function AudioEngine(specification) {
                         }
                     }
                 }
-            };
+            }
 
             this.progress = 0;
             this.status = 1;
@@ -1607,11 +1610,11 @@ function AudioEngine(specification) {
         this.registerAudioObject = function (audioObject) {
             // Called by an audioObject to register to the buffer for use
             // First check if already in the register pool
-            for (var objects of this.users) {
+            this.users.forEach(function (object) {
                 if (audioObject.id == objects.id) {
                     return 0;
                 }
-            }
+            });
             this.users.push(audioObject);
             if (this.status == 3 || this.status == -1) {
                 // The buffer is already ready, trigger bufferLoaded
@@ -1631,13 +1634,14 @@ function AudioEngine(specification) {
             var postSilenceSamples = secondsToSamples(postSilenceTime, this.buffer.sampleRate);
             var newLength = this.buffer.length + preSilenceSamples + postSilenceSamples;
             var copybuffer = audioContext.createBuffer(this.buffer.numberOfChannels, newLength, this.buffer.sampleRate);
+            var c;
             // Now we can use some efficient background copy schemes if we are just padding the end
             if (preSilenceSamples === 0 && typeof copybuffer.copyToChannel === "function") {
-                for (var c = 0; c < this.buffer.numberOfChannels; c++) {
+                for (c = 0; c < this.buffer.numberOfChannels; c++) {
                     copybuffer.copyToChannel(this.buffer.getChannelData(c), c);
                 }
             } else {
-                for (var c = 0; c < this.buffer.numberOfChannels; c++) {
+                for (c = 0; c < this.buffer.numberOfChannels; c++) {
                     var src = this.buffer.getChannelData(c);
                     var dst = copybuffer.getChannelData(c);
                     for (var n = 0; n < src.length; n++)
@@ -1674,16 +1678,12 @@ function AudioEngine(specification) {
 
     this.loadPageData = function (page) {
         // Load the URL from pages
-        for (var element of page.audioElements) {
+        function loadAudioElementData(element) {
             var URL = page.hostURL + element.url;
-            var buffer = null;
-            for (var buffObj of this.buffers) {
-                if (buffObj.hasUrl(URL)) {
-                    buffer = buffObj;
-                    break;
-                }
-            }
-            if (buffer === null) {
+            var buffer = this.buffers.find(function (buffObj) {
+                return buffObj.hasUrl(URL);
+            });
+            if (buffer === undefined) {
                 buffer = new this.bufferObj();
                 var urls = [{
                     url: URL,
@@ -1700,44 +1700,51 @@ function AudioEngine(specification) {
                 this.buffers.push(buffer);
             }
         }
+        page.audioElements.forEach(loadAudioElementData, this);
     };
+
+    function playNormal(id) {
+        var playTime = audioContext.currentTime + 0.1;
+        var stopTime = playTime + specification.crossFade;
+        this.audioObjects.forEach(function (ao) {
+            if (ao.id === id) {
+                ao.play(playTime);
+            } else {
+                ao.stop(stopTime);
+            }
+        });
+    }
+
+    function playLoopSync(id) {
+        var playTime = audioContext.currentTime + 0.1;
+        var stopTime = playTime + specification.crossFade;
+        this.audioObjects.forEach(function (ao) {
+            ao.play(playTime);
+            if (ao.id === id) {
+                ao.loopStart(playTime);
+            } else {
+                ao.loopStop(stopTime);
+            }
+        });
+    }
 
     this.play = function (id) {
         // Start the timer and set the audioEngine state to playing (1)
-        if (this.status === 0) {
-            // Check if all audioObjects are ready
-            this.bufferReady(id);
-        } else {
-            this.status = 1;
+        if (typeof id !== "number" || id < 0 || id > this.audioObjects.length) {
+            throw ('FATAL - Passed id was undefined - AudioEngineContext.play(id)');
         }
         if (this.status === 1) {
             this.timer.startTest();
-            if (id === undefined) {
-                id = -1;
-                console.error('FATAL - Passed id was undefined - AudioEngineContext.play(id)');
-                return;
-            } else {
-                interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
-            }
-            var setTime = audioContext.currentTime;
+            interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
             if (this.synchPlayback && this.loopPlayback) {
                 // Traditional looped playback
-                for (var i = 0; i < this.audioObjects.length; i++) {
-                    this.audioObjects[i].play(audioContext.currentTime);
-                    if (id == i) {
-                        this.audioObjects[i].loopStart(setTime);
-                    } else {
-                        this.audioObjects[i].loopStop(setTime + specification.crossFade);
-                    }
-                }
+                playLoopSync.call(this, id);
             } else {
-                for (var i = 0; i < this.audioObjects.length; i++) {
-                    if (i != id) {
-                        this.audioObjects[i].stop(setTime + specification.crossFade);
-                    } else if (i == id) {
-                        this.audioObjects[id].play(setTime);
-                    }
+                if (this.bufferReady(id) === false) {
+                    console.log("Cannot play. Buffer not ready");
+                    return;
                 }
+                playNormal.call(this, id);
             }
             interfaceContext.playhead.start();
         }
@@ -1747,9 +1754,9 @@ function AudioEngine(specification) {
         // Send stop and reset command to all playback buffers
         if (this.status == 1) {
             var setTime = audioContext.currentTime + 0.1;
-            for (var i = 0; i < this.audioObjects.length; i++) {
-                this.audioObjects[i].stop(setTime);
-            }
+            this.audioObjects.forEach(function (a) {
+                a.stop(setTime);
+            });
             interfaceContext.playhead.stop();
         }
     };
@@ -1764,14 +1771,10 @@ function AudioEngine(specification) {
 
         // Check if audioObject buffer is currently stored by full URL
         var URL = testState.currentStateMap.hostURL + element.url;
-        var buffer = null;
-        for (var i = 0; i < this.buffers.length; i++) {
-            if (this.buffers[i].hasUrl(URL)) {
-                buffer = this.buffers[i];
-                break;
-            }
-        }
-        if (buffer === null) {
+        var buffer = this.buffers.find(function (buffObj) {
+            return buffObj.hasUrl(URL);
+        });
+        if (buffer === undefined) {
             console.log("[WARN]: Buffer was not loaded in pre-test! " + URL);
             buffer = new this.bufferObj();
             this.buffers.push(buffer);
@@ -1797,9 +1800,9 @@ function AudioEngine(specification) {
         this.status = 0;
         this.audioObjectsReady = false;
         this.metric.reset();
-        for (var i = 0; i < this.buffers.length; i++) {
-            this.buffers[i].users = [];
-        }
+        this.buffers.forEach(function (buffer) {
+            buffer.users = [];
+        });
         this.audioObjects = [];
         this.timer = new timer();
         this.loopPlayback = audioHolderObject.loop;
@@ -1840,11 +1843,11 @@ function AudioEngine(specification) {
             }
         }
         // Extract the audio and zero-pad
-        for (var ao of this.audioObjects) {
+        this.audioObjects.forEach(function (ao) {
             if (ao.buffer.buffer.duration !== duration) {
                 ao.buffer.buffer = ao.buffer.copyBuffer(0, duration - ao.buffer.buffer.duration);
             }
-        }
+        });
     };
 
     this.bufferReady = function (id) {
@@ -1858,16 +1861,12 @@ function AudioEngine(specification) {
         return false;
     };
 
-    this.exportXML = function () {
-
-    };
-
 }
 
 function audioObject(id) {
     // The main buffer object with common control nodes to the AudioEngine
 
-    this.specification;
+    this.specification = undefined;
     this.id = id;
     this.state = 0; // 0 - no data, 1 - ready
     this.url = null; // Hold the URL given for the output back to the results.
@@ -1890,7 +1889,7 @@ function audioObject(id) {
 
     // the audiobuffer is not designed for multi-start playback
     // When stopeed, the buffer node is deleted and recreated with the stored buffer.
-    this.buffer;
+    this.buffer = undefined;
 
     this.bufferLoaded = function (callee) {
         // Called by the associated buffer when it has finished loading, will then 'bind' the buffer to the
@@ -3589,10 +3588,10 @@ function Storage() {
         this.XMLDOM.setAttribute('ref', specification.id);
         this.XMLDOM.setAttribute('presentedId', specification.presentedId);
         this.XMLDOM.setAttribute("state", this.state);
-        if (specification.preTest !== undefined) {
+        if (specification.preTest !== null) {
             this.preTest = new this.parent.surveyNode(this.parent, this.XMLDOM, this.specification.preTest);
         }
-        if (specification.postTest !== undefined) {
+        if (specification.postTest !== null) {
             this.postTest = new this.parent.surveyNode(this.parent, this.XMLDOM, this.specification.postTest);
         }
 
