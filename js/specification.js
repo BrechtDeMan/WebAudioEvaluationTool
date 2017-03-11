@@ -115,8 +115,8 @@ function Specification() {
         for (i = 0; i < attributes.length; i++) {
             var attributeName = attributes[i].getAttribute('name') || attributes[i].getAttribute('ref');
             var projectAttr = setupNode.getAttribute(attributeName);
+            projectAttr = processAttribute(projectAttr, attributes[i]);
             if (projectAttr !== null) {
-                projectAttr = processAttribute(projectAttr, attributes[i]);
                 this[attributeName] = projectAttr;
             }
 
@@ -236,8 +236,8 @@ function Specification() {
                     }
                     var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                     var projectAttr = child.getAttribute(attributeName);
+                    projectAttr = processAttribute(projectAttr, attributeMap[i]);
                     if (projectAttr !== null) {
-                        projectAttr = processAttribute(projectAttr, attributeMap[i]);
                         this[attributeName] = projectAttr;
                     }
                 }
@@ -435,8 +435,8 @@ function Specification() {
                 for (j = 0; j < attributeMap.length; j++) {
                     var attributeName = attributeMap[j].getAttribute('name') || attributeMap[j].getAttribute('ref');
                     var projectAttr = ioNode.getAttribute(attributeName);
+                    projectAttr = processAttribute(projectAttr, attributeMap[j]);
                     if (projectAttr !== null) {
-                        processAttribute(projectAttr, attributeMap[j]);
                         option[attributeName] = projectAttr;
                     }
                 }
@@ -541,8 +541,8 @@ function Specification() {
             for (i = 0; i < attributeMap.length; i++) {
                 var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                 var projectAttr = xml.getAttribute(attributeName);
+                projectAttr = processAttribute(projectAttr, attributeMap[i]);
                 if (projectAttr !== null) {
-                    projectAttr = processAttribute(projectAttr, attributeMap[i]);
                     this[attributeName] = projectAttr;
                 }
             }
@@ -797,8 +797,8 @@ function Specification() {
                 for (var i = 0; i < attributeMap.length; i++) {
                     var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                     var projectAttr = xml.getAttribute(attributeName);
+                    projectAttr = processAttribute(projectAttr, attributeMap[i]);
                     if (projectAttr !== null) {
-                        projectAttr = processAttribute(projectAttr, attributeMap[i]);
                         this[attributeName] = projectAttr;
                     }
                 }
