@@ -269,7 +269,7 @@ function comparator(audioHolderObject) {
                 } else {
                     a.value = 1;
                 }
-                a.parent.metric.moved(time, obj.value);
+                a.parent.metric.moved(time, a.value);
             }, this);
             console.log("Selected " + this.id + ' (' + time + ')');
         };
