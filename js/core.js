@@ -3629,10 +3629,10 @@ function Storage() {
         this.XMLDOM.setAttribute('ref', specification.id);
         this.XMLDOM.setAttribute('presentedId', specification.presentedId);
         this.XMLDOM.setAttribute("state", this.state);
-        if (specification.preTest !== null) {
+        if (specification.preTest !== undefined) {
             this.preTest = new this.parent.surveyNode(this.parent, this.XMLDOM, this.specification.preTest);
         }
-        if (specification.postTest !== null) {
+        if (specification.postTest !== undefined) {
             this.postTest = new this.parent.surveyNode(this.parent, this.XMLDOM, this.specification.postTest);
         }
 

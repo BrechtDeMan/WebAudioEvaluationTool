@@ -275,9 +275,9 @@ function comparator(audioHolderObject) {
         };
         this.playback.setAttribute("playstate", "ready");
         this.playbackClicked = function () {
-            if (event.currentTarget.getAttribute("playstate") == "ready") {
+            if (this.playback.getAttribute("playstate") == "ready") {
                 audioEngineContext.play(this.id);
-            } else if (event.currentTarget.getAttribute("playstate") == "playing") {
+            } else if (this.playback.getAttribute("playstate") == "playing") {
                 audioEngineContext.stop();
             }
 
