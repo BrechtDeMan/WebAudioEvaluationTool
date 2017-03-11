@@ -95,12 +95,16 @@ function Specification() {
             projectAttr = this.processAttribute(projectAttr, attributes[i], this.schema);
             switch (typeof projectAttr) {
                 case "number":
+                    this[attributeName] = Number(projectAttr);
+                    break;
                 case "boolean":
-                    eval('this.' + attributeName + ' = ' + projectAttr);
+                    this[attributeName] = Boolean(projectAttr);
                     break;
                 case "string":
-                    eval('this.' + attributeName + ' = "' + projectAttr + '"');
+                    this[attributeName] = String(projectAttr);
                     break;
+                default:
+                    throw ("Unkown attribute type " + projectAttr);
             }
 
         }
@@ -167,8 +171,8 @@ function Specification() {
             if (name === undefined) {
                 name = attributes[i].getAttribute("ref");
             }
-            if (eval("this." + name + " != undefined") || attributes[i].getAttribute("use") == "required") {
-                eval("setup.setAttribute('" + name + "',this." + name + ")");
+            if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
+                setup.setAttribute(name, this[name]);
             }
         }
         root.appendChild(setup);
@@ -222,12 +226,16 @@ function Specification() {
                     projectAttr = parent.processAttribute(projectAttr, attributeMap[i], parent.schema);
                     switch (typeof projectAttr) {
                         case "number":
+                            this[attributeName] = Number(projectAttr);
+                            break;
                         case "boolean":
-                            eval('this.' + attributeName + ' = ' + projectAttr);
+                            this[attributeName] = Boolean(projectAttr);
                             break;
                         case "string":
-                            eval('this.' + attributeName + ' = "' + projectAttr + '"');
+                            this[attributeName] = String(projectAttr);
                             break;
+                        default:
+                            throw ("Unkown attribute type " + projectAttr);
                     }
                 }
                 if (child.nodeName == 'surveyentry') {
@@ -430,11 +438,13 @@ function Specification() {
                     }
                     switch (typeof projectAttr) {
                         case "number":
+                            option[attributeName] = Number(projectAttr);
+                            break;
                         case "boolean":
-                            eval('option.' + attributeName + ' = ' + projectAttr);
+                            option[attributeName] = Boolean(projectAttr);
                             break;
                         case "string":
-                            eval('option.' + attributeName + ' = "' + projectAttr + '"');
+                            option[attributeName] = String(projectAttr);
                             break;
                     }
                 }
@@ -542,11 +552,13 @@ function Specification() {
                 projectAttr = parent.processAttribute(projectAttr, attributeMap[i], parent.schema);
                 switch (typeof projectAttr) {
                     case "number":
+                        this[attributeName] = Number(projectAttr);
+                        break;
                     case "boolean":
-                        eval('this.' + attributeName + ' = ' + projectAttr);
+                        this[attributeName] = Boolean(projectAttr);
                         break;
                     case "string":
-                        eval('this.' + attributeName + ' = "' + projectAttr + '"');
+                        this[attributeName] = String(projectAttr);
                         break;
                 }
             }
@@ -625,8 +637,8 @@ function Specification() {
                 if (name === undefined) {
                     name = attributes[i].getAttribute("ref");
                 }
-                if (eval("this." + name + " != undefined") || attributes[i].getAttribute("use") == "required") {
-                    eval("AHNode.setAttribute('" + name + "',this." + name + ")");
+                if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
+                    AHNode.setAttribute(name, this[name]);
                 }
             }
             if (this.loudness !== null) {
@@ -802,11 +814,13 @@ function Specification() {
                     projectAttr = parent.parent.processAttribute(projectAttr, attributeMap[i], parent.parent.schema);
                     switch (typeof projectAttr) {
                         case "number":
+                            this[attributeName] = Number(projectAttr);
+                            break;
                         case "boolean":
-                            eval('this.' + attributeName + ' = ' + projectAttr);
+                            this[attributeName] = Boolean(projectAttr);
                             break;
                         case "string":
-                            eval('this.' + attributeName + ' = "' + projectAttr + '"');
+                            this[attributeName] = String(projectAttr);
                             break;
                     }
                 }
@@ -831,8 +845,8 @@ function Specification() {
                     if (name === undefined) {
                         name = attributes[i].getAttribute("ref");
                     }
-                    if (eval("this." + name + " != undefined") || attributes[i].getAttribute("use") == "required") {
-                        eval("AENode.setAttribute('" + name + "',this." + name + ")");
+                    if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
+                        AENode.setAttribute(name, this[name]);
                     }
                 }
                 this.alternatives.forEach(function (alt) {
