@@ -861,7 +861,6 @@ function pageXMLSave(store, pageSpecification) {
                     if (name == "elementTracker" || name == "elementTrackerFull" || name == "elementInitialPosition" || name == "elementFlagMoved") {
                         mrnodes[j].setAttribute("interface-name", interfaceContext.interfaceSliders[k].name);
                         mrnodes[j].setAttribute("interface-id", k);
-                        inject.appendChild(mrnodes[j]);
                     }
                 }
             }

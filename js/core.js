@@ -328,7 +328,7 @@ function loadProjectSpecCallback(response) {
         storage.initialise(responseDocument);
     }
     /// CHECK FOR SAMPLE RATE COMPATIBILITY
-    if (specification.sampleRate !== null) {
+    if (isFinite(specification.sampleRate)) {
         if (Number(specification.sampleRate) != audioContext.sampleRate) {
             var errStr = 'Sample rates do not match! Requested ' + Number(specification.sampleRate) + ', got ' + audioContext.sampleRate + '. Please set the sample rate to match before completing this test.';
             interfaceContext.lightbox.post("Error", errStr);
@@ -609,7 +609,7 @@ function interfacePopup() {
             conditionFunction = processCheckboxConditional;
         } else if (node.specification.type === "radio") {
             conditionFunction = processRadioConditional;
-        } else if (node.specifiication.type === "number") {
+        } else if (node.specification.type === "number") {
             conditionFunction = processNumberConditional;
         } else if (node.specification.type === "slider") {
             conditionFunction = processSliderConditional;
@@ -801,17 +801,19 @@ function interfacePopup() {
     }
 
     function postRadio(node) {
-        if (node.response === undefined) {
+        if (node.response === null) {
             node.response = {
                 name: "",
                 text: ""
             };
         }
-        var index = 0;
         var table = document.createElement("table");
         table.className = "popup-option-list";
         table.border = "0";
-        node.specification.options.forEach(function (option) {
+        if (node.response === null || node.response.length === 0) {
+            node.response = [];
+        }
+        node.specification.options.forEach(function (option, index) {
             var tr = document.createElement("tr");
             table.appendChild(tr);
             var td = document.createElement("td");
@@ -830,12 +832,7 @@ function interfacePopup() {
             tr = document.createElement('div');
             tr.setAttribute('name', 'option');
             tr.className = "popup-option-checbox";
-            if (node.response[index] !== undefined) {
-                if (node.response[index].checked === true) {
-                    input.checked = "true";
-                }
-            }
-            index++;
+            table.appendChild(tr);
         });
         this.popupResponse.appendChild(table);
     }
@@ -2207,6 +2204,7 @@ function metricTracker(caller) {
         mElementTimer.setAttribute('name', 'enableElementTimer');
         mElementTimer.textContent = this.listenedTimer;
         parentElement.appendChild(mElementTimer);
+        return mElementTimer;
     }
 
     function exportElementTrack(parentElement) {
@@ -2219,6 +2217,7 @@ function metricTracker(caller) {
             elementTrackerFull.appendChild(timePos);
         }
         parentElement.appendChild(elementTrackerFull);
+        return elementTrackerFull;
     }
 
     function exportElementListenTracker(parentElement) {
@@ -2228,6 +2227,7 @@ function metricTracker(caller) {
             elementListenTracker.appendChild(this.listenTracker[k]);
         }
         parentElement.appendChild(elementListenTracker);
+        return elementListenTracker;
     }
 
     function exportElementInitialPosition(parentElement) {
@@ -2235,6 +2235,7 @@ function metricTracker(caller) {
         elementInitial.setAttribute('name', 'elementInitialPosition');
         elementInitial.textContent = this.initialPosition;
         parentElement.appendChild(elementInitial);
+        return elementInitial;
     }
 
     function exportFlagListenedTo(parentElement) {
@@ -2242,6 +2243,7 @@ function metricTracker(caller) {
         flagListenedTo.setAttribute('name', 'elementFlagListenedTo');
         flagListenedTo.textContent = this.wasListenedTo;
         parentElement.appendChild(flagListenedTo);
+        return flagListenedTo;
     }
 
     function exportFlagMoved(parentElement) {
@@ -2249,6 +2251,7 @@ function metricTracker(caller) {
         flagMoved.setAttribute('name', 'elementFlagMoved');
         flagMoved.textContent = this.wasMoved;
         parentElement.appendChild(flagMoved);
+        return flagMoved;
     }
 
     function exportFlagComments(parentElement) {
@@ -2262,30 +2265,33 @@ function metricTracker(caller) {
             flagComments.textContet = 'true';
         }
         parentElement.appendChild(flagComments);
+        return flagComments;
     }
 
     this.exportXMLDOM = function (parentElement) {
+        var elems = []
         if (audioEngineContext.metric.enableElementTimer) {
-            exportElementTimer.call(this, parentElement);
+            elems.push(exportElementTimer.call(this, parentElement));
         }
         if (audioEngineContext.metric.enableElementTracker) {
-            exportElementTrack.call(this, parentElement);
+            elems.push(exportElementTrack.call(this, parentElement));
         }
         if (audioEngineContext.metric.enableElementListenTracker) {
-            exportElementListenTracker.call(this, parentElement);
+            elems.push(exportElementListenTracker.call(this, parentElement));
         }
         if (audioEngineContext.metric.enableElementInitialPosition) {
-            exportElementInitialPosition.call(this, parentElement);
+            elems.push(exportElementInitialPosition.call(this, parentElement));
         }
         if (audioEngineContext.metric.enableFlagListenedTo) {
-            exportFlagListenedTo.call(this, parentElement);
+            elems.push(exportFlagListenedTo.call(this, parentElement));
         }
         if (audioEngineContext.metric.enableFlagMoved) {
-            exportFlagMoved.call(this, parentElement);
+            elems.push(exportFlagMoved.call(this, parentElement));
         }
         if (audioEngineContext.metric.enableFlagComments) {
-            exportFlagComments.call(this, parentElement);
+            elems.push(exportFlagComments.call(this, parentElement));
         }
+        return elems;
     };
 }
 
@@ -2651,8 +2657,7 @@ function Interface(specificationObject) {
             options.style.marginLeft = spanMargin;
             text.style.marginRight = spanMargin;
             text.style.marginLeft = spanMargin;
-            while (options.nextSibling !== undefined) {
-                options = options.nextSibling;
+            while (options = options.nextSibling) {
                 text = text.nextSibling;
                 options.style.marginRight = spanMargin;
                 options.style.marginLeft = spanMargin;
@@ -2750,8 +2755,7 @@ function Interface(specificationObject) {
             options.style.marginLeft = spanMargin;
             text.style.marginRight = spanMargin;
             text.style.marginLeft = spanMargin;
-            while (options.nextSibling !== undefined) {
-                options = options.nextSibling;
+            while (options = options.nextSibling) {
                 text = text.nextSibling;
                 options.style.marginRight = spanMargin;
                 options.style.marginLeft = spanMargin;
