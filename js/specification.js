@@ -1,5 +1,7 @@
 /* globals document, console */
 function Specification() {
+    var schemaRoot = undefined;
+    var schemaString = undefined;
     // Handles the decoding of the project specification XML into a simple JavaScript Object.
 
     // <setup> attributes
@@ -26,10 +28,10 @@ function Specification() {
     this.schema = null;
     this.exitText = "Thank you.";
 
-    this.processAttribute = function (attribute, schema, schemaRoot) {
+    var processAttribute = function (attribute, schema) {
         // attribute is the string returned from getAttribute on the XML
         // schema is the <xs:attribute> node
-        if (schema.getAttribute('name') === undefined && schema.getAttribute('ref') !== undefined) {
+        if (schema.getAttribute('name') === null && schema.getAttribute('ref') !== undefined) {
             schema = schemaRoot.getAllElementsByName(schema.getAttribute('ref'))[0];
         }
         var defaultOpt = schema.getAttribute('default');
@@ -79,31 +81,44 @@ function Specification() {
         return attribute;
     };
 
+    this.processSchema = function (schemaXSD) {
+        if (schemaRoot === undefined) {
+            schemaString = schemaXSD;
+            var parse = new DOMParser();
+            schemaRoot = parse.parseFromString(schemaString, 'text/xml');
+            Object.defineProperties(this, {
+                'schema': {
+                    'value': schemaRoot
+                },
+                'schemaString': {
+                    'value': schemaString
+                }
+            });
+        }
+    }
+    this.getSchema = function () {
+        return schemaRoot;
+    }
+    this.getSchemaString = function () {
+        return schemaString;
+    }
+
     this.decode = function (projectXML) {
+        schemaRoot = this.schema;
         this.errors = [];
         // projectXML - DOM Parsed document
         this.projectXML = projectXML.childNodes[0];
         var setupNode = projectXML.getElementsByTagName('setup')[0];
-        var schemaSetup = this.schema.getAllElementsByName('setup')[0];
+        var schemaSetup = schemaRoot.getAllElementsByName('setup')[0];
         // First decode the attributes
         var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
         var i;
         for (i = 0; i < attributes.length; i++) {
             var attributeName = attributes[i].getAttribute('name') || attributes[i].getAttribute('ref');
             var projectAttr = setupNode.getAttribute(attributeName);
-            projectAttr = this.processAttribute(projectAttr, attributes[i], this.schema);
-            switch (typeof projectAttr) {
-                case "number":
-                    this[attributeName] = Number(projectAttr);
-                    break;
-                case "boolean":
-                    this[attributeName] = Boolean(projectAttr);
-                    break;
-                case "string":
-                    this[attributeName] = String(projectAttr);
-                    break;
-                default:
-                    throw ("Unkown attribute type " + projectAttr);
+            if (projectAttr !== null) {
+                projectAttr = processAttribute(projectAttr, attributes[i]);
+                this[attributeName] = projectAttr;
             }
 
         }
@@ -162,7 +177,7 @@ function Specification() {
         root.setAttribute("xsi:noNamespaceSchemaLocation", "test-schema.xsd");
         // Build setup node
         var setup = RootDocument.createElement("setup");
-        var schemaSetup = this.schema.getAllElementsByName('setup')[0];
+        var schemaSetup = schemaRoot.getAllElementsByName('setup')[0];
         // First decode the attributes
         var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
         for (var i = 0; i < attributes.length; i++) {
@@ -195,7 +210,7 @@ function Specification() {
         this.location = null;
         this.options = [];
         this.parent = null;
-        this.schema = specification.schema.getAllElementsByName('survey')[0];
+        this.schema = schemaRoot.getAllElementsByName('survey')[0];
         this.specification = specification;
 
         this.OptionNode = function (specification) {
@@ -213,7 +228,7 @@ function Specification() {
             this.conditions = [];
 
             this.decode = function (parent, child) {
-                this.schema = specification.schema.getAllElementsByName(child.nodeName)[0];
+                this.schema = schemaRoot.getAllElementsByName(child.nodeName)[0];
                 var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
                 var i;
                 for (i in attributeMap) {
@@ -222,19 +237,9 @@ function Specification() {
                     }
                     var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                     var projectAttr = child.getAttribute(attributeName);
-                    projectAttr = parent.processAttribute(projectAttr, attributeMap[i], parent.schema);
-                    switch (typeof projectAttr) {
-                        case "number":
-                            this[attributeName] = Number(projectAttr);
-                            break;
-                        case "boolean":
-                            this[attributeName] = Boolean(projectAttr);
-                            break;
-                        case "string":
-                            this[attributeName] = String(projectAttr);
-                            break;
-                        default:
-                            throw ("Unkown attribute type " + projectAttr);
+                    if (projectAttr !== null) {
+                        projectAttr = processAttribute(projectAttr, attributeMap[i]);
+                        this[attributeName] = projectAttr;
                     }
                 }
                 if (child.nodeName == 'surveyentry') {
@@ -412,7 +417,7 @@ function Specification() {
         this.name = null;
         this.options = [];
         this.scales = [];
-        this.schema = specification.schema.getAllElementsByName('interface')[1];
+        this.schema = schemaRoot.getAllElementsByName('interface')[1];
 
         this.decode = function (parent, xml) {
             this.name = xml.getAttribute('name');
@@ -431,21 +436,9 @@ function Specification() {
                 for (j = 0; j < attributeMap.length; j++) {
                     var attributeName = attributeMap[j].getAttribute('name') || attributeMap[j].getAttribute('ref');
                     var projectAttr = ioNode.getAttribute(attributeName);
-                    if (parent.processAttribute) {
-                        parent.processAttribute(projectAttr, attributeMap[j], parent.schema);
-                    } else {
-                        parent.parent.processAttribute(projectAttr, attributeMap[j], parent.parent.schema);
-                    }
-                    switch (typeof projectAttr) {
-                        case "number":
-                            option[attributeName] = Number(projectAttr);
-                            break;
-                        case "boolean":
-                            option[attributeName] = Boolean(projectAttr);
-                            break;
-                        case "string":
-                            option[attributeName] = String(projectAttr);
-                            break;
+                    if (projectAttr !== null) {
+                        processAttribute(projectAttr, attributeMap[j]);
+                        this[attributeName] = projectAttr;
                     }
                 }
                 this.options.push(option);
@@ -538,7 +531,7 @@ function Specification() {
         this.commentBoxPrefix = "Comment on track";
         this.audioElements = [];
         this.commentQuestions = [];
-        this.schema = specification.schema.getAllElementsByName("page")[0];
+        this.schema = schemaRoot.getAllElementsByName("page")[0];
         this.specification = specification;
         this.parent = null;
 
@@ -549,17 +542,9 @@ function Specification() {
             for (i = 0; i < attributeMap.length; i++) {
                 var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                 var projectAttr = xml.getAttribute(attributeName);
-                projectAttr = parent.processAttribute(projectAttr, attributeMap[i], parent.schema);
-                switch (typeof projectAttr) {
-                    case "number":
-                        this[attributeName] = Number(projectAttr);
-                        break;
-                    case "boolean":
-                        this[attributeName] = Boolean(projectAttr);
-                        break;
-                    case "string":
-                        this[attributeName] = String(projectAttr);
-                        break;
+                if (projectAttr !== null) {
+                    projectAttr = processAttribute(projectAttr, attributeMap[i]);
+                    this[attributeName] = projectAttr;
                 }
             }
 
@@ -671,7 +656,7 @@ function Specification() {
             this.name = undefined;
             this.type = undefined;
             this.statement = undefined;
-            this.schema = specification.schema.getAllElementsByName('commentquestion')[0];
+            this.schema = schemaRoot.getAllElementsByName('commentquestion')[0];
             this.decode = function (parent, xml) {
                 this.id = xml.id;
                 this.name = xml.getAttribute('name');
@@ -805,7 +790,7 @@ function Specification() {
             this.stopTime = undefined;
             this.sampleRate = undefined;
             this.alternatives = [];
-            this.schema = specification.schema.getAllElementsByName('audioelement')[0];
+            this.schema = schemaRoot.getAllElementsByName('audioelement')[0];
             this.parent = null;
             this.decode = function (parent, xml) {
                 this.parent = parent;
@@ -813,17 +798,9 @@ function Specification() {
                 for (var i = 0; i < attributeMap.length; i++) {
                     var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                     var projectAttr = xml.getAttribute(attributeName);
-                    projectAttr = parent.parent.processAttribute(projectAttr, attributeMap[i], parent.parent.schema);
-                    switch (typeof projectAttr) {
-                        case "number":
-                            this[attributeName] = Number(projectAttr);
-                            break;
-                        case "boolean":
-                            this[attributeName] = Boolean(projectAttr);
-                            break;
-                        case "string":
-                            this[attributeName] = String(projectAttr);
-                            break;
+                    if (projectAttr !== null) {
+                        projectAttr = processAttribute(projectAttr, attributeMap[i]);
+                        this[attributeName] = projectAttr;
                     }
                 }
                 // Get the alternative nodes

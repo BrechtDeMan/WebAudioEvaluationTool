@@ -193,9 +193,7 @@ function loadProjectSpec(url) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open("GET", 'xml/test-schema.xsd', true);
     xmlhttp.onload = function () {
-        schemaXSD = xmlhttp.response;
-        var parse = new DOMParser();
-        specification.schema = parse.parseFromString(xmlhttp.response, 'text/xml');
+        specification.processSchema(xmlhttp.response);
         var r = new XMLHttpRequest();
         r.open('GET', url, true);
         r.onload = function () {
@@ -252,7 +250,7 @@ function loadProjectSpecCallback(response) {
         // Perform XML schema validation
         var Module = {
             xml: response,
-            schema: schemaXSD,
+            schema: specification.getSchemaString(),
             arguments: ["--noout", "--schema", 'test-schema.xsd', 'document.xml']
         };
         projectXML = responseDocument;
