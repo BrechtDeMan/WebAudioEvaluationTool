@@ -4,6 +4,7 @@
  */
 
 // Once this is loaded and parsed, begin execution
+/* globals interfaceContext, Interface, testState, audioEngineContext, console, document, window, feedbackHolder, $, specification, storage*/
 loadInterface();
 
 function loadInterface() {
@@ -29,7 +30,7 @@ function loadInterface() {
             }
         }
         if (maxRanking * 100 < max) {
-            str += "At least one fragment must be selected."
+            str += "At least one fragment must be selected.";
             state = false;
         }
         if (!state) {
@@ -38,7 +39,7 @@ function loadInterface() {
             interfaceContext.lightbox.post("Message", str);
         }
         return state;
-    }
+    };
 
     // Custom comparator Object
     Interface.prototype.comparator = null;
@@ -57,7 +58,7 @@ function loadInterface() {
     titleSpan.id = "test-title";
 
     // Set title to that defined in XML, else set to default
-    if (titleAttr != undefined) {
+    if (titleAttr !== undefined) {
         titleSpan.textContent = titleAttr;
     } else {
         titleSpan.textContent = 'Listening test';
@@ -68,7 +69,8 @@ function loadInterface() {
     var pagetitle = document.createElement('div');
     pagetitle.className = "pageTitle";
     pagetitle.align = "center";
-    var titleSpan = document.createElement('span');
+
+    titleSpan = document.createElement('span');
     titleSpan.id = "pageTitle";
     pagetitle.appendChild(titleSpan);
 
@@ -131,7 +133,7 @@ function loadInterface() {
     // Load the full interface
     testState.initialise();
     testState.advanceState();
-};
+}
 
 function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
@@ -148,10 +150,10 @@ function loadTest(page) {
 
     // Set the page title
     if (typeof page.title == "string" && page.title.length > 0) {
-        document.getElementById("test-title").textContent = page.title
+        document.getElementById("test-title").textContent = page.title;
     }
 
-    if (interfaceObj.title != null) {
+    if (interfaceObj.title !== null) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
@@ -163,7 +165,7 @@ function loadTest(page) {
             switch (option.name) {
                 case "playhead":
                     var playbackHolder = document.getElementById('playback-holder');
-                    if (playbackHolder == null) {
+                    if (playbackHolder === null) {
                         playbackHolder = document.createElement('div');
                         playbackHolder.style.width = "100%";
                         playbackHolder.style.float = "left";
@@ -174,7 +176,7 @@ function loadTest(page) {
                     break;
                 case "page-count":
                     var pagecountHolder = document.getElementById('page-count');
-                    if (pagecountHolder == null) {
+                    if (pagecountHolder === null) {
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
                     }
@@ -183,7 +185,7 @@ function loadTest(page) {
                     inject.appendChild(pagecountHolder);
                     break;
                 case "volume":
-                    if (document.getElementById('master-volume-holder') == null) {
+                    if (document.getElementById('master-volume-holder') === null) {
                         feedbackHolder.appendChild(interfaceContext.volume.object);
                     }
                     break;
@@ -231,60 +233,54 @@ function comparator(page) {
         this.playback.textContent = "Listen";
         this.box.appendChild(this.selector);
         this.box.appendChild(this.playback);
-        this.selector.onclick = function (event) {
-            var label = event.currentTarget.children[0].textContent;
+        this.selectorClicked = function (event) {
             if (label == "X" || label == "x") {
                 return;
             }
             var time = audioEngineContext.timer.getTestTime();
-            if ($(event.currentTarget).hasClass('disabled')) {
+            if (this.disabled) {
+                interfaceContext.lightbox.post("Message", "Please wait until sample has loaded");
                 console.log("Please wait until sample has loaded");
                 return;
             }
-            if (audioEngineContext.status == 0) {
+            if (audioEngineContext.status === 0) {
                 interfaceContext.lightbox.post("Message", "Please listen to the samples before making a selection");
                 console.log("Please listen to the samples before making a selection");
                 return;
             }
-            var id = event.currentTarget.parentElement.getAttribute('track-id');
-            interfaceContext.comparator.selected = id;
-            if ($(event.currentTarget).hasClass("selected")) {
-                $(".comparator-selector").removeClass('selected');
-                for (var i = 0; i < interfaceContext.comparator.pair.length; i++) {
-                    var obj = interfaceContext.comparator.pair[i];
-                    obj.parent.metric.moved(time, 0);
-                    obj.value = 0;
-                }
-            } else {
-                $(".comparator-selector").removeClass('selected');
-                $(event.currentTarget).addClass('selected');
-                for (var i = 0; i < interfaceContext.comparator.pair.length; i++) {
-                    var obj = interfaceContext.comparator.pair[i];
-                    if (i == id) {
-                        obj.value = 1;
-                    } else {
-                        obj.value = 0;
-                    }
-                    obj.parent.metric.moved(time, obj.value);
-                }
-                console.log("Selected " + id + ' (' + time + ')');
-            }
+            interfaceContext.comparator.selected = this.id;
+            $(".comparator-selector").removeClass('selected');
+            $(this.selector).addClass('selected');
+            interfaceContext.comparator.pair.forEach(function (obj) {
+                obj.value = 1.0 * obj === this;
+                obj.parent.metric.moved(time, obj.value);
+            });
+            console.log("Selected " + this.id + ' (' + time + ')');
         };
         this.playback.setAttribute("playstate", "ready");
-        this.playback.onclick = function (event) {
-            var id = event.currentTarget.parentElement.getAttribute('track-id');
-            if (event.currentTarget.getAttribute("playstate") == "ready") {
-                audioEngineContext.play(id);
+        this.playbackClicked = function (event) {
+            if (this.playback.getAttribute("playstate") == "ready") {
+                audioEngineContext.play(this.id);
             } else if (event.currentTarget.getAttribute("playstate") == "playing") {
                 audioEngineContext.stop();
             }
 
         };
+        this.handleEvent = function (event) {
+            if (event.currentTarget === this.playback) {
+                this.playbackClicked(event);
+            } else if (event.currentTarget === this.selector) {
+                this.selectorClicked(event);
+            }
+        };
+        this.playback.addEventListener("click", this);
+        this.selector.addEventListener("click", this);
         this.enable = function () {
             // This is used to tell the interface object that playback of this node is ready
             if (this.parent.state == 1) {
                 $(this.selector).removeClass('disabled');
                 this.playback.disabled = false;
+                this.disabled = false;
             }
         };
         this.updateLoading = function (progress) {
@@ -345,7 +341,7 @@ function comparator(page) {
         };
         this.error = function () {
             // If there is an error with the audioObject, this will be called to indicate a failure
-        }
+        };
     };
     // Ensure there are only two comparisons per page
     if (page.audioElements.length != 2) {
@@ -353,31 +349,42 @@ function comparator(page) {
         return;
     }
     // Build the three audio elements
+
+    function buildElement(index, audioObject) {
+        var label;
+        switch (index) {
+            case 0:
+                label = "A";
+                break;
+            case 1:
+                label = "B";
+                break;
+            default:
+                label = "X";
+                break;
+        }
+        var node = new this.interfaceObject(audioObject, label);
+        audioObject.bindInterface(node);
+        return node;
+    }
+
     this.pair = [];
     this.X = null;
     this.boxHolders = document.getElementById('box-holders');
-    for (var index = 0; index < page.audioElements.length; index++) {
-        var element = page.audioElements[index];
+    var node;
+    page.audioElements.forEach(function (element, index) {
         if (element.type != 'normal') {
             console.log("WARNING - ABX can only have normal elements. Page " + page.id + ", Element " + element.id);
             element.type = "normal";
         }
-        var audioObject = audioEngineContext.newTrack(element);
-        var label;
-        if (index == 0) {
-            label = "A";
-        } else {
-            label = "B";
-        }
-        var node = new this.interfaceObject(audioObject, label);
-        audioObject.bindInterface(node);
+        node = buildElement.call(this, index, audioEngineContext.newTrack(element));
         this.pair.push(node);
         this.boxHolders.appendChild(node.box);
-    }
+    }, this);
     var elementId = Math.floor(Math.random() * 2); //Randomly pick A or B to be X
     var element = new page.audioElementNode(specification);
     for (var atr in page.audioElements[elementId]) {
-        eval("element." + atr + " = page.audioElements[elementId]." + atr);
+        element[atr] = page.audioElements[elementId][atr];
     }
     element.id += "-X";
     if (typeof element.name == "string") {
@@ -397,17 +404,9 @@ function comparator(page) {
     aeNode.appendChild(storage.document.createElement('metric'));
     root.appendChild(aeNode);
     // Build the 'X' element
-    var audioObject = audioEngineContext.newTrack(element);
     var label;
-    switch (audioObject.specification.parent.label) {
-        case "letter":
-            label = "x";
-            break;
-        default:
-            label = "X";
-            break;
-    }
-    var node = new this.interfaceObject(audioObject, label);
+    var audioObject = audioEngineContext.newTrack(element);
+    node = buildElement.call(this, 3, audioObject);
     node.box.children[0].classList.add('inactive');
     audioObject.bindInterface(node);
     this.X = node;
@@ -434,40 +433,41 @@ function buttonSubmitClick() {
         canContinue = true;
 
     for (var i = 0; i < checks.length; i++) {
+        var checkState;
         if (checks[i].type == 'check') {
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    var checkState = interfaceContext.checkAllPlayed();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllPlayed();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    var checkState = interfaceContext.checkFragmentsFullyPlayed();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkFragmentsFullyPlayed();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllMoved();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllMoved();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllCommented();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllCommented();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    var checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
@@ -487,7 +487,7 @@ function buttonSubmitClick() {
             playback.click();
             // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
         } else {
-            if (audioEngineContext.timer.testStarted == false) {
+            if (audioEngineContext.timer.testStarted === false) {
                 interfaceContext.lightbox.post("Warning", 'You have not started the test! Please listen to a sample to begin the test!');
                 return;
             }

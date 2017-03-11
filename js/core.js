@@ -1311,7 +1311,7 @@ function stateMachine() {
         }
         if (this.stateIndex == -2) {
             this.stateIndex++;
-            if (this.preTestSurvey !== null) {
+            if (this.preTestSurvey !== undefined) {
                 popup.initState(this.preTestSurvey, storage.globalPreTest);
             } else {
                 this.advanceState();
@@ -1331,7 +1331,7 @@ function stateMachine() {
             // All test pages complete, post test
             console.log('Ending test ...');
             this.stateIndex++;
-            if (this.postTestSurvey === null) {
+            if (this.postTestSurvey === undefined) {
                 this.advanceState();
             } else {
                 popup.initState(this.postTestSurvey, storage.globalPostTest);
@@ -1361,7 +1361,7 @@ function stateMachine() {
                 this.currentStateMap.audioElements = elements.concat(ref);
 
                 this.currentStore = storage.testPages[this.stateIndex];
-                if (this.currentStateMap.preTest !== null) {
+                if (this.currentStateMap.preTest !== undefined) {
                     this.currentStatePosition = 'pre';
                     popup.initState(this.currentStateMap.preTest, storage.testPages[this.stateIndex].preTest);
                 } else {
