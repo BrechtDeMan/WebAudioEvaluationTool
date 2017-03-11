@@ -72,7 +72,6 @@ function Specification() {
             case "short":
                 attribute = Number(attribute);
                 break;
-            case "string":
             default:
                 attribute = String(attribute);
                 break;
@@ -315,7 +314,7 @@ function Specification() {
                             node.setAttribute("max", this.max);
                         } else {
                             node.setAttribute("max", "undefined");
-                        }
+                        } /* falls through */
                     case "radio":
                         for (var i = 0; i < this.options.length; i++) {
                             var option = this.options[i];
@@ -344,7 +343,7 @@ function Specification() {
                     case "video":
                         if (this.mandatory !== undefined) {
                             node.setAttribute("mandatory", this.mandatory);
-                        }
+                        } /* falls through */
                     case "youtube":
                         if (this.url !== undefined) {
                             node.setAttribute("url", this.url);
@@ -363,6 +362,7 @@ function Specification() {
                             maxText.textContent = this.rightText;
                             node.appendChild(maxText);
                         }
+                        break;
                     default:
                         break;
                 }
@@ -691,9 +691,10 @@ function Specification() {
                         this.step = undefined;
                         break;
                     case "commentquestion":
-                    default:
                         this.type = "question";
                         break;
+                    default:
+                        throw ("Unknown comment type " + xml.nodeName);
                 }
                 this.statement = xml.getElementsByTagName('statement')[0].textContent;
                 if (this.type == "radio" || this.type == "checkbox") {
@@ -745,9 +746,10 @@ function Specification() {
                         node = root.createElement("commentslider");
                         break;
                     case "question":
-                    default:
                         node = root.createElement("commentquestion");
                         break;
+                    default:
+                        throw ("Unknown type " + this.type);
                 }
                 node.id = this.id;
                 node.setAttribute("type", this.type);
