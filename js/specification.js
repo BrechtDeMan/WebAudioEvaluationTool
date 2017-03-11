@@ -5,27 +5,26 @@ function Specification() {
     // Handles the decoding of the project specification XML into a simple JavaScript Object.
 
     // <setup> attributes
-    this.interface = null;
-    this.projectReturn = null;
-    this.returnURL = null;
-    this.randomiseOrder = null;
-    this.poolSize = null;
-    this.loudness = null;
-    this.sampleRate = null;
-    this.calibration = null;
-    this.crossFade = null;
-    this.preSilence = null;
-    this.postSilence = null;
-    this.playOne = null;
+    this.interface = undefined;
+    this.projectReturn = undefined;
+    this.returnURL = undefined;
+    this.randomiseOrder = undefined;
+    this.poolSize = undefined;
+    this.loudness = undefined;
+    this.sampleRate = undefined;
+    this.calibration = undefined;
+    this.crossFade = undefined;
+    this.preSilence = undefined;
+    this.postSilence = undefined;
+    this.playOne = undefined;
 
     // nodes
-    this.metrics = null;
+    this.metrics = undefined;
     this.preTest = undefined;
     this.postTest = undefined;
     this.pages = [];
-    this.interfaces = null;
+    this.interfaces = undefined;
     this.errors = [];
-    this.schema = null;
     this.exitText = "Thank you.";
 
     var processAttribute = function (attribute, schema) {
@@ -207,9 +206,9 @@ function Specification() {
     };
 
     this.surveyNode = function (specification) {
-        this.location = null;
+        this.location = undefined;
         this.options = [];
-        this.parent = null;
+        this.parent = undefined;
         this.schema = schemaRoot.getAllElementsByName('survey')[0];
         this.specification = specification;
 
@@ -413,8 +412,8 @@ function Specification() {
     };
 
     this.interfaceNode = function (specification) {
-        this.title = null;
-        this.name = null;
+        this.title = undefined;
+        this.name = undefined;
         this.options = [];
         this.scales = [];
         this.schema = schemaRoot.getAllElementsByName('interface')[1];
@@ -438,7 +437,7 @@ function Specification() {
                     var projectAttr = ioNode.getAttribute(attributeName);
                     if (projectAttr !== null) {
                         processAttribute(projectAttr, attributeMap[j]);
-                        this[attributeName] = projectAttr;
+                        option[attributeName] = projectAttr;
                     }
                 }
                 this.options.push(option);
@@ -519,21 +518,21 @@ function Specification() {
         this.hostURL = undefined;
         this.randomiseOrder = undefined;
         this.loop = undefined;
-        this.outsideReference = null;
-        this.loudness = null;
-        this.label = null;
-        this.labelStart = "";
-        this.preTest = null;
-        this.postTest = null;
+        this.outsideReference = undefined;
+        this.loudness = undefined;
+        this.label = undefined;
+        this.labelStart = undefined;
+        this.preTest = undefined;
+        this.postTest = undefined;
         this.interfaces = [];
-        this.playOne = null;
-        this.restrictMovement = null;
+        this.playOne = undefined;
+        this.restrictMovement = undefined;
         this.commentBoxPrefix = "Comment on track";
         this.audioElements = [];
         this.commentQuestions = [];
         this.schema = schemaRoot.getAllElementsByName("page")[0];
         this.specification = specification;
-        this.parent = null;
+        this.parent = undefined;
 
         this.decode = function (parent, xml) {
             this.parent = parent;
@@ -574,14 +573,14 @@ function Specification() {
             for (i = 0; i < survey.length; i++) {
                 var location = survey[i].getAttribute('location');
                 if (location == 'pre' || location == 'before') {
-                    if (this.preTest !== null) {
+                    if (this.preTest !== undefined) {
                         this.errors.push("Already a pre/before test survey defined! Ignoring second!!");
                     } else {
                         this.preTest = new parent.surveyNode(this.specification);
                         this.preTest.decode(parent, survey[i], surveySchema);
                     }
                 } else if (location == 'post' || location == 'after') {
-                    if (this.postTest !== null) {
+                    if (this.postTest !== undefined) {
                         this.errors.push("Already a post/after test survey defined! Ignoring second!!");
                     } else {
                         this.postTest = new parent.surveyNode(this.specification);
@@ -619,15 +618,12 @@ function Specification() {
             var i;
             for (i = 0; i < attributes.length; i++) {
                 var name = attributes[i].getAttribute("name");
-                if (name === undefined) {
+                if (name === null) {
                     name = attributes[i].getAttribute("ref");
                 }
                 if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
                     AHNode.setAttribute(name, this[name]);
                 }
-            }
-            if (this.loudness !== null) {
-                AHNode.setAttribute("loudness", this.loudness);
             }
             // <commentboxprefix>
             var commentboxprefix = root.createElement("commentboxprefix");
@@ -652,7 +648,7 @@ function Specification() {
         };
 
         this.commentQuestionNode = function (specification) {
-            this.id = null;
+            this.id = undefined;
             this.name = undefined;
             this.type = undefined;
             this.statement = undefined;
@@ -660,6 +656,9 @@ function Specification() {
             this.decode = function (parent, xml) {
                 this.id = xml.id;
                 this.name = xml.getAttribute('name');
+                if (this.name === null) {
+                    this.name = undefined;
+                }
                 switch (xml.nodeName) {
                     case "commentradio":
                         this.type = "radio";
@@ -777,21 +776,21 @@ function Specification() {
         };
 
         this.audioElementNode = function (specification) {
-            this.url = null;
-            this.id = null;
-            this.name = null;
-            this.parent = null;
-            this.type = null;
-            this.marker = null;
+            this.url = undefined;
+            this.id = undefined;
+            this.name = undefined;
+            this.parent = undefined;
+            this.type = undefined;
+            this.marker = undefined;
             this.enforce = false;
             this.gain = 0.0;
-            this.label = null;
+            this.label = undefined;
             this.startTime = undefined;
             this.stopTime = undefined;
             this.sampleRate = undefined;
             this.alternatives = [];
             this.schema = schemaRoot.getAllElementsByName('audioelement')[0];
-            this.parent = null;
+            this.parent = undefined;
             this.decode = function (parent, xml) {
                 this.parent = parent;
                 var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
@@ -821,7 +820,7 @@ function Specification() {
                 var attributes = this.schema.getAllElementsByTagName('xs:attribute');
                 for (var i = 0; i < attributes.length; i++) {
                     var name = attributes[i].getAttribute("name");
-                    if (name === undefined) {
+                    if (name === null) {
                         name = attributes[i].getAttribute("ref");
                     }
                     if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
