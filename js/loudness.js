@@ -5,7 +5,7 @@
  * 	return gain values to correct for a target loudness or match loudness between
  *  multiple objects
  */
-
+/* globals webkitOfflineAudioContext, navigator, audioContext, Float32Array */
 var interval_cal_loudness_event = null;
 
 if (typeof OfflineAudioContext == "undefined") {
@@ -21,16 +21,16 @@ function calculateLoudness(buffer, timescale, target, offlineContext) {
     if (navigator.platform == 'iPad' || navigator.platform == 'iPhone') {
         buffer.ready();
     }
-    if (buffer == undefined) {
+    if (buffer === undefined) {
         return 0;
     }
-    if (timescale == undefined) {
+    if (timescale === undefined) {
         timescale = "I";
     }
-    if (target == undefined) {
+    if (target === undefined) {
         target = -23;
     }
-    if (offlineContext == undefined) {
+    if (offlineContext === undefined) {
         offlineContext = new OfflineAudioContext(audioContext.destination.channelCount, buffer.buffer.duration * audioContext.sampleRate, audioContext.sampleRate);
     }
     // Create the required filters
@@ -77,11 +77,11 @@ function calculateLoudness(buffer, timescale, target, offlineContext) {
 }
 
 function calculateMeanSquared(buffer, frame_dur, frame_overlap) {
-    frame_size = Math.floor(buffer.sampleRate * frame_dur);
-    step_size = Math.floor(frame_size * (1.0 - frame_overlap));
-    num_frames = Math.floor((buffer.length - frame_size) / step_size);
+    var frame_size = Math.floor(buffer.sampleRate * frame_dur);
+    var step_size = Math.floor(frame_size * (1.0 - frame_overlap));
+    var num_frames = Math.floor((buffer.length - frame_size) / step_size);
 
-    MS = Array(buffer.numberOfChannels);
+    var MS = Array(buffer.numberOfChannels);
     for (var c = 0; c < buffer.numberOfChannels; c++) {
         MS[c] = new Float32Array(num_frames);
         var data = buffer.getChannelData(c);
@@ -119,13 +119,14 @@ function loudnessGate(blocks, source, threshold) {
     var num_frames = source[0].length;
     var num_channels = source.length;
     var LK = Array(num_channels);
-    for (var c = 0; c < num_channels; c++) {
+    var n, c;
+    for (c = 0; c < num_channels; c++) {
         LK[c] = [];
     }
 
-    for (var n = 0; n < num_frames; n++) {
+    for (n = 0; n < num_frames; n++) {
         if (blocks[n] > threshold) {
-            for (var c = 0; c < num_channels; c++) {
+            for (c = 0; c < num_channels; c++) {
                 LK[c].push(source[c][n]);
             }
         }

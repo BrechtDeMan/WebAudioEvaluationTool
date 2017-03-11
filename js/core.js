@@ -2269,7 +2269,7 @@ function metricTracker(caller) {
     }
 
     this.exportXMLDOM = function (parentElement) {
-        var elems = []
+        var elems = [];
         if (audioEngineContext.metric.enableElementTimer) {
             elems.push(exportElementTimer.call(this, parentElement));
         }

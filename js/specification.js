@@ -1,7 +1,7 @@
-/* globals document, console */
+/* globals document, console, DOMParser */
 function Specification() {
-    var schemaRoot = undefined;
-    var schemaString = undefined;
+    var schemaRoot;
+    var schemaString;
     // Handles the decoding of the project specification XML into a simple JavaScript Object.
 
     // <setup> attributes
@@ -94,13 +94,13 @@ function Specification() {
                 }
             });
         }
-    }
+    };
     this.getSchema = function () {
         return schemaRoot;
-    }
+    };
     this.getSchemaString = function () {
         return schemaString;
-    }
+    };
 
     this.decode = function (projectXML) {
         schemaRoot = this.schema;
