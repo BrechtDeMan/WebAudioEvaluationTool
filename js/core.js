@@ -2849,7 +2849,7 @@ function Interface(specificationObject) {
         this.outsideReferenceHolder.setAttribute('track-id', index);
         this.outsideReferenceHolder.textContent = this.parent.specification.label || "Reference";
         this.outsideReferenceHolder.disabled = true;
-        this.handlEvent = function (event) {
+        this.handleEvent = function (event) {
             audioEngineContext.play(this.parent.id);
         };
         this.outsideReferenceHolder.addEventListener("click", this);
