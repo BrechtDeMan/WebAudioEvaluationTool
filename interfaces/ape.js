@@ -101,17 +101,17 @@ function loadInterface() {
                     max: scaleRange.max
                 };
             })();
-            var outsideBounds = sliderHolder.sliders.some(function (elem) {
-                var a = convSliderPosToRate(elem);
-                if (a <= scales.min) {
-                    return true;
+            var range = sliderHolder.sliders.reduce(function (a, b) {
+                var v = convSliderPosToRate(b) * 100.0;
+                return {
+                    min: Math.min(a.min, v),
+                    max: Math.max(a.max, v)
                 }
-                if (a >= scales.max) {
-                    return true;
-                }
-                return false;
+            }, {
+                min: 100,
+                max: 0
             });
-            if (!outsideBounds) {
+            if (range.min >= scales.min || range.max <= scales.max) {
                 state = false;
                 str += 'On axis "' + sliderHolder.interfaceObject.title + '" you have not used the full width of the scale. ';
             }

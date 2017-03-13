@@ -3288,31 +3288,42 @@ function Interface(specificationObject) {
         }
         return true;
     };
-    this.checkScaleRange = function (min, max) {
+    this.checkScaleRange = function () {
         var page = testState.getCurrentTestPage();
-        var audioObjects = audioEngineContext.audioObjects;
+        var interfaceObject = page.interfaces;
         var state = true;
         var str = "Please keep listening. ";
-        var minRanking = Infinity;
-        var maxRanking = -Infinity;
-        audioEngineContext.audioObjects.forEach(function (ao) {
-            var rank = ao.interfaceDOM.getValue();
-            if (rank < minRanking) {
-                minRanking = rank;
+        if (interfaceObject === undefined) {
+            return true;
+        }
+        interfaceObject = interfaceObject[0];
+        var scales = (function () {
+            var scaleRange = interfaceObject.options.find(function (a) {
+                return a.name == "scalerange";
+            });
+            return {
+                min: scaleRange.min,
+                max: scaleRange.max
+            };
+        })();
+        var range = audioEngineContext.audioObjects.reduce(function (a, b) {
+            var v = b.interfaceDOM.getValue();
+            return {
+                min: Math.min(a.min, v),
+                max: Math.max(a.max, v)
             }
-            if (rank > maxRanking) {
-                maxRanking = rank;
-            }
-        }, this);
-        if (minRanking * 100 > min) {
-            str += "At least one fragment must be below the " + min + " mark.";
+        }, {
+            min: 100,
+            max: 0
+        });
+        if (range.min > scales.min) {
+            str += "At least one fragment must be below the " + range.min + " mark.";
+            state = false;
+        } else if (range.max < sacles.max) {
+            str += "At least one fragment must be above the " + range.max + " mark.";
             state = false;
         }
-        if (maxRanking * 100 < max) {
-            str += "At least one fragment must be above the " + max + " mark.";
-            state = false;
-        }
-        if (!state) {
+        if (state === false) {
             console.log(str);
             this.storeErrorNode(str);
             interfaceContext.lightbox.post("Error", str);
