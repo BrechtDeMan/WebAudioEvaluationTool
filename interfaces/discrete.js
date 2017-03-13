@@ -255,11 +255,8 @@ function discreteObject(audioObject, label, interfaceScales) {
             return;
         }
         var id = this.parent.id;
-        var checkedelement = this.discretes.find(function (elem) {
-            return elem.checked;
-        });
-        var position = checkedelement.getAttribute("position") / 100.0;
-        this.parent.metric.moved(time, checkedelement);
+        var position = this.getValue();
+        this.parent.metric.moved(time, position);
         console.log('slider ' + id + ' moved to ' + position + ' (' + time + ')');
 
     };
@@ -355,14 +352,13 @@ function discreteObject(audioObject, label, interfaceScales) {
 
     this.getValue = function () {
         // Return the current value of the object. If there is no value, return -1
-        var value = -1;
-        for (var i = 0; i < this.discretes.length; i++) {
-            if (this.discretes[i].checked === true) {
-                value = this.discretes[i].getAttribute('position') / 100.0;
-                break;
-            }
+        var checkedElement = this.discretes.find(function (elem) {
+            return elem.checked;
+        });
+        if (checkedElement === undefined) {
+            return -1;
         }
-        return value;
+        return checkedElement.getAttribute("position") / 100.0;
     };
     this.getPresentedId = function () {
         // Return the presented ID of the object. For instance, the APE has sliders starting from 0. Whilst AB has alphabetical scale
