@@ -84,8 +84,8 @@ function loadInterface() {
         }
         return state;
     };
-
-    Interface.prototype.checkAllCommented = function () {
+    /*
+    interfaceContext.checkAllCommented = function () {
         var audioObjs = audioEngineContext.audioObjects;
         var audioHolder = testState.stateMap[testState.stateIndex];
         var state = true;
@@ -128,8 +128,8 @@ function loadInterface() {
         }
         return state;
     };
-
-    Interface.prototype.checkScaleRange = function () {
+    */
+    interfaceContext.checkScaleRange = function () {
         var audioObjs = audioEngineContext.audioObjects;
         var audioHolder = testState.stateMap[testState.stateIndex];
         var interfaceObject = this.interfaceSliders[0].interfaceObject;

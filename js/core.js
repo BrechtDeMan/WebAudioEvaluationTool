@@ -1378,7 +1378,7 @@ function stateMachine() {
                     this.currentStatePosition = 'post';
                     // Save the data
                     this.testPageCompleted();
-                    if (this.currentStateMap.postTest === null) {
+                    if (this.currentStateMap.postTest === undefined) {
                         this.advanceState();
                         return;
                     } else {
@@ -3161,7 +3161,7 @@ function Interface(specificationObject) {
 
     this.checkHiddenReference = function () {
         var references = audioEngineContext.audioObjects.filter(function (ao) {
-            return ao.specification.type === "references";
+            return ao.specification.type === "reference";
         });
         var state = references.some(function (ao) {
             return (ao.interfaceDOM.getValue() < (ao.specification.marker / 100) && ao.specification.marker > 0);
