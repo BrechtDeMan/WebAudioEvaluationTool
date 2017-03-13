@@ -84,51 +84,7 @@ function loadInterface() {
         }
         return state;
     };
-    /*
-    interfaceContext.checkAllCommented = function () {
-        var audioObjs = audioEngineContext.audioObjects;
-        var audioHolder = testState.stateMap[testState.stateIndex];
-        var state = true;
-        if (audioHolder.elementComments) {
-            var notCommented = audioObjs.filter(function (ao) {
-                return ao.commentDOM.trackCommentBox.value.length === 0;
-            });
-            notCommented.sort(function (a, b) {
-                var va = a.interfaceDOM.getPresentedId();
-                var vb = a.interfaceDOM.getPresentedId();
-                if (va < vb) {
-                    return -1;
-                }
-                if (vb < va) {
-                    return 1;
-                }
-                return 0;
-            });
-            if (notCommented.length > 0) {
-                var str = "You have not commented on fragment";
-                if (notCommented.length > 1) {
-                    str += "s ";
-                } else {
-                    str += " ";
-                }
-                for (var i = 0; i < notCommented.length; i++) {
-                    var ao_id = notCommented[i].interfaceDOM.getPresentedId();
-                    str = str + ao_id; // start from 1
-                    if (i < notCommented.length - 2) {
-                        str += ", ";
-                    } else if (i == notCommented.length - 2) {
-                        str += " or ";
-                    }
-                }
-                str += "Please listen, rate and comment all samples before submitting.";
-                this.storeErrorNode(str);
-                interfaceContext.lightbox.post("Message", str);
-                console.log(str);
-            }
-        }
-        return state;
-    };
-    */
+
     interfaceContext.checkScaleRange = function () {
         var audioObjs = audioEngineContext.audioObjects;
         var audioHolder = testState.stateMap[testState.stateIndex];
@@ -755,42 +711,27 @@ function buttonSubmitClick() {
 
     for (var i = 0; i < checks.length; i++) {
         if (checks[i].type == 'check') {
-            var checkState;
+            var checkState = true;
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
                     checkState = interfaceContext.checkAllPlayed();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
                     checkState = interfaceContext.checkFragmentsFullyPlayed();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
                     checkState = interfaceContext.checkAllMoved();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
                     checkState = interfaceContext.checkAllCommented();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
                     break;
                 case 'scalerange':
                     // Check the scale is used to its full width outlined by the node
                     checkState = interfaceContext.checkScaleRange();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].name + " is not supported on this interface");
@@ -798,7 +739,8 @@ function buttonSubmitClick() {
             }
 
         }
-        if (!canContinue) {
+        if (checkState === false) {
+            canContinue = false;
             break;
         }
     }

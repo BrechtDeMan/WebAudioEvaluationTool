@@ -13,34 +13,6 @@ function loadInterface() {
 
     interfaceContext.insertPoint.innerHTML = ""; // Clear the current schema
 
-    Interface.prototype.checkScaleRange = function (min, max) {
-        var page = testState.getCurrentTestPage();
-        var audioObjects = audioEngineContext.audioObjects;
-        var state = true;
-        var str = "Please keep listening. ";
-        var minRanking = Infinity;
-        var maxRanking = -Infinity;
-        for (var ao of audioObjects) {
-            var rank = ao.interfaceDOM.getValue();
-            if (rank < minRanking) {
-                minRanking = rank;
-            }
-            if (rank > maxRanking) {
-                maxRanking = rank;
-            }
-        }
-        if (maxRanking * 100 < max) {
-            str += "At least one fragment must be selected.";
-            state = false;
-        }
-        if (!state) {
-            console.log(str);
-            this.storeErrorNode(str);
-            interfaceContext.lightbox.post("Message", str);
-        }
-        return state;
-    };
-
     // Custom comparator Object
     Interface.prototype.comparator = null;
 
@@ -433,43 +405,28 @@ function buttonSubmitClick() {
         canContinue = true;
 
     for (var i = 0; i < checks.length; i++) {
-        var checkState;
+        var checkState = true;
         if (checks[i].type == 'check') {
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
                     checkState = interfaceContext.checkAllPlayed();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
+
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
                     checkState = interfaceContext.checkFragmentsFullyPlayed();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
                     checkState = interfaceContext.checkAllMoved();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllCommented();
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
+                    console.log("WARNING - Check 'scalerange' does not make sense in AB/ABX! Ignoring!");
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
@@ -477,10 +434,12 @@ function buttonSubmitClick() {
             }
 
         }
-        if (!canContinue) {
+        if (checkState === false) {
+            canContinue = false;
             break;
         }
     }
+
     if (canContinue) {
         if (audioEngineContext.status == 1) {
             var playback = document.getElementById('playback-button');

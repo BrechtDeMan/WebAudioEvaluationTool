@@ -10,34 +10,6 @@ function loadInterface() {
     // Custom comparator Object
     Interface.prototype.comparator = null;
 
-    Interface.prototype.checkScaleRange = function (min, max) {
-        var page = testState.getCurrentTestPage();
-        var audioObjects = audioEngineContext.audioObjects;
-        var state = true;
-        var str = "Please keep listening. ";
-        var minRanking = Infinity;
-        var maxRanking = -Infinity;
-        for (var ao of audioObjects) {
-            var rank = ao.interfaceDOM.getValue();
-            if (rank < minRanking) {
-                minRanking = rank;
-            }
-            if (rank > maxRanking) {
-                maxRanking = rank;
-            }
-        }
-        if (maxRanking * 100 < max) {
-            str += "At least one fragment must be selected.";
-            state = false;
-        }
-        if (!state) {
-            console.log(str);
-            this.storeErrorNode(str);
-            interfaceContext.lightbox.post("Message", str);
-        }
-        return state;
-    };
-
     // The injection point into the HTML page
     interfaceContext.insertPoint = document.getElementById("topLevelBody");
     var testContent = document.createElement('div');
@@ -437,10 +409,7 @@ function buttonSubmitClick() {
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
-                    if (checkState === false) {
-                        canContinue = false;
-                    }
+                    console.log("WARNING - Check 'scalerange' does not make sense in AB/ABX! Ignoring!");
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
