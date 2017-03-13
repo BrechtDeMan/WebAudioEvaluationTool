@@ -2,7 +2,7 @@
  * WAET Timeline
  * This interface plots a waveform timeline per audio fragment on a page. Clicking on the fragment will generate a comment box for processing.
  */
-
+/*globals interfaceContext, window, document, console, audioEngineContext, testState, $, storage */
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
@@ -77,7 +77,7 @@ function loadInterface() {
     // Load the full interface
     testState.initialise();
     testState.advanceState();
-};
+}
 
 function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
@@ -94,7 +94,7 @@ function loadTest(page) {
         document.getElementById("test-title").textContent = page.title;
     }
 
-    if (interfaceObj.title != null) {
+    if (interfaceObj.title !== null) {
         document.getElementById("page-title").textContent = interfaceObj.title;
     }
 
@@ -103,7 +103,7 @@ function loadTest(page) {
     outsideReferenceHolder.innerHTML = "";
 
     var commentBoxPrefix = "Comment on track";
-    if (interfaceObj.commentBoxPrefix != undefined) {
+    if (interfaceObj.commentBoxPrefix !== undefined) {
         commentBoxPrefix = interfaceObj.commentBoxPrefix;
     }
     var index = 0;
@@ -116,7 +116,7 @@ function loadTest(page) {
         var audioObject = audioEngineContext.newTrack(element);
         if (page.audioElements.type == 'outside-reference') {
             var refNode = interfaceContext.outsideReferenceDOM(audioObject, index, outsideReferenceHolder);
-            audioObject.bindInterface(orNode);
+            audioObject.bindInterface(refNode);
         } else {
             var label = interfaceContext.getLabel(labelType, index, page.labelStart);
             var node = new interfaceObject(audioObject, label);
@@ -169,7 +169,7 @@ function interfaceObject(audioObject, labelstr) {
             var titleHolder = document.createElement("div");
             titleHolder.className = "comment-entry-header";
             this.title = document.createElement("span");
-            if (str != undefined) {
+            if (str !== undefined) {
                 this.title.textContent = str;
             } else {
                 this.title.textContent = "Time: " + time.toFixed(2) + "s";
@@ -186,7 +186,7 @@ function interfaceObject(audioObject, labelstr) {
                 handleEvent: function () {
                     this.parent.parent.deleteComment(this.parent);
                 }
-            }
+            };
             this.clear.DOM.textContent = "Delete";
             this.clear.DOM.addEventListener("click", this.clear);
             titleHolder.appendChild(this.clear.DOM);
@@ -199,7 +199,7 @@ function interfaceObject(audioObject, labelstr) {
                 elem_w = Math.max(elem_w, 190);
                 this.DOM.style.width = elem_w + "px";
                 this.textarea.style.width = (elem_w - 5) + "px";
-            }
+            };
             this.buildXML = function (root) {
                 //storage.document.createElement();
                 var node = storage.document.createElement("comment");
@@ -211,7 +211,7 @@ function interfaceObject(audioObject, labelstr) {
                 node.appendChild(question);
                 node.appendChild(comment);
                 root.appendChild(node);
-            }
+            };
             this.resize();
         },
         newComment: function (time) {
@@ -240,7 +240,7 @@ function interfaceObject(audioObject, labelstr) {
                 this.deleteComment(this.list[0]);
             }
         }
-    }
+    };
 
     this.canvas = {
         parent: this,
@@ -283,7 +283,7 @@ function interfaceObject(audioObject, labelstr) {
             }
         },
         drawWaveform: function () {
-            if (this.parent.parent == undefined || this.parent.parent.buffer == undefined) {
+            if (this.parent.parent === undefined || this.parent.parent.buffer === undefined) {
                 return;
             }
             var buffer = this.parent.parent.buffer.buffer;
@@ -342,7 +342,7 @@ function interfaceObject(audioObject, labelstr) {
             context.stroke();
         },
         drawMarkers: function () {
-            if (this.parent.parent == undefined || this.parent.parent.buffer == undefined) {
+            if (this.parent.parent === undefined || this.parent.parent.buffer === undefined) {
                 return;
             }
             var context = this.layer3.getContext("2d");
@@ -362,7 +362,7 @@ function interfaceObject(audioObject, labelstr) {
             var context = canvas.getContext("2d");
             context.clearRect(0, 0, canvas.width, canvas.height);
         }
-    }
+    };
     this.canvas.layer1.className = "timeline-element-canvas canvas-layer1 canvas-disabled";
     this.canvas.layer2.className = "timeline-element-canvas canvas-layer2";
     this.canvas.layer3.className = "timeline-element-canvas canvas-layer3";
@@ -393,7 +393,7 @@ function interfaceObject(audioObject, labelstr) {
                 audioEngineContext.stop();
             }
         }
-    }
+    };
     this.playButton.DOM.addEventListener("click", this.playButton);
     this.playButton.DOM.className = "timeline-button timeline-button-disabled";
     this.playButton.DOM.disabled = true;
@@ -408,7 +408,7 @@ function interfaceObject(audioObject, labelstr) {
         root.style.width = w + "px";
         var c_w = w - 100;
         this.canvas.resize(c_w);
-    }
+    };
 
     this.enable = function () {
         // This is used to tell the interface object that playback of this node is ready
@@ -459,8 +459,8 @@ function interfaceObject(audioObject, labelstr) {
     };
     this.error = function () {
         // If there is an error with the audioObject, this will be called to indicate a failure
-    }
-};
+    };
+}
 
 function resizeWindow(event) {
     // Called on every window resize event, use this to scale your page properly
@@ -470,7 +470,7 @@ function resizeWindow(event) {
 }
 
 function buttonSubmitClick() {
-    if (audioEngineContext.timer.testStarted == false) {
+    if (audioEngineContext.timer.testStarted === false) {
         interfaceContext.lightbox.post("Warning", 'You have not started the test! Please click play on a sample to begin the test!');
         return;
     }
@@ -495,7 +495,7 @@ function buttonSubmitClick() {
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
                     break;
             }
-            if (checkState == false) {
+            if (checkState === false) {
                 canContinue = false;
             }
         }
