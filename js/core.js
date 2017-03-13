@@ -3144,32 +3144,34 @@ function Interface(specificationObject) {
     // Global Checkers
     // These functions will help enforce the checkers
     this.checkHiddenAnchor = function () {
-        audioEngineContext.audioObjects.forEach(function (ao) {
-            if (ao.specification.type === "anchor") {
-                if (ao.interfaceDOM.getValue() > (ao.specification.marker / 100) && ao.specification.marker > 0) {
-                    // Anchor is not set below
-                    console.log('Anchor node not below marker value');
-                    interfaceContext.lightbox.post("Message", 'Please keep listening');
-                    this.storeErrorNode('Anchor node not below marker value');
-                    return false;
-                }
-            }
-        }, this);
+        var anchors = audioEngineContext.audioObjects.filter(function (ao) {
+            return ao.specification.type === "anchor";
+        });
+        var state = anchors.some(function (ao) {
+            return (ao.interfaceDOM.getValue() > (ao.specification.marker / 100) && ao.specification.marker > 0);
+        });
+        if (state) {
+            console.log('Anchor node not below marker value');
+            interfaceContext.lightbox.post("Message", 'Please keep listening');
+            this.storeErrorNode('Anchor node not below marker value');
+            return false;
+        }
         return true;
     };
 
     this.checkHiddenReference = function () {
-        audioEngineContext.audioObjects.forEach(function (ao) {
-            if (ao.specification.type == "reference") {
-                if (ao.interfaceDOM.getValue() < (ao.specification.marker / 100) && ao.specification.marker > 0) {
-                    // Anchor is not set below
-                    console.log('Reference node not above marker value');
-                    this.storeErrorNode('Reference node not above marker value');
-                    interfaceContext.lightbox.post("Message", 'Please keep listening');
-                    return false;
-                }
-            }
-        }, this);
+        var references = audioEngineContext.audioObjects.filter(function (ao) {
+            return ao.specification.type === "references";
+        });
+        var state = references.some(function (ao) {
+            return (ao.interfaceDOM.getValue() < (ao.specification.marker / 100) && ao.specification.marker > 0);
+        });
+        if (state) {
+            console.log('Reference node not below marker value');
+            interfaceContext.lightbox.post("Message", 'Please keep listening');
+            this.storeErrorNode('Reference node not below marker value');
+            return false;
+        }
         return true;
     };
 
