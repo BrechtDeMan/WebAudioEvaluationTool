@@ -3,7 +3,8 @@
  *  Create the APE interface
  */
 
-
+/*globals window,interfaceContext, document, audioEngineContext, console, $, Interface, testState, storage, specification */
+/*globals metricTracker */
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
@@ -21,7 +22,7 @@ function loadInterface() {
 
     // Bindings for interfaceContext
     interfaceContext.checkAllPlayed = function () {
-        hasBeenPlayed = audioEngineContext.checkAllPlayed();
+        var hasBeenPlayed = audioEngineContext.checkAllPlayed();
         if (hasBeenPlayed.length > 0) // if a fragment has not been played yet
         {
             var str = "";
@@ -53,14 +54,14 @@ function loadInterface() {
             var interfaceTID = [];
             for (var j = 0; j < this.interfaceSliders[i].metrics.length; j++) {
                 var ao_id = this.interfaceSliders[i].sliders[j].getAttribute("trackIndex");
-                if (this.interfaceSliders[i].metrics[j].wasMoved == false && audioEngineContext.audioObjects[ao_id].interfaceDOM.canMove()) {
+                if (this.interfaceSliders[i].metrics[j].wasMoved === false && audioEngineContext.audioObjects[ao_id].interfaceDOM.canMove()) {
                     state = false;
                     interfaceTID.push(j);
                 }
             }
-            if (interfaceTID.length != 0) {
+            if (interfaceTID.length !== 0) {
                 var interfaceName = this.interfaceSliders[i].interfaceObject.title;
-                if (interfaceName == undefined) {
+                if (interfaceName === undefined) {
                     str += 'On axis ' + String(i + 1) + ' you must move ';
                 } else {
                     str += 'On axis "' + interfaceName + '" you must move ';
@@ -76,7 +77,7 @@ function loadInterface() {
                 }
             }
         }
-        if (state != true) {
+        if (state !== true) {
             this.storeErrorNode(str);
             interfaceContext.lightbox.post("Message", str);
             console.log(str);
@@ -89,30 +90,37 @@ function loadInterface() {
         var audioHolder = testState.stateMap[testState.stateIndex];
         var state = true;
         if (audioHolder.elementComments) {
-            var strNums = [];
-            for (var i = 0; i < audioObjs.length; i++) {
-                if (audioObjs[i].commentDOM.trackCommentBox.value.length == 0) {
-                    state = false;
-                    strNums.push(i);
+            var notCommented = audioObjs.filter(function (ao) {
+                return ao.commentDOM.trackCommentBox.value.length === 0;
+            });
+            notCommented.sort(function (a, b) {
+                var va = a.interfaceDOM.getPresentedId();
+                var vb = a.interfaceDOM.getPresentedId();
+                if (va < vb) {
+                    return -1;
                 }
-            }
-            if (state == false) {
-                var str = "";
-                if (strNums.length > 1) {
-
-                    for (var i = 0; i < strNums.length; i++) {
-                        var ao_id = audioEngineContext.audioObjects[strNums[i]].interfaceDOM.getPresentedId();
-                        str = str + (ao_id); // start from 1
-                        if (i < strNums.length - 2) {
-                            str += ", ";
-                        } else if (i == strNums.length - 2) {
-                            str += " or ";
-                        }
-                    }
-                    str = 'You have not commented on fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.';
+                if (vb < va) {
+                    return 1;
+                }
+                return 0;
+            });
+            if (notCommented.length > 0) {
+                var str = "You have not commented on fragment";
+                if (notCommented.length > 1) {
+                    str += "s ";
                 } else {
-                    str = 'You have not commented on fragment ' + (audioEngineContext.audioObjects[strNums[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.';
+                    str += " ";
                 }
+                for (var i = 0; i < notCommented.length; i++) {
+                    var ao_id = notCommented[i].interfaceDOM.getPresentedId();
+                    str = str + ao_id; // start from 1
+                    if (i < notCommented.length - 2) {
+                        str += ", ";
+                    } else if (i == notCommented.length - 2) {
+                        str += " or ";
+                    }
+                }
+                str += "Please listen, rate and comment all samples before submitting.";
                 this.storeErrorNode(str);
                 interfaceContext.lightbox.post("Message", str);
                 console.log(str);
@@ -124,35 +132,35 @@ function loadInterface() {
     Interface.prototype.checkScaleRange = function () {
         var audioObjs = audioEngineContext.audioObjects;
         var audioHolder = testState.stateMap[testState.stateIndex];
+        var interfaceObject = this.interfaceSliders[0].interfaceObject;
         var state = true;
         var str = '';
-        for (var i = 0; i < this.interfaceSliders.length; i++) {
-            var minScale;
-            var maxScale;
-            var interfaceObject = interfaceContext.interfaceSliders[0].interfaceObject;
-            for (var j = 0; j < interfaceObject.options.length; j++) {
-                if (interfaceObject.options[j].check == "scalerange") {
-                    minScale = interfaceObject.options[j].min;
-                    maxScale = interfaceObject.options[j].max;
-                    break;
+        this.interfaceSliders.forEach(function (sliderHolder, i) {
+            var scales = (function () {
+                var scaleRange = interfaceObject.options.find(function (a) {
+                    return a.name == "scalerange";
+                });
+                return {
+                    min: scaleRange.min,
+                    max: scaleRange.max
+                };
+            })();
+            var outsideBounds = sliderHolder.sliders.some(function (elem) {
+                var a = convSliderPosToRate(elem);
+                if (a <= scales.min) {
+                    return true;
                 }
-            }
-            var minRanking = convSliderPosToRate(this.interfaceSliders[i].sliders[0]);
-            var maxRanking = minRanking;
-            for (var j = 1; j < this.interfaceSliders[i].sliders.length; j++) {
-                var ranking = convSliderPosToRate(this.interfaceSliders[i].sliders[j]);
-                if (ranking < minRanking) {
-                    minRanking = ranking;
-                } else if (ranking > maxRanking) {
-                    maxRanking = ranking;
+                if (a >= scales.max) {
+                    return true;
                 }
-            }
-            if (minRanking > minScale || maxRanking < maxScale) {
+                return false;
+            });
+            if (!outsideBounds) {
                 state = false;
-                str += 'On axis "' + this.interfaceSliders[i].interfaceObject.title + '" you have not used the full width of the scale. ';
+                str += 'On axis "' + sliderHolder.interfaceObject.title + '" you have not used the full width of the scale. ';
             }
-        }
-        if (state != true) {
+        });
+        if (state !== true) {
             this.storeErrorNode(str);
             interfaceContext.lightbox.post("Message", str);
             console.log(str);
@@ -163,13 +171,13 @@ function loadInterface() {
     Interface.prototype.objectSelected = null;
     Interface.prototype.objectMoved = false;
     Interface.prototype.selectObject = function (object) {
-        if (this.objectSelected == null) {
+        if (this.objectSelected === null) {
             this.objectSelected = object;
             this.objectMoved = false;
         }
     };
     Interface.prototype.moveObject = function () {
-        if (this.objectMoved == false) {
+        if (this.objectMoved === false) {
             this.objectMoved = true;
         }
     };
@@ -198,7 +206,7 @@ function loadInterface() {
     titleSpan.id = "test-title";
 
     // Set title to that defined in XML, else set to default
-    if (titleAttr != undefined) {
+    if (titleAttr !== undefined) {
         titleSpan.textContent = titleAttr;
     } else {
         titleSpan.textContent = 'Listening test';
@@ -274,12 +282,12 @@ function loadTest(audioHolderObject) {
     sliderHolder.innerHTML = "";
 
     // Set labelType if default to number
-    if (audioHolderObject.label == "default" || audioHolderObject.label == "") {
+    if (audioHolderObject.label === "default" || audioHolderObject.label === "") {
         audioHolderObject.label = "number";
     }
     // Set the page title
     if (typeof audioHolderObject.title == "string" && audioHolderObject.title.length > 0) {
-        document.getElementById("test-title").textContent = audioHolderObject.title
+        document.getElementById("test-title").textContent = audioHolderObject.title;
     }
 
 
@@ -287,17 +295,17 @@ function loadTest(audioHolderObject) {
     document.getElementById("outside-reference-holder").innerHTML = "";
 
     var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
-    for (var k = 0; k < interfaceObj.length; k++) {
+    interfaceObj.forEach(function (interfaceObjectInstance) {
         // Create the div box to center align
-        interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObj[k]));
-    }
+        interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObjectInstance));
+    });
     interfaceObj.forEach(function (interface) {
-        for (var option of interface.options) {
+        interface.options.forEach(function (option) {
             if (option.type == "show") {
                 switch (option.name) {
                     case "playhead":
                         var playbackHolder = document.getElementById('playback-holder');
-                        if (playbackHolder == null) {
+                        if (playbackHolder === null) {
                             playbackHolder = document.createElement('div');
                             playbackHolder.style.width = "100%";
                             playbackHolder.align = 'center';
@@ -307,7 +315,7 @@ function loadTest(audioHolderObject) {
                         break;
                     case "page-count":
                         var pagecountHolder = document.getElementById('page-count');
-                        if (pagecountHolder == null) {
+                        if (pagecountHolder === null) {
                             pagecountHolder = document.createElement('div');
                             pagecountHolder.id = 'page-count';
                         }
@@ -316,7 +324,7 @@ function loadTest(audioHolderObject) {
                         inject.appendChild(pagecountHolder);
                         break;
                     case "volume":
-                        if (document.getElementById('master-volume-holder') == null) {
+                        if (document.getElementById('master-volume-holder') === null) {
                             feedbackHolder.appendChild(interfaceContext.volume.object);
                         }
                         break;
@@ -325,7 +333,7 @@ function loadTest(audioHolderObject) {
                         break;
                 }
             }
-        }
+        });
     });
 
     var commentBoxPrefix = "Comment on fragment";
@@ -334,7 +342,7 @@ function loadTest(audioHolderObject) {
 
     var loopPlayback = audioHolderObject.loop;
 
-    currentTestHolder = document.createElement('audioHolder');
+    var currentTestHolder = document.createElement('audioHolder');
     currentTestHolder.id = audioHolderObject.id;
     currentTestHolder.repeatCount = audioHolderObject.repeatCount;
 
@@ -372,7 +380,7 @@ function loadTest(audioHolderObject) {
     $('.slider').mousemove(function (event) {
         event.preventDefault();
         var obj = interfaceContext.getSelectedObject();
-        if (obj == null) {
+        if (obj === null) {
             return;
         }
         var move = event.clientX - 6;
@@ -386,7 +394,7 @@ function loadTest(audioHolderObject) {
     $('.slider').on('touchmove', null, function (event) {
         event.preventDefault();
         var obj = interfaceContext.getSelectedObject();
-        if (obj == null) {
+        if (obj === null) {
             return;
         }
         var move = event.originalEvent.targetTouches[0].clientX - 6;
@@ -400,14 +408,15 @@ function loadTest(audioHolderObject) {
     $(document).mouseup(function (event) {
         event.preventDefault();
         var obj = interfaceContext.getSelectedObject();
-        if (obj == null) {
+        if (obj === null) {
             return;
         }
         var interfaceID = obj.parentElement.getAttribute("interfaceid");
         var trackID = obj.getAttribute("trackindex");
-        if (interfaceContext.hasSelectedObjectMoved() == true) {
+        var id;
+        if (interfaceContext.hasSelectedObjectMoved() === true) {
             var l = $(obj).css("left");
-            var id = obj.getAttribute('trackIndex');
+            id = obj.getAttribute('trackIndex');
             var time = audioEngineContext.timer.getTestTime();
             var rate = convSliderPosToRate(obj);
             audioEngineContext.audioObjects[id].metric.moved(time, rate);
@@ -415,7 +424,7 @@ function loadTest(audioHolderObject) {
             console.log("slider " + id + " moved to " + rate + ' (' + time + ')');
             obj.setAttribute("slider-value", convSliderPosToRate(obj));
         } else {
-            var id = Number(obj.attributes['trackIndex'].value);
+            id = Number(obj.attributes.trackIndex.value);
             //audioEngineContext.metric.sliderPlayed(id);
             audioEngineContext.play(id);
         }
@@ -424,12 +433,12 @@ function loadTest(audioHolderObject) {
 
     $('.slider').on('touchend', null, function (event) {
         var obj = interfaceContext.getSelectedObject();
-        if (obj == null) {
+        if (obj === null) {
             return;
         }
         var interfaceID = obj.parentElement.getAttribute("interfaceid");
         var trackID = obj.getAttribute("trackindex");
-        if (interfaceContext.hasSelectedObjectMoved() == true) {
+        if (interfaceContext.hasSelectedObjectMoved() === true) {
             var l = $(obj).css("left");
             var id = obj.getAttribute('trackIndex');
             var time = audioEngineContext.timer.getTestTime();
@@ -446,7 +455,7 @@ function loadTest(audioHolderObject) {
         for (var i = 0; i < interfaceList[k].options.length; i++) {
             if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'playhead') {
                 var playbackHolder = document.getElementById('playback-holder');
-                if (playbackHolder == null) {
+                if (playbackHolder === null) {
                     playbackHolder = document.createElement('div');
                     playbackHolder.id = "playback-holder";
                     playbackHolder.style.width = "100%";
@@ -456,7 +465,7 @@ function loadTest(audioHolderObject) {
                 }
             } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'page-count') {
                 var pagecountHolder = document.getElementById('page-count');
-                if (pagecountHolder == null) {
+                if (pagecountHolder === null) {
                     pagecountHolder = document.createElement('div');
                     pagecountHolder.id = 'page-count';
                 }
@@ -464,7 +473,7 @@ function loadTest(audioHolderObject) {
                 var inject = document.getElementById('interface-buttons');
                 inject.appendChild(pagecountHolder);
             } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'volume') {
-                if (document.getElementById('master-volume-holder') == null) {
+                if (document.getElementById('master-volume-holder') === null) {
                     feedbackHolder.appendChild(interfaceContext.volume.object);
                 }
             } else if (interfaceList[k].options[i].type == 'show' && interfaceList[k].options[i].name == 'comments') {
@@ -497,7 +506,7 @@ function interfaceSliderHolder(interfaceObject) {
     pagetitle.align = "center";
     var titleSpan = document.createElement('span');
     titleSpan.id = "pageTitle-" + this.id;
-    if (interfaceObject.title != undefined && typeof interfaceObject.title == "string") {
+    if (interfaceObject.title !== undefined && typeof interfaceObject.title == "string") {
         titleSpan.textContent = interfaceObject.title;
     } else {
         titleSpan.textContent = "Axis " + String(this.id + 1);
@@ -507,7 +516,7 @@ function interfaceSliderHolder(interfaceObject) {
 
     // Create the slider box to hold the slider elements
     this.canvas = document.createElement('div');
-    if (this.name != undefined)
+    if (this.name !== undefined)
         this.canvas.id = 'slider-' + this.name;
     else
         this.canvas.id = 'slider-' + this.id;
@@ -531,16 +540,16 @@ function interfaceSliderHolder(interfaceObject) {
     var positionScale = this.canvas.style.width.substr(0, this.canvas.style.width.length - 2);
     var offset = 50;
     var dest = document.getElementById("slider-holder").appendChild(this.sliderDOM);
-    for (var scaleObj of interfaceObject.scales) {
+    interfaceObject.scales.forEach(function (scaleObj) {
         var position = Number(scaleObj.position) * 0.01;
         var pixelPosition = (position * $(this.canvas).width()) + offset;
         var scaleDOM = document.createElement('span');
         scaleDOM.className = "ape-marker-text";
         scaleDOM.textContent = scaleObj.text;
-        scaleDOM.setAttribute('value', position)
+        scaleDOM.setAttribute('value', position);
         this.scale.appendChild(scaleDOM);
         scaleDOM.style.left = Math.floor((pixelPosition - ($(scaleDOM).width() / 2))) + 'px';
-    }
+    }, this);
 
     this.createSliderObject = function (audioObject, label) {
         var trackObj = document.createElement('div');
@@ -548,7 +557,7 @@ function interfaceSliderHolder(interfaceObject) {
         trackObj.className = 'track-slider track-slider-disabled track-slider-' + audioObject.id;
         trackObj.id = 'track-slider-' + this.id + '-' + audioObject.id;
         trackObj.setAttribute('trackIndex', audioObject.id);
-        if (this.name != undefined) {
+        if (this.name !== undefined) {
             trackObj.setAttribute('interface-name', this.name);
         } else {
             trackObj.setAttribute('interface-name', this.id);
@@ -572,21 +581,20 @@ function interfaceSliderHolder(interfaceObject) {
     };
 
     this.resize = function (event) {
-        var width = window.innerWidth;
         var sliderDiv = this.canvas;
         var sliderScaleDiv = this.scale;
         var width = $(sliderDiv).width();
         var marginsize = 50;
         // Move sliders into new position
-        for (var index = 0; index < this.sliders.length; index++) {
-            var pix = Number(this.sliders[index].getAttribute("slider-value")) * width;
-            this.sliders[index].style.left = (pix + marginsize) + 'px';
-        }
+        this.sliders.forEach(function (slider, index) {
+            var pix = Number(slider.getAttribute("slider-value")) * width;
+            slider.style.left = (pix + marginsize) + 'px';
+        });
 
         // Move scale labels
         for (var index = 0; index < this.scale.children.length; index++) {
             var scaleObj = this.scale.children[index];
-            var position = Number(scaleObj.attributes['value'].value);
+            var position = Number(scaleObj.attributes.value.value);
             var pixelPosition = (position * width) + marginsize;
             scaleObj.style.left = Math.floor((pixelPosition - ($(scaleObj).width() / 2))) + 'px';
         }
@@ -671,7 +679,7 @@ function sliderObject(audioObject, interfaceObjects, index) {
         // audioObject has an error!!
         this.playback.textContent = "Error";
         $(this.playback).addClass("error-colour");
-    }
+    };
 }
 
 function outsideReferenceDOM(audioObject, index, inject) {
@@ -684,16 +692,13 @@ function outsideReferenceDOM(audioObject, index, inject) {
     this.outsideReferenceHolder.appendChild(outsideReferenceHolderspan);
     this.outsideReferenceHolder.setAttribute('track-id', index);
 
-    this.outsideReferenceHolder.onclick = function (event) {
-        audioEngineContext.play(event.currentTarget.getAttribute('track-id'));
+    this.handleEvent = function (event) {
+        audioEngineContext.play(audioObject.id);
         $('.track-slider').removeClass('track-slider-playing');
         $('.comment-div').removeClass('comment-box-playing');
-        if (event.currentTarget.nodeName == 'DIV') {
-            $(event.currentTarget).addClass('track-slider-playing');
-        } else {
-            $(event.currentTarget.parentElement).addClass('track-slider-playing');
-        }
+        $(this.outsideReferenceHolder).addClass('track-slider-playing');
     };
+    this.outsideReferenceHolder.addEventListener("click", this.handleEvent);
     inject.appendChild(this.outsideReferenceHolder);
     this.enable = function () {
         if (this.parent.state == 1) {
@@ -733,7 +738,7 @@ function outsideReferenceDOM(audioObject, index, inject) {
         // audioObject has an error!!
         this.outsideReferenceHolder.textContent = "Error";
         $(this.outsideReferenceHolder).addClass("error-colour");
-    }
+    };
 }
 
 function buttonSubmitClick() {
@@ -741,48 +746,49 @@ function buttonSubmitClick() {
         canContinue = true;
 
     // Check that the anchor and reference objects are correctly placed
-    if (interfaceContext.checkHiddenAnchor() == false) {
+    if (interfaceContext.checkHiddenAnchor() === false) {
         return;
     }
-    if (interfaceContext.checkHiddenReference() == false) {
+    if (interfaceContext.checkHiddenReference() === false) {
         return;
     }
 
     for (var i = 0; i < checks.length; i++) {
         if (checks[i].type == 'check') {
+            var checkState;
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    var checkState = interfaceContext.checkAllPlayed();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllPlayed();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    var checkState = interfaceContext.checkFragmentsFullyPlayed();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkFragmentsFullyPlayed();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllMoved();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllMoved();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllCommented();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllCommented();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'scalerange':
                     // Check the scale is used to its full width outlined by the node
-                    var checkState = interfaceContext.checkScaleRange();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkScaleRange();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
@@ -803,7 +809,7 @@ function buttonSubmitClick() {
             playback.click();
             // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
         } else {
-            if (audioEngineContext.timer.testStarted == false) {
+            if (audioEngineContext.timer.testStarted === false) {
                 interfaceContext.lightbox.post("Warning", 'You have not started the test! Please click a fragment to begin the test!');
                 return;
             }
@@ -847,9 +853,9 @@ function pageXMLSave(store, pageSpecification) {
     var audioelements = store.getElementsByTagName("audioelement");
     for (var i = 0; i < audioelements.length; i++) {
         // Have to append the metric specific nodes
-        if (pageSpecification.outsideReference == null || pageSpecification.outsideReference.id != audioelements[i].id) {
+        if (pageSpecification.outsideReference === undefined || pageSpecification.outsideReference.id != audioelements[i].id) {
             var inject = audioelements[i].getElementsByTagName("metric");
-            if (inject.length == 0) {
+            if (inject.length === 0) {
                 inject = storage.document.createElement("metric");
             } else {
                 inject = inject[0];
