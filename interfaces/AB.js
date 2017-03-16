@@ -364,7 +364,10 @@ function comparator(audioHolderObject) {
             var orNode = new interfaceContext.outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
             audioObject.bindInterface(orNode);
         } else {
-            var label = interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
+            var label = element.label;
+            if (label === "") {
+                label = interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
+            }
             var node = new this.comparatorBox(audioObject, index, label);
             audioObject.bindInterface(node);
             this.comparators.push(node);
