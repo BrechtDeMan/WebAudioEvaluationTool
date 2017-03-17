@@ -992,7 +992,7 @@ function interfacePopup() {
                         console.log("Survey Element of type 'radio' cannot interpret contains/greaterThan/lessThan conditions. IGNORING");
                         break;
                     case "equals":
-                        if (node.response == condition.value) {
+                        if (node.response.name == condition.value) {
                             pass = true;
                         }
                         break;
