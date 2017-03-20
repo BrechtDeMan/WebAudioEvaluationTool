@@ -435,11 +435,11 @@ function createProjectSave(destURL) {
             } else {
                 var parser = new DOMParser();
                 var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
-                var response = xmlDoc.firstElementChild;
-                if (response.nodeName == "response" && response.getAttribute("state") == "OK") {
+                var response = xmlDoc.getElementsByTagName('response')[0];
+                if (response.getAttribute("state") == "OK") {
                     window.onbeforeunload = undefined;
                     var file = response.getElementsByTagName("file")[0];
-                    console.log("Save: OK, written " + file.getAttribute("bytes") + "B");
+                    console.log("Intermediate save: OK, written " + file.getAttribute("bytes") + "B");
                     if (typeof specification.returnURL == "string" && specification.returnURL.length > 0) {
                         window.location = specification.returnURL;
                     } else {
