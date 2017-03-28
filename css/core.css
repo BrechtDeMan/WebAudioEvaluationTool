@@ -211,17 +211,16 @@ div#master-volume-root {
     height: 40px;
 }
 input#master-volume-control {
-    width: 200px;
+    width: 190px;
     height: 25px;
     float: left;
     margin: 0px;
     padding: 0px;
 }
 span#master-volume-feedback {
-    width: 45px;
     height: 25px;
-    margin-left: 5px;
-    float: left;
+    margin: 0px 5px;
+    float: right;
 }
 div.error-colour {
     background-color: #FF8F8F;
