@@ -3012,13 +3012,22 @@ function Interface(specificationObject) {
         this.slider.max = 12;
         this.slider.value = 0;
         this.slider.step = 1;
-        this.slider.onmousemove = function (event) {
-            interfaceContext.volume.valueDB = event.currentTarget.value;
-            interfaceContext.volume.valueLin = decibelToLinear(interfaceContext.volume.valueDB);
-            interfaceContext.volume.valueText.textContent = interfaceContext.volume.valueDB + 'dB';
-            audioEngineContext.outputGain.gain.value = interfaceContext.volume.valueLin;
-        };
-        this.slider.onmouseup = function (event) {
+        this.handleEvent = function (event) {
+            if (event.type == "mousemove") {
+                this.valueDB = Number(this.slider.value);
+                this.valueLin = decibelToLinear(this.valueDB);
+                this.valueText.textContent = this.valueDB + 'dB';
+                audioEngineContext.outputGain.gain.value = this.valueLin;
+            } else if (event.type == "mouseup") {
+                this.onmouseup();
+            }
+            this.slider.value = this.valueDB;
+
+            if (event.stopPropagation) {
+                event.stopPropagation();
+            }
+        }
+        this.onmouseup = function () {
             var storePoint = testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].getAllElementsByName('volumeTracker');
             if (storePoint.length === 0) {
                 storePoint = storage.document.createElement('metricresult');
@@ -3029,10 +3038,12 @@ function Interface(specificationObject) {
             }
             var node = storage.document.createElement('movement');
             node.setAttribute('test-time', audioEngineContext.timer.getTestTime());
-            node.setAttribute('volume', interfaceContext.volume.valueDB);
+            node.setAttribute('volume', this.valueDB);
             node.setAttribute('format', 'dBFS');
             storePoint.appendChild(node);
-        };
+        }
+        this.slider.addEventListener("mousemove", this);
+        this.root.addEventListener("mouseup", this);
 
         var title = document.createElement('div');
         title.innerHTML = '<span>Master Volume Control</span>';
