@@ -89,7 +89,11 @@ function calculateMeanSquared(buffer, frame_dur, frame_overlap) {
         for (var no = 0; no < num_frames; no++) {
             MS[c][no] = 0.0;
             for (var ptr = 0; ptr < frame_size; ptr++) {
-                var sample = data[no * step_size + ptr];
+                var i = no * step_size + ptr;
+                if (i >= buffer.length) {
+                    break;
+                }
+                var sample = data[i];
                 MS[c][no] += sample * sample;
             }
             MS[c][no] /= frame_size;
