@@ -80,7 +80,7 @@ function calculateMeanSquared(buffer, frame_dur, frame_overlap) {
     frame_size = Math.floor(buffer.sampleRate * frame_dur);
     step_size = Math.floor(frame_size * (1.0 - frame_overlap));
     num_frames = Math.floor((buffer.length - frame_size) / step_size);
-    num_frames = Math.max(num_frames, 0);
+    num_frames = Math.max(num_frames, 1);
 
     MS = Array(buffer.numberOfChannels);
     for (var c = 0; c < buffer.numberOfChannels; c++) {
@@ -89,7 +89,11 @@ function calculateMeanSquared(buffer, frame_dur, frame_overlap) {
         for (var no = 0; no < num_frames; no++) {
             MS[c][no] = 0.0;
             for (var ptr = 0; ptr < frame_size; ptr++) {
-                var sample = data[no * step_size + ptr];
+                var i = no * step_size + ptr;
+                if (i >= buffer.length) {
+                    break;
+                }
+                var sample = data[i];
                 MS[c][no] += sample * sample;
             }
             MS[c][no] /= frame_size;
