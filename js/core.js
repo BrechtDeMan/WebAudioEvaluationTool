@@ -2569,47 +2569,32 @@ function Interface(specificationObject) {
         // Create a string next to each comment asking for a comment
         this.string = document.createElement('span');
         this.string.innerHTML = commentQuestion.statement;
-        var br = document.createElement('br');
         // Add to the holder.
         this.holder.appendChild(this.string);
-        this.holder.appendChild(br);
         this.options = [];
         this.inputs = document.createElement('div');
-        this.span = document.createElement('div');
-        this.inputs.align = 'center';
-        this.inputs.style.marginLeft = '12px';
-        this.inputs.className = "comment-radio-inputs-holder";
-        this.span.style.marginLeft = '12px';
-        this.span.align = 'center';
-        this.span.style.marginTop = '15px';
-        this.span.className = "comment-radio-span-holder";
+        this.inputs.className = "comment-checkbox-inputs-holder";
 
         var optCount = commentQuestion.options.length;
-        commentQuestion.options.forEach(function (optNode) {
+        for (var i = 0; i < optCount; i++) {
             var div = document.createElement('div');
-            div.style.width = '80px';
-            div.style.float = 'left';
+            div.className = "comment-checkbox-inputs-flex";
+            
+            var span = document.createElement('span');
+            span.textContent = commentQuestion.options[i].text;
+            span.className = 'comment-radio-span';
+            div.appendChild(span);
+            
             var input = document.createElement('input');
             input.type = 'radio';
             input.name = commentQuestion.id;
-            input.setAttribute('setvalue', optNode.name);
+            input.setAttribute('setvalue', commentQuestion.options[i].name);
             input.className = 'comment-radio';
             div.appendChild(input);
+            
             this.inputs.appendChild(div);
-
-
-            div = document.createElement('div');
-            div.style.width = '80px';
-            div.style.float = 'left';
-            div.align = 'center';
-            var span = document.createElement('span');
-            span.textContent = optNode.text;
-            span.className = 'comment-radio-span';
-            div.appendChild(span);
-            this.span.appendChild(div);
             this.options.push(input);
-        }, this);
-        this.holder.appendChild(this.span);
+        }
         this.holder.appendChild(this.inputs);
 
         this.exportXMLDOM = function (storePoint) {
@@ -2647,23 +2632,6 @@ function Interface(specificationObject) {
                 boxwidth = 400;
             }
             this.holder.style.width = boxwidth + "px";
-            var text = this.holder.getElementsByClassName("comment-radio-span-holder")[0];
-            var options = this.holder.getElementsByClassName("comment-radio-inputs-holder")[0];
-            var optCount = options.childElementCount;
-            var spanMargin = Math.floor(((boxwidth - 20 - (optCount * 80)) / (optCount)) / 2) + 'px';
-            options = options.firstChild;
-            text = text.firstChild;
-            options.style.marginRight = spanMargin;
-            options.style.marginLeft = spanMargin;
-            text.style.marginRight = spanMargin;
-            text.style.marginLeft = spanMargin;
-            while (options = options.nextSibling) {
-                text = text.nextSibling;
-                options.style.marginRight = spanMargin;
-                options.style.marginLeft = spanMargin;
-                text.style.marginRight = spanMargin;
-                text.style.marginLeft = spanMargin;
-            }
         };
         this.resize();
     };
@@ -2676,47 +2644,32 @@ function Interface(specificationObject) {
         // Create a string next to each comment asking for a comment
         this.string = document.createElement('span');
         this.string.innerHTML = commentQuestion.statement;
-        var br = document.createElement('br');
         // Add to the holder.
         this.holder.appendChild(this.string);
-        this.holder.appendChild(br);
         this.options = [];
         this.inputs = document.createElement('div');
-        this.span = document.createElement('div');
-        this.inputs.align = 'center';
-        this.inputs.style.marginLeft = '12px';
         this.inputs.className = "comment-checkbox-inputs-holder";
-        this.span.style.marginLeft = '12px';
-        this.span.align = 'center';
-        this.span.style.marginTop = '15px';
-        this.span.className = "comment-checkbox-span-holder";
 
         var optCount = commentQuestion.options.length;
         for (var i = 0; i < optCount; i++) {
             var div = document.createElement('div');
-            div.style.width = '80px';
-            div.style.float = 'left';
+            div.className = "comment-checkbox-inputs-flex";
+            
+            var span = document.createElement('span');
+            span.textContent = commentQuestion.options[i].text;
+            span.className = 'comment-radio-span';
+            div.appendChild(span);
+            
             var input = document.createElement('input');
             input.type = 'checkbox';
             input.name = commentQuestion.id;
             input.setAttribute('setvalue', commentQuestion.options[i].name);
             input.className = 'comment-radio';
             div.appendChild(input);
+            
             this.inputs.appendChild(div);
-
-
-            div = document.createElement('div');
-            div.style.width = '80px';
-            div.style.float = 'left';
-            div.align = 'center';
-            var span = document.createElement('span');
-            span.textContent = commentQuestion.options[i].text;
-            span.className = 'comment-radio-span';
-            div.appendChild(span);
-            this.span.appendChild(div);
             this.options.push(input);
         }
-        this.holder.appendChild(this.span);
         this.holder.appendChild(this.inputs);
 
         this.exportXMLDOM = function (storePoint) {
@@ -2745,23 +2698,6 @@ function Interface(specificationObject) {
                 boxwidth = 400;
             }
             this.holder.style.width = boxwidth + "px";
-            var text = this.holder.getElementsByClassName("comment-checkbox-span-holder")[0];
-            var options = this.holder.getElementsByClassName("comment-checkbox-inputs-holder")[0];
-            var optCount = options.childElementCount;
-            var spanMargin = Math.floor(((boxwidth - 20 - (optCount * 80)) / (optCount)) / 2) + 'px';
-            options = options.firstChild;
-            text = text.firstChild;
-            options.style.marginRight = spanMargin;
-            options.style.marginLeft = spanMargin;
-            text.style.marginRight = spanMargin;
-            text.style.marginLeft = spanMargin;
-            while (options = options.nextSibling) {
-                text = text.nextSibling;
-                options.style.marginRight = spanMargin;
-                options.style.marginLeft = spanMargin;
-                text.style.marginRight = spanMargin;
-                text.style.marginLeft = spanMargin;
-            }
         };
         this.resize();
     };
@@ -3026,7 +2962,7 @@ function Interface(specificationObject) {
             if (event.stopPropagation) {
                 event.stopPropagation();
             }
-        }
+        };
         this.onmouseup = function () {
             var storePoint = testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].getAllElementsByName('volumeTracker');
             if (storePoint.length === 0) {
@@ -3041,7 +2977,7 @@ function Interface(specificationObject) {
             node.setAttribute('volume', this.valueDB);
             node.setAttribute('format', 'dBFS');
             storePoint.appendChild(node);
-        }
+        };
         this.slider.addEventListener("mousemove", this);
         this.root.addEventListener("mouseup", this);
 
