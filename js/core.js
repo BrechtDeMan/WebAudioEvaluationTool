@@ -2429,10 +2429,11 @@ function Interface(specificationObject) {
     document.getElementsByTagName("body")[0].appendChild(this.lightbox.root);
     document.getElementsByTagName("body")[0].appendChild(this.lightbox.blanker);
 
-    this.commentBoxes = new function () {
-        this.boxes = [];
-        this.injectPoint = null;
-        this.elementCommentBox = function (audioObject) {
+    this.commentBoxes = (function () {
+        var commentBoxes = {};
+        commentBoxes.boxes = [];
+        commentBoxes.injectPoint = null;
+        commentBoxes.elementCommentBox = function (audioObject) {
             var element = audioObject.specification;
             this.audioObject = audioObject;
             this.id = audioObject.id;
@@ -2479,19 +2480,19 @@ function Interface(specificationObject) {
             };
             this.resize();
         };
-        this.createCommentBox = function (audioObject) {
+        commentBoxes.createCommentBox = function (audioObject) {
             var node = new this.elementCommentBox(audioObject);
             this.boxes.push(node);
             audioObject.commentDOM = node;
             return node;
         };
-        this.sortCommentBoxes = function () {
+        commentBoxes.sortCommentBoxes = function () {
             this.boxes.sort(function (a, b) {
                 return a.id - b.id;
             });
         };
 
-        this.showCommentBoxes = function (inject, sort) {
+        commentBoxes.showCommentBoxes = function (inject, sort) {
             this.injectPoint = inject;
             if (sort) {
                 this.sortCommentBoxes();
@@ -2501,7 +2502,7 @@ function Interface(specificationObject) {
             });
         };
 
-        this.deleteCommentBoxes = function () {
+        commentBoxes.deleteCommentBoxes = function () {
             if (this.injectPoint !== null) {
                 this.boxes.forEach(function (box) {
                     this.injectPoint.removeChild(box.trackComment);
@@ -2510,7 +2511,8 @@ function Interface(specificationObject) {
             }
             this.boxes = [];
         };
-    };
+        return commentBoxes;
+    })();
 
     this.commentQuestions = [];
 
@@ -2833,30 +2835,31 @@ function Interface(specificationObject) {
         };
     };
 
-    this.playhead = new function () {
-        this.object = document.createElement('div');
-        this.object.className = 'playhead';
-        this.object.align = 'left';
+    this.playhead = (function () {
+        var playhead ={};
+        playhead.object = document.createElement('div');
+        playhead.object.className = 'playhead';
+        playhead.object.align = 'left';
         var curTime = document.createElement('div');
         curTime.style.width = '50px';
-        this.curTimeSpan = document.createElement('span');
-        this.curTimeSpan.textContent = '00:00';
-        curTime.appendChild(this.curTimeSpan);
-        this.object.appendChild(curTime);
-        this.scrubberTrack = document.createElement('div');
-        this.scrubberTrack.className = 'playhead-scrub-track';
+        playhead.curTimeSpan = document.createElement('span');
+        playhead.curTimeSpan.textContent = '00:00';
+        curTime.appendChild(playhead.curTimeSpan);
+        playhead.object.appendChild(curTime);
+        playhead.scrubberTrack = document.createElement('div');
+        playhead.scrubberTrack.className = 'playhead-scrub-track';
 
-        this.scrubberHead = document.createElement('div');
-        this.scrubberHead.id = 'playhead-scrubber';
-        this.scrubberTrack.appendChild(this.scrubberHead);
-        this.object.appendChild(this.scrubberTrack);
+        playhead.scrubberHead = document.createElement('div');
+        playhead.scrubberHead.id = 'playhead-scrubber';
+        playhead.scrubberTrack.appendChild(playhead.scrubberHead);
+        playhead.object.appendChild(playhead.scrubberTrack);
 
-        this.timePerPixel = 0;
-        this.maxTime = 0;
+        playhead.timePerPixel = 0;
+        playhead.maxTime = 0;
 
-        this.playbackObject = undefined;
+        playhead.playbackObject = undefined;
 
-        this.setTimePerPixel = function (audioObject) {
+        playhead.setTimePerPixel = function (audioObject) {
             //maxTime must be in seconds
             this.playbackObject = audioObject;
             this.maxTime = audioObject.buffer.buffer.duration;
@@ -2869,7 +2872,7 @@ function Interface(specificationObject) {
             }
         };
 
-        this.update = function () {
+        playhead.update = function () {
             // Update the playhead position, startPlay must be called
             if (this.timePerPixel > 0) {
                 var time = this.playbackObject.getCurrentPosition();
@@ -2899,9 +2902,9 @@ function Interface(specificationObject) {
             }
         };
 
-        this.interval = undefined;
+        playhead.interval = undefined;
 
-        this.start = function () {
+        playhead.start = function () {
             if (this.playbackObject !== undefined && this.interval === undefined) {
                 if (this.maxTime < 60) {
                     this.interval = window.setInterval(function () {
@@ -2914,7 +2917,7 @@ function Interface(specificationObject) {
                 }
             }
         };
-        this.stop = function () {
+        playhead.stop = function () {
             window.clearInterval(this.interval);
             this.interval = undefined;
             this.scrubberHead.style.left = '0px';
@@ -2924,31 +2927,33 @@ function Interface(specificationObject) {
                 this.curTimeSpan.textContent = '00:00';
             }
         };
-    };
+        return playhead;
+    })();
 
-    this.volume = new function () {
+    this.volume = (function () {
         // An in-built volume module which can be viewed on page
         // Includes trackers on page-by-page data
         // Volume does NOT reset to 0dB on each page load
-        this.valueLin = 1.0;
-        this.valueDB = 0.0;
-        this.root = document.createElement('div');
-        this.root.id = 'master-volume-root';
-        this.object = document.createElement('div');
-        this.object.className = 'master-volume-holder-float';
-        this.object.appendChild(this.root);
-        this.slider = document.createElement('input');
-        this.slider.id = 'master-volume-control';
-        this.slider.type = 'range';
-        this.valueText = document.createElement('span');
-        this.valueText.id = 'master-volume-feedback';
-        this.valueText.textContent = '0dB';
+        var volume = {};
+        volume.valueLin = 1.0;
+        volume.valueDB = 0.0;
+        volume.root = document.createElement('div');
+        volume.root.id = 'master-volume-root';
+        volume.object = document.createElement('div');
+        volume.object.className = 'master-volume-holder-float';
+        volume.object.appendChild(volume.root);
+        volume.slider = document.createElement('input');
+        volume.slider.id = 'master-volume-control';
+        volume.slider.type = 'range';
+        volume.valueText = document.createElement('span');
+        volume.valueText.id = 'master-volume-feedback';
+        volume.valueText.textContent = '0dB';
 
-        this.slider.min = -60;
-        this.slider.max = 12;
-        this.slider.value = 0;
-        this.slider.step = 1;
-        this.handleEvent = function (event) {
+        volume.slider.min = -60;
+        volume.slider.max = 12;
+        volume.slider.value = 0;
+        volume.slider.step = 1;
+        volume.handleEvent = function (event) {
             if (event.type == "mousemove") {
                 this.valueDB = Number(this.slider.value);
                 this.valueLin = decibelToLinear(this.valueDB);
@@ -2963,7 +2968,7 @@ function Interface(specificationObject) {
                 event.stopPropagation();
             }
         };
-        this.onmouseup = function () {
+        volume.onmouseup = function () {
             var storePoint = testState.currentStore.XMLDOM.getElementsByTagName('metric')[0].getAllElementsByName('volumeTracker');
             if (storePoint.length === 0) {
                 storePoint = storage.document.createElement('metricresult');
@@ -2978,27 +2983,28 @@ function Interface(specificationObject) {
             node.setAttribute('format', 'dBFS');
             storePoint.appendChild(node);
         };
-        this.slider.addEventListener("mousemove", this);
-        this.root.addEventListener("mouseup", this);
+        volume.slider.addEventListener("mousemove", volume);
+        volume.root.addEventListener("mouseup", volume);
 
         var title = document.createElement('div');
         title.innerHTML = '<span>Master Volume Control</span>';
         title.style.fontSize = '0.75em';
         title.style.width = "100%";
         title.align = 'center';
-        this.root.appendChild(title);
+        volume.root.appendChild(title);
 
-        this.root.appendChild(this.slider);
-        this.root.appendChild(this.valueText);
+        volume.root.appendChild(volume.slider);
+        volume.root.appendChild(volume.valueText);
 
-        this.resize = function (event) {
+        volume.resize = function (event) {
             if (window.innerWidth < 1000) {
                 this.object.className = "master-volume-holder-inline";
             } else {
                 this.object.className = 'master-volume-holder-float';
             }
         };
-    };
+        return volume;
+    })();
 
     this.calibrationModuleObject = null;
     this.calibrationModule = function () {
@@ -3014,6 +3020,7 @@ function Interface(specificationObject) {
             this.holder.className = "calibration-holder";
             this.calibrationNodes = [];
             while (f0 < 20000) {
+                /* jshint loopfunc: true */
                 var obj = {
                     root: document.createElement("div"),
                     input: document.createElement("input"),
@@ -3258,7 +3265,7 @@ function Interface(specificationObject) {
             return {
                 min: Math.min(a.min, v),
                 max: Math.max(a.max, v)
-            }
+            };
         }, {
             min: 100,
             max: 0
@@ -3266,7 +3273,7 @@ function Interface(specificationObject) {
         if (range.min > scales.min) {
             str += "At least one fragment must be below the " + range.min + " mark.";
             state = false;
-        } else if (range.max < sacles.max) {
+        } else if (range.max < scales.max) {
             str += "At least one fragment must be above the " + range.max + " mark.";
             state = false;
         }
