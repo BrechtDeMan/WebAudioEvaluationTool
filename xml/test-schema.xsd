@@ -100,6 +100,7 @@
                 <xs:attribute name="labelStart" type="xs:string" use="optional" default="" />
                 <xs:attribute ref="poolSize" />
                 <xs:attribute ref="alwaysInclude" />
+                <xs:attribute name="position" use="optional" type="xs:nonNegativeInteger" />
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
                 <xs:attribute ref="playOne" />
