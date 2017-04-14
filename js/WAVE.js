@@ -1,6 +1,7 @@
 // Decode and perform WAVE file byte level manipulation
+/*globals console, Uint8Array, Float32Array, Float64Array */
 
-find_subarray = function (arr, subarr) {
+function find_subarray(arr, subarr) {
     var arr_length = arr.length;
     var subarr_length = subarr.length;
     var last_check_index = arr_length - subarr_length;
@@ -15,7 +16,7 @@ find_subarray = function (arr, subarr) {
             return i;
         }
     return -1;
-};
+}
 
 function convertToInteger(arr) {
     var value = 0;
@@ -35,24 +36,24 @@ function convertToString(arr) {
 
 function WAVE() {
     // The WAVE file object
-    this.status == 'WAVE_DECLARED'
+    this.status = 'WAVE_DECLARED';
 
     this.decoded_data = null;
 
     this.RIFF = String(); //ChunkID
-    this.size; //ChunkSize
-    this.FT_Header; //Format
-    this.fmt_marker; //Subchunk1ID
-    this.formatDataLength; //Subchunk1Size
-    this.type; //AudioFormat
-    this.num_channels; //NumChannels
-    this.sample_rate; //SampleRate
-    this.byte_rate; //ByteRate
-    this.block_align; //BlockAlign
-    this.bits_per_sample; //BitsPerSample
-    this.data_header; //Subchunk2ID
-    this.data_size; //Subchunk2Size
-    this.num_samples;
+    this.size = undefined; //ChunkSize
+    this.FT_Header = undefined; //Format
+    this.fmt_marker = undefined; //Subchunk1ID
+    this.formatDataLength = undefined; //Subchunk1Size
+    this.type = undefined; //AudioFormat
+    this.num_channels = undefined; //NumChannels
+    this.sample_rate = undefined; //SampleRate
+    this.byte_rate = undefined; //ByteRate
+    this.block_align = undefined; //BlockAlign
+    this.bits_per_sample = undefined; //BitsPerSample
+    this.data_header = undefined; //Subchunk2ID
+    this.data_size = undefined; //Subchunk2Size
+    this.num_samples = undefined;
 
     this.open = function (IOArrayBuffer) {
         var IOView8 = new Uint8Array(IOArrayBuffer);

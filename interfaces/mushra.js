@@ -2,7 +2,7 @@
  *  mushra.js
  *  Create the MUSHRA interface
  */
-
+/*globals window, interfaceContext, document, $, specification, audioEngineContext, console, testState, storage */
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
@@ -25,7 +25,7 @@ function loadInterface() {
     titleSpan.id = "test-title";
 
     // Set title to that defined in XML, else set to default
-    if (titleAttr != undefined) {
+    if (titleAttr !== undefined) {
         titleSpan.textContent = titleAttr;
     } else {
         titleSpan.textContent = 'Listening test';
@@ -36,7 +36,8 @@ function loadInterface() {
     var pagetitle = document.createElement('div');
     pagetitle.className = "pageTitle";
     pagetitle.align = "center";
-    var titleSpan = document.createElement('span');
+
+    titleSpan = document.createElement('span');
     titleSpan.id = "pageTitle";
     pagetitle.appendChild(titleSpan);
 
@@ -129,10 +130,10 @@ function loadTest(audioHolderObject) {
 
     // Set the page title
     if (typeof audioHolderObject.title == "string" && audioHolderObject.title.length > 0) {
-        document.getElementById("test-title").textContent = audioHolderObject.title
+        document.getElementById("test-title").textContent = audioHolderObject.title;
     }
 
-    if (interfaceObj.title != null) {
+    if (interfaceObj.title !== null) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
@@ -144,12 +145,12 @@ function loadTest(audioHolderObject) {
     sliderBox.innerHTML = "";
 
     var commentBoxPrefix = "Comment on track";
-    if (interfaceObj.commentBoxPrefix != undefined) {
+    if (interfaceObj.commentBoxPrefix !== undefined) {
         commentBoxPrefix = interfaceObj.commentBoxPrefix;
     }
     var loopPlayback = audioHolderObject.loop;
 
-    currentTestHolder = document.createElement('audioHolder');
+    var currentTestHolder = document.createElement('audioHolder');
     currentTestHolder.id = audioHolderObject.id;
     currentTestHolder.repeatCount = audioHolderObject.repeatCount;
 
@@ -192,18 +193,18 @@ function loadTest(audioHolderObject) {
     if (testState.currentStateMap.restrictMovement) {
         $(".track-slider-range").addClass("track-slider-range-disabled");
         $(".track-slider-range").each(function (i, e) {
-            e.disabled = true
+            e.disabled = true;
         });
     }
 
 
     var interfaceOptions = interfaceObj.options;
-    for (var option of interfaceOptions) {
+    interfaceOptions.forEach(function (option) {
         if (option.type == "show") {
             switch (option.name) {
                 case "playhead":
                     var playbackHolder = document.getElementById('playback-holder');
-                    if (playbackHolder == null) {
+                    if (playbackHolder === null) {
                         playbackHolder = document.createElement('div');
                         playbackHolder.style.width = "100%";
                         playbackHolder.align = 'center';
@@ -213,7 +214,7 @@ function loadTest(audioHolderObject) {
                     break;
                 case "page-count":
                     var pagecountHolder = document.getElementById('page-count');
-                    if (pagecountHolder == null) {
+                    if (pagecountHolder === null) {
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
                     }
@@ -222,7 +223,7 @@ function loadTest(audioHolderObject) {
                     inject.appendChild(pagecountHolder);
                     break;
                 case "volume":
-                    if (document.getElementById('master-volume-holder') == null) {
+                    if (document.getElementById('master-volume-holder') === null) {
                         feedbackHolder.appendChild(interfaceContext.volume.object);
                     }
                     break;
@@ -231,7 +232,7 @@ function loadTest(audioHolderObject) {
                     break;
             }
         }
-    }
+    });
 
     $(audioHolderObject.commentQuestions).each(function (index, element) {
         var node = interfaceContext.createCommentQuestion(element);
@@ -257,7 +258,7 @@ function sliderObject(audioObject, label) {
     this.holder.appendChild(this.slider);
     this.holder.appendChild(this.play);
     this.holder.align = "center";
-    if (label == 0) {
+    if (label === 0) {
         this.holder.style.marginLeft = '0px';
     }
     this.holder.setAttribute('trackIndex', audioObject.id);
@@ -316,7 +317,7 @@ function sliderObject(audioObject, label) {
         $(".track-slider").removeClass('track-slider-playing');
         $(this.holder).addClass('track-slider-playing');
         var outsideReference = document.getElementById('outside-reference');
-        if (outsideReference != null) {
+        if (outsideReference !== null) {
             $(outsideReference).removeClass('track-slider-playing');
         }
         this.play.textContent = "Stop";
@@ -374,7 +375,7 @@ function sliderObject(audioObject, label) {
         // audioObject has an error!!
         this.playback.textContent = "Error";
         $(this.playback).addClass("error-colour");
-    }
+    };
 }
 
 function resizeWindow(event) {
@@ -382,7 +383,7 @@ function resizeWindow(event) {
     // MANDATORY FUNCTION
 
     var outsideRef = document.getElementById('outside-reference');
-    if (outsideRef != null) {
+    if (outsideRef !== null) {
         outsideRef.style.left = (window.innerWidth - 120) / 2 + 'px';
     }
 
@@ -428,7 +429,7 @@ function drawScale() {
     var textHolder = document.getElementById('scale-text-holder');
     textHolder.innerHTML = "";
     var lastHeight = 0;
-    for (var scale of scales) {
+    scales.forEach(function (scale) {
         var posPercent = scale.position / 100.0;
         var posPix = (1 - posPercent) * (draw_heights[1] - draw_heights[0]) + draw_heights[0];
         ctx.fillStyle = "#000000";
@@ -446,7 +447,7 @@ function drawScale() {
         text.style.top = (posPix - 9) + 'px';
         text.style.left = 100 - ($(text).width() + 3) + 'px';
         lastHeight = posPix;
-    }
+    });
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
@@ -455,51 +456,37 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
         canContinue = true;
 
     // Check that the anchor and reference objects are correctly placed
-    if (interfaceContext.checkHiddenAnchor() == false) {
+    if (interfaceContext.checkHiddenAnchor() === false) {
         return;
     }
-    if (interfaceContext.checkHiddenReference() == false) {
+    if (interfaceContext.checkHiddenReference() === false) {
         return;
     }
 
     for (var i = 0; i < checks.length; i++) {
+        var checkState = true;
         if (checks[i].type == 'check') {
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    var checkState = interfaceContext.checkAllPlayed();
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkAllPlayed();
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    var checkState = interfaceContext.checkAllPlayed();
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkAllPlayed();
                     console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllMoved();
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkAllMoved();
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllCommented();
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkAllCommented();
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    var checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
@@ -507,7 +494,8 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
             }
 
         }
-        if (!canContinue) {
+        if (checkState === false) {
+            canContinue = false;
             break;
         }
     }
@@ -518,7 +506,7 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
             playback.click();
             // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
         } else {
-            if (audioEngineContext.timer.testStarted == false) {
+            if (audioEngineContext.timer.testStarted === false) {
                 interfaceContext.lightbox.post("Message", 'You have not started the test! Please press start to begin the test!');
                 return;
             }

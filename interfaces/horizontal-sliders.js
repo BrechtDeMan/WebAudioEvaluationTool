@@ -1,4 +1,5 @@
 // Once this is loaded and parsed, begin execution
+/*globals interfaceContext, window, document, specification, audioEngineContext, console, testState, $, storage */
 loadInterface();
 
 function loadInterface() {
@@ -19,7 +20,7 @@ function loadInterface() {
     titleSpan.id = "test-title";
 
     // Set title to that defined in XML, else set to default
-    if (titleAttr != undefined) {
+    if (titleAttr !== undefined) {
         titleSpan.textContent = titleAttr;
     } else {
         titleSpan.textContent = 'Listening test';
@@ -30,7 +31,8 @@ function loadInterface() {
     var pagetitle = document.createElement('div');
     pagetitle.className = "pageTitle";
     pagetitle.align = "center";
-    var titleSpan = document.createElement('span');
+
+    titleSpan = document.createElement('span');
     titleSpan.id = "pageTitle";
     pagetitle.appendChild(titleSpan);
 
@@ -111,7 +113,7 @@ function loadInterface() {
     // Load the full interface
     testState.initialise();
     testState.advanceState();
-};
+}
 
 function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
@@ -128,10 +130,10 @@ function loadTest(page) {
 
     // Set the page title
     if (typeof page.title == "string" && page.title.length > 0) {
-        document.getElementById("test-title").textContent = page.title
+        document.getElementById("test-title").textContent = page.title;
     }
 
-    if (interfaceObj.title != null) {
+    if (interfaceObj.title !== null) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
@@ -142,7 +144,7 @@ function loadTest(page) {
     sliderBox.innerHTML = "";
 
     var commentBoxPrefix = "Comment on track";
-    if (interfaceObj.commentBoxPrefix != undefined) {
+    if (interfaceObj.commentBoxPrefix !== undefined) {
         commentBoxPrefix = interfaceObj.commentBoxPrefix;
     }
     var loopPlayback = page.loop;
@@ -186,12 +188,12 @@ function loadTest(page) {
         }
 
     });
-    for (var option of interfaceObj.options) {
+    interfaceObj.options.forEach(function (option) {
         if (option.type == "show") {
             switch (option.name) {
                 case "playhead":
                     var playbackHolder = document.getElementById('playback-holder');
-                    if (playbackHolder == null) {
+                    if (playbackHolder === null) {
                         playbackHolder = document.createElement('div');
                         playbackHolder.style.width = "100%";
                         playbackHolder.align = 'center';
@@ -201,7 +203,7 @@ function loadTest(page) {
                     break;
                 case "page-count":
                     var pagecountHolder = document.getElementById('page-count');
-                    if (pagecountHolder == null) {
+                    if (pagecountHolder === null) {
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
                     }
@@ -210,7 +212,7 @@ function loadTest(page) {
                     inject.appendChild(pagecountHolder);
                     break;
                 case "volume":
-                    if (document.getElementById('master-volume-holder') == null) {
+                    if (document.getElementById('master-volume-holder') === null) {
                         feedbackHolder.appendChild(interfaceContext.volume.object);
                     }
                     break;
@@ -219,7 +221,7 @@ function loadTest(page) {
                     break;
             }
         }
-    }
+    });
     // Auto-align
     resizeWindow(null);
 }
@@ -291,7 +293,7 @@ function sliderObject(audioObject, label) {
         $(".track-slider").removeClass('track-slider-playing');
         $(this.holder).addClass('track-slider-playing');
         var outsideReference = document.getElementById('outside-reference');
-        if (outsideReference != null) {
+        if (outsideReference !== null) {
             $(outsideReference).removeClass('track-slider-playing');
         }
     };
@@ -326,8 +328,8 @@ function sliderObject(audioObject, label) {
         // audioObject has an error!!
         this.playback.textContent = "Error";
         $(this.playback).addClass("error-colour");
-    }
-};
+    };
+}
 
 function resizeWindow(event) {
     // Called on every window resize event, use this to scale your page properly
@@ -367,7 +369,7 @@ function drawScale() {
     textHolder.innerHTML = "";
     ctx.fillStyle = "#000000";
     ctx.setLineDash([1, 4]);
-    for (var scale of scales) {
+    scales.forEach(function (scale) {
         var posPercent = scale.position / 100.0;
         var posPix = Math.round(width * posPercent);
         if (posPix <= 0) {
@@ -389,7 +391,7 @@ function drawScale() {
         textHolder.appendChild(text);
         text.style.width = Math.ceil($(text).width()) + 'px';
         text.style.left = (posPix + 100 - ($(text).width() / 2)) + 'px';
-    }
+    });
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
@@ -398,59 +400,46 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
         canContinue = true;
 
     // Check that the anchor and reference objects are correctly placed
-    if (interfaceContext.checkHiddenAnchor() == false) {
+    if (interfaceContext.checkHiddenAnchor() === false) {
         return;
     }
-    if (interfaceContext.checkHiddenReference() == false) {
+    if (interfaceContext.checkHiddenReference() === false) {
         return;
     }
 
     for (var i = 0; i < checks.length; i++) {
+        var checkState = true;
         if (checks[i].type == 'check') {
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    var checkState = interfaceContext.checkAllPlayed();
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkAllPlayed();
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    var checkState = interfaceContext.checkAllPlayed();
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkAllPlayed();
                     console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllMoved();
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkAllMoved();
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllCommented();
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkAllCommented();
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    var checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
+
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
                     break;
             }
-
         }
-        if (!canContinue) {
+        if (checkState === false) {
+            canContinue = false;
             break;
         }
     }
@@ -461,7 +450,7 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
             playback.click();
             // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
         } else {
-            if (audioEngineContext.timer.testStarted == false) {
+            if (audioEngineContext.timer.testStarted === false) {
                 interfaceContext.lightbox.post("Warning", 'You have not started the test! Please press start to begin the test!');
                 return;
             }

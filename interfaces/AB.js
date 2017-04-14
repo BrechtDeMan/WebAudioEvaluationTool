@@ -1,6 +1,6 @@
 // Once this is loaded and parsed, begin execution
 loadInterface();
-
+/*globals window, interfaceContext, testState, Interface, audioEngineContext, console, document, specification, $, storage*/
 function loadInterface() {
     // Get the dimensions of the screen available to the page
     var width = window.innerWidth;
@@ -9,34 +9,6 @@ function loadInterface() {
 
     // Custom comparator Object
     Interface.prototype.comparator = null;
-
-    Interface.prototype.checkScaleRange = function (min, max) {
-        var page = testState.getCurrentTestPage();
-        var audioObjects = audioEngineContext.audioObjects;
-        var state = true;
-        var str = "Please keep listening. ";
-        var minRanking = Infinity;
-        var maxRanking = -Infinity;
-        for (var ao of audioObjects) {
-            var rank = ao.interfaceDOM.getValue();
-            if (rank < minRanking) {
-                minRanking = rank;
-            }
-            if (rank > maxRanking) {
-                maxRanking = rank;
-            }
-        }
-        if (maxRanking * 100 < max) {
-            str += "At least one fragment must be selected."
-            state = false;
-        }
-        if (!state) {
-            console.log(str);
-            this.storeErrorNode(str);
-            interfaceContext.lightbox.post("Message", str);
-        }
-        return state;
-    }
 
     // The injection point into the HTML page
     interfaceContext.insertPoint = document.getElementById("topLevelBody");
@@ -52,7 +24,7 @@ function loadInterface() {
     titleSpan.id = "test-title";
 
     // Set title to that defined in XML, else set to default
-    if (titleAttr != undefined) {
+    if (titleAttr !== undefined) {
         titleSpan.textContent = titleAttr;
     } else {
         titleSpan.textContent = 'Listening test';
@@ -63,7 +35,8 @@ function loadInterface() {
     var pagetitle = document.createElement('div');
     pagetitle.className = "pageTitle";
     pagetitle.align = "center";
-    var titleSpan = document.createElement('span');
+
+    titleSpan = document.createElement('span');
     titleSpan.id = "pageTitle";
     pagetitle.appendChild(titleSpan);
 
@@ -150,10 +123,10 @@ function loadTest(audioHolderObject) {
 
     // Set the page title
     if (typeof audioHolderObject.title == "string" && audioHolderObject.title.length > 0) {
-        document.getElementById("test-title").textContent = audioHolderObject.title
+        document.getElementById("test-title").textContent = audioHolderObject.title;
     }
 
-    if (interfaceObj.title != null) {
+    if (interfaceObj.title !== null) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
@@ -182,7 +155,7 @@ function loadTest(audioHolderObject) {
             switch (option.name) {
                 case "playhead":
                     var playbackHolder = document.getElementById('playback-holder');
-                    if (playbackHolder == null) {
+                    if (playbackHolder === null) {
                         playbackHolder = document.createElement('div');
                         playbackHolder.id = 'playback-holder';
                         playbackHolder.style.width = "100%";
@@ -194,7 +167,7 @@ function loadTest(audioHolderObject) {
                     break;
                 case "page-count":
                     var pagecountHolder = document.getElementById('page-count');
-                    if (pagecountHolder == null) {
+                    if (pagecountHolder === null) {
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
                         document.getElementById('interface-buttons').appendChild(pagecountHolder);
@@ -202,7 +175,7 @@ function loadTest(audioHolderObject) {
                     pagecountHolder.innerHTML = '<span>Page ' + (testState.stateIndex + 1) + ' of ' + testState.stateMap.length + '</span>';
                     break;
                 case "volume":
-                    if (document.getElementById('master-volume-holder-float') == null) {
+                    if (document.getElementById('master-volume-holder-float') === null) {
                         feedbackHolder.appendChild(interfaceContext.volume.object);
                     }
                     break;
@@ -246,51 +219,50 @@ function comparator(audioHolderObject) {
         this.playback.textContent = "Listen";
         this.box.appendChild(this.selector);
         this.box.appendChild(this.playback);
-        this.selector.onclick = function (event) {
+        this.selectorClicked = function () {
+            var i;
             var time = audioEngineContext.timer.getTestTime();
-            if ($(event.currentTarget).hasClass('disabled')) {
+            if (this.parent.state !== 1) {
+                interfaceContext.lightbox.post("Message", "Please wait for the sample to load");
                 console.log("Please wait until sample has loaded");
                 return;
             }
-            if (audioEngineContext.status == 0) {
+            if (audioEngineContext.status === 0) {
                 interfaceContext.lightbox.post("Message", "Please listen to the samples before making a selection");
                 console.log("Please listen to the samples before making a selection");
                 return;
             }
-            var id = event.currentTarget.parentElement.getAttribute('track-id');
-            interfaceContext.comparator.selected = id;
-            if ($(event.currentTarget).hasClass("selected")) {
-                $(".comparator-selector").removeClass('selected');
-                for (var i = 0; i < interfaceContext.comparator.comparators.length; i++) {
-                    var obj = interfaceContext.comparator.comparators[i];
-                    obj.parent.metric.moved(time, 0);
-                    obj.value = 0;
+            interfaceContext.comparator.selected = this.id;
+            $(".comparator-selector").removeClass('selected');
+            $(this.selector).addClass('selected');
+            this.comparator.comparators.forEach(function (a) {
+                if (a !== this) {
+                    a.value = 0;
+                } else {
+                    a.value = 1;
                 }
-            } else {
-                $(".comparator-selector").removeClass('selected');
-                $(event.currentTarget).addClass('selected');
-                for (var i = 0; i < interfaceContext.comparator.comparators.length; i++) {
-                    var obj = interfaceContext.comparator.comparators[i];
-                    if (i == id) {
-                        obj.value = 1;
-                    } else {
-                        obj.value = 0;
-                    }
-                    obj.parent.metric.moved(time, obj.value);
-                }
-                console.log("Selected " + id + ' (' + time + ')');
-            }
+                a.parent.metric.moved(time, a.value);
+            }, this);
+            console.log("Selected " + this.id + ' (' + time + ')');
         };
         this.playback.setAttribute("playstate", "ready");
-        this.playback.onclick = function (event) {
-            var id = event.currentTarget.parentElement.getAttribute('track-id');
-            if (event.currentTarget.getAttribute("playstate") == "ready") {
-                audioEngineContext.play(id);
-            } else if (event.currentTarget.getAttribute("playstate") == "playing") {
+        this.playbackClicked = function () {
+            if (this.playback.getAttribute("playstate") == "ready") {
+                audioEngineContext.play(this.id);
+            } else if (this.playback.getAttribute("playstate") == "playing") {
                 audioEngineContext.stop();
             }
 
         };
+        this.handleEvent = function (event) {
+            if (event.currentTarget === this.selector) {
+                this.selectorClicked();
+            } else if (event.currentTarget === this.playback) {
+                this.playbackClicked();
+            }
+        }
+        this.playback.addEventListener("click", this);
+        this.selector.addEventListener("click", this);
 
         this.enable = function () {
             if (this.parent.state == 1) {
@@ -311,7 +283,7 @@ function comparator(audioHolderObject) {
             // audioObject has an error!!
             this.playback.textContent = "Error";
             $(this.playback).addClass("error-colour");
-        }
+        };
         this.startPlayback = function () {
             if (this.parent.specification.parent.playOne || specification.playOne) {
                 $('.comparator-button').text('Wait');
@@ -369,6 +341,11 @@ function comparator(audioHolderObject) {
                 label = interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
             }
             var node = new this.comparatorBox(audioObject, index, label);
+            Object.defineProperties(node, {
+                'comparator': {
+                    'value': this
+                }
+            });
             audioObject.bindInterface(node);
             this.comparators.push(node);
             this.boxHolders.appendChild(node.box);
@@ -392,7 +369,7 @@ function resizeWindow(event) {
     document.getElementById('box-holders').style.width = boxW + 'px';
 
     var outsideRef = document.getElementById('outside-reference');
-    if (outsideRef != null) {
+    if (outsideRef !== null) {
         outsideRef.style.left = (window.innerWidth - 120) / 2 + 'px';
     }
 }
@@ -403,41 +380,39 @@ function buttonSubmitClick() {
 
     for (var i = 0; i < checks.length; i++) {
         if (checks[i].type == 'check') {
+            var checkState;
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    var checkState = interfaceContext.checkAllPlayed();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllPlayed();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    var checkState = interfaceContext.checkFragmentsFullyPlayed();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkFragmentsFullyPlayed();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllMoved();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllMoved();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    var checkState = interfaceContext.checkAllCommented();
-                    if (checkState == false) {
+                    checkState = interfaceContext.checkAllCommented();
+                    if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    var checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
-                    if (checkState == false) {
-                        canContinue = false;
-                    }
+                    console.log("WARNING - Check 'scalerange' does not make sense in AB/ABX! Ignoring!");
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
@@ -455,7 +430,7 @@ function buttonSubmitClick() {
             playback.click();
             // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
         } else {
-            if (audioEngineContext.timer.testStarted == false) {
+            if (audioEngineContext.timer.testStarted === false) {
                 interfaceContext.lightbox.post("Warning", 'You have not started the test! Please click play on a sample to begin the test!');
                 return;
             }
