@@ -1187,7 +1187,7 @@ function stateMachine() {
             }
         });
 
-        return picked.concat(randomSubArray(pool, numElements - excluded.length));
+        return picked.concat(randomSubArray(pool, numElements - picked.length));
     }
 
     this.stateMap = [];
@@ -1239,7 +1239,7 @@ function stateMachine() {
             if (page.poolSize > 0 || page.randomiseOrder) {
                 page.randomiseOrder = true;
                 if (page.poolSize == 0) {
-                    page.poolSize = page.randomiseOrder;
+                    page.poolSize = elements.length;
                 }
                 elements = pickSubPool(elements, page.poolSize);
             }
