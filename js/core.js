@@ -1213,6 +1213,21 @@ function advanceState() {
 
 function stateMachine() {
     // Object prototype for tracking and managing the test state
+    
+    function pickSubPool(pool, numElements) {
+        // Assumes each element of pool has function "alwaysInclude"
+
+        // First extract those excluded from picking process
+        var picked = [];
+        pool.forEach(function (e) {
+            if (e.alwaysInclude) {
+                picked.push(e);
+            }
+        });
+
+        return picked.concat(randomSubArray(pool, numElements - picked.length));
+    }
+    
     this.stateMap = [];
     this.preTestSurvey = null;
     this.postTestSurvey = null;
@@ -1224,66 +1239,55 @@ function stateMachine() {
 
         // Get the data from Specification
         var pagePool = [];
-        var pageInclude = [];
-        var i;
-        for (i = 0; i < specification.pages.length; i++) {
-            var page = specification.pages[i];
-            if (page.alwaysInclude) {
-                pageInclude.push(page);
-            } else {
-                pagePool.push(page);
+        for (var page of specification.pages) {
+            if (page.position !== null || page.alwaysInclude) {
+                page.alwaysInclude = true;
+            }
+            pagePool.push(page);
+        }
+        if (specification.numPages > 0) {
+            specification.randomiseOrder = true;
+            pagePool = pickSubPool(pagePool, specification.numPages);
+        }
+
+        // Now get the order of pages
+        var fixed = [];
+        for (var page of pagePool) {
+            if (page.position !== null) {
+                fixed.push(page);
+                var i = pagePool.indexOf(page);
+                pagePool.splice(i, 1);
             }
         }
 
-        // Find how many are left to get
-        var numPages = specification.poolSize;
-        if (numPages > pagePool.length) {
-            console.log("WARNING - You have specified more pages in <setup poolSize> than you have created!!");
-            numPages = specification.pages.length;
-        }
-        if (specification.poolSize === 0) {
-            numPages = specification.pages.length;
-        }
-        numPages -= pageInclude.length;
-
-        if (numPages > 0) {
-            // Go find the rest of the pages from the pool
-            var subarr = null;
-            if (specification.randomiseOrder) {
-                // Append a random sub-array
-                subarr = randomSubArray(pagePool, numPages);
-            } else {
-                // Append the matching number
-                subarr = pagePool.slice(0, numPages);
-            }
-            pageInclude = pageInclude.concat(subarr);
-        }
-
-        // We now have our selected pages in pageInclude array
         if (specification.randomiseOrder) {
-            pageInclude = randomiseOrder(pageInclude);
+            pagePool = randomiseOrder(pagePool);
         }
-        for (i = 0; i < pageInclude.length; i++) {
-            pageInclude[i].presentedId = i;
-            this.stateMap.push(pageInclude[i]);
-            // For each selected page, we must get the sub pool
-            if (pageInclude[i].poolSize !== 0 && pageInclude[i].poolSize !== pageInclude[i].audioElements.length) {
-                var elemInclude = [];
-                var elemPool = [];
-                for (var j = 0; j < pageInclude[i].audioElements.length; j++) {
-                    var elem = pageInclude[i].audioElements[j];
-                    if (elem.alwaysInclude || elem.type != "normal") {
-                        elemInclude.push(elem);
-                    } else {
-                        elemPool.push(elem);
-                    }
+
+        // Place in the correct order
+        for (var page of fixed) {
+            pagePool.splice(page.position, 0, page);
+        }
+
+        // Now process the pages
+        pagePool.forEach(function (page, i) {
+            page.presentedId = i;
+            this.stateMap.push(page);
+            var elements = page.audioElements;
+            if (page.poolSize > 0 || page.randomiseOrder) {
+                page.randomiseOrder = true;
+                if (page.poolSize === 0) {
+                    page.poolSize = page.randomiseOrder;
                 }
-                var numElems = pageInclude[i].poolSize - elemInclude.length;
-                pageInclude[i].audioElements = elemInclude.concat(randomSubArray(elemPool, numElems));
+                elements = pickSubPool(elements, page.poolSize);
             }
-            storage.createTestPageStore(pageInclude[i]);
-            audioEngineContext.loadPageData(pageInclude[i]);
-        }
+            if (page.randomiseOrder) {
+                elements = randomiseOrder(elements);
+            }
+            page.audioElements = elements;
+            storage.createTestPageStore(page);
+            audioEngineContext.loadPageData(page);
+        }, this);
 
         if (specification.preTest !== null) {
             this.preTestSurvey = specification.preTest;
