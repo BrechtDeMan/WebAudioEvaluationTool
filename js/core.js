@@ -1239,12 +1239,12 @@ function stateMachine() {
 
         // Get the data from Specification
         var pagePool = [];
-        for (var page of specification.pages) {
+        specification.pages.forEach(function(page){
             if (page.position !== null || page.alwaysInclude) {
                 page.alwaysInclude = true;
             }
             pagePool.push(page);
-        }
+        });
         if (specification.numPages > 0) {
             specification.randomiseOrder = true;
             pagePool = pickSubPool(pagePool, specification.numPages);
@@ -1252,22 +1252,22 @@ function stateMachine() {
 
         // Now get the order of pages
         var fixed = [];
-        for (var page of pagePool) {
+        pagePool.forEach(function(page){
             if (page.position !== null) {
                 fixed.push(page);
                 var i = pagePool.indexOf(page);
                 pagePool.splice(i, 1);
             }
-        }
+        });
 
         if (specification.randomiseOrder) {
             pagePool = randomiseOrder(pagePool);
         }
 
         // Place in the correct order
-        for (var page of fixed) {
+        fixed.forEach(function(page) {
             pagePool.splice(page.position, 0, page);
-        }
+        });
 
         // Now process the pages
         pagePool.forEach(function (page, i) {
