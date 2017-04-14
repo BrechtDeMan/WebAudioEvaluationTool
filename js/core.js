@@ -1277,7 +1277,7 @@ function stateMachine() {
             if (page.poolSize > 0 || page.randomiseOrder) {
                 page.randomiseOrder = true;
                 if (page.poolSize === 0) {
-                    page.poolSize = page.randomiseOrder;
+                    page.poolSize = elements.length;
                 }
                 elements = pickSubPool(elements, page.poolSize);
             }
