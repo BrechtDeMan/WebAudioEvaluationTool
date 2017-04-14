@@ -1202,7 +1202,7 @@ function stateMachine() {
         // Get the data from Specification
         var pagePool = [];
         for (var page of specification.pages) {
-            if (page.position !== null || page.alwaysInclude) {
+            if (page.position !== undefined || page.alwaysInclude) {
                 page.alwaysInclude = true;
             }
             pagePool.push(page)
@@ -1215,7 +1215,7 @@ function stateMachine() {
         // Now get the order of pages
         var fixed = []
         for (var page of pagePool) {
-            if (page.position !== null) {
+            if (page.position !== undefined) {
                 fixed.push(page);
                 var i = pagePool.indexOf(page);
                 pagePool.splice(i, 1);
