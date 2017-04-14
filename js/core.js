@@ -2321,7 +2321,7 @@ function Interface(specificationObject) {
         popup.resize(event);
         this.volume.resize();
         this.lightbox.resize();
-        this.commentBoxes.forEach(function (elem) {
+        this.commentBoxes.boxes.forEach(function (elem) {
             elem.resize();
         });
         this.commentQuestions.forEach(function (elem) {
