@@ -2454,6 +2454,13 @@ function Interface(specificationObject) {
                 this.trackCommentBox.style.width = boxwidth - 6 + "px";
             };
             this.resize();
+            this.highlight = function (state) {
+                if (state === true) {
+                    $(this.trackComment).addClass("comment-box-playing");
+                } else {
+                    $(this.trackComment).removeClass("comment-box-playing");
+                }
+            };
         };
         commentBoxes.createCommentBox = function (audioObject) {
             var node = new this.elementCommentBox(audioObject);
@@ -2485,6 +2492,19 @@ function Interface(specificationObject) {
                 this.injectPoint = null;
             }
             this.boxes = [];
+        };
+        commentBoxes.highlightById = function (id) {
+            if (id === undefined || typeof id !== "number" || id >= this.boxes.length) {
+                console.log("Error - Invalid id");
+                id = -1;
+            }
+            this.boxes.forEach(function (a) {
+                if (a.id === id) {
+                    a.highlight(true);
+                } else {
+                    a.highlight(false);
+                }
+            });
         };
         return commentBoxes;
     })();
@@ -3669,7 +3689,7 @@ function Storage() {
                 return value;
             }
         }
-    })
+    });
 }
 
 var window_depedancy_callback;
