@@ -175,7 +175,7 @@ var onload = function () {
                     gReturnURL = value;
                     break;
                 case "saveFilenamePrefix":
-                    gSaveFilenamePrefix = value;
+                    storage.filenamePrefix = value;
                     break;
             }
         }
@@ -1213,7 +1213,7 @@ function advanceState() {
 
 function stateMachine() {
     // Object prototype for tracking and managing the test state
-    
+
     function pickSubPool(pool, numElements) {
         // Assumes each element of pool has function "alwaysInclude"
 
@@ -1227,7 +1227,7 @@ function stateMachine() {
 
         return picked.concat(randomSubArray(pool, numElements - picked.length));
     }
-    
+
     this.stateMap = [];
     this.preTestSurvey = null;
     this.postTestSurvey = null;
@@ -1239,7 +1239,7 @@ function stateMachine() {
 
         // Get the data from Specification
         var pagePool = [];
-        specification.pages.forEach(function(page){
+        specification.pages.forEach(function (page) {
             if (page.position !== null || page.alwaysInclude) {
                 page.alwaysInclude = true;
             }
@@ -1252,7 +1252,7 @@ function stateMachine() {
 
         // Now get the order of pages
         var fixed = [];
-        pagePool.forEach(function(page){
+        pagePool.forEach(function (page) {
             if (page.position !== null) {
                 fixed.push(page);
                 var i = pagePool.indexOf(page);
@@ -1265,7 +1265,7 @@ function stateMachine() {
         }
 
         // Place in the correct order
-        fixed.forEach(function(page) {
+        fixed.forEach(function (page) {
             pagePool.splice(page.position, 0, page);
         });
 
@@ -2585,19 +2585,19 @@ function Interface(specificationObject) {
         for (var i = 0; i < optCount; i++) {
             var div = document.createElement('div');
             div.className = "comment-checkbox-inputs-flex";
-            
+
             var span = document.createElement('span');
             span.textContent = commentQuestion.options[i].text;
             span.className = 'comment-radio-span';
             div.appendChild(span);
-            
+
             var input = document.createElement('input');
             input.type = 'radio';
             input.name = commentQuestion.id;
             input.setAttribute('setvalue', commentQuestion.options[i].name);
             input.className = 'comment-radio';
             div.appendChild(input);
-            
+
             this.inputs.appendChild(div);
             this.options.push(input);
         }
@@ -2660,19 +2660,19 @@ function Interface(specificationObject) {
         for (var i = 0; i < optCount; i++) {
             var div = document.createElement('div');
             div.className = "comment-checkbox-inputs-flex";
-            
+
             var span = document.createElement('span');
             span.textContent = commentQuestion.options[i].text;
             span.className = 'comment-radio-span';
             div.appendChild(span);
-            
+
             var input = document.createElement('input');
             input.type = 'checkbox';
             input.name = commentQuestion.id;
             input.setAttribute('setvalue', commentQuestion.options[i].name);
             input.className = 'comment-radio';
             div.appendChild(input);
-            
+
             this.inputs.appendChild(div);
             this.options.push(input);
         }
@@ -2840,7 +2840,7 @@ function Interface(specificationObject) {
     };
 
     this.playhead = (function () {
-        var playhead ={};
+        var playhead = {};
         playhead.object = document.createElement('div');
         playhead.object.className = 'playhead';
         playhead.object.align = 'left';
@@ -3402,6 +3402,7 @@ function Storage() {
     this.document = null;
     this.root = null;
     this.state = 0;
+    var pFilenamePrefix = "";
 
     this.initialise = function (existingStore) {
         if (existingStore === undefined) {
@@ -3480,7 +3481,7 @@ function Storage() {
                     returnURL = specification.projectReturn;
                 }
             }
-            xmlhttp.open("POST", returnURL + "php/save.php?key=" + this.key);
+            xmlhttp.open("POST", returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=" + this.parent.filenamePrefix);
             xmlhttp.setRequestHeader('Content-Type', 'text/xml');
             xmlhttp.onerror = function () {
                 console.log('Error updating file to server!');
@@ -3650,6 +3651,21 @@ function Storage() {
         this.root.setAttribute("state", "complete");
         return this.root;
     };
+
+    Object.defineProperties(this, {
+        'filenamePrefix': {
+            'get': function () {
+                return pFilenamePrefix;
+            },
+            'set': function (value) {
+                if (typeof value !== "string") {
+                    value = String(value);
+                }
+                pFilenamePrefix = value;
+                return value;
+            }
+        }
+    })
 }
 
 var window_depedancy_callback;

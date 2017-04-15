@@ -137,16 +137,27 @@ def saveFile(self):
     global curFileName
     global curSaveIndex
     options = self.path.rsplit('?')
-    options = options[1].rsplit('=')
-    key = options[1]
+    options = options[1].rsplit('&')
+    for option in options:
+        optionPair = option.rsplit('=')
+        if optionPair[0] == "key":
+            key = optionPair[1]
+        elif optionPair[0] == "saveFilenamePrefix":
+            prefix = optionPair[1]
+    if key == None:
+        self.send_response(404)
+        return
+    if prefix == None:
+        prefix = "save"
     varLen = int(self.headers['Content-Length'])
     postVars = self.rfile.read(varLen)
     print("Saving file key "+key)
-    file = open('../saves/save-'+key+'.xml','wb')
+    filename = prefix+'-'+key+'.xml'
+    file = open('../saves/'+filename,'wb')
     file.write(postVars)
     file.close()
     try:
-        wbytes = os.path.getsize('../saves/save-'+key+'.xml')
+        wbytes = os.path.getsize('../saves/'+filename)
     except OSError:
         self.send_response(200)
         self.send_header("Content-type", "text/xml")
@@ -155,7 +166,7 @@ def saveFile(self):
     self.send_response(200)
     self.send_header("Content-type", "text/xml")
     self.end_headers()
-    reply = '<response state="OK"><message>OK</message><file bytes="'+str(wbytes)+'">"saves/'+curFileName+'"</file></response>'
+    reply = '<response state="OK"><message>OK</message><file bytes="'+str(wbytes)+'">"saves/'+filename+'"</file></response>'
     if sys.version_info[0] == 2:
         self.wfile.write(reply)
     elif sys.version_info[0] == 3:
