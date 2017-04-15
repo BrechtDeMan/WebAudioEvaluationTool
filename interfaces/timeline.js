@@ -474,7 +474,7 @@ function buttonSubmitClick() {
         interfaceContext.lightbox.post("Warning", 'You have not started the test! Please click play on a sample to begin the test!');
         return;
     }
-    var checks = testState.currentStateMap.interfaces[0],
+    var checks = testState.currentStateMap.interfaces[0].options,
         canContinue = true;
     for (var i = 0; i < checks.length; i++) {
         var checkState = true;
