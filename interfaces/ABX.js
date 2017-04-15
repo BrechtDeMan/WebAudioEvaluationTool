@@ -280,12 +280,19 @@ function comparator(page) {
             }
             $(this.playback).text('Stop');
             this.playback.setAttribute("playstate", "playing");
+            interfaceContext.commentBoxes.highlightById(element.id);
         };
         this.stopPlayback = function () {
             if (this.playback.getAttribute("playstate") == "playing") {
                 $('.comparator-button').text('Listen');
                 $('.comparator-button').removeAttr("disabled");
                 this.playback.setAttribute("playstate", "ready");
+            }
+            var box = interfaceContext.commentBoxes.boxes.find(function (a) {
+                return a.id === element.id;
+            });
+            if (box) {
+                box.highlight(false);
             }
         };
         this.getValue = function () {

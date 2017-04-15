@@ -338,6 +338,7 @@ function discreteObject(audioObject, label, interfaceScales) {
             $('.track-slider-button').text = "Wait";
             $('.track-slider-button').attr("disabled", "true");
         }
+        interfaceContext.commentBoxes.highlightById(audioObject.id);
     };
     this.stopPlayback = function () {
         // Called by audioObject when playback stops
@@ -347,6 +348,12 @@ function discreteObject(audioObject, label, interfaceScales) {
             $('.track-slider-button').text = "Play";
             this.play.textContent = "Play";
             $('.track-slider-button').removeAttr("disabled");
+            var box = interfaceContext.commentBoxes.boxes.find(function (a) {
+                return a.id === audioObject.id;
+            });
+            if (box) {
+                box.highlight(false);
+            }
         }
     };
 
