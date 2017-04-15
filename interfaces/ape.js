@@ -590,8 +590,7 @@ function sliderObject(audioObject, interfaceObjects, index) {
         $('.track-slider').removeClass('track-slider-playing');
         var name = ".track-slider-" + this.parent.id;
         $(name).addClass('track-slider-playing');
-        $('.comment-div').removeClass('comment-box-playing');
-        $('#comment-div-' + this.parent.id).addClass('comment-box-playing');
+        interfaceContext.commentBoxes.highlightById(audioObject.id);
         $('.outside-reference').removeClass('track-slider-playing');
         this.playing = true;
 
@@ -605,9 +604,14 @@ function sliderObject(audioObject, interfaceObjects, index) {
             this.playing = false;
             var name = ".track-slider-" + this.parent.id;
             $(name).removeClass('track-slider-playing');
-            $('#comment-div-' + this.parent.id).removeClass('comment-box-playing');
             $('.track-slider').removeClass('track-slider-disabled');
             $('.outside-reference').removeClass('track-slider-disabled');
+            var box = interfaceContext.commentBoxes.boxes.find(function (a) {
+                return a.id === audioObject.id;
+            });
+            if (box) {
+                box.highlight(false);
+            }
         }
     };
     this.exportXMLDOM = function (audioObject) {

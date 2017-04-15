@@ -294,12 +294,19 @@ function comparator(audioHolderObject) {
             }
             $(this.playback).text('Stop');
             this.playback.setAttribute("playstate", "playing");
+            interfaceContext.commentBoxes.highlightById(audioElement.id);
         };
         this.stopPlayback = function () {
             if (this.playback.getAttribute("playstate") == "playing") {
                 $('.comparator-button').text('Listen');
                 $('.comparator-button').removeAttr("disabled");
                 this.playback.setAttribute("playstate", "ready");
+            }
+            var box = interfaceContext.commentBoxes.boxes.find(function (a) {
+                return a.id === audioElement.id;
+            });
+            if (box) {
+                box.highlight(false);
             }
         };
         this.exportXMLDOM = function (audioObject) {

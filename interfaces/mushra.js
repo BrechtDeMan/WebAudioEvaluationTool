@@ -316,6 +316,7 @@ function sliderObject(audioObject, label) {
         this.play.setAttribute("playstate", "playing");
         $(".track-slider").removeClass('track-slider-playing');
         $(this.holder).addClass('track-slider-playing');
+        interfaceContext.commentBoxes.highlightById(audioObject.id);
         var outsideReference = document.getElementById('outside-reference');
         if (outsideReference !== null) {
             $(outsideReference).removeClass('track-slider-playing');
@@ -346,6 +347,12 @@ function sliderObject(audioObject, label) {
         if (page.restrictMovement && page.loop) {
             $(this.slider).addClass("track-slider-range-disabled");
             this.slider.setAttribute("disabled", "true");
+        }
+        var box = interfaceContext.commentBoxes.boxes.find(function (a) {
+            return a.id === audioObject.id;
+        });
+        if (box) {
+            box.highlight(false);
         }
     };
     this.getValue = function () {

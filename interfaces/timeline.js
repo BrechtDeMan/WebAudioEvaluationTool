@@ -430,12 +430,19 @@ function interfaceObject(audioObject, labelstr) {
         // Called when playback has begun
         canvasIntervalID = window.setInterval(this.canvas.drawTicker.bind(this.canvas), 100);
         this.playButton.DOM.textContent = "Stop";
+        interfaceContext.commentBoxes.highlightById(audioObject.id);
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
         window.clearInterval(canvasIntervalID);
         this.canvas.clearCanvas(this.canvas.layer2);
         this.playButton.DOM.textContent = "Play";
+        var box = interfaceContext.commentBoxes.boxes.find(function (a) {
+            return a.id === audioObject.id;
+        });
+        if (box) {
+            box.highlight(false);
+        }
     };
     this.getValue = function () {
         // Return the current value of the object. If there is no value, return 0

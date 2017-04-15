@@ -296,11 +296,18 @@ function sliderObject(audioObject, label) {
         if (outsideReference !== null) {
             $(outsideReference).removeClass('track-slider-playing');
         }
+        interfaceContext.commentBoxes.highlightById(audioObject.id);
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
         this.play.setAttribute("playstate", "ready");
         $(this.holder).removeClass('track-slider-playing');
+        var box = interfaceContext.commentBoxes.boxes.find(function (a) {
+            return a.id === audioObject.id;
+        });
+        if (box) {
+            box.highlight(false);
+        }
     };
     this.getValue = function () {
         // Return the current value of the object. If there is no value, return 0
