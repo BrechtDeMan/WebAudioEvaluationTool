@@ -408,51 +408,22 @@ function createProjectSave(destURL) {
         popup.popupContent.innerHTML = "<span>Please save the file below to give to your test supervisor</span><br>";
         popup.popupContent.appendChild(a);
     } else {
-        var saveUrlSuffix = "";
-        var saveFilenamePrefix = specification.saveFilenamePrefix;
-        if (typeof (saveFilenamePrefix) === "string" && saveFilenamePrefix.length > 0) {
-            saveUrlSuffix = "&saveFilenamePrefix=" + saveFilenamePrefix;
-        }
         var projectReturn = "";
         if (typeof specification.projectReturn == "string") {
             if (specification.projectReturn.substr(0, 4) == "http") {
                 projectReturn = specification.projectReturn;
             }
         }
-        var saveURL = projectReturn + "php/save.php?key=" + storage.SessionKey.key + saveUrlSuffix;
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("POST", saveURL, true);
-        xmlhttp.setRequestHeader('Content-Type', 'text/xml');
-        xmlhttp.onerror = function () {
-            console.log('Error saving file to server! Presenting download locally');
-            createProjectSave("local");
-        };
-        xmlhttp.onload = function () {
-            console.log(xmlhttp);
-            if (this.status >= 300) {
-                console.log("WARNING - Could not update at this time");
-                createProjectSave("local");
+        storage.SessionKey.finish().then(function (resolved) {
+            if (typeof specification.returnURL == "string" && specification.returnURL.length > 0) {
+                window.location = specification.returnURL;
             } else {
-                var parser = new DOMParser();
-                var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
-                var response = xmlDoc.getElementsByTagName('response')[0];
-                if (response.getAttribute("state") == "OK") {
-                    window.onbeforeunload = undefined;
-                    var file = response.getElementsByTagName("file")[0];
-                    console.log("Intermediate save: OK, written " + file.getAttribute("bytes") + "B");
-                    if (typeof specification.returnURL == "string" && specification.returnURL.length > 0) {
-                        window.location = specification.returnURL;
-                    } else {
-                        popup.popupContent.textContent = specification.exitText;
-                    }
-                } else {
-                    var message = response.getElementsByTagName("message");
-                    console.log("Save: Error! " + message.textContent);
-                    createProjectSave("local");
-                }
+                popup.popupContent.textContent = specification.exitText;
             }
-        };
-        xmlhttp.send(file);
+        }, function (message) {
+            console.log("Save: Error! " + message.textContent);
+            createProjectSave("local");
+        });
         popup.showPopup();
         popup.popupContent.innerHTML = null;
         popup.popupContent.textContent = "Submitting. Please Wait";
@@ -3506,6 +3477,42 @@ function Storage() {
                 }
             };
             xmlhttp.send([hold.innerHTML]);
+        },
+        finish: function () {
+            // Final upload to complete the test
+            this.parent.finish();
+            var hold = document.createElement("div");
+            var clone = this.parent.root.cloneNode(true);
+            hold.appendChild(clone);
+            return new Promise(function (resolve, reject) {
+                var saveURL = specification.returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=" + this.parent.filenamePrefix;
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("POST", saveURL);
+                xmlhttp.setRequestHeader('Content-Type', 'text/xml');
+                xmlhttp.onerror = function () {
+                    console.log('Error updating file to server!');
+                    createProjectSave("local");
+                };
+                xmlhttp.onload = function () {
+                    if (this.status >= 300) {
+                        console.log("WARNING - Could not update at this time");
+                        createProjectSave("local");
+                    } else {
+                        var parser = new DOMParser();
+                        var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
+                        var response = xmlDoc.getElementsByTagName('response')[0];
+                        if (response.getAttribute("state") == "OK") {
+                            var file = response.getElementsByTagName("file")[0];
+                            console.log("Intermediate save: OK, written " + file.getAttribute("bytes") + "B");
+                            resolve(response);
+                        } else {
+                            var message = response.getElementsByTagName("message");
+                            reject(message);
+                        }
+                    }
+                };
+                xmlhttp.send([hold.innerHTML]);
+            });
         }
     };
 
@@ -3644,9 +3651,6 @@ function Storage() {
         this.SessionKey.update();
     };
     this.finish = function () {
-        if (this.state === 0) {
-            this.update();
-        }
         this.state = 1;
         this.root.setAttribute("state", "complete");
         return this.root;
