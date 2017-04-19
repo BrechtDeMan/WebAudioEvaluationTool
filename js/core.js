@@ -389,7 +389,7 @@ function createProjectSave(destURL) {
     // Save the data from interface into XML and send to destURL
     // If destURL is null then download XML in client
     // Now time to render file locally
-    var xmlDoc = interfaceXMLSave();
+    var xmlDoc = storage.finish();
     var parent = document.createElement("div");
     parent.appendChild(xmlDoc);
     var file = [parent.innerHTML];
@@ -3393,7 +3393,7 @@ function Storage() {
     this.document = null;
     this.root = null;
     this.state = 0;
-    var pFilenamePrefix = "";
+    var pFilenamePrefix = "save";
 
     this.initialise = function (existingStore) {
         if (existingStore === undefined) {
@@ -3504,8 +3504,13 @@ function Storage() {
             var hold = document.createElement("div");
             var clone = this.parent.root.cloneNode(true);
             hold.appendChild(clone);
+            var saveURL = specification.returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=";
+            if (this.parent.filenamePrefix.length == 0) {
+                saveURL += "save";
+            } else {
+                saveURL += this.parent.filenamePrefix;
+            }
             return new Promise(function (resolve, reject) {
-                var saveURL = specification.returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=" + this.parent.filenamePrefix;
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.open("POST", saveURL);
                 xmlhttp.setRequestHeader('Content-Type', 'text/xml');
