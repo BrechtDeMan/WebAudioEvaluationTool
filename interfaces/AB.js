@@ -73,9 +73,7 @@ function loadInterface() {
 
     // Construct the AB Boxes
     var boxes = document.createElement('div');
-    boxes.align = "center";
     boxes.id = "box-holders";
-    boxes.style.float = "left";
 
     var submit = document.createElement('button');
     submit.id = "submit";
@@ -375,9 +373,6 @@ function resizeWindow(event) {
         boxW = numObj * 312;
         diff = window.innerWidth - boxW;
     }
-    document.getElementById('box-holders').style.marginLeft = diff / 2 + 'px';
-    document.getElementById('box-holders').style.marginRight = diff / 2 + 'px';
-    document.getElementById('box-holders').style.width = boxW + 'px';
 
     var outsideRef = document.getElementById('outside-reference');
     if (outsideRef !== null) {
