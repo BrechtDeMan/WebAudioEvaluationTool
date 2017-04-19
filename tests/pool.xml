@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
     <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-        <setup interface="likert" projectReturn="save.php" crossFade="3.0" poolSize="3">
+        <setup interface="discrete" projectReturn="save.php" crossFade="0.1" poolSize="3">
             <metric>
                 <metricenable>testTimer</metricenable>
                 <metricenable>elementTimer</metricenable>

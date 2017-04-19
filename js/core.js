@@ -873,7 +873,7 @@ function interfacePopup() {
 
     function processNumber(node) {
         var input = this.popupContent.getElementsByTagName('input')[0];
-        if (node.mandatory === true && input.value.length === 0) {
+        if (node.specification.mandatory === true && input.value.length === 0) {
             interfaceContext.lightbox.post("Error", 'This question is mandatory. Please enter a number');
             return false;
         }
@@ -882,12 +882,12 @@ function interfacePopup() {
             interfaceContext.lightbox.post("Error", 'Please enter a valid number');
             return false;
         }
-        if (enteredNumber < node.min && node.min !== null) {
-            interfaceContext.lightbox.post("Error", 'Number is below the minimum value of ' + node.min);
+        if (enteredNumber < node.specification.min && node.specification.min !== null) {
+            interfaceContext.lightbox.post("Error", 'Number is below the minimum value of ' + node.specification.min);
             return false;
         }
-        if (enteredNumber > node.max && node.max !== null) {
-            interfaceContext.lightbox.post("Error", 'Number is above the maximum value of ' + node.max);
+        if (enteredNumber > node.specification.max && node.specification.max !== null) {
+            interfaceContext.lightbox.post("Error", 'Number is above the maximum value of ' + node.specification.max);
             return false;
         }
         node.response = input.value;
