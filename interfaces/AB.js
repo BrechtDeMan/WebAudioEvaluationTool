@@ -288,7 +288,7 @@ function comparator(audioHolderObject) {
             if (this.parent.specification.parent.playOne || specification.playOne) {
                 $('.comparator-button').text('Wait');
                 $('.comparator-button').attr("disabled", "true");
-                $(this.playback).css("disabled", "false");
+                $(this.playback).removeAttr("disabled");
             } else {
                 $('.comparator-button').text('Listen');
             }
@@ -298,9 +298,13 @@ function comparator(audioHolderObject) {
         };
         this.stopPlayback = function () {
             if (this.playback.getAttribute("playstate") == "playing") {
-                $('.comparator-button').text('Listen');
-                $('.comparator-button').removeAttr("disabled");
+                $(this.playback).text('Listen');
+                $(this.playback).removeAttr("disabled");
                 this.playback.setAttribute("playstate", "ready");
+                if (this.parent.specification.parent.playOne || specification.playOne) {
+                    $('.comparator-button').text('Listen');
+                    $('.comparator-button').removeAttr("disabled");
+                }
             }
             var box = interfaceContext.commentBoxes.boxes.find(function (a) {
                 return a.id === audioElement.id;
