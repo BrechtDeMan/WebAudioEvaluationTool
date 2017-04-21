@@ -478,6 +478,11 @@ function Specification() {
                 child.setAttribute("name", option.name);
                 node.appendChild(child);
             });
+            if (typeof this.image == "string" && this.image.length !== 0) {
+                var imgNode = doc.createElement("image");
+                imgNode.setAttribute("src", this.image);
+                node.appendChild(imgNode);
+            }
             if (this.scales.length !== 0) {
                 var scales = doc.createElement("scales");
                 this.scales.forEach(function (scale) {
