@@ -415,6 +415,7 @@ function Specification() {
     this.interfaceNode = function (specification) {
         this.title = undefined;
         this.name = undefined;
+        this.image = undefined;
         this.options = [];
         this.scales = [];
         this.schema = schemaRoot.getAllElementsByName('interface')[1];
@@ -443,7 +444,11 @@ function Specification() {
                 }
                 this.options.push(option);
             }
-
+            // Get the image node
+            var imageNode = xml.getElementsByTagName("image");
+            if (imageNode.length == 1) {
+                this.image = imageNode[0].getAttribute("src");
+            }
             // Now the scales nodes
             var scaleParent = xml.getElementsByTagName('scales');
             if (scaleParent.length == 1) {
@@ -790,6 +795,7 @@ function Specification() {
             this.startTime = undefined;
             this.stopTime = undefined;
             this.sampleRate = undefined;
+            this.image = undefined;
             this.alternatives = [];
             this.schema = schemaRoot.getAllElementsByName('audioelement')[0];
             this.parent = undefined;

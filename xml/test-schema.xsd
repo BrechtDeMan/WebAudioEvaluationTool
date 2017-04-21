@@ -28,7 +28,7 @@
         </xs:attribute>
 
         <xs:attribute name="playOne" type="xs:boolean" default="false" />
-        
+
         <xs:attribute name="minWait" type="xs:nonNegativeInteger" default="0" />
 
         <!-- define complex elements-->
@@ -122,6 +122,11 @@
             <xs:complexType>
                 <xs:sequence>
                     <xs:element ref="title" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="image" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:attribute name="src" type="xs:anyURI" use="required" />
+                        </xs:complexType>
+                    </xs:element>
                     <xs:element name="interfaceoption" minOccurs="0" maxOccurs="unbounded">
                         <xs:complexType>
                             <xs:attribute name="type" use="required">
@@ -229,6 +234,7 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute name="image" type="xs:anyURI" use="optional" />
             </xs:complexType>
         </xs:element>
 
