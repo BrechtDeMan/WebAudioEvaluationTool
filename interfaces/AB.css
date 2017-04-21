@@ -40,10 +40,6 @@ button.outside-reference {
 }
 div#box-holders {
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
 }
 div#playback-holder{
     float:none;
@@ -54,9 +50,7 @@ div.comparator-holder {
     border: black 1px solid;
     padding-top: 5px;
     margin: 25px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: inline-block;
 }
 div.comparator-selector {
     width: 248px;
@@ -66,6 +60,8 @@ div.comparator-selector {
     background-color: #FF0000;
     border-radius: 20px;
     text-align: center;
+    display: block;
+    margin: auto;
 }
 div.disabled {
     background-color: #AAA;
