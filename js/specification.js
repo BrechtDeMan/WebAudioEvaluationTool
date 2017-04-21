@@ -223,6 +223,7 @@ function Specification() {
             this.options = [];
             this.min = undefined;
             this.max = undefined;
+            this.minWait = undefined;
             this.step = undefined;
             this.conditions = [];
 

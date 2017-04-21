@@ -28,6 +28,8 @@
         </xs:attribute>
 
         <xs:attribute name="playOne" type="xs:boolean" default="false" />
+        
+        <xs:attribute name="minWait" type="xs:nonNegativeInteger" default="0" />
 
         <!-- define complex elements-->
         <xs:element name="waet">
@@ -332,6 +334,7 @@
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
                 <xs:attribute ref="mandatory" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="boxsize" default="normal">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -365,6 +368,7 @@
                 <xs:attribute ref="mandatory" />
                 <xs:attribute name="min" type="xs:decimal" />
                 <xs:attribute name="max" type="xs:decimal" />
+                <xs:attribute ref="minWait" />
             </xs:complexType>
         </xs:element>
 
@@ -386,6 +390,7 @@
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
                 <xs:attribute ref="mandatory" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="min" type="xs:decimal" />
                 <xs:attribute name="max" type="xs:decimal" />
             </xs:complexType>
@@ -409,6 +414,7 @@
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
                 <xs:attribute ref="mandatory" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="min" type="xs:decimal" />
                 <xs:attribute name="max" type="xs:decimal" />
             </xs:complexType>
@@ -424,6 +430,7 @@
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="min" use="required" type="xs:decimal" />
                 <xs:attribute name="max" use="required" type="xs:decimal" />
             </xs:complexType>
@@ -435,6 +442,7 @@
                     <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="url" use="required" type="xs:string" />
             </xs:complexType>
         </xs:element>
@@ -445,6 +453,7 @@
                     <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="url" use="required" type="xs:string" />
             </xs:complexType>
         </xs:element>

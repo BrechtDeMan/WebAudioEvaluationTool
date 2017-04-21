@@ -553,6 +553,7 @@ function interfacePopup() {
     this.currentIndex = null;
     this.node = null;
     this.store = null;
+    var lastNodeStart = undefined;
     $(window).keypress(function (e) {
         if (e.keyCode == 13 && popup.popup.style.visibility == 'visible') {
             console.log(e);
@@ -1048,6 +1049,7 @@ function interfacePopup() {
         var node = this.popupOptions[this.currentIndex],
             converter = new showdown.Converter(),
             p = new DOMParser();
+        lastNodeStart = new Date();
         this.popupResponse.innerHTML = "";
         this.popupTitle.innerHTML = "";
         this.popupTitle.appendChild(p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild);
@@ -1110,7 +1112,12 @@ function interfacePopup() {
             return;
         }
         var node = this.popupOptions[this.currentIndex],
-            pass = true;
+            pass = true,
+            timeDelta = (new Date() - lastNodeStart)/1000.0;
+        if (timeDelta < node.specification.minWait) {
+            interfaceContext.lightbox.post("Error", "Not enough time has elapsed, please wait "+(node.specification.minWait-timeDelta).toFixed(0)+" seconds");
+            return;
+        }
         if (node.specification.type == 'question') {
             // Must extract the question data
             pass = processQuestion.call(this, node);
