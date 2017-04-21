@@ -553,7 +553,7 @@ function interfacePopup() {
     this.currentIndex = null;
     this.node = null;
     this.store = null;
-    var lastNodeStart = undefined;
+    var lastNodeStart;
     $(window).keypress(function (e) {
         if (e.keyCode == 13 && popup.popup.style.visibility == 'visible') {
             console.log(e);
@@ -1118,6 +1118,7 @@ function interfacePopup() {
             interfaceContext.lightbox.post("Error", "Not enough time has elapsed, please wait "+(node.specification.minWait-timeDelta).toFixed(0)+" seconds");
             return;
         }
+        node.elapsedTime = timeDelta;
         if (node.specification.type == 'question') {
             // Must extract the question data
             pass = processQuestion.call(this, node);
@@ -3512,7 +3513,7 @@ function Storage() {
             var clone = this.parent.root.cloneNode(true);
             hold.appendChild(clone);
             var saveURL = specification.returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=";
-            if (this.parent.filenamePrefix.length == 0) {
+            if (this.parent.filenamePrefix.length === 0) {
                 saveURL += "save";
             } else {
                 saveURL += this.parent.filenamePrefix;
@@ -3605,6 +3606,7 @@ function Storage() {
                 }
                 surveyresult = surveyresult.nextElementSibling;
             }
+            surveyresult.setAttribute("duration", node.elapsedTime);
             switch (node.specification.type) {
                 case "number":
                 case "question":
