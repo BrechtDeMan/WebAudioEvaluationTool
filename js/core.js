@@ -1113,9 +1113,9 @@ function interfacePopup() {
         }
         var node = this.popupOptions[this.currentIndex],
             pass = true,
-            timeDelta = (new Date() - lastNodeStart)/1000.0;
+            timeDelta = (new Date() - lastNodeStart) / 1000.0;
         if (timeDelta < node.specification.minWait) {
-            interfaceContext.lightbox.post("Error", "Not enough time has elapsed, please wait "+(node.specification.minWait-timeDelta).toFixed(0)+" seconds");
+            interfaceContext.lightbox.post("Error", "Not enough time has elapsed, please wait " + (node.specification.minWait - timeDelta).toFixed(0) + " seconds");
             return;
         }
         node.elapsedTime = timeDelta;
@@ -3007,6 +3007,22 @@ function Interface(specificationObject) {
             }
         };
         return volume;
+    })();
+
+    this.imageHolder = (function () {
+        var imageController = {};
+        imageController.root = document.createElement("div");
+        imageController.root.id = "imageController";
+        imageController.img = document.createElement("img");
+        imageController.root.appendChild(imageController.img);
+        imageController.setImage = function (src) {
+            imageController.img.src = "";
+            if (typeof src !== "string" || src.length == undefined) {
+                return;
+            }
+            imageController.img.src = src;
+        }
+        return imageController;
     })();
 
     this.calibrationModuleObject = null;
