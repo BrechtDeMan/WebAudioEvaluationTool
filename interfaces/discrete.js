@@ -137,6 +137,11 @@ function loadTest(page) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
+    if (interfaceObj.image !== undefined) {
+        document.getElementById("testContent").insertBefore(interfaceContext.imageHolder.root, document.getElementById("slider"));
+        interfaceContext.imageHolder.setImage(interfaceObj.image);
+    }
+
     // Delete outside reference
     document.getElementById("outside-reference-holder").innerHTML = "";
 

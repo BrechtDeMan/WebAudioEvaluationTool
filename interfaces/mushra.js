@@ -137,6 +137,11 @@ function loadTest(audioHolderObject) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
+    if (interfaceObj.image !== undefined) {
+        document.getElementById("testContent").insertBefore(interfaceContext.imageHolder.root, document.getElementById("slider"));
+        interfaceContext.imageHolder.setImage(interfaceObj.image);
+    }
+
     // Delete outside reference
     var outsideReferenceHolder = document.getElementById("outside-reference-holder");
     outsideReferenceHolder.innerHTML = "";
@@ -360,8 +365,12 @@ function sliderObject(audioObject, label) {
     };
 
     this.resize = function (event) {
-        this.holder.style.height = window.innerHeight - 200 + 'px';
-        this.slider.style.height = window.innerHeight - 250 + 'px';
+        var imgHeight = 0;
+        if (document.getElementById("imageController")) {
+            imgHeight = $(interfaceContext.imageHolder.root).height();
+        }
+        this.holder.style.height = window.innerHeight - 200 - imgHeight + 'px';
+        this.slider.style.height = window.innerHeight - 250 - imgHeight + 'px';
     };
     this.updateLoading = function (progress) {
         progress = String(progress);
@@ -389,7 +398,11 @@ function resizeWindow(event) {
     // Function called when the window has been resized.
     // MANDATORY FUNCTION
 
-    var outsideRef = document.getElementById('outside-reference');
+    var outsideRef = document.getElementById('outside-reference'),
+        imageHeight = 0;
+    if (document.getElementById("imageController")) {
+        imgHeight = $(interfaceContext.imageHolder.root).height();
+    }
     if (outsideRef !== null) {
         outsideRef.style.left = (window.innerWidth - 120) / 2 + 'px';
     }
@@ -398,7 +411,7 @@ function resizeWindow(event) {
     var numObj = document.getElementsByClassName('track-slider').length;
     var totalWidth = (numObj - 1) * 150 + 100;
     var diff = (window.innerWidth - totalWidth) / 2;
-    document.getElementById('slider').style.height = window.innerHeight - 180 + 'px';
+    document.getElementById('slider').style.height = window.innerHeight - 180 - imgHeight + 'px';
     if (diff <= 0) {
         diff = 0;
     }
@@ -409,7 +422,7 @@ function resizeWindow(event) {
         }
     }
     document.getElementById('scale-holder').style.marginLeft = (diff - 100) + 'px';
-    document.getElementById('scale-text-holder').style.height = window.innerHeight - 194 + 'px';
+    document.getElementById('scale-text-holder').style.height = window.innerHeight - imgHeight - 194 + 'px';
     // Cheers edge for making me delete a canvas every resize.
     var canvas = document.getElementById('scale-canvas');
     var new_canvas = document.createElement("canvas");
@@ -417,7 +430,7 @@ function resizeWindow(event) {
     canvas.parentElement.appendChild(new_canvas);
     canvas.parentElement.removeChild(canvas);
     new_canvas.width = totalWidth;
-    new_canvas.height = window.innerHeight - 194;
+    new_canvas.height = window.innerHeight - 194 - imgHeight;
     drawScale();
 }
 

@@ -129,6 +129,11 @@ function loadTest(page) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
+    if (interfaceObj.image !== undefined) {
+        feedbackHolder.insertBefore(interfaceContext.imageHolder.root, document.getElementById("box-holders"));
+        interfaceContext.imageHolder.setImage(interfaceObj.image);
+    }
+
     interfaceContext.comparator = new comparator(page);
 
     var interfaceOptions = interfaceObj.options;
