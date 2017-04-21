@@ -124,8 +124,13 @@ function loadTest(audioHolderObject) {
         document.getElementById("test-title").textContent = audioHolderObject.title;
     }
 
-    if (interfaceObj.title !== null) {
+    if (interfaceObj.title !== undefined) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
+    }
+
+    if (interfaceObj.image !== undefined) {
+        feedbackHolder.insertBefore(interfaceContext.imageHolder.root, document.getElementById("box-holders"));
+        interfaceContext.imageHolder.setImage(interfaceObj.image);
     }
 
     var interfaceOptions = interfaceObj.options;

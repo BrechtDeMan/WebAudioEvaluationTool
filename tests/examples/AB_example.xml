@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
     <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-        <setup interface="AB" projectReturn="save.php" randomiseOrder='true' poolSize="2" loudness="-23" playOne="true">
+        <setup interface="AB" projectReturn="save.php" randomiseOrder="false" poolSize="2" loudness="-23" playOne="true">
             <survey location="before">
                 <surveyquestion id="sessionId" mandatory="true">
                     <statement>Please enter your name.</statement>
@@ -56,13 +56,14 @@
         <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='false' loudness="-12">
             <commentboxprefix>Comment on fragment</commentboxprefix>
             <interface>
-                <title>Depth</title>
+                <title>Which sounds most like a drum?</title>
+                <image src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
             </interface>
             <audioelement url="0.wav" id="track-0" />
             <audioelement url="1.wav" id="track-1" />
             <survey location="before">
                 <surveystatement id="test-0-intro">
-                    <statement>A two way comparison using randomised element order, automatic loudness and synchronised looping.</statement>
+                    <statement>A two way comparison using randomised element order, automatic loudness and synchronised looping. Also an embedded image</statement>
                 </surveystatement>
             </survey>
             <survey location="after">
