@@ -423,7 +423,10 @@ function buttonSubmitClick() {
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    console.log("WARNING - Check 'scalerange' does not make sense in AB/ABX! Ignoring!");
+                    checkState = interfaceContext.checkScaleRange();
+                    if (checkState === false) {
+                        canContinue = false;
+                    }
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
