@@ -456,6 +456,21 @@ function interfaceSliderHolder(interfaceObject) {
     this.sliderDOM = document.createElement('div');
     this.sliderDOM.className = 'sliderCanvasDiv';
     this.sliderDOM.id = 'sliderCanvasHolder-' + this.id;
+    this.imageHolder = (function () {
+        var imageController = {};
+        imageController.root = document.createElement("div");
+        imageController.root.className = "imageController";
+        imageController.img = document.createElement("img");
+        imageController.root.appendChild(imageController.img);
+        imageController.setImage = function (src) {
+            imageController.img.src = "";
+            if (typeof src !== "string" || src.length == undefined) {
+                return;
+            }
+            imageController.img.src = src;
+        }
+        return imageController;
+    })();
 
     var pagetitle = document.createElement('div');
     pagetitle.className = "pageTitle";
@@ -470,6 +485,10 @@ function interfaceSliderHolder(interfaceObject) {
     pagetitle.appendChild(titleSpan);
     this.sliderDOM.appendChild(pagetitle);
 
+    if (interfaceObject.image !== undefined) {
+        this.sliderDOM.appendChild(this.imageHolder.root);
+        this.imageHolder.setImage(interfaceObject.image);
+    }
     // Create the slider box to hold the slider elements
     this.canvas = document.createElement('div');
     if (this.name !== undefined)
