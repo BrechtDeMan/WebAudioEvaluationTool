@@ -24,8 +24,8 @@ div#box-holders {
     width: 100%;
     text-align: center;
 }
-div#playback-holder{
-    float:none;
+div#playback-holder {
+    float: none;
 }
 div.comparator-holder {
     width: 260px;
@@ -70,9 +70,4 @@ div.playhead {
 div#page-count {
     float: left;
     margin: 0px 5px;
-}
-div#master-volume-holder {
-    position: absolute;
-    top: 10px;
-    left: 120px;
 }
