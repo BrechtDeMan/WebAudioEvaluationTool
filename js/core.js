@@ -596,7 +596,7 @@ function interfacePopup() {
             } else {
                 jumpID = condition.jumpToOnFail;
             }
-            if (jumpID !== undefined) {
+            if (jumpID !== null) {
                 jumpToId.call(this, jumpID);
                 break;
             }
@@ -828,7 +828,7 @@ function interfacePopup() {
             }
             i++;
         }
-        processConditional.call(this, node, node.response);
+        processConditional.call(this, node, node.response.name);
         return true;
     }
 
