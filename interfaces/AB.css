@@ -40,6 +40,7 @@ button.outside-reference {
 }
 div#box-holders {
     width: 100%;
+    text-align: center;
 }
 div#playback-holder{
     float:none;
