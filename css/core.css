@@ -65,9 +65,10 @@ div#popupTitleHolder {
 div#popupResponse {
     width: inherit;
     min-height: 50px;
-    max-height: 320px;
+    max-height: 270px;
     overflow: auto;
     position: relative;
+    margin-bottom: 10px;
 }
 button.popupButton {
     /* Button for popup window
