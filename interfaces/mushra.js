@@ -401,7 +401,7 @@ function resizeWindow(event) {
     var outsideRef = document.getElementById('outside-reference'),
         imageHeight = 0;
     if (document.getElementById("imageController")) {
-        imgHeight = $(interfaceContext.imageHolder.root).height();
+        imageHeight = $(interfaceContext.imageHolder.root).height();
     }
     if (outsideRef !== null) {
         outsideRef.style.left = (window.innerWidth - 120) / 2 + 'px';
@@ -411,7 +411,7 @@ function resizeWindow(event) {
     var numObj = document.getElementsByClassName('track-slider').length;
     var totalWidth = (numObj - 1) * 150 + 100;
     var diff = (window.innerWidth - totalWidth) / 2;
-    document.getElementById('slider').style.height = window.innerHeight - 180 - imgHeight + 'px';
+    document.getElementById('slider').style.height = window.innerHeight - 180 - imageHeight + 'px';
     if (diff <= 0) {
         diff = 0;
     }
@@ -422,7 +422,7 @@ function resizeWindow(event) {
         }
     }
     document.getElementById('scale-holder').style.marginLeft = (diff - 100) + 'px';
-    document.getElementById('scale-text-holder').style.height = window.innerHeight - imgHeight - 194 + 'px';
+    document.getElementById('scale-text-holder').style.height = window.innerHeight - imageHeight - 194 + 'px';
     // Cheers edge for making me delete a canvas every resize.
     var canvas = document.getElementById('scale-canvas');
     var new_canvas = document.createElement("canvas");
@@ -430,7 +430,7 @@ function resizeWindow(event) {
     canvas.parentElement.appendChild(new_canvas);
     canvas.parentElement.removeChild(canvas);
     new_canvas.width = totalWidth;
-    new_canvas.height = window.innerHeight - 194 - imgHeight;
+    new_canvas.height = window.innerHeight - 194 - imageHeight;
     drawScale();
 }
 
