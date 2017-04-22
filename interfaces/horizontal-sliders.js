@@ -425,24 +425,24 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllMoved();
+                    checkState = interfaceContext.checkAllMoved(checks[i].errorMessage);
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllCommented();
+                    checkState = interfaceContext.checkAllCommented(checks[i].errorMessage);
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
+                    checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
 
                     break;
                 default:

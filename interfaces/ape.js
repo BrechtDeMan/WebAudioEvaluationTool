@@ -738,23 +738,23 @@ function buttonSubmitClick() {
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    checkState = interfaceContext.checkFragmentsFullyPlayed();
+                    checkState = interfaceContext.checkFragmentsFullyPlayed(checks[i].errorMessage);
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllMoved();
+                    checkState = interfaceContext.checkAllMoved(checks[i].errorMessage);
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllCommented();
+                    checkState = interfaceContext.checkAllCommented(checks[i].errorMessage);
                     break;
                 case 'scalerange':
                     // Check the scale is used to its full width outlined by the node
-                    checkState = interfaceContext.checkScaleRange();
+                    checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].name + " is not supported on this interface");

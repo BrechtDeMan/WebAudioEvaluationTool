@@ -395,35 +395,35 @@ function buttonSubmitClick() {
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    checkState = interfaceContext.checkFragmentsFullyPlayed();
+                    checkState = interfaceContext.checkFragmentsFullyPlayed(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllMoved();
+                    checkState = interfaceContext.checkAllMoved(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllCommented();
+                    checkState = interfaceContext.checkAllCommented(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    checkState = interfaceContext.checkScaleRange();
+                    checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
