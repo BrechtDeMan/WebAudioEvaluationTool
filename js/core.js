@@ -3116,7 +3116,7 @@ function Interface(specificationObject) {
 
     // Global Checkers
     // These functions will help enforce the checkers
-    this.checkHiddenAnchor = function () {
+    this.checkHiddenAnchor = function (message) {
         var anchors = audioEngineContext.audioObjects.filter(function (ao) {
             return ao.specification.type === "anchor";
         });
@@ -3125,14 +3125,18 @@ function Interface(specificationObject) {
         });
         if (state) {
             console.log('Anchor node not below marker value');
-            interfaceContext.lightbox.post("Message", 'Please keep listening');
+            if (message) {
+                interfaceContext.lightbox.post("Message", message);
+            } else {
+                interfaceContext.lightbox.post("Message", 'Please keep listening');
+            }
             this.storeErrorNode('Anchor node not below marker value');
             return false;
         }
         return true;
     };
 
-    this.checkHiddenReference = function () {
+    this.checkHiddenReference = function (message) {
         var references = audioEngineContext.audioObjects.filter(function (ao) {
             return ao.specification.type === "reference";
         });
@@ -3141,14 +3145,18 @@ function Interface(specificationObject) {
         });
         if (state) {
             console.log('Reference node not below marker value');
-            interfaceContext.lightbox.post("Message", 'Please keep listening');
+            if (message) {
+                interfaceContext.lightbox.post("Message", message);
+            } else {
+                interfaceContext.lightbox.post("Message", 'Please keep listening');
+            }
             this.storeErrorNode('Reference node not below marker value');
             return false;
         }
         return true;
     };
 
-    this.checkFragmentsFullyPlayed = function () {
+    this.checkFragmentsFullyPlayed = function (message) {
         // Checks the entire file has been played back
         // NOTE ! This will return true IF playback is Looped!!!
         if (audioEngineContext.loopPlayback) {
@@ -3188,14 +3196,17 @@ function Interface(specificationObject) {
                 }
             }
             str_start += ". Please keep listening";
-            console.log("[ALERT]: " + str_start);
-            this.storeErrorNode("[ALERT]: " + str_start);
+            console.log(str_start);
+            this.storeErrorNode(str_start);
+            if (message) {
+                str_start = message;
+            }
             interfaceContext.lightbox.post("Error", str_start);
             return false;
         }
         return true;
     };
-    this.checkAllMoved = function () {
+    this.checkAllMoved = function (message) {
         var str = "You have not moved ";
         var failed = [];
         audioEngineContext.audioObjects.forEach(function (ao) {
@@ -3215,12 +3226,15 @@ function Interface(specificationObject) {
             str += 'and ' + failed[i];
         }
         str += '.';
-        interfaceContext.lightbox.post("Error", str);
         console.log(str);
         this.storeErrorNode(str);
+        if (message) {
+            str = message;
+        }
+        interfaceContext.lightbox.post("Error", str);
         return false;
     };
-    this.checkAllPlayed = function () {
+    this.checkAllPlayed = function (message) {
         var str = "You have not played ";
         var failed = [];
         audioEngineContext.audioObjects.forEach(function (ao) {
@@ -3240,12 +3254,15 @@ function Interface(specificationObject) {
             str += 'and ' + failed[i];
         }
         str += '.';
-        interfaceContext.lightbox.post("Error", str);
         console.log(str);
         this.storeErrorNode(str);
+        if (message) {
+            str = message;
+        }
+        interfaceContext.lightbox.post("Error", str);
         return false;
     };
-    this.checkAllCommented = function () {
+    this.checkAllCommented = function (message) {
         var str = "You have not commented on all the fragments.";
         var cont = true,
             boxes = this.commentBoxes.boxes,
@@ -3253,15 +3270,18 @@ function Interface(specificationObject) {
             i;
         for (i = 0; i < numBoxes; i++) {
             if (boxes[i].trackCommentBox.value === "") {
-                interfaceContext.lightbox.post("Error", str);
                 console.log(str);
                 this.storeErrorNode(str);
+                if (message) {
+                    str = message;
+                }
+                interfaceContext.lightbox.post("Error", str);
                 return false;
             }
         }
         return true;
     };
-    this.checkScaleRange = function () {
+    this.checkScaleRange = function (message) {
         var page = testState.getCurrentTestPage();
         var interfaceObject = page.interfaces;
         var state = true;
@@ -3299,6 +3319,9 @@ function Interface(specificationObject) {
         if (state === false) {
             console.log(str);
             this.storeErrorNode(str);
+            if (message) {
+                str = message;
+            }
             interfaceContext.lightbox.post("Error", str);
         }
         return state;
