@@ -479,6 +479,11 @@ function Specification() {
                 var child = doc.createElement("interfaceoption");
                 child.setAttribute("type", option.type);
                 child.setAttribute("name", option.name);
+                if (option.type == "check" && option.errorMessage !== undefined) {
+                    var errorMessage = doc.createElement("errormessage");
+                    errorMessage.textContent = option.errorMessage;
+                    child.appendChild(errorMessage);
+                }
                 node.appendChild(child);
             });
             if (typeof this.image == "string" && this.image.length !== 0) {
