@@ -3017,11 +3017,11 @@ function Interface(specificationObject) {
         imageController.root.appendChild(imageController.img);
         imageController.setImage = function (src) {
             imageController.img.src = "";
-            if (typeof src !== "string" || src.length == undefined) {
+            if (typeof src !== "string" || src.length === undefined) {
                 return;
             }
             imageController.img.src = src;
-        }
+        };
         return imageController;
     })();
 
