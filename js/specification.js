@@ -442,6 +442,9 @@ function Specification() {
                         option[attributeName] = projectAttr;
                     }
                 }
+                if (option.type == "check" && ioNode.firstElementChild) {
+                    option.errorMessage = ioNode.firstElementChild.textContent;
+                }
                 this.options.push(option);
             }
             // Get the image node
