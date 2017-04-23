@@ -576,6 +576,18 @@ function interfaceSliderHolder(interfaceObject, page) {
             scaleObj.style.left = Math.floor((pixelPosition - ($(scaleObj).width() / 2))) + 'px';
         }
     };
+
+    this.playing = function (id) {
+        var node = audioEngineContext.audioObjects.find(function (a) {
+            return a.id == id;
+        });
+        if (node === undefined) {
+            this.imageHolder.setImage(interfaceObject.image || "");
+            return;
+        }
+        var imgurl = node.specification.image || interfaceObject.image || "";
+        this.imageHolder.setImage(imgurl);
+    }
 }
 
 function sliderObject(audioObject, interfaceObjects, index) {
@@ -619,6 +631,9 @@ function sliderObject(audioObject, interfaceObjects, index) {
             $('.track-slider').addClass('track-slider-disabled');
             $('.outside-reference').addClass('track-slider-disabled');
         }
+        interfaceContext.interfaceSliders.forEach(function (ts) {
+            ts.playing(this.parent.id);
+        }, this);
     };
     this.stopPlayback = function () {
         if (this.playing) {
