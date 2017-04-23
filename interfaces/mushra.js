@@ -137,6 +137,13 @@ function loadTest(audioHolderObject) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
+    if (interfaceObj.image !== undefined || audioHolderObject.audioElements.some(function (elem) {
+            return elem.image !== undefined;
+        })) {
+        document.getElementById("testContent").insertBefore(interfaceContext.imageHolder.root, document.getElementById("slider"));
+        interfaceContext.imageHolder.setImage(interfaceObj.image);
+    }
+
     // Delete outside reference
     var outsideReferenceHolder = document.getElementById("outside-reference-holder");
     outsideReferenceHolder.innerHTML = "";
@@ -338,6 +345,9 @@ function sliderObject(audioObject, label) {
                 });
             }
         }
+        if (audioObject.specification.image !== undefined) {
+            interfaceContext.imageHolder.setImage(audioObject.specification.image);
+        }
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
@@ -354,14 +364,23 @@ function sliderObject(audioObject, label) {
         if (box) {
             box.highlight(false);
         }
+        if (audioObject.specification.parent.interfaces[0].image !== undefined) {
+            interfaceContext.imageHolder.setImage(audioObject.specification.parent.interfaces[0].image);
+        } else {
+            interfaceContext.imageHolder.setImage("");
+        }
     };
     this.getValue = function () {
         return this.slider.value;
     };
 
     this.resize = function (event) {
-        this.holder.style.height = window.innerHeight - 200 + 'px';
-        this.slider.style.height = window.innerHeight - 250 + 'px';
+        var imgHeight = 0;
+        if (document.getElementById("imageController")) {
+            imgHeight = $(interfaceContext.imageHolder.root).height();
+        }
+        this.holder.style.height = window.innerHeight - 200 - imgHeight + 'px';
+        this.slider.style.height = window.innerHeight - 250 - imgHeight + 'px';
     };
     this.updateLoading = function (progress) {
         progress = String(progress);
@@ -389,7 +408,11 @@ function resizeWindow(event) {
     // Function called when the window has been resized.
     // MANDATORY FUNCTION
 
-    var outsideRef = document.getElementById('outside-reference');
+    var outsideRef = document.getElementById('outside-reference'),
+        imageHeight = 0;
+    if (document.getElementById("imageController")) {
+        imageHeight = $(interfaceContext.imageHolder.root).height();
+    }
     if (outsideRef !== null) {
         outsideRef.style.left = (window.innerWidth - 120) / 2 + 'px';
     }
@@ -398,7 +421,7 @@ function resizeWindow(event) {
     var numObj = document.getElementsByClassName('track-slider').length;
     var totalWidth = (numObj - 1) * 150 + 100;
     var diff = (window.innerWidth - totalWidth) / 2;
-    document.getElementById('slider').style.height = window.innerHeight - 180 + 'px';
+    document.getElementById('slider').style.height = window.innerHeight - 180 - imageHeight + 'px';
     if (diff <= 0) {
         diff = 0;
     }
@@ -409,7 +432,7 @@ function resizeWindow(event) {
         }
     }
     document.getElementById('scale-holder').style.marginLeft = (diff - 100) + 'px';
-    document.getElementById('scale-text-holder').style.height = window.innerHeight - 194 + 'px';
+    document.getElementById('scale-text-holder').style.height = window.innerHeight - imageHeight - 194 + 'px';
     // Cheers edge for making me delete a canvas every resize.
     var canvas = document.getElementById('scale-canvas');
     var new_canvas = document.createElement("canvas");
@@ -417,7 +440,7 @@ function resizeWindow(event) {
     canvas.parentElement.appendChild(new_canvas);
     canvas.parentElement.removeChild(canvas);
     new_canvas.width = totalWidth;
-    new_canvas.height = window.innerHeight - 194;
+    new_canvas.height = window.innerHeight - 194 - imageHeight;
     drawScale();
 }
 
@@ -476,24 +499,24 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllMoved();
+                    checkState = interfaceContext.checkAllMoved(checks[i].errorMessage);
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllCommented();
+                    checkState = interfaceContext.checkAllCommented(checks[i].errorMessage);
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
+                    checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");

@@ -73,9 +73,7 @@ function loadInterface() {
 
     // Construct the AB Boxes
     var boxes = document.createElement('div');
-    boxes.align = "center";
     boxes.id = "box-holders";
-    boxes.style.float = "left";
 
     var submit = document.createElement('button');
     submit.id = "submit";
@@ -126,8 +124,13 @@ function loadTest(audioHolderObject) {
         document.getElementById("test-title").textContent = audioHolderObject.title;
     }
 
-    if (interfaceObj.title !== null) {
+    if (interfaceObj.title !== undefined) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
+    }
+
+    if (interfaceObj.image !== undefined) {
+        feedbackHolder.insertBefore(interfaceContext.imageHolder.root, document.getElementById("box-holders"));
+        interfaceContext.imageHolder.setImage(interfaceObj.image);
     }
 
     var interfaceOptions = interfaceObj.options;
@@ -210,6 +213,13 @@ function comparator(audioHolderObject) {
         this.box.id = 'comparator-' + text;
         this.selector = document.createElement('div');
         this.selector.className = 'comparator-selector disabled';
+        if (audioElement.specification.image) {
+            this.selector.className += " comparator-image";
+            var image = document.createElement("img");
+            image.src = audioElement.specification.image;
+            image.className = "comparator-image";
+            this.selector.appendChild(image);
+        }
         var selectorText = document.createElement('span');
         selectorText.textContent = text;
         this.selector.appendChild(selectorText);
@@ -260,7 +270,7 @@ function comparator(audioHolderObject) {
             } else if (event.currentTarget === this.playback) {
                 this.playbackClicked();
             }
-        }
+        };
         this.playback.addEventListener("click", this);
         this.selector.addEventListener("click", this);
 
@@ -375,9 +385,6 @@ function resizeWindow(event) {
         boxW = numObj * 312;
         diff = window.innerWidth - boxW;
     }
-    document.getElementById('box-holders').style.marginLeft = diff / 2 + 'px';
-    document.getElementById('box-holders').style.marginRight = diff / 2 + 'px';
-    document.getElementById('box-holders').style.width = boxW + 'px';
 
     var outsideRef = document.getElementById('outside-reference');
     if (outsideRef !== null) {
@@ -395,35 +402,35 @@ function buttonSubmitClick() {
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    checkState = interfaceContext.checkFragmentsFullyPlayed();
+                    checkState = interfaceContext.checkFragmentsFullyPlayed(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllMoved();
+                    checkState = interfaceContext.checkAllMoved(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllCommented();
+                    checkState = interfaceContext.checkAllCommented(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    checkState = interfaceContext.checkScaleRange();
+                    checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
                     if (checkState === false) {
                         canContinue = false;
                     }

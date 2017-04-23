@@ -553,6 +553,7 @@ function interfacePopup() {
     this.currentIndex = null;
     this.node = null;
     this.store = null;
+    var lastNodeStart;
     $(window).keypress(function (e) {
         if (e.keyCode == 13 && popup.popup.style.visibility == 'visible') {
             console.log(e);
@@ -1048,6 +1049,7 @@ function interfacePopup() {
         var node = this.popupOptions[this.currentIndex],
             converter = new showdown.Converter(),
             p = new DOMParser();
+        lastNodeStart = new Date();
         this.popupResponse.innerHTML = "";
         this.popupTitle.innerHTML = "";
         this.popupTitle.appendChild(p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild);
@@ -1110,7 +1112,13 @@ function interfacePopup() {
             return;
         }
         var node = this.popupOptions[this.currentIndex],
-            pass = true;
+            pass = true,
+            timeDelta = (new Date() - lastNodeStart) / 1000.0;
+        if (timeDelta < node.specification.minWait) {
+            interfaceContext.lightbox.post("Error", "Not enough time has elapsed, please wait " + (node.specification.minWait - timeDelta).toFixed(0) + " seconds");
+            return;
+        }
+        node.elapsedTime = timeDelta;
         if (node.specification.type == 'question') {
             // Must extract the question data
             pass = processQuestion.call(this, node);
@@ -3001,6 +3009,22 @@ function Interface(specificationObject) {
         return volume;
     })();
 
+    this.imageHolder = (function () {
+        var imageController = {};
+        imageController.root = document.createElement("div");
+        imageController.root.id = "imageController";
+        imageController.img = document.createElement("img");
+        imageController.root.appendChild(imageController.img);
+        imageController.setImage = function (src) {
+            imageController.img.src = "";
+            if (typeof src !== "string" || src.length === undefined) {
+                return;
+            }
+            imageController.img.src = src;
+        };
+        return imageController;
+    })();
+
     this.calibrationModuleObject = null;
     this.calibrationModule = function () {
         // This creates an on-page calibration module
@@ -3092,7 +3116,7 @@ function Interface(specificationObject) {
 
     // Global Checkers
     // These functions will help enforce the checkers
-    this.checkHiddenAnchor = function () {
+    this.checkHiddenAnchor = function (message) {
         var anchors = audioEngineContext.audioObjects.filter(function (ao) {
             return ao.specification.type === "anchor";
         });
@@ -3101,14 +3125,18 @@ function Interface(specificationObject) {
         });
         if (state) {
             console.log('Anchor node not below marker value');
-            interfaceContext.lightbox.post("Message", 'Please keep listening');
+            if (message) {
+                interfaceContext.lightbox.post("Message", message);
+            } else {
+                interfaceContext.lightbox.post("Message", 'Please keep listening');
+            }
             this.storeErrorNode('Anchor node not below marker value');
             return false;
         }
         return true;
     };
 
-    this.checkHiddenReference = function () {
+    this.checkHiddenReference = function (message) {
         var references = audioEngineContext.audioObjects.filter(function (ao) {
             return ao.specification.type === "reference";
         });
@@ -3117,14 +3145,18 @@ function Interface(specificationObject) {
         });
         if (state) {
             console.log('Reference node not below marker value');
-            interfaceContext.lightbox.post("Message", 'Please keep listening');
+            if (message) {
+                interfaceContext.lightbox.post("Message", message);
+            } else {
+                interfaceContext.lightbox.post("Message", 'Please keep listening');
+            }
             this.storeErrorNode('Reference node not below marker value');
             return false;
         }
         return true;
     };
 
-    this.checkFragmentsFullyPlayed = function () {
+    this.checkFragmentsFullyPlayed = function (message) {
         // Checks the entire file has been played back
         // NOTE ! This will return true IF playback is Looped!!!
         if (audioEngineContext.loopPlayback) {
@@ -3164,14 +3196,17 @@ function Interface(specificationObject) {
                 }
             }
             str_start += ". Please keep listening";
-            console.log("[ALERT]: " + str_start);
-            this.storeErrorNode("[ALERT]: " + str_start);
+            console.log(str_start);
+            this.storeErrorNode(str_start);
+            if (message) {
+                str_start = message;
+            }
             interfaceContext.lightbox.post("Error", str_start);
             return false;
         }
         return true;
     };
-    this.checkAllMoved = function () {
+    this.checkAllMoved = function (message) {
         var str = "You have not moved ";
         var failed = [];
         audioEngineContext.audioObjects.forEach(function (ao) {
@@ -3191,12 +3226,15 @@ function Interface(specificationObject) {
             str += 'and ' + failed[i];
         }
         str += '.';
-        interfaceContext.lightbox.post("Error", str);
         console.log(str);
         this.storeErrorNode(str);
+        if (message) {
+            str = message;
+        }
+        interfaceContext.lightbox.post("Error", str);
         return false;
     };
-    this.checkAllPlayed = function () {
+    this.checkAllPlayed = function (message) {
         var str = "You have not played ";
         var failed = [];
         audioEngineContext.audioObjects.forEach(function (ao) {
@@ -3216,12 +3254,15 @@ function Interface(specificationObject) {
             str += 'and ' + failed[i];
         }
         str += '.';
-        interfaceContext.lightbox.post("Error", str);
         console.log(str);
         this.storeErrorNode(str);
+        if (message) {
+            str = message;
+        }
+        interfaceContext.lightbox.post("Error", str);
         return false;
     };
-    this.checkAllCommented = function () {
+    this.checkAllCommented = function (message) {
         var str = "You have not commented on all the fragments.";
         var cont = true,
             boxes = this.commentBoxes.boxes,
@@ -3229,15 +3270,18 @@ function Interface(specificationObject) {
             i;
         for (i = 0; i < numBoxes; i++) {
             if (boxes[i].trackCommentBox.value === "") {
-                interfaceContext.lightbox.post("Error", str);
                 console.log(str);
                 this.storeErrorNode(str);
+                if (message) {
+                    str = message;
+                }
+                interfaceContext.lightbox.post("Error", str);
                 return false;
             }
         }
         return true;
     };
-    this.checkScaleRange = function () {
+    this.checkScaleRange = function (message) {
         var page = testState.getCurrentTestPage();
         var interfaceObject = page.interfaces;
         var state = true;
@@ -3275,6 +3319,9 @@ function Interface(specificationObject) {
         if (state === false) {
             console.log(str);
             this.storeErrorNode(str);
+            if (message) {
+                str = message;
+            }
             interfaceContext.lightbox.post("Error", str);
         }
         return state;
@@ -3505,7 +3552,7 @@ function Storage() {
             var clone = this.parent.root.cloneNode(true);
             hold.appendChild(clone);
             var saveURL = specification.returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=";
-            if (this.parent.filenamePrefix.length == 0) {
+            if (this.parent.filenamePrefix.length === 0) {
                 saveURL += "save";
             } else {
                 saveURL += this.parent.filenamePrefix;
@@ -3598,6 +3645,7 @@ function Storage() {
                 }
                 surveyresult = surveyresult.nextElementSibling;
             }
+            surveyresult.setAttribute("duration", node.elapsedTime);
             switch (node.specification.type) {
                 case "number":
                 case "question":

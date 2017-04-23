@@ -223,6 +223,7 @@ function Specification() {
             this.options = [];
             this.min = undefined;
             this.max = undefined;
+            this.minWait = undefined;
             this.step = undefined;
             this.conditions = [];
 
@@ -414,6 +415,7 @@ function Specification() {
     this.interfaceNode = function (specification) {
         this.title = undefined;
         this.name = undefined;
+        this.image = undefined;
         this.options = [];
         this.scales = [];
         this.schema = schemaRoot.getAllElementsByName('interface')[1];
@@ -440,9 +442,16 @@ function Specification() {
                         option[attributeName] = projectAttr;
                     }
                 }
+                if (option.type == "check" && ioNode.firstElementChild) {
+                    option.errorMessage = ioNode.firstElementChild.textContent;
+                }
                 this.options.push(option);
             }
-
+            // Get the image node
+            var imageNode = xml.getElementsByTagName("image");
+            if (imageNode.length == 1) {
+                this.image = imageNode[0].getAttribute("src");
+            }
             // Now the scales nodes
             var scaleParent = xml.getElementsByTagName('scales');
             if (scaleParent.length == 1) {
@@ -470,8 +479,18 @@ function Specification() {
                 var child = doc.createElement("interfaceoption");
                 child.setAttribute("type", option.type);
                 child.setAttribute("name", option.name);
+                if (option.type == "check" && option.errorMessage !== undefined) {
+                    var errorMessage = doc.createElement("errormessage");
+                    errorMessage.textContent = option.errorMessage;
+                    child.appendChild(errorMessage);
+                }
                 node.appendChild(child);
             });
+            if (typeof this.image == "string" && this.image.length !== 0) {
+                var imgNode = doc.createElement("image");
+                imgNode.setAttribute("src", this.image);
+                node.appendChild(imgNode);
+            }
             if (this.scales.length !== 0) {
                 var scales = doc.createElement("scales");
                 this.scales.forEach(function (scale) {
@@ -789,6 +808,7 @@ function Specification() {
             this.startTime = undefined;
             this.stopTime = undefined;
             this.sampleRate = undefined;
+            this.image = undefined;
             this.alternatives = [];
             this.schema = schemaRoot.getAllElementsByName('audioelement')[0];
             this.parent = undefined;

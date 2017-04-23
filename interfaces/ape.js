@@ -106,7 +106,7 @@ function loadInterface() {
                 return {
                     min: Math.min(a.min, v),
                     max: Math.max(a.max, v)
-                }
+                };
             }, {
                 min: 100,
                 max: 0
@@ -253,7 +253,7 @@ function loadTest(audioHolderObject) {
     var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
     interfaceObj.forEach(function (interfaceObjectInstance) {
         // Create the div box to center align
-        interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObjectInstance));
+        interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObjectInstance, audioHolderObject));
     });
     interfaceObj.forEach(function (interface) {
         interface.options.forEach(function (option) {
@@ -447,7 +447,7 @@ function loadTest(audioHolderObject) {
     //testWaitIndicator();
 }
 
-function interfaceSliderHolder(interfaceObject) {
+function interfaceSliderHolder(interfaceObject, page) {
     this.sliders = [];
     this.metrics = [];
     this.id = document.getElementsByClassName("sliderCanvasDiv").length;
@@ -456,6 +456,21 @@ function interfaceSliderHolder(interfaceObject) {
     this.sliderDOM = document.createElement('div');
     this.sliderDOM.className = 'sliderCanvasDiv';
     this.sliderDOM.id = 'sliderCanvasHolder-' + this.id;
+    this.imageHolder = (function () {
+        var imageController = {};
+        imageController.root = document.createElement("div");
+        imageController.root.className = "imageController";
+        imageController.img = document.createElement("img");
+        imageController.root.appendChild(imageController.img);
+        imageController.setImage = function (src) {
+            imageController.img.src = "";
+            if (typeof src !== "string" || src.length === undefined) {
+                return;
+            }
+            imageController.img.src = src;
+        };
+        return imageController;
+    })();
 
     var pagetitle = document.createElement('div');
     pagetitle.className = "pageTitle";
@@ -470,6 +485,12 @@ function interfaceSliderHolder(interfaceObject) {
     pagetitle.appendChild(titleSpan);
     this.sliderDOM.appendChild(pagetitle);
 
+    if (interfaceObject.image !== undefined || page.audioElements.some(function (a) {
+            return a.image !== undefined;
+        })) {
+        this.sliderDOM.appendChild(this.imageHolder.root);
+        this.imageHolder.setImage(interfaceObject.image);
+    }
     // Create the slider box to hold the slider elements
     this.canvas = document.createElement('div');
     if (this.name !== undefined)
@@ -555,6 +576,18 @@ function interfaceSliderHolder(interfaceObject) {
             scaleObj.style.left = Math.floor((pixelPosition - ($(scaleObj).width() / 2))) + 'px';
         }
     };
+
+    this.playing = function (id) {
+        var node = audioEngineContext.audioObjects.find(function (a) {
+            return a.id == id;
+        });
+        if (node === undefined) {
+            this.imageHolder.setImage(interfaceObject.image || "");
+            return;
+        }
+        var imgurl = node.specification.image || interfaceObject.image || "";
+        this.imageHolder.setImage(imgurl);
+    }
 }
 
 function sliderObject(audioObject, interfaceObjects, index) {
@@ -598,6 +631,9 @@ function sliderObject(audioObject, interfaceObjects, index) {
             $('.track-slider').addClass('track-slider-disabled');
             $('.outside-reference').addClass('track-slider-disabled');
         }
+        interfaceContext.interfaceSliders.forEach(function (ts) {
+            ts.playing(this.parent.id);
+        }, this);
     };
     this.stopPlayback = function () {
         if (this.playing) {
@@ -714,28 +750,28 @@ function buttonSubmitClick() {
     }
 
     for (var i = 0; i < checks.length; i++) {
+        var checkState = true;
         if (checks[i].type == 'check') {
-            var checkState = true;
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    checkState = interfaceContext.checkFragmentsFullyPlayed();
+                    checkState = interfaceContext.checkFragmentsFullyPlayed(checks[i].errorMessage);
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllMoved();
+                    checkState = interfaceContext.checkAllMoved(checks[i].errorMessage);
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllCommented();
+                    checkState = interfaceContext.checkAllCommented(checks[i].errorMessage);
                     break;
                 case 'scalerange':
                     // Check the scale is used to its full width outlined by the node
-                    checkState = interfaceContext.checkScaleRange();
+                    checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].name + " is not supported on this interface");

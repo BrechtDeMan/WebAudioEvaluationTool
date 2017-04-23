@@ -137,6 +137,13 @@ function loadTest(page) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
+    if (interfaceObj.image !== undefined || audioHolderObject.audioElements.some(function (elem) {
+            return elem.image !== undefined;
+        })) {
+        document.getElementById("testContent").insertBefore(interfaceContext.imageHolder.root, document.getElementById("slider"));
+        interfaceContext.imageHolder.setImage(interfaceObj.image);
+    }
+
     // Delete outside reference
     document.getElementById("outside-reference-holder").innerHTML = "";
 
@@ -297,6 +304,9 @@ function sliderObject(audioObject, label) {
             $(outsideReference).removeClass('track-slider-playing');
         }
         interfaceContext.commentBoxes.highlightById(audioObject.id);
+        if (audioObject.specification.image !== undefined) {
+            interfaceContext.imageHolder.setImage(audioObject.specification.image);
+        }
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
@@ -307,6 +317,11 @@ function sliderObject(audioObject, label) {
         });
         if (box) {
             box.highlight(false);
+        }
+        if (audioObject.specification.parent.interfaces[0].image !== undefined) {
+            interfaceContext.imageHolder.setImage(audioObject.specification.parent.interfaces[0].image);
+        } else {
+            interfaceContext.imageHolder.setImage("");
         }
     };
     this.getValue = function () {
@@ -420,24 +435,24 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     break;
                 case 'fragmentFullPlayback':
                     // Check all fragments have been played to their full length
-                    checkState = interfaceContext.checkAllPlayed();
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
                     console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
                     break;
                 case 'fragmentMoved':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllMoved();
+                    checkState = interfaceContext.checkAllMoved(checks[i].errorMessage);
                     break;
                 case 'fragmentComments':
                     // Check all fragment sliders have been moved.
-                    checkState = interfaceContext.checkAllCommented();
+                    checkState = interfaceContext.checkAllCommented(checks[i].errorMessage);
                     break;
                 case 'scalerange':
                     // Check the scale has been used effectively
-                    checkState = interfaceContext.checkScaleRange(checks[i].min, checks[i].max);
+                    checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
 
                     break;
                 default:
