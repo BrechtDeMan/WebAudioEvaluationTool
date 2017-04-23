@@ -106,7 +106,7 @@ function loadInterface() {
                 return {
                     min: Math.min(a.min, v),
                     max: Math.max(a.max, v)
-                }
+                };
             }, {
                 min: 100,
                 max: 0
@@ -253,7 +253,7 @@ function loadTest(audioHolderObject) {
     var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
     interfaceObj.forEach(function (interfaceObjectInstance) {
         // Create the div box to center align
-        interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObjectInstance));
+        interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObjectInstance, audioHolderObject));
     });
     interfaceObj.forEach(function (interface) {
         interface.options.forEach(function (option) {
@@ -447,7 +447,7 @@ function loadTest(audioHolderObject) {
     //testWaitIndicator();
 }
 
-function interfaceSliderHolder(interfaceObject) {
+function interfaceSliderHolder(interfaceObject, page) {
     this.sliders = [];
     this.metrics = [];
     this.id = document.getElementsByClassName("sliderCanvasDiv").length;
@@ -464,11 +464,11 @@ function interfaceSliderHolder(interfaceObject) {
         imageController.root.appendChild(imageController.img);
         imageController.setImage = function (src) {
             imageController.img.src = "";
-            if (typeof src !== "string" || src.length == undefined) {
+            if (typeof src !== "string" || src.length === undefined) {
                 return;
             }
             imageController.img.src = src;
-        }
+        };
         return imageController;
     })();
 
@@ -485,7 +485,9 @@ function interfaceSliderHolder(interfaceObject) {
     pagetitle.appendChild(titleSpan);
     this.sliderDOM.appendChild(pagetitle);
 
-    if (interfaceObject.image !== undefined) {
+    if (interfaceObject.image !== undefined || page.audioElements.some(function (a) {
+            return a.image !== undefined;
+        })) {
         this.sliderDOM.appendChild(this.imageHolder.root);
         this.imageHolder.setImage(interfaceObject.image);
     }
@@ -733,8 +735,8 @@ function buttonSubmitClick() {
     }
 
     for (var i = 0; i < checks.length; i++) {
+        var checkState = true;
         if (checks[i].type == 'check') {
-            var checkState = true;
             switch (checks[i].name) {
                 case 'fragmentPlayed':
                     // Check if all fragments have been played
