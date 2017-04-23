@@ -137,7 +137,9 @@ function loadTest(page) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
-    if (interfaceObj.image !== undefined) {
+    if (interfaceObj.image !== undefined || audioHolderObject.audioElements.some(function (elem) {
+            return elem.image !== undefined;
+        })) {
         document.getElementById("testContent").insertBefore(interfaceContext.imageHolder.root, document.getElementById("slider"));
         interfaceContext.imageHolder.setImage(interfaceObj.image);
     }
@@ -302,6 +304,9 @@ function sliderObject(audioObject, label) {
             $(outsideReference).removeClass('track-slider-playing');
         }
         interfaceContext.commentBoxes.highlightById(audioObject.id);
+        if (audioObject.specification.image !== undefined) {
+            interfaceContext.imageHolder.setImage(audioObject.specification.image);
+        }
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
@@ -312,6 +317,11 @@ function sliderObject(audioObject, label) {
         });
         if (box) {
             box.highlight(false);
+        }
+        if (audioObject.specification.parent.interfaces[0].image !== undefined) {
+            interfaceContext.imageHolder.setImage(audioObject.specification.parent.interfaces[0].image);
+        } else {
+            interfaceContext.imageHolder.setImage("");
         }
     };
     this.getValue = function () {
