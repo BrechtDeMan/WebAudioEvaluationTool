@@ -3256,7 +3256,7 @@ function Interface(specificationObject) {
             };
         })();
         var range = audioEngineContext.audioObjects.reduce(function (a, b) {
-            var v = b.interfaceDOM.getValue();
+            var v = b.interfaceDOM.getValue() * 100.0;
             return {
                 min: Math.min(a.min, v),
                 max: Math.max(a.max, v)
@@ -3266,10 +3266,10 @@ function Interface(specificationObject) {
             max: 0
         });
         if (range.min > scales.min) {
-            str += "At least one fragment must be below the " + range.min + " mark.";
+            str += "At least one fragment must be below the " + scales.min + " mark.";
             state = false;
         } else if (range.max < scales.max) {
-            str += "At least one fragment must be above the " + range.max + " mark.";
+            str += "At least one fragment must be above the " + scales.max + " mark.";
             state = false;
         }
         if (state === false) {
@@ -3505,7 +3505,7 @@ function Storage() {
             var clone = this.parent.root.cloneNode(true);
             hold.appendChild(clone);
             var saveURL = specification.returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=";
-            if (this.parent.filenamePrefix.length == 0) {
+            if (this.parent.filenamePrefix.length === 0) {
                 saveURL += "save";
             } else {
                 saveURL += this.parent.filenamePrefix;
