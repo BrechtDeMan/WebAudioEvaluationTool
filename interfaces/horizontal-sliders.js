@@ -137,7 +137,7 @@ function loadTest(page) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
 
-    if (interfaceObj.image !== undefined || audioHolderObject.audioElements.some(function (elem) {
+    if (interfaceObj.image !== undefined || page.audioElements.some(function (elem) {
             return elem.image !== undefined;
         })) {
         document.getElementById("testContent").insertBefore(interfaceContext.imageHolder.root, document.getElementById("slider"));

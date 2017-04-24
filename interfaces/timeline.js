@@ -98,6 +98,13 @@ function loadTest(page) {
         document.getElementById("page-title").textContent = interfaceObj.title;
     }
 
+    if (interfaceObj.image !== undefined || page.audioElements.some(function (elem) {
+            return elem.image !== undefined;
+        })) {
+        document.getElementById("testContent").insertBefore(interfaceContext.imageHolder.root, document.getElementById("timeline-test-content"));
+        interfaceContext.imageHolder.setImage(interfaceObj.image);
+    }
+
     // Delete outside reference
     var outsideReferenceHolder = document.getElementById("outside-reference-holder");
     outsideReferenceHolder.innerHTML = "";
