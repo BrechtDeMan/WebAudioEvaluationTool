@@ -27,14 +27,14 @@ elif not os.access(os.path.dirname(folder_name), os.W_OK):
     print("No write privileges in folder '"+folder_name+"'.")
 
 # create folder 'ratings' if not yet created
-if not os.path.exists(folder_name + '/ratings'):
-    os.makedirs(folder_name + '/ratings')
+if not os.path.exists(folder_name + '/comments'):
+    os.makedirs(folder_name + '/comments')
     
 pagestore = {}
 
 for filename in os.listdir(folder_name):
     if (filename.endswith(".xml")):
-        tree = ET.parse(folder_name + '/' + file_name)
+        tree = ET.parse(folder_name + '/' + filename)
         root = tree.getroot()
         
         subject_id = root.get('key');
@@ -51,7 +51,7 @@ for filename in os.listdir(folder_name):
                 break
             try:
                 questionStore = pagestore[pagename]
-            except KeyValue:
+            except KeyError:
                 questionStore = {}
                 pagestore[pagename] = questionStore
             
@@ -60,8 +60,19 @@ for filename in os.listdir(folder_name):
                 response = cq.find("./response").text
                 try:
                     commentStore = questionStore[cqid]
-                except KeyValue:
+                except KeyError:
                     commentStore = [];
                     questionStore[cqid] = commentStore
                 commentStore.append({"subject": subject_id, "value": response})
-print pagestore
+
+for page in pagestore.keys():
+	print page
+	pagedir = folder_name + '/comments/'+page
+	if not os.path.exists(pagedir):
+	    os.makedirs(pagedir)
+	for comment in pagestore[page].keys():
+		with open(pagedir+"/"+comment+".csv", "w") as csvfile:
+			filewriter = csv.writer(csvfile, delimiter=',')
+			filewriter.writerow(("save_id", "value"))
+			for entry in pagestore[page][comment]:
+				filewriter.writerow((entry["subject"], entry["value"]))
