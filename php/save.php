@@ -28,10 +28,12 @@ header("Content-type: text/xml");
 $saveFilenamePrefix = '';
 if (isset($_GET['saveFilenamePrefix'])) {
     $saveFilenamePrefix = $_GET['saveFilenamePrefix'].'-';
+} else {
+    $saveFilenamePrefix = "save-"
 }
 $postText = file_get_contents('php://input');
 $file_key = $_GET['key'];
-$filename = '../saves/'.$saveFilenamePrefix.'save-'.$file_key.".xml";
+$filename = '../saves/'.$saveFilenamePrefix.$file_key.".xml";
 
 if (!file_exists($filename)) {
     die('<response state="error"><message>Could not find save</message></response>');
