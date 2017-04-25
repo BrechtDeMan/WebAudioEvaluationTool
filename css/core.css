@@ -8,6 +8,12 @@ div.title {
     margin-bottom: 10px;
     font-size: 2em;
 }
+div#footer {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    text-align: center;
+}
 div.indicator-box {
     position: absolute;
     left: 150px;
