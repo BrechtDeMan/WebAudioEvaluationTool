@@ -237,6 +237,7 @@ function sliderObject(audioObject, label) {
     // An example node, you can make this however you want for each audioElement.
     // However, every audioObject (audioEngineContext.audioObject) MUST have an interface object with the following
     // You attach them by calling audioObject.bindInterface( )
+    var playing = false;
     this.parent = audioObject;
 
     this.holder = document.createElement('div');
@@ -275,9 +276,9 @@ function sliderObject(audioObject, label) {
     this.play.onclick = function (event) {
         var id = Number(event.currentTarget.value);
         //audioEngineContext.metric.sliderPlayed(id);
-        if (event.currentTarget.getAttribute("playstate") == "ready") {
+        if (!playing) {
             audioEngineContext.play(id);
-        } else if (event.currentTarget.getAttribute("playstate") == "playing") {
+        } else if (playing) {
             audioEngineContext.stop();
         }
     };
@@ -296,7 +297,8 @@ function sliderObject(audioObject, label) {
     };
     this.startPlayback = function () {
         // Called when playback has begun
-        this.play.setAttribute("playstate", "playing");
+        playing = true;
+        this.play.textContent = "Stop";
         $(".track-slider").removeClass('track-slider-playing');
         $(this.holder).addClass('track-slider-playing');
         var outsideReference = document.getElementById('outside-reference');
@@ -310,7 +312,8 @@ function sliderObject(audioObject, label) {
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
-        this.play.setAttribute("playstate", "ready");
+        playing = false;
+        this.play.textContent = "Play";
         $(this.holder).removeClass('track-slider-playing');
         var box = interfaceContext.commentBoxes.boxes.find(function (a) {
             return a.id === audioObject.id;
