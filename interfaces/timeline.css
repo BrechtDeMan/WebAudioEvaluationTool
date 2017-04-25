@@ -3,7 +3,7 @@ div.timeline-element {
     justify-content: center;
 }
 div.timeline-element-content {
-    max-width: 800px;
+    width: 90%;
     min-width: 200px;
     border: 1px solid black;
     margin: 10px 0px;
@@ -13,7 +13,7 @@ div.timeline-element-canvas-holder {
     display: flex;
     width: inherit;
     height: 160px;
-    margin-left: 50px;
+    margin: auto;
 }
 canvas.canvas-layer1 {
     position: absolute;
@@ -36,11 +36,7 @@ canvas.timeline-element-canvas {
 canvas.canvas-disabled {
     background-color: gray;
 }
-div.timeline-element-comment-holder {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
+div.timeline-element-comment-holder {}
 div.comment-entry {
     border: 1px solid #444444;
     max-width: 600px;
@@ -49,14 +45,22 @@ div.comment-entry {
     padding: 5px;
     height: 80px;
     border-radius: 10px;
-    display: flex;
-    flex-direction: column;
+    display: inline-block;
+    text-align: center;
 }
 div.comment-entry-header {
-    display: flex;
-    justify-content: space-between;
+    display: table;
+    text-align: unset;
+    width: 100%;
+}
+div.comment-entry-header span {
+    float: left;
+}
+div.comment-entry-header button {
+    float: right;
 }
 textarea.comment-entry-text {
     resize: none;
     margin: auto;
+    width: 90%;
 }

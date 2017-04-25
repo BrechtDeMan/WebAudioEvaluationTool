@@ -256,7 +256,8 @@ function interfaceObject(audioObject, labelstr) {
         layer2: document.createElement("canvas"),
         layer3: document.createElement("canvas"),
         layer4: document.createElement("canvas"),
-        resize: function (w) {
+        resize: function () {
+            var w = $(this.layer1.parentElement).width();
             this.layer1.width = w;
             this.layer2.width = w;
             this.layer3.width = w;
@@ -409,12 +410,7 @@ function interfaceObject(audioObject, labelstr) {
     buttonHolder.appendChild(this.playButton.DOM);
 
     this.resize = function () {
-        var w = window.innerWidth;
-        w = Math.min(w, 800);
-        w = Math.max(w, 200);
-        root.style.width = w + "px";
-        var c_w = w - 100;
-        this.canvas.resize(c_w);
+        this.canvas.resize();
     };
 
     this.enable = function () {
