@@ -46,6 +46,17 @@ div.comparator-selector {
     display: block;
     margin: auto;
 }
+div.comparator-image {
+    background-color: rgba(255, 255, 255, 0);
+}
+img.comparator-image {
+    width: inherit;
+    height: inherit;
+    z-index: -1;
+    position: absolute;
+    display: inline;
+    right: 0px;
+}
 div.disabled {
     background-color: #AAA;
 }

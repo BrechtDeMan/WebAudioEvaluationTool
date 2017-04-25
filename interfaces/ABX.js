@@ -208,6 +208,15 @@ function comparator(page) {
         this.playback.className = 'comparator-button';
         this.playback.disabled = true;
         this.playback.textContent = "Listen";
+        if (element.specification.image) {
+            this.selector.className += " comparator-image";
+            var image = document.createElement("img");
+            image.src = element.specification.image;
+            image.className = "comparator-image";
+            this.selector.appendChild(image);
+        } else if (label === "X") {
+            this.selector.classList.add('inactive');
+        }
         this.box.appendChild(this.selector);
         this.box.appendChild(this.playback);
         this.selectorClicked = function (event) {
@@ -391,7 +400,6 @@ function comparator(page) {
     var label;
     var audioObject = audioEngineContext.newTrack(element);
     node = buildElement.call(this, 3, audioObject);
-    node.box.children[0].classList.add('inactive');
     audioObject.bindInterface(node);
     this.X = node;
     this.boxHolders.appendChild(node.box);

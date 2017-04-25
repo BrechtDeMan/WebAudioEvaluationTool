@@ -58,8 +58,8 @@
             <interface>
                 <title>Depth</title>
             </interface>
-            <audioelement url="0.wav" id="track-0" />
-            <audioelement url="1.wav" id="track-1" />
+            <audioelement url="0.wav" id="track-0" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+            <audioelement url="1.wav" id="track-1" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
             <survey location="before">
                 <surveyentry type="statement" id="test-0-intro">
                     <statement>A two way comparison using randomised element order, automatic loudness and synchronised looping.</statement>
