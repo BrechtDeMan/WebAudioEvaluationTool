@@ -58,14 +58,13 @@ fclose($fileHandle);
 $doc_struct = new DOMDocument;
 $doc_struct->preserveWhiteSpace = false;
 $doc_struct->formatOutput = true;
-$doc_struct->loadXML("<waetresult/>");
+$doc_struct->loadXML("<waetresult key=".$key."/>");
 // Add the root
 if (file_exists($testURL)) {
     $test_proto_doc = new DOMDocument;
     $test_proto_doc->loadXML(file_get_contents($testURL, FILE_TEXT));
     $test_proto = $test_proto_doc->documentElement;
     $test_proto = $doc_struct->importNode($test_proto, true);
-    $test_proto['key'] = $key;
     $doc_struct->documentElement->appendChild($test_proto);
 }
 //  Add start time
