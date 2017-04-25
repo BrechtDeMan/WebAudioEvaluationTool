@@ -61,7 +61,7 @@ div.disabled {
     background-color: #AAA;
 }
 div.selected {
-    background-color: #008000;
+    background-color: rgba(0, 200, 0, 0.4);
 }
 div.comparator-selector.inactive {
     background-color: yellow !important;

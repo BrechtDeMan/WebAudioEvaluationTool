@@ -65,7 +65,7 @@ div.comparator-selector {
     margin: auto;
 }
 div.comparator-image {
-    background-color: rgba(255,255,255,0);
+    background-color: rgba(255, 255, 255, 0);
 }
 img.comparator-image {
     width: inherit;
@@ -79,7 +79,7 @@ div.disabled {
     background-color: #AAA;
 }
 div.selected {
-    background-color: #008000;
+    background-color: rgba(0, 200, 0, 0.4);
 }
 div.comparator-selector span {
     font-size: 4em;
