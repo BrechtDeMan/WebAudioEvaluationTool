@@ -65,6 +65,7 @@ if (file_exists($testURL)) {
     $test_proto_doc->loadXML(file_get_contents($testURL, FILE_TEXT));
     $test_proto = $test_proto_doc->documentElement;
     $test_proto = $doc_struct->importNode($test_proto, true);
+    $test_proto['key'] = $key;
     $doc_struct->documentElement->appendChild($test_proto);
 }
 //  Add start time
