@@ -29,7 +29,7 @@ $saveFilenamePrefix = '';
 if (isset($_GET['saveFilenamePrefix'])) {
     $saveFilenamePrefix = $_GET['saveFilenamePrefix'].'-';
 } else {
-    $saveFilenamePrefix = "save-"
+    $saveFilenamePrefix = "save-";
 }
 $postText = file_get_contents('php://input');
 $file_key = $_GET['key'];
