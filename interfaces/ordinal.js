@@ -412,8 +412,69 @@ function resizeWindow(event) {
     $(".ordinal-element").width(w);
 }
 
-function buttonSubmitClick() {
+function buttonSubmitClick() // TODO: Only when all songs have been played!
+{
+    var checks = testState.currentStateMap.interfaces[0].options,
+        canContinue = true;
 
+    // Check that the anchor and reference objects are correctly placed
+    if (interfaceContext.checkHiddenAnchor() === false) {
+        return;
+    }
+    if (interfaceContext.checkHiddenReference() === false) {
+        return;
+    }
+
+    for (var i = 0; i < checks.length; i++) {
+        var checkState = true;
+        if (checks[i].type == 'check') {
+            switch (checks[i].name) {
+                case 'fragmentPlayed':
+                    // Check if all fragments have been played
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
+                    break;
+                case 'fragmentFullPlayback':
+                    // Check all fragments have been played to their full length
+                    checkState = interfaceContext.checkAllPlayed(checks[i].errorMessage);
+                    console.log('NOTE: fragmentFullPlayback not currently implemented, performing check fragmentPlayed instead');
+                    break;
+                case 'fragmentMoved':
+                    // Check all fragment sliders have been moved.
+                    checkState = interfaceContext.checkAllMoved(checks[i].errorMessage);
+                    break;
+                case 'fragmentComments':
+                    // Check all fragment sliders have been moved.
+                    checkState = interfaceContext.checkAllCommented(checks[i].errorMessage);
+                    break;
+                case 'scalerange':
+                    // Check the scale has been used effectively
+                    checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
+
+                    break;
+                default:
+                    console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
+                    break;
+            }
+        }
+        if (checkState === false) {
+            canContinue = false;
+            break;
+        }
+    }
+
+    if (canContinue) {
+        if (audioEngineContext.status == 1) {
+            var playback = document.getElementById('playback-button');
+            playback.click();
+            // This function is called when the submit button is clicked. Will check for any further tests to perform, or any post-test options
+        } else {
+            if (audioEngineContext.timer.testStarted === false) {
+                interfaceContext.lightbox.post("Warning", 'You have not started the test! Please press start to begin the test!');
+                return;
+            }
+        }
+        testState.advanceState();
+    }
 }
 
 function pageXMLSave(store, pageSpecification) {
