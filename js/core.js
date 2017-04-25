@@ -3327,6 +3327,25 @@ function Interface(specificationObject) {
         return state;
     };
 
+    this.sortFragmentsByScore = function () {
+        var elements = audioEngineContext.audioObjects.filter(function (elem) {
+            return elem.specification.type !== "outside-reference";
+        });
+        var indexes = [];
+        var i = 0;
+        while (indexes.push(i++) < elements.length);
+        return indexes.sort(function (x, y) {
+            var a = elements[x].interfaceDOM.getValue();
+            var b = elements[y].interfaceDOM.getValue();
+            if (a > b) {
+                return 1;
+            } else if (a < b) {
+                return -1;
+            }
+            return 0;
+        }, elements[0].interfaceDOM.getValue());
+    };
+
     this.storeErrorNode = function (errorMessage) {
         var time = audioEngineContext.timer.getTestTime();
         var node = storage.document.createElement('error');
