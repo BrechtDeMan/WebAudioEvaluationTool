@@ -10,7 +10,6 @@ div.timeline-element-content {
     padding: 20px;
 }
 div.timeline-element-canvas-holder {
-    display: flex;
     width: inherit;
     height: 160px;
     margin: auto;
@@ -37,6 +36,12 @@ canvas.canvas-disabled {
     background-color: gray;
 }
 div.timeline-element-comment-holder {}
+img.timeline-element-image {
+    height: 150px;
+    max-width: 20%;
+    display: inline-block;
+    float: right;
+}
 div.comment-entry {
     border: 1px solid #444444;
     max-width: 600px;

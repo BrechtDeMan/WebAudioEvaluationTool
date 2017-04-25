@@ -98,9 +98,7 @@ function loadTest(page) {
         document.getElementById("page-title").textContent = interfaceObj.title;
     }
 
-    if (interfaceObj.image !== undefined || page.audioElements.some(function (elem) {
-            return elem.image !== undefined;
-        })) {
+    if (interfaceObj.image !== undefined) {
         document.getElementById("timeline-test-content").parentElement.insertBefore(interfaceContext.imageHolder.root, document.getElementById("timeline-test-content"));
         interfaceContext.imageHolder.setImage(interfaceObj.image);
     }
@@ -375,17 +373,29 @@ function interfaceObject(audioObject, labelstr) {
     this.canvas.layer2.className = "timeline-element-canvas canvas-layer2";
     this.canvas.layer3.className = "timeline-element-canvas canvas-layer3";
     this.canvas.layer4.className = "timeline-element-canvas canvas-layer3";
-    this.canvas.layer1.height = "150";
-    this.canvas.layer2.height = "150";
-    this.canvas.layer3.height = "150";
-    this.canvas.layer4.height = "150";
-    canvasHolder.appendChild(this.canvas.layer1);
-    canvasHolder.appendChild(this.canvas.layer2);
-    canvasHolder.appendChild(this.canvas.layer3);
-    canvasHolder.appendChild(this.canvas.layer4);
+    this.canvas.layer1.height = "160";
+    this.canvas.layer2.height = "160";
+    this.canvas.layer3.height = "160";
+    this.canvas.layer4.height = "160";
+    var canvasDiv = document.createElement("div");
+    canvasDiv.appendChild(this.canvas.layer1);
+    canvasDiv.appendChild(this.canvas.layer2);
+    canvasDiv.appendChild(this.canvas.layer3);
+    canvasDiv.appendChild(this.canvas.layer4);
+    canvasHolder.appendChild(canvasDiv);
     this.canvas.layer1.addEventListener("mousemove", this.canvas);
     this.canvas.layer1.addEventListener("mouseleave", this.canvas);
     this.canvas.layer1.addEventListener("click", this.canvas);
+
+    if (audioObject.specification.image) {
+        canvasDiv.style.width = "80%";
+        var image = document.createElement("img");
+        image.src = audioObject.specification.image;
+        image.className = "timeline-element-image";
+        canvasHolder.appendChild(image);
+    } else {
+        canvasDiv.style.width = "100%";
+    }
 
     var canvasIntervalID = null;
 
