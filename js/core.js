@@ -1232,7 +1232,7 @@ function stateMachine() {
         // Now get the order of pages
         var fixed = [];
         pagePool.forEach(function (page) {
-            if (page.position !== null) {
+            if (page.position !== undefined) {
                 fixed.push(page);
                 var i = pagePool.indexOf(page);
                 pagePool.splice(i, 1);
