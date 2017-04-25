@@ -383,7 +383,7 @@ function interfaceObject(audioObject, label) {
         // If there are multiple value nodes (such as multiple scale / 2D scales), return an array of nodes with each value node having an 'interfaceName' attribute
         // Use storage.document.createElement('value'); to generate the XML node.
         var node = storage.document.createElement('value');
-        node.textContent = this.slider.value;
+        node.textContent = this.getValue();
         return node;
 
     };
