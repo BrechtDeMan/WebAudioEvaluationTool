@@ -1,0 +1,36 @@
+[draggable] {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    /* Required to make elements draggable in old WebKit */
+    -khtml-user-drag: element;
+    -webkit-user-drag: element;
+}
+.ordinal-element {
+    width: 250px;
+    height: 250px;
+    background: #bbffbb;
+    border: 2px #050 solid;
+    border-radius: 10px;
+    float: left;
+    margin: 10px 5px;
+    text-align: center;
+    cursor: move;
+}
+.disabled {
+    background-color: grey;
+}
+.playing {
+    background-color: #ffbbbb;
+    border: 2px #500 solid;
+}
+.dragging {
+    opacity: 0.4;
+}
+.over {
+    border-style: dashed;
+}
+.ordinal-element-label {
+    font-size: 2em;
+}
