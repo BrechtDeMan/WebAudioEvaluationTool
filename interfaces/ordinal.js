@@ -77,6 +77,7 @@ function loadInterface() {
     // Create a slider box
     var slider = document.createElement("div");
     slider.id = "slider";
+    slider.style.height = "300px";
 
     // Global parent for the comment boxes on the page
     var feedbackHolder = document.createElement('div');
@@ -161,6 +162,40 @@ function loadTest(page) {
             audioObject.bindInterface(sliderObj);
             interfaceContext.commentBoxes.createCommentBox(audioObject);
             index += 1;
+        }
+    });
+    interfaceObj.options.forEach(function (option) {
+        if (option.type == "show") {
+            switch (option.name) {
+                case "playhead":
+                    var playbackHolder = document.getElementById('playback-holder');
+                    if (playbackHolder === null) {
+                        playbackHolder = document.createElement('div');
+                        playbackHolder.style.width = "100%";
+                        playbackHolder.align = 'center';
+                        playbackHolder.appendChild(interfaceContext.playhead.object);
+                        feedbackHolder.appendChild(playbackHolder);
+                    }
+                    break;
+                case "page-count":
+                    var pagecountHolder = document.getElementById('page-count');
+                    if (pagecountHolder === null) {
+                        pagecountHolder = document.createElement('div');
+                        pagecountHolder.id = 'page-count';
+                    }
+                    pagecountHolder.innerHTML = '<span>Page ' + (testState.stateIndex + 1) + ' of ' + testState.stateMap.length + '</span>';
+                    var inject = document.getElementById('interface-buttons');
+                    inject.appendChild(pagecountHolder);
+                    break;
+                case "volume":
+                    if (document.getElementById('master-volume-holder') === null) {
+                        feedbackHolder.appendChild(interfaceContext.volume.object);
+                    }
+                    break;
+                case "comments":
+                    interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder, true);
+                    break;
+            }
         }
     });
     resizeWindow();
@@ -294,7 +329,7 @@ function interfaceObject(audioObject, label) {
             elem = elem.nextElementSibling;
         }
         return position;
-    }
+    };
 
     this.processMovement = function () {
         var time = audioEngineContext.timer.getTestTime();
@@ -302,7 +337,7 @@ function interfaceObject(audioObject, label) {
         var rank = pos / (audioEngineContext.audioObjects.length - 1);
         audioObject.metric.moved(time, rank);
         console.log('slider ' + audioObject.id + ' moved to ' + rank + ' (' + time + ')');
-    }
+    };
 
     this.enable = function () {
         // This is used to tell the interface object that playback of this node is ready
@@ -316,10 +351,17 @@ function interfaceObject(audioObject, label) {
     this.startPlayback = function () {
         // Called when playback has begun
         root.classList.add("playing");
+        if (audioObject.commentDOM) {
+            audioObject.commentDOM.trackComment.classList.add("comment-box-playing");
+        }
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
         root.classList.remove("playing");
+        playing = false;
+        if (audioObject.commentDOM) {
+            audioObject.commentDOM.trackComment.classList.remove("comment-box-playing");
+        }
     };
     this.getValue = function () {
         // Return the current value of the object. If there is no value, return 0
@@ -366,6 +408,7 @@ function resizeWindow(event) {
     var N = audioEngineContext.audioObjects.length;
     w /= N;
     w -= 14;
+    w = Math.floor(w);
     $(".ordinal-element").width(w);
 }
 
