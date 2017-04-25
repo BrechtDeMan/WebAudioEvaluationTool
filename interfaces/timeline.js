@@ -101,7 +101,7 @@ function loadTest(page) {
     if (interfaceObj.image !== undefined || page.audioElements.some(function (elem) {
             return elem.image !== undefined;
         })) {
-        document.getElementById("testContent").insertBefore(interfaceContext.imageHolder.root, document.getElementById("timeline-test-content"));
+        document.getElementById("timeline-test-content").parentElement.insertBefore(interfaceContext.imageHolder.root, document.getElementById("timeline-test-content"));
         interfaceContext.imageHolder.setImage(interfaceObj.image);
     }
 
