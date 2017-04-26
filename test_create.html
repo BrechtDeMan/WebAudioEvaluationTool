@@ -3,29 +3,114 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <!-- This defines the test creator tool for the Web Audio Evaluation Toolbox -->
-    <link rel='stylesheet' type="text/css" href="test_create/style.css" />
-    <link rel='stylesheet' type="text/css" href="test_create/custom.css" />
-    <script type="text/javascript">
-        window.onbeforeunload = function(e) {
-            var message = 'If you leave the page now, any unsaved changes will be lost',
-                e = e || window.event;
-            if (e) {
-                e.returnValue = message;
-            }
-            return message;
-        };
-        // Copy of Specifiation node from Core.js
-
-    </script>
+    <link rel="stylesheet" type="text/css" href="test_create/style.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="js/jquery-2.1.4.js"></script>
-    <script type="text/javascript" src='js/specification.js'></script>
+    <script src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/specification.js"></script>
     <script type="text/javascript" src="test_create/test_core.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <title>WAET 1.2.1 Test Creator</title>
 </head>
 
 <body>
-    <div id="popupHolder"></div>
-    <div id="blanket"></div>
-    <div id="content"></div>
+    <div ng-app="creator" ng-controller="view">
+        <div id="pageRoot">
+            <h1>Web Audio Evaluation Tool - Test Creator</h1>
+        </div>
+        <div id="setupNode" class="node" ng-controller="setup">
+            <h2>Setup</h2>
+            <div class="attributes">
+                <div class="attribute">
+                    <span>Interface: </span>
+                    <input type="text" ng-model="specification.interface" />
+                </div>
+                <div class="attribute">
+                    <span>Save URL: </span>
+                    <input type="text" ng-model="specification.projectReturn" />
+                </div>
+                <div class="attribute">
+                    <span>Exit URL: </span>
+                    <input type="text" ng-model="specification.returnURL" />
+                </div>
+                <div class="attribute">
+                    <span>Randomise Page Order: </span>
+                    <input type="checkbox" ng-model="specification.randomiseOrder" />
+                </div>
+                <div class="attribute">
+                    <span>Page Pool Size: </span>
+                    <input type="number" ng-model="specification.poolSize" min="0" />
+                </div>
+                <div class="attribute">
+                    <span>Loudness Normalisation (LUFS): </span>
+                    <input type="number" ng-model="specification.loudness" max="0" />
+                </div>
+                <div class="attribute">
+                    <span>Fixed Sampling Rate: </span>
+                    <input type="number" ng-model="specification.sampleRate" min="0" />
+                </div>
+                <div class="attribute">
+                    <span>Pre-Test audio calibration: </span>
+                    <input type="checkbox" ng-model="specification.calibration" />
+                </div>
+                <div class="attribute">
+                    <span>Global Cross-fade time: </span>
+                    <input type="number" ng-model="specification.crossFade" min="0" step="0.1" />
+                </div>
+                <div class="attribute">
+                    <span>Global Fragment Pre-Silence: </span>
+                    <input type="number" ng-model="specification.preSilence" min="0" step="0.1" />
+                </div>
+                <div class="attribute">
+                    <span>Global Fragment Post-Silence: </span>
+                    <input type="number" ng-model="specification.preSilence" min="0" step="0.1" />
+                </div>
+                <div class="attribute">
+                    <span>Play audio one-at-a-time: </span>
+                    <input type="checkbox" ng-model="specification.playOne" />
+                </div>
+            </div>
+        </div>
+        <div id="popupHolder" ng-show="popupVisible">
+            <div ng-controller="introduction" class="popup" ng-show="popupVisible">
+                <div class="popupTitle" ng-switch="state">
+                    <span ng-switch-when="0">Test Creator</span>
+                    <span ng-switch-when="1">Create New Test</span>
+                </div>
+                <div class="popupContent container-fluid" ng-switch="state">
+                    <div ng-switch-when="0">
+                        <div>
+                            <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.1 version.</span>
+                        </div>
+                        <div class="drag-drop" id="introdragdrop"><span>Upload XML here</span></div>
+                    </div>
+                    <div ng-switch-when="1">
+                        <div>
+                            <span>Please select the interface you would like to use below. Selecting an interface will give a brief description of the interface type.</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
+                                <div class="new-test" ng-repeat="i in interfaces" ng-mouseover="mouseover(i.name)" ng-click="initialise(i.name)">
+                                    <label style="cursor:pointer">
+                                        <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <span>{{description}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="popupButtons">
+                    <button id="popupBack" type="button" class="btn btn-default" ng-show="state>0" ng-click="back()">Back</button>
+                    <button id="popupNext" type="button" class="btn btn-default" ng-click="next()">Next</button>
+                </div>
+            </div>
+        </div>
+        <div id="screenblank" ng-show="popupVisible"></div>
+    </div>
 </body>
 
 </html>

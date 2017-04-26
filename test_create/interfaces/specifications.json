@@ -1,0 +1,101 @@
+{
+    "interfaces": [
+        {
+            "name": "Audio Perceptual Evaluation (APE)",
+            "interface": "APE",
+            "description": {
+                "en": "Audio Perceptual Evaluation. A multi-stimulus test where each audio fragment is shown on one continuous slider. Fragments are randomnly positioned along the slider. The user clicks a fragment to play and drags to move."
+            }
+        }, {
+            "name": "MUSHRA",
+            "interface": "MUSHRA",
+            "description": {
+                "en": "Multi-stimulus with hidden reference and anchor. Each fragment is shown on its own vertical slider. One fragment must be labelled as a reference and another labelled as an anchor. One external reference must also be shown."
+            }
+        }, {
+            "name": "Vertical Sliders",
+            "interface": "MUSHRA",
+            "description": {
+                "en": "Each element is given its own vertical slider with user defined scale markers."
+            }
+        }, {
+            "name": "Horizontal Sliders",
+            "interface": "horizontal",
+            "description": {
+                "en": "Each element is given its own horizontal slider with user defined scale markers."
+            }
+        }, {
+            "name": "Discrete",
+            "interface": "discrete",
+            "description": {
+                "en": "Each element is given a horizontal scale broken into a number of discrete choices. The number of choices is defined by the scale markers."
+            }
+        }, {
+            "name": "Rank",
+            "interface": "ordinal",
+            "description": {
+                "en": "Each stimulus is placed on a discrete scale equalling the number of fragments. The fragments are then ranked based on the question posed. Only one element can occupy a rank position"
+            }
+        }, {
+            "name": "Likert",
+            "interface": "discrete",
+            "description": {
+                "en": "Each stimulus is placed on a discrete scale. The scale is fixed to the Likert scale options of 'Strongly Disagree', 'Disagree', 'Neutral', 'Agree' and 'Strongly Agree'"
+            }
+        }, {
+            "name": "ABC/HR",
+            "interface": "MUSHRA",
+            "description": {
+                "en": "Each stimulus is placed on a vertical slider. The scale is fixed with the labels 'Imperceptible' to 'Very Annoying'"
+            }
+        }, {
+            "name": "Bipolar",
+            "interface": "horizontal",
+            "description": {
+                "en": "Each stimulus is placed on a horizontal slider and initialised to the value '0'. The scale operates from -50 to +5-. In the results this is normalised, like all other interfaces, from 0 (-50) to 1 (+50)"
+            }
+        }, {
+            "name": "Absolute Category Rating",
+            "interface": "discrete",
+            "description": {
+                "en": "Each element is on a discrete scale of 'Bad', 'Poor', 'Fair', 'Good' and 'Excellent'. Each element must be given a rating."
+            }
+        }, {
+            "name": "Discrete Category Rating",
+            "interface": "discrete",
+            "description": {
+                "en": ""
+            }
+        }, {
+            "name": "HCRS",
+            "interface": "MUSHRA",
+            "description": {
+                "en": ""
+            }
+        }, {
+            "name": "ITUR5PCIS",
+            "interface": "MUSHRA",
+            "description": {
+                "en": ""
+            }
+        }, {
+            "name": "AB",
+            "interface": "AB",
+            "description": {
+                "en": "Each page contains two audio fragments. The user must select one of the fragments to proceed. There can be an outside reference."
+            }
+        }, {
+            "name": "ABX",
+            "interface": "ABX",
+            "description": {
+                "en": "Each page has two audio fragments presented as A and B. The test duplicates one of the fragments and presents it as X. The user must choose which, out of A or B, is closest to X."
+            }
+        }, {
+            "name": "Timeline",
+            "interface": "timeline",
+            "description": {
+                "en": "Each fragment is displayed with a clickable waveform of itself. The user must click on the waveform at the location that a specific event occured. Users can then enter in information about this event. This test is unit-/value-less."
+            }
+        }
+    ]
+}
