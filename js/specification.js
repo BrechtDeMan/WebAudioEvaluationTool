@@ -31,7 +31,7 @@ function Specification() {
         // attribute is the string returned from getAttribute on the XML
         // schema is the <xs:attribute> node
         if (schema.getAttribute('name') === null && schema.getAttribute('ref') !== undefined) {
-            schema = schemaRoot.getAllElementsByName(schema.getAttribute('ref'))[0];
+            schema = schemaRoot.querySelector("[name=" + schema.getAttribute('ref') + "]");
         }
         var defaultOpt = schema.getAttribute('default');
         if (attribute === null) {
@@ -41,7 +41,7 @@ function Specification() {
         if (typeof dataType == "string") {
             dataType = dataType.substr(3);
         } else {
-            var rest = schema.getAllElementsByTagName("xs:restriction").concat(schema.getAllElementsByTagName("xs:enumeration"));
+            var rest = schema.querySelectorAll("restriction,enumeration");
             if (rest.length > 0) {
                 dataType = rest[0].getAttribute("base");
                 if (typeof dataType == "string") {
@@ -108,9 +108,9 @@ function Specification() {
         // projectXML - DOM Parsed document
         this.projectXML = projectXML.childNodes[0];
         var setupNode = projectXML.getElementsByTagName('setup')[0];
-        var schemaSetup = schemaRoot.getAllElementsByName('setup')[0];
+        var schemaSetup = schemaRoot.querySelector('[name=setup]');
         // First decode the attributes
-        var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
+        var attributes = schemaSetup.querySelectorAll('attribute');
         var i;
         for (i = 0; i < attributes.length; i++) {
             var attributeName = attributes[i].getAttribute('name') || attributes[i].getAttribute('ref');
@@ -156,12 +156,12 @@ function Specification() {
         this.interfaces = new this.interfaceNode(this);
         if (interfaceNode.length !== 0) {
             interfaceNode = interfaceNode[0];
-            this.interfaces.decode(this, interfaceNode, this.schema.getAllElementsByName('interface')[1]);
+            this.interfaces.decode(this, interfaceNode, this.schema.querySelectorAll('[name=interface]')[1]);
         }
 
         // Page tags
         var pageTags = projectXML.getElementsByTagName('page');
-        var pageSchema = this.schema.getAllElementsByName('page')[0];
+        var pageSchema = this.schema.querySelector('[name=page]');
         for (i = 0; i < pageTags.length; i++) {
             var node = new this.page(this);
             node.decode(this, pageTags[i], pageSchema);
@@ -176,9 +176,9 @@ function Specification() {
         root.setAttribute("xsi:noNamespaceSchemaLocation", "test-schema.xsd");
         // Build setup node
         var setup = RootDocument.createElement("setup");
-        var schemaSetup = schemaRoot.getAllElementsByName('setup')[0];
+        var schemaSetup = schemaRoot.querySelector('[name=setup]');
         // First decode the attributes
-        var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
+        var attributes = schemaSetup.querySelectorAll('attribute');
         for (var i = 0; i < attributes.length; i++) {
             var name = attributes[i].getAttribute("name");
             if (name === undefined) {
@@ -209,7 +209,7 @@ function Specification() {
         this.location = undefined;
         this.options = [];
         this.parent = undefined;
-        this.schema = schemaRoot.getAllElementsByName('survey')[0];
+        this.schema = schemaRoot.querySelector('[name=survey]');
         this.specification = specification;
 
         this.OptionNode = function (specification) {
@@ -228,8 +228,8 @@ function Specification() {
             this.conditions = [];
 
             this.decode = function (parent, child) {
-                this.schema = schemaRoot.getAllElementsByName(child.nodeName)[0];
-                var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
+                this.schema = schemaRoot.querySelector("[name=" + child.nodeName + "]");
+                var attributeMap = this.schema.querySelectorAll('attribute');
                 var i;
                 for (i in attributeMap) {
                     if (isNaN(Number(i)) === true) {
@@ -418,7 +418,7 @@ function Specification() {
         this.image = undefined;
         this.options = [];
         this.scales = [];
-        this.schema = schemaRoot.getAllElementsByName('interface')[1];
+        this.schema = schemaRoot.querySelectorAll('[name=interface]')[1];
 
         this.decode = function (parent, xml) {
             this.name = xml.getAttribute('name');
@@ -428,8 +428,8 @@ function Specification() {
             }
             var interfaceOptionNodes = xml.getElementsByTagName('interfaceoption');
             // Extract interfaceoption node schema
-            var interfaceOptionNodeSchema = this.schema.getAllElementsByName('interfaceoption')[0];
-            var attributeMap = interfaceOptionNodeSchema.getAllElementsByTagName('xs:attribute');
+            var interfaceOptionNodeSchema = this.schema.querySelector('[name=interfaceoption]');
+            var attributeMap = interfaceOptionNodeSchema.querySelectorAll('attribute');
             var i, j;
             for (i = 0; i < interfaceOptionNodes.length; i++) {
                 var ioNode = interfaceOptionNodes[i];
@@ -456,7 +456,7 @@ function Specification() {
             var scaleParent = xml.getElementsByTagName('scales');
             if (scaleParent.length == 1) {
                 scaleParent = scaleParent[0];
-                var scalelabels = scaleParent.getAllElementsByTagName('scalelabel');
+                var scalelabels = scaleParent.querySelectorAll('scalelabel');
                 for (i = 0; i < scalelabels.length; i++) {
                     this.scales.push({
                         text: scalelabels[i].textContent,
@@ -550,13 +550,13 @@ function Specification() {
         this.commentBoxPrefix = "Comment on track";
         this.audioElements = [];
         this.commentQuestions = [];
-        this.schema = schemaRoot.getAllElementsByName("page")[0];
+        this.schema = schemaRoot.querySelector("[name=page]");
         this.specification = specification;
         this.parent = undefined;
 
         this.decode = function (parent, xml) {
             this.parent = parent;
-            var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
+            var attributeMap = this.schema.querySelectorAll('attribute');
             var i, node;
             for (i = 0; i < attributeMap.length; i++) {
                 var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
@@ -583,13 +583,13 @@ function Specification() {
             var interfaceNode = xml.getElementsByTagName('interface');
             for (i = 0; i < interfaceNode.length; i++) {
                 node = new parent.interfaceNode(this.specification);
-                node.decode(this, interfaceNode[i], parent.schema.getAllElementsByName('interface')[1]);
+                node.decode(this, interfaceNode[i], parent.schema.querySelectorAll('[name=interface]')[1]);
                 this.interfaces.push(node);
             }
 
             // Now process the survey node options
             var survey = xml.getElementsByTagName('survey');
-            var surveySchema = parent.schema.getAllElementsByName('survey')[0];
+            var surveySchema = parent.schema.querySelector('[name=survey]');
             for (i = 0; i < survey.length; i++) {
                 var location = survey[i].getAttribute('location');
                 if (location == 'pre' || location == 'before') {
@@ -634,7 +634,7 @@ function Specification() {
         this.encode = function (root) {
             var AHNode = root.createElement("page");
             // First decode the attributes
-            var attributes = this.schema.getAllElementsByTagName('xs:attribute');
+            var attributes = this.schema.querySelectorAll('attribute');
             var i;
             for (i = 0; i < attributes.length; i++) {
                 var name = attributes[i].getAttribute("name");
@@ -672,7 +672,7 @@ function Specification() {
             this.name = undefined;
             this.type = undefined;
             this.statement = undefined;
-            this.schema = schemaRoot.getAllElementsByName('commentquestion')[0];
+            this.schema = schemaRoot.querySelector('[name=commentquestion]');
             this.decode = function (parent, xml) {
                 this.id = xml.id;
                 this.name = xml.getAttribute('name');
@@ -810,11 +810,11 @@ function Specification() {
             this.sampleRate = undefined;
             this.image = undefined;
             this.alternatives = [];
-            this.schema = schemaRoot.getAllElementsByName('audioelement')[0];
+            this.schema = schemaRoot.querySelector('[name=audioelement]');
             this.parent = undefined;
             this.decode = function (parent, xml) {
                 this.parent = parent;
-                var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
+                var attributeMap = this.schema.querySelectorAll('attribute');
                 for (var i = 0; i < attributeMap.length; i++) {
                     var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                     var projectAttr = xml.getAttribute(attributeName);
@@ -838,7 +838,7 @@ function Specification() {
             };
             this.encode = function (root) {
                 var AENode = root.createElement("audioelement");
-                var attributes = this.schema.getAllElementsByTagName('xs:attribute');
+                var attributes = this.schema.querySelectorAll('attribute');
                 for (var i = 0; i < attributes.length; i++) {
                     var name = attributes[i].getAttribute("name");
                     if (name === null) {
