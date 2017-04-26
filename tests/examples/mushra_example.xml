@@ -48,6 +48,7 @@
             <interface>
                 <interfaceoption type="check" name="fragmentMoved" />
                 <interfaceoption type="check" name="scalerange" min="25" max="75" />
+                <interfaceoption type="show" name="fragmentSort" />
                 <interfaceoption type="show" name='playhead' />
                 <interfaceoption type="show" name="page-count" />
                 <interfaceoption type="show" name="volume" />

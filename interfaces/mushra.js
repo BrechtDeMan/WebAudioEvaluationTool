@@ -50,7 +50,7 @@ function loadInterface() {
     var playback = document.createElement("button");
     playback.innerHTML = 'Stop';
     playback.id = 'playback-button';
-    playback.style.float = 'left';
+    playback.style.display = 'inline-block';
     // onclick function. Check if it is playing or not, call the correct function in the
     // audioEngine, change the button text to reflect the next state.
     playback.onclick = function () {
@@ -66,7 +66,7 @@ function loadInterface() {
     submit.innerHTML = 'Next';
     submit.onclick = buttonSubmitClick;
     submit.id = 'submit-button';
-    submit.style.float = 'left';
+    submit.style.display = 'inline-block';
     // Append the interface buttons into the interfaceButtons object.
     interfaceButtons.appendChild(playback);
     interfaceButtons.appendChild(submit);
@@ -224,6 +224,7 @@ function loadTest(audioHolderObject) {
                     if (pagecountHolder === null) {
                         pagecountHolder = document.createElement('div');
                         pagecountHolder.id = 'page-count';
+                        pagecountHolder.style.display = 'inline-block';
                     }
                     pagecountHolder.innerHTML = '<span>Page ' + (testState.stateIndex + 1) + ' of ' + testState.stateMap.length + '</span>';
                     var inject = document.getElementById('interface-buttons');
@@ -236,6 +237,38 @@ function loadTest(audioHolderObject) {
                     break;
                 case "comments":
                     interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder, true);
+                    break;
+                case "fragmentSort":
+                    (function () {
+                        var button = document.createElement("button");
+                        button.textContent = "Sort";
+                        button.style.display = 'inline-block';
+                        var container = document.getElementById("interface-buttons");
+                        var neighbour = container.lastElementChild;
+                        while (neighbour.nodeName !== "BUTTON") {
+                            neighbour = neighbour.previousElementSibling;
+                        }
+                        if (neighbour.nextElementSibling) {
+                            container.insertBefore(button, neighbour.nextElementSibling);
+                        } else {
+                            container.appendChild(button);
+                        }
+                        button.onclick = function () {
+                            var sortIndex = interfaceContext.sortFragmentsByScore();
+                            var sliderBox = document.getElementById("slider-holder");
+                            var nodes = audioEngineContext.audioObjects.filter(function (ao) {
+                                return ao.specification.type !== "outside-reference";
+                            });
+                            var i;
+                            nodes.forEach(function (ao) {
+                                sliderBox.removeChild(ao.interfaceDOM.holder);
+                            });
+                            for (i = 0; i < nodes.length; i++) {
+                                var j = sortIndex[i];
+                                sliderBox.appendChild(nodes[j].interfaceDOM.holder);
+                            }
+                        };
+                    })();
                     break;
             }
         }
