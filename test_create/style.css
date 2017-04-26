@@ -90,6 +90,6 @@ h5 {
 #setupNode {
     background-color: rgba(255, 10, 10, 0.25);
 }
-#pageNode {
+.pageNode {
     background-color: rgba(10, 255, 10, 0.25);
 }

@@ -203,3 +203,4 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
         }
     }
 }]);
+AngularInterface.controller("page", ['$scope', '$element', '$window', function ($s, $e, $w) {}]);

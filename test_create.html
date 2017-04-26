@@ -338,6 +338,9 @@
                 </div>
             </div>
         </div>
+        <div class="node pageNode" ng-controller="page" ng-repeat="page in specification.pages">
+            <h2>Page</h2>
+        </div>
         <div id="popupHolder" ng-show="popupVisible">
             <div ng-controller="introduction" class="popup" ng-show="popupVisible">
                 <div class="popupTitle" ng-switch="state">
