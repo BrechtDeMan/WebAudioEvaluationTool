@@ -71,6 +71,225 @@
                     <input type="checkbox" ng-model="specification.playOne" />
                 </div>
             </div>
+            <div class="node">
+                <h2>Test Completed Message</h2>
+                <textarea ng-model="specification.exitText"></textarea>
+            </div>
+            <div id="metricsNode" class="node">
+                <h3>Session Metrics</h3>
+                <div class="attributes">
+                    <div class="attribute">
+                        <span>Collect Total Test Time: </span>
+                        <input type="checkbox" value="testTimer" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute">
+                        <span>Collect Fragment Listen Time: </span>
+                        <input type="checkbox" value="elementTimer" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute">
+                        <span>Collect Fragment Initial Position: </span>
+                        <input type="checkbox" value="elementInitialPosition" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute">
+                        <span>Collect Fragment Position over Time: </span>
+                        <input type="checkbox" value="elementTracker" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute">
+                        <span>Collect Fragment Listened To Flag: </span>
+                        <input type="checkbox" value="elementFlagListenedTo" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute">
+                        <span>Collect Fragment Moved Flag: </span>
+                        <input type="checkbox" value="elementFlagMoved" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute">
+                        <span>Collect Fragment Listened Flag: </span>
+                        <input type="checkbox" value="elementListenTracker" ng-click="enableMetric($event)" />
+                    </div>
+                </div>
+            </div>
+            <div id="globalpresurvey" class="node">
+                <h2>Pre Test Survey</h2>
+                <div class="node" ng-repeat="opt in specification.preTest.options" ng-controller="surveyOption">
+                    <h3>Survey Entry</h3>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Survey Type: </span>
+                            <select ng-model="opt.type">
+                                <option value="question">Question</option>
+                                <option value="radio">Radio</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="statement">Statement</option>
+                                <option value="number">Number</option>
+                                <option value="slider">Slider</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
+                            <span>Unique Survey Entry ID:</span>
+                            <input type="text" ng-model="opt.id" />
+                        </div>
+                        <div class="attribute">
+                            <span>Entry Name:</span>
+                            <input type="text" ng-model="opt.name" />
+                        </div>
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="opt.mandatory" />
+                        </div>
+                        <div class="attribute">
+                            <span>Minimum Wait Time (s):</span>
+                            <input type="number" ng-model="opt.minWait" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="opt.type == 'question'">
+                            <span>Box Size:</span>
+                            <select ng-model="opt.boxsize">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Minimum Selected:</span>
+                            <input type="number" ng-model="opt.min" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Maximum Selected:</span>
+                            <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Minimum Value:</span>
+                            <input type="number" ng-model="opt.min" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Maximum Value:</span>
+                            <input type="number" ng-model="opt.max" />
+                        </div>
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                            <span>Video URL:</span>
+                            <input type="text" ng-model="opt.url" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Statement</h4>
+                        <textarea ng-model="opt.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <h4>Options</h4>
+                        <div>
+                            <button type="button" class="btn btn-default" ng-click="addOption();">Add Option</button>
+                        </div>
+                        <div class="node" ng-repeat="option in opt.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-default" ng-click="removeOption(option);">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Displayed Text: </span>
+                                    <input type="text" ng-model="option.text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="globalpostsurvey" class="node">
+                <h2>Post Test Survey</h2>
+                <div class="node" ng-repeat="opt in specification.postTest.options" ng-controller="surveyOption">
+                    <h3>Survey Entry</h3>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Survey Type: </span>
+                            <select ng-model="opt.type">
+                                <option value="question">Question</option>
+                                <option value="radio">Radio</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="statement">Statement</option>
+                                <option value="number">Number</option>
+                                <option value="slider">Slider</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
+                            <span>Unique Survey Entry ID:</span>
+                            <input type="text" ng-model="opt.id" />
+                        </div>
+                        <div class="attribute">
+                            <span>Entry Name:</span>
+                            <input type="text" ng-model="opt.name" />
+                        </div>
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="opt.mandatory" />
+                        </div>
+                        <div class="attribute">
+                            <span>Minimum Wait Time (s):</span>
+                            <input type="number" ng-model="opt.minWait" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="opt.type == 'question'">
+                            <span>Box Size:</span>
+                            <select ng-model="opt.boxsize">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Minimum Selected:</span>
+                            <input type="number" ng-model="opt.min" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Maximum Selected:</span>
+                            <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Minimum Value:</span>
+                            <input type="number" ng-model="opt.min" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Maximum Value:</span>
+                            <input type="number" ng-model="opt.max" />
+                        </div>
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                            <span>Video URL:</span>
+                            <input type="text" ng-model="opt.url" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Statement</h4>
+                        <textarea ng-model="opt.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <h4>Options</h4>
+                        <div>
+                            <button type="button" class="btn btn-default" ng-click="addOption();">Add Option</button>
+                        </div>
+                        <div class="node" ng-repeat="option in opt.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-default" ng-click="removeOption(option);">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Displayed Text: </span>
+                                    <input type="text" ng-model="option.text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="popupHolder" ng-show="popupVisible">
             <div ng-controller="introduction" class="popup" ng-show="popupVisible">

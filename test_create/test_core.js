@@ -111,7 +111,56 @@ AngularInterface.controller("setup", ['$scope', '$element', '$window', function 
     }
     $s.schema = undefined;
     $s.attributes = [];
-    $s.model = specification;
 
     $s.$watch("globalSchema", initialise);
+    $s.$watch("specification.metrics.enabled.length", function () {
+        var metricsNode = document.getElementById("metricsNode");
+        if (!$s.specification.metrics) {
+            return;
+        }
+        metricsNode.querySelectorAll("input").forEach(function (DOM) {
+            DOM.checked = false;
+        });
+        $s.specification.metrics.enabled.forEach(function (metric) {
+            var DOM = metricsNode.querySelector("[value=" + metric + "]");
+            if (DOM) {
+                DOM.checked = true;
+            }
+        });
+    })
+
+    $s.enableMetric = function ($event) {
+        var metric = $event.currentTarget.value;
+        var index = specification.metrics.enabled.findIndex(function (a) {
+            return a == metric;
+        });
+        if ($event.currentTarget.checked) {
+            if (index == -1) {
+                specification.metrics.enabled.push(metric);
+            }
+        } else {
+            if (index >= 0) {
+                specification.metrics.enabled.splice(index, 1);
+            }
+        }
+    }
+}]);
+
+AngularInterface.controller("surveyOption", ['$scope', '$element', '$window', function ($s, $e, $w) {
+
+    $s.removeOption = function (option) {
+        var index = $s.opt.options.findIndex(function (a) {
+            return a == option;
+        });
+        if (index === -1) {
+            throw ("Invalid option");
+        }
+        $s.opt.options.splice(index, 1);
+    };
+    $s.addOption = function () {
+        $s.opt.options.push({
+            name: "",
+            text: ""
+        });
+    }
 }]);

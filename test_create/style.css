@@ -64,10 +64,21 @@
     font-style: italic;
 }
 .node {
-    padding: 0px 20px;
+    padding: 10px 20px;
     border: 2px solid black;
     margin: 20px;
     border-radius: 20px;
+    background-color: inherit;
+}
+.node > textarea {
+    width: 80%;
+}
+.node > h1,
+h2,
+h3,
+h4,
+h5 {
+    text-align: center;
 }
 .attribute {
     display: inline-block;
@@ -75,4 +86,10 @@
     border-left: 1px solid grey;
     border-right: 1px solid grey;
     padding: 5px 5px;
+}
+#setupNode {
+    background-color: rgba(255, 10, 10, 0.25);
+}
+#pageNode {
+    background-color: rgba(10, 255, 10, 0.25);
 }
