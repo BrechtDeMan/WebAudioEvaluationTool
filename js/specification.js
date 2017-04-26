@@ -19,11 +19,11 @@ function Specification() {
     this.playOne = undefined;
 
     // nodes
-    this.metrics = undefined;
+    this.metrics = new metricNode();
     this.preTest = undefined;
     this.postTest = undefined;
     this.pages = [];
-    this.interfaces = undefined;
+    this.interfaces = new interfaceNode(this);
     this.errors = [];
     this.exitText = "Thank you.";
 
@@ -127,8 +127,6 @@ function Specification() {
             this.exitText = exitTextNode[0].textContent;
         }
 
-        this.metrics = new this.metricNode();
-
         this.metrics.decode(this, setupNode.getElementsByTagName('metric')[0]);
 
         // Now process the survey node options
@@ -138,12 +136,12 @@ function Specification() {
             switch (location) {
                 case 'pre':
                 case 'before':
-                    this.preTest = new this.surveyNode(this);
+                    this.preTest = new surveyNode(this);
                     this.preTest.decode(this, survey[i]);
                     break;
                 case 'post':
                 case 'after':
-                    this.postTest = new this.surveyNode(this);
+                    this.postTest = new surveyNode(this);
                     this.postTest.decode(this, survey[i]);
                     break;
             }
@@ -153,7 +151,7 @@ function Specification() {
         if (interfaceNode.length > 1) {
             this.errors.push("Only one <interface> node in the <setup> node allowed! Others except first ingnored!");
         }
-        this.interfaces = new this.interfaceNode(this);
+
         if (interfaceNode.length !== 0) {
             interfaceNode = interfaceNode[0];
             this.interfaces.decode(this, interfaceNode, this.schema.querySelectorAll('[name=interface]')[1]);
@@ -163,7 +161,7 @@ function Specification() {
         var pageTags = projectXML.getElementsByTagName('page');
         var pageSchema = this.schema.querySelector('[name=page]');
         for (i = 0; i < pageTags.length; i++) {
-            var node = new this.page(this);
+            var node = new page(this);
             node.decode(this, pageTags[i], pageSchema);
             this.pages.push(node);
         }
@@ -205,7 +203,7 @@ function Specification() {
         return RootDocument;
     };
 
-    this.surveyNode = function (specification) {
+    function surveyNode(specification) {
         this.location = undefined;
         this.options = [];
         this.parent = undefined;
@@ -412,15 +410,16 @@ function Specification() {
         };
     };
 
-    this.interfaceNode = function (specification) {
+    function interfaceNode(specification) {
         this.title = undefined;
         this.name = undefined;
         this.image = undefined;
         this.options = [];
         this.scales = [];
-        this.schema = schemaRoot.querySelectorAll('[name=interface]')[1];
+        this.schema = undefined;
 
         this.decode = function (parent, xml) {
+            this.schema = schemaRoot.querySelectorAll('[name=interface]')[1];
             this.name = xml.getAttribute('name');
             var titleNode = xml.getElementsByTagName('title');
             if (titleNode.length == 1) {
@@ -505,7 +504,7 @@ function Specification() {
         };
     };
 
-    this.metricNode = function () {
+    function metricNode() {
         this.enabled = [];
         this.decode = function (parent, xml) {
             var children = xml.getElementsByTagName('metricenable');
@@ -530,7 +529,7 @@ function Specification() {
         };
     };
 
-    this.page = function (specification) {
+    function page(specification) {
         this.presentedId = undefined;
         this.id = undefined;
         this.title = undefined;
@@ -580,10 +579,10 @@ function Specification() {
             }
 
             // Now decode the interfaces
-            var interfaceNode = xml.getElementsByTagName('interface');
-            for (i = 0; i < interfaceNode.length; i++) {
-                node = new parent.interfaceNode(this.specification);
-                node.decode(this, interfaceNode[i], parent.schema.querySelectorAll('[name=interface]')[1]);
+            var interfaceNodes = xml.getElementsByTagName('interface');
+            for (i = 0; i < interfaceNodes.length; i++) {
+                node = new interfaceNode(this.specification);
+                node.decode(this, interfaceNodes[i], parent.schema.querySelectorAll('[name=interface]')[1]);
                 this.interfaces.push(node);
             }
 
@@ -596,14 +595,14 @@ function Specification() {
                     if (this.preTest !== undefined) {
                         this.errors.push("Already a pre/before test survey defined! Ignoring second!!");
                     } else {
-                        this.preTest = new parent.surveyNode(this.specification);
+                        this.preTest = new surveyNode(this.specification);
                         this.preTest.decode(parent, survey[i], surveySchema);
                     }
                 } else if (location == 'post' || location == 'after') {
                     if (this.postTest !== undefined) {
                         this.errors.push("Already a post/after test survey defined! Ignoring second!!");
                     } else {
-                        this.postTest = new parent.surveyNode(this.specification);
+                        this.postTest = new surveyNode(this.specification);
                         this.postTest.decode(parent, survey[i], surveySchema);
                     }
                 }
@@ -612,7 +611,7 @@ function Specification() {
             // Now process the audioelement tags
             var audioElements = xml.getElementsByTagName('audioelement');
             for (i = 0; i < audioElements.length; i++) {
-                var audioNode = new this.audioElementNode(this.specification);
+                var audioNode = new audioElementNode(this.specification);
                 audioNode.decode(this, audioElements[i]);
                 this.audioElements.push(audioNode);
             }
@@ -623,7 +622,7 @@ function Specification() {
                 cqNode = cqNode[0];
                 var commentQuestion = cqNode.firstElementChild;
                 while (commentQuestion) {
-                    node = new this.commentQuestionNode(this.specification);
+                    node = new commentQuestionNode(this.specification);
                     node.decode(parent, commentQuestion);
                     this.commentQuestions.push(node);
                     commentQuestion = commentQuestion.nextElementSibling;
@@ -667,7 +666,7 @@ function Specification() {
             return AHNode;
         };
 
-        this.commentQuestionNode = function (specification) {
+        function commentQuestionNode(specification) {
             this.id = undefined;
             this.name = undefined;
             this.type = undefined;
@@ -795,7 +794,7 @@ function Specification() {
             };
         };
 
-        this.audioElementNode = function (specification) {
+        function audioElementNode(specification) {
             this.url = undefined;
             this.id = undefined;
             this.name = undefined;
