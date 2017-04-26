@@ -290,6 +290,53 @@
                     </div>
                 </div>
             </div>
+            <div id="globalinterface" class="node" ng-controller="interfaceNode" ng-init="interface = specification.interfaces">
+                <h2>Interface (Globals)</h2>
+                <div class="node interfaceOptions">
+                    <div class="attributes">
+                        <div class="attribute" name="fragmentPlayed" type="check">
+                            <span>Check all fragments played: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentFullPlayback" type="check">
+                            <span>Check all fragments fully played: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentMoved" type="check">
+                            <span>Check all fragments have been moved: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentComments" type="check">
+                            <span>Check all fragments have comments: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="scalerange" type="check">
+                            <span>Enforce a scale usage: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                            <span>Minimum:</span>
+                            <input type="number" min="0" max="100" name="min" />
+                            <span>Maximum:</span>
+                            <input type="number" min="0" max="100" name="max" />
+                        </div>
+                        <div class="attribute" name="volume" type="show">
+                            <span>Show master volume control: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="playhead" type="show">
+                            <span>Show playhead: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="page-count" type="show">
+                            <span>Show Page Count: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="comments" type="show">
+                            <span>Show Fragment Comments: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="popupHolder" ng-show="popupVisible">
             <div ng-controller="introduction" class="popup" ng-show="popupVisible">

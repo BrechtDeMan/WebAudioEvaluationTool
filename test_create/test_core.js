@@ -1,4 +1,4 @@
-/* globals angular, window, Promise, XMLHttpRequest, Specification */
+/* globals document, angular, window, Promise, XMLHttpRequest, Specification */
 function get(url) {
     // Return a new promise.
     return new Promise(function (resolve, reject) {
@@ -127,7 +127,7 @@ AngularInterface.controller("setup", ['$scope', '$element', '$window', function 
                 DOM.checked = true;
             }
         });
-    })
+    });
 
     $s.enableMetric = function ($event) {
         var metric = $event.currentTarget.value;
@@ -143,7 +143,7 @@ AngularInterface.controller("setup", ['$scope', '$element', '$window', function 
                 specification.metrics.enabled.splice(index, 1);
             }
         }
-    }
+    };
 }]);
 
 AngularInterface.controller("surveyOption", ['$scope', '$element', '$window', function ($s, $e, $w) {
@@ -162,5 +162,44 @@ AngularInterface.controller("surveyOption", ['$scope', '$element', '$window', fu
             name: "",
             text: ""
         });
+    };
+}]);
+
+AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', function ($s, $e, $w) {
+    $s.$watch("interface.options.length", function () {
+        if (!$s.interface || !$s.interface.options) {
+            return;
+        }
+        var options = $e[0].querySelector(".interfaceOptions").querySelectorAll(".attribute");
+        options.forEach(function (option) {
+            var name = option.getAttribute("name");
+            var index = $s.interface.options.findIndex(function (io) {
+                return io.name == name;
+            });
+            option.querySelector("input").checked = (index >= 0);
+            if (name == "scalerange" && index >= 0) {
+                option.querySelector("[name=min]").value = $s.interface.options[index].min;
+                option.querySelector("[name=max]").value = $s.interface.options[index].max;
+            }
+        });
+    });
+    $s.enableInterfaceOption = function ($event) {
+        var name = $event.currentTarget.parentElement.getAttribute("name");
+        var type = $event.currentTarget.parentElement.getAttribute("type");
+        var index = $s.interface.options.findIndex(function (io) {
+            return io.name == name;
+        });
+        if (index == -1 && $event.currentTarget.checked) {
+            var obj = $s.interface.options.push({
+                name: name,
+                type: type
+            });
+            if (name == "scalerange") {
+                obj.min = $event.currentTarget.parentElement.querySelector("[name=min]").value;
+                obj.max = $event.currentTarget.parentElement.querySelector("[name=max]").value;
+            }
+        } else if (index >= 0 && !$event.currentTarget.checked) {
+            $s.interface.options.splice(index, 1);
+        }
     }
 }]);
