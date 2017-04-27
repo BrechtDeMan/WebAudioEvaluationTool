@@ -110,6 +110,7 @@
             </div>
             <div id="globalpresurvey" class="node">
                 <h2>Pre Test Survey</h2>
+                <button type="button" class="btn btn-success" ng-click="specification.preTest.addOption()">Add Entry</button>
                 <div class="node" ng-repeat="opt in specification.preTest.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
                     <div class="attributes">
@@ -197,10 +198,49 @@
                             </div>
                         </div>
                     </div>
+                    <div class="node">
+                        <h4>Conditionals</h4>
+                        <button type="button" class="btn btn-default" ng-click="addCondition()">Add Condition</button>
+                        <div class="node" ng-repeat="condition in opt.conditions">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCondition(condition)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Check Type:</span>
+                                    <select ng-model="condition.check">
+                                        <option value="equals">Equal To</option>
+                                        <option value="lessThan">Less Than</option>
+                                        <option value="greaterThan">Greater Than</option>
+                                        <option value="stringContains">String Contains</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Value: </span>
+                                    <input type="text" ng-model="condition.value" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Pass: </span>
+                                    <select ng-model="condition.jumpToOnPass">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in specification.preTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Fail: </span>
+                                    <select ng-model="condition.jumpToOnFail">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in specification.preTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="globalpostsurvey" class="node">
                 <h2>Post Test Survey</h2>
+                <button type="button" class="btn btn-success" ng-click="specification.postTest.addOption()">Add Entry</button>
                 <div class="node" ng-repeat="opt in specification.postTest.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
                     <div class="attributes">
@@ -288,6 +328,44 @@
                             </div>
                         </div>
                     </div>
+                    <div class="node">
+                        <h4>Conditionals</h4>
+                        <button type="button" class="btn btn-default" ng-click="addCondition()">Add Condition</button>
+                        <div class="node" ng-repeat="condition in opt.conditions">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCondition(condition)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Check Type:</span>
+                                    <select ng-model="condition.check">
+                                        <option value="equals">Equal To</option>
+                                        <option value="lessThan">Less Than</option>
+                                        <option value="greaterThan">Greater Than</option>
+                                        <option value="stringContains">String Contains</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Value: </span>
+                                    <input type="text" ng-model="condition.value" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Pass: </span>
+                                    <select ng-model="condition.jumpToOnPass">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in specification.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Fail: </span>
+                                    <select ng-model="condition.jumpToOnFail">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in specification.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="globalinterface" class="node" ng-controller="interfaceNode" ng-init="interface = specification.interfaces">
@@ -338,8 +416,567 @@
                 </div>
             </div>
         </div>
+        <div style="text-align: center;">
+            <button type="button" class="btn btn-success" ng-click="addPage()">Add Page</button>
+        </div>
         <div class="node pageNode" ng-controller="page" ng-repeat="page in specification.pages">
             <h2>Page</h2>
+            <div class="attributes">
+                <div class="attribute">
+                    <span>Unique ID: </span>
+                    <input type="text" ng-model="page.id" />
+                </div>
+                <div class="attribute">
+                    <span>Fragment common-root URL: </span>
+                    <input type="text" ng-model="page.hostURL" />
+                </div>
+                <div class="attribute">
+                    <span>Randomise Fragment Order: </span>
+                    <input type="checkbox" ng-model="page.randomiseOrder" />
+                </div>
+                <div class="attribute">
+                    <span>Repeat Page N-times: </span>
+                    <input type="number" ng-model="page.repeatCount" />
+                </div>
+                <div class="attribute">
+                    <span>Loop audio: </span>
+                    <input type="checkbox" ng-model="page.loop" />
+                </div>
+                <div class="attribute">
+                    <span>Synchronous audio playback: </span>
+                    <input type="checkbox" ng-model="page.synchronous" />
+                </div>
+                <div class="attribute">
+                    <span>Loudness (page): </span>
+                    <input type="number" ng-model="page.loudness" max="0" />
+                </div>
+                <div class="attribute">
+                    <span>Label type: </span>
+                    <select ng-model="page.label">
+                        <option value="default">Default</option>
+                        <option value="none">None</option>
+                        <option value="number">[1, 2, 3...]</option>
+                        <option value="letter">[a, b, c...]</option>
+                        <option value="capital">[A, B, C...]</option>
+                        <option value="samediff" ng-show="specification.interface == 'AB'">[Same, Different]</option>
+                    </select>
+                </div>
+                <div class="attribute" ng-show="page.label != 'default' && page.label != 'none'">
+                    <span>Label Start: </span>
+                    <input type="text" ng-model="page.labelStart" />
+                </div>
+                <div class="attribute">
+                    <span>Fragment pool size: </span>
+                    <input type="number" ng-model="page.poolSize" min="0" max="page.audioElements.length" />
+                </div>
+                <div class="attribute" ng-show="specification.poolSize > 0">
+                    <span>Always include page: </span>
+                    <input type="checkbox" ng-model="page.alwaysInclude" />
+                </div>
+                <div class="attribute">
+                    <span>Fixed Page Position: </span>
+                    <input type="number" ng-model="page.position" max="{{specification.pages.length}}" />
+                </div>
+                <div class="attribute">
+                    <span>Fixed Page Position: </span>
+                    <input type="number" ng-model="page.position" min="0" max="{{specification.pages.length}}" />
+                </div>
+                <div class="attribute">
+                    <span>Fragment pre-silence: </span>
+                    <input type="number" ng-model="page.preSilence" min="0" step="0.1" />
+                </div>
+                <div class="attribute">
+                    <span>Fragment post-silence: </span>
+                    <input type="number" ng-model="page.postSilence" min="0" step="0.1" />
+                </div>
+                <div class="attribute">
+                    <span>Cannot interupt audio: </span>
+                    <input type="checkbox" ng-model="page.playOne" />
+                </div>
+                <div class="attribute">
+                    <span>Only move playing audio: </span>
+                    <input type="checkbox" ng-model="page.restrictMovement" />
+                </div>
+            </div>
+            <div class="node">
+                <h3>Page Title</h3>
+                <textarea ng-model="page.title"></textarea>
+            </div>
+            <div class="node">
+                <h3>Comment box text prefix</h3>
+                <textarea ng-model="page.commentboxprefix"></textarea>
+                <p>Example:
+                    <span style="font-weight:600">{{page.commentboxprefix}} A</span>
+                </p>
+            </div>
+            <div class="node">
+                <h2>Pre Page Survey</h2>
+                <button type="button" class="btn btn-success" ng-click="page.preTest.addOption()">Add Entry</button>
+                <div class="node" ng-repeat="opt in page.preTest.options" ng-controller="surveyOption">
+                    <h3>Survey Entry</h3>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Survey Type: </span>
+                            <select ng-model="opt.type">
+                                <option value="question">Question</option>
+                                <option value="radio">Radio</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="statement">Statement</option>
+                                <option value="number">Number</option>
+                                <option value="slider">Slider</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
+                            <span>Unique Survey Entry ID:</span>
+                            <input type="text" ng-model="opt.id" />
+                        </div>
+                        <div class="attribute">
+                            <span>Entry Name:</span>
+                            <input type="text" ng-model="opt.name" />
+                        </div>
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="opt.mandatory" />
+                        </div>
+                        <div class="attribute">
+                            <span>Minimum Wait Time (s):</span>
+                            <input type="number" ng-model="opt.minWait" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="opt.type == 'question'">
+                            <span>Box Size:</span>
+                            <select ng-model="opt.boxsize">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Minimum Selected:</span>
+                            <input type="number" ng-model="opt.min" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Maximum Selected:</span>
+                            <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Minimum Value:</span>
+                            <input type="number" ng-model="opt.min" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Maximum Value:</span>
+                            <input type="number" ng-model="opt.max" />
+                        </div>
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                            <span>Video URL:</span>
+                            <input type="text" ng-model="opt.url" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Statement</h4>
+                        <textarea ng-model="opt.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <h4>Options</h4>
+                        <div>
+                            <button type="button" class="btn btn-default" ng-click="addOption();">Add Option</button>
+                        </div>
+                        <div class="node" ng-repeat="option in opt.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-default" ng-click="removeOption(option);">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Displayed Text: </span>
+                                    <input type="text" ng-model="option.text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Conditionals</h4>
+                        <button type="button" class="btn btn-default" ng-click="addCondition()">Add Condition</button>
+                        <div class="node" ng-repeat="condition in opt.conditions">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCondition(condition)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Check Type:</span>
+                                    <select ng-model="condition.check">
+                                        <option value="equals">Equal To</option>
+                                        <option value="lessThan">Less Than</option>
+                                        <option value="greaterThan">Greater Than</option>
+                                        <option value="stringContains">String Contains</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Value: </span>
+                                    <input type="text" ng-model="condition.value" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Pass: </span>
+                                    <select ng-model="condition.jumpToOnPass">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in page.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Fail: </span>
+                                    <select ng-model="condition.jumpToOnFail">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in page.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="node">
+                <h2>Post Page Survey</h2>
+                <button type="button" class="btn btn-success" ng-click="page.postTest.addOption()">Add Entry</button>
+                <div class="node" ng-repeat="opt in page.postTest.options" ng-controller="surveyOption">
+                    <h3>Survey Entry</h3>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Survey Type: </span>
+                            <select ng-model="opt.type">
+                                <option value="question">Question</option>
+                                <option value="radio">Radio</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="statement">Statement</option>
+                                <option value="number">Number</option>
+                                <option value="slider">Slider</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
+                            <span>Unique Survey Entry ID:</span>
+                            <input type="text" ng-model="opt.id" />
+                        </div>
+                        <div class="attribute">
+                            <span>Entry Name:</span>
+                            <input type="text" ng-model="opt.name" />
+                        </div>
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="opt.mandatory" />
+                        </div>
+                        <div class="attribute">
+                            <span>Minimum Wait Time (s):</span>
+                            <input type="number" ng-model="opt.minWait" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="opt.type == 'question'">
+                            <span>Box Size:</span>
+                            <select ng-model="opt.boxsize">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Minimum Selected:</span>
+                            <input type="number" ng-model="opt.min" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Maximum Selected:</span>
+                            <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Minimum Value:</span>
+                            <input type="number" ng-model="opt.min" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Maximum Value:</span>
+                            <input type="number" ng-model="opt.max" />
+                        </div>
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                            <span>Video URL:</span>
+                            <input type="text" ng-model="opt.url" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Statement</h4>
+                        <textarea ng-model="opt.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <h4>Options</h4>
+                        <div>
+                            <button type="button" class="btn btn-default" ng-click="addOption();">Add Option</button>
+                        </div>
+                        <div class="node" ng-repeat="option in opt.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-default" ng-click="removeOption(option);">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Displayed Text: </span>
+                                    <input type="text" ng-model="option.text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Conditionals</h4>
+                        <button type="button" class="btn btn-default" ng-click="addCondition()">Add Condition</button>
+                        <div class="node" ng-repeat="condition in opt.conditions">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCondition(condition)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Check Type:</span>
+                                    <select ng-model="condition.check">
+                                        <option value="equals">Equal To</option>
+                                        <option value="lessThan">Less Than</option>
+                                        <option value="greaterThan">Greater Than</option>
+                                        <option value="stringContains">String Contains</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Value: </span>
+                                    <input type="text" ng-model="condition.value" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Pass: </span>
+                                    <select ng-model="condition.jumpToOnPass">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in page.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Fail: </span>
+                                    <select ng-model="condition.jumpToOnFail">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in page.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="node" ng-repeat="interface in page.interfaces" ng-controller="interfaceNode">
+                <h2>Interface</h2>
+                <div class="node interfaceOptions">
+                    <div class="attributes">
+                        <div class="attribute" name="fragmentPlayed" type="check">
+                            <span>Check all fragments played: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentFullPlayback" type="check">
+                            <span>Check all fragments fully played: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentMoved" type="check">
+                            <span>Check all fragments have been moved: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentComments" type="check">
+                            <span>Check all fragments have comments: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="scalerange" type="check">
+                            <span>Enforce a scale usage: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                            <span>Minimum:</span>
+                            <input type="number" min="0" max="100" name="min" />
+                            <span>Maximum:</span>
+                            <input type="number" min="0" max="100" name="max" />
+                        </div>
+                        <div class="attribute" name="volume" type="show">
+                            <span>Show master volume control: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="playhead" type="show">
+                            <span>Show playhead: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="page-count" type="show">
+                            <span>Show Page Count: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="comments" type="show">
+                            <span>Show Fragment Comments: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="node">
+                    <h3>Axis Title</h3>
+                    <textarea ng-model="interface.title"></textarea>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Axis name (in saves): </span>
+                            <input type="text" ng-model="interface.name" />
+                        </div>
+                    </div>
+                </div>
+                <div class="node">
+                    <h3>Axis Image</h3>
+                    <textarea ng-model="interface.image"></textarea>
+                </div>
+                <div class="node">
+                    <h3>Axis Scales</h3>
+                    <button type="button" class="btn btn-default" ng-click="addScale();">Add</button>
+                    <div class="node" ng-repeat="scale in interface.scales">
+                        <div class="attributes">
+                            <div class="attribute">
+                                <button type="button" class="btn btn-danger" ng-click="removeScale(scale);">Remove</button>
+                            </div>
+                            <div class="attribute">
+                                <span>Position: </span>
+                                <input type="number" min="0" max="100" ng-model="scale.position" />
+                            </div>
+                            <div class="attribute">
+                                <span>Text: </span>
+                                <input type="text" ng-model="scale.text" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="node">
+                <h3>Comment Questions</h3>
+                <div class="node" ng-repeat="cq in page.commentQuestions">
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Unique ID:</span>
+                            <input type="text" ng-model="cq.id" />
+                        </div>
+                        <div class="attribute">
+                            <span>Common Name:</span>
+                            <input type="text" ng-model="cq.name" />
+                        </div>
+                        <div class="attribute" ng-show="cq.type == 'slider'">
+                            <span>Minimum:</span>
+                            <input type="number" ng-model="cq.min" />
+                        </div>
+                        <div class="attribute" ng-show="cq.type == 'slider'">
+                            <span>Maximum:</span>
+                            <input type="number" ng-model="cq.max" />
+                        </div>
+                        <div class="attribute" ng-show="cq.type == 'slider'">
+                            <span>Step size:</span>
+                            <input type="number" ng-model="cq.step" />
+                        </div>
+                        <div class="attribute" ng-show="cq.type == 'slider'">
+                            <span>Initial Value:</span>
+                            <input type="number" ng-model="cq.value" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Question:</h4>
+                        <textarea ng-model="cq.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['radio', 'checkbox'].indexOf(cq.type) >= 0">
+                        <h4>Options</h4>
+                        <div class="node" ng-repeat="option in cq.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCommentQuestionOption(cq,option)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" />
+                                </div>
+                                <div class="attribute">
+                                    <span>Display Text: </span>
+                                    <input type="text" ng-model="option.text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="node" ng-repeat="fragment in page.audioElements">
+                <h3>Audio Fragment</h3>
+                <div class="attributes">
+                    <div class="attribute">
+                        <span>Unique ID: </span>
+                        <input type="text" ng-model="fragment.id" />
+                    </div>
+                    <div class="attribute">
+                        <span>URL: </span>
+                        <input type="text" ng-model="fragment.url" />
+                        <span>Full URL: </span><span style="font-weight=600">{{page.hostURL}}{{fragment.url}}</span>
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Gain (dB): </span>
+                        <input type="number" ng-model="fragment.gain" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Label: </span>
+                        <input type="text" ng-model="fragment.label" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Common name: </span>
+                        <input type="text" ng-model="fragment.name" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Type: </span>
+                        <select ng-model="fragment.type">
+                            <option value="normal">Normal</option>
+                            <option value="anchor">Hidden Anchor</option>
+                            <option value="reference">Hidden Reference</option>
+                            <option value="outside-reference">Outside Reference</option>
+                        </select>
+                    </div>
+                    <div class="attribute" ng-show="fragment.type == 'anchor'">
+                        <span>Anchor must be below: </span>
+                        <input type="number" ng-model="fragment.marker" min="0" max="100" />
+                    </div>
+                    <div class="attribute" ng-show="fragment.type == 'reference'">
+                        <span>Reference must be above: </span>
+                        <input type="number" ng-model="fragment.marker" min="0" max="100" />
+                    </div>
+                    <div class="attribute">
+                        <span>Loudness: </span>
+                        <input type="number" ng-model="fragment.loudness" max="0" />
+                    </div>
+                    <div class="attribute" ng-show="page.poolSize > 0">
+                        <span>Always include fragment: </span>
+                        <input type="checkbox" ng-model="fragment.alwaysInclude" max="0" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Pre-Silence: </span>
+                        <input type="number" ng-model="fragment.preSilence" max="0" step="0.1" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Post-Silence: </span>
+                        <input type="number" ng-model="fragment.postSilence" max="0" step="0.1" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment playback start position (s): </span>
+                        <input type="number" ng-model="fragment.startTime" min="0" max="{{fragment.stopTime}}" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment playback stop position (s): </span>
+                        <input type="number" ng-model="fragment.stopTime" min="{{fragment.startTime}}" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment sampling rate: </span>
+                        <input type="number" ng-model="fragment.sampleRate" min="1" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Image (URL): </span>
+                        <input type="text" ng-model="fragment.image" />
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="popupHolder" ng-show="popupVisible">
             <div ng-controller="introduction" class="popup" ng-show="popupVisible">

@@ -20,12 +20,19 @@ function Specification() {
 
     // nodes
     this.metrics = new metricNode();
-    this.preTest = undefined;
-    this.postTest = undefined;
+    this.preTest = new surveyNode(this);
+    this.postTest = new surveyNode(this);
     this.pages = [];
     this.interfaces = new interfaceNode(this);
     this.errors = [];
     this.exitText = "Thank you.";
+
+    // Creators
+    this.createNewPage = function () {
+        var newpage = new page(this);
+        this.pages.push(newpage);
+        return newpage;
+    }
 
     var processAttribute = function (attribute, schema) {
         // attribute is the string returned from getAttribute on the XML
@@ -136,12 +143,10 @@ function Specification() {
             switch (location) {
                 case 'pre':
                 case 'before':
-                    this.preTest = new surveyNode(this);
                     this.preTest.decode(this, survey[i]);
                     break;
                 case 'post':
                 case 'after':
-                    this.postTest = new surveyNode(this);
                     this.postTest.decode(this, survey[i]);
                     break;
             }
@@ -207,8 +212,13 @@ function Specification() {
         this.location = undefined;
         this.options = [];
         this.parent = undefined;
-        this.schema = schemaRoot.querySelector('[name=survey]');
         this.specification = specification;
+
+        this.addOption = function () {
+            var node = new this.OptionNode(this.specification);
+            this.options.push(node);
+            return node;
+        }
 
         this.OptionNode = function (specification) {
             this.type = undefined;
@@ -381,6 +391,7 @@ function Specification() {
             };
         };
         this.decode = function (parent, xml) {
+            this.schema = schemaRoot.querySelector('[name=survey]');
             this.parent = parent;
             this.location = xml.getAttribute('location');
             if (this.location == 'before') {
@@ -540,8 +551,8 @@ function Specification() {
         this.loudness = undefined;
         this.label = undefined;
         this.labelStart = undefined;
-        this.preTest = undefined;
-        this.postTest = undefined;
+        this.preTest = new surveyNode(specification);
+        this.postTest = new surveyNode(specification);
         this.interfaces = [];
         this.playOne = undefined;
         this.restrictMovement = undefined;
@@ -592,17 +603,15 @@ function Specification() {
             for (i = 0; i < survey.length; i++) {
                 var location = survey[i].getAttribute('location');
                 if (location == 'pre' || location == 'before') {
-                    if (this.preTest !== undefined) {
+                    if (this.preTest.options.length !== 0) {
                         this.errors.push("Already a pre/before test survey defined! Ignoring second!!");
                     } else {
-                        this.preTest = new surveyNode(this.specification);
                         this.preTest.decode(parent, survey[i], surveySchema);
                     }
                 } else if (location == 'post' || location == 'after') {
-                    if (this.postTest !== undefined) {
+                    if (this.postTest.options.length !== 0) {
                         this.errors.push("Already a post/after test survey defined! Ignoring second!!");
                     } else {
-                        this.postTest = new surveyNode(this.specification);
                         this.postTest.decode(parent, survey[i], surveySchema);
                     }
                 }

@@ -53,6 +53,10 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
         $s.globalSchema = specification.getSchema();
     });
     $s.specification = specification;
+
+    $s.addPage = function () {
+        $s.specification.createNewPage();
+    }
 }]);
 
 AngularInterface.controller("introduction", ['$scope', '$element', '$window', function ($s, $e, $w) {
@@ -163,6 +167,25 @@ AngularInterface.controller("surveyOption", ['$scope', '$element', '$window', fu
             text: ""
         });
     };
+
+    $s.addCondition = function () {
+        $s.opt.conditions.push({
+            check: "equals",
+            value: "",
+            jumpToOnPass: undefined,
+            jumpToOnFail: undefined
+        });
+    };
+
+    $s.removeCondition = function (condition) {
+        var index = $s.opt.conditions.findIndex(function (c) {
+            return c == condition;
+        });
+        if (index === -1) {
+            throw ("Invalid Condition");
+        }
+        $s.opt.conditions.splice(index, 1);
+    };
 }]);
 
 AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', function ($s, $e, $w) {
@@ -201,6 +224,20 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
         } else if (index >= 0 && !$event.currentTarget.checked) {
             $s.interface.options.splice(index, 1);
         }
-    }
+    };
+    $s.removeScale = function (scale) {
+        var index = $s.interface.scales.findIndex(function (s) {
+            return s == scale;
+        });
+        if (index >= 0) {
+            $s.interface.scales.splice(index, 1);
+        }
+    };
+    $s.addScale = function () {
+        $s.interface.scales.push({
+            position: undefined,
+            text: undefined
+        });
+    };
 }]);
 AngularInterface.controller("page", ['$scope', '$element', '$window', function ($s, $e, $w) {}]);
