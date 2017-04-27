@@ -150,6 +150,21 @@ AngularInterface.controller("setup", ['$scope', '$element', '$window', function 
     };
 }]);
 
+AngularInterface.controller("survey", ['$scope', '$element', '$window', function ($s, $e, $w) {
+    $s.addSurveyEntry = function () {
+        $s.survey.addOption();
+    };
+    $s.removeSurveyEntry = function (entry) {
+        var index = $s.survey.options.findIndex(function (a) {
+            return a == entry;
+        });
+        if (index === -1) {
+            throw ("Invalid Entry");
+        }
+        $s.survey.options.splice(index, 1);
+    };
+}]);
+
 AngularInterface.controller("surveyOption", ['$scope', '$element', '$window', function ($s, $e, $w) {
 
     $s.removeOption = function (option) {

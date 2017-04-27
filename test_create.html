@@ -108,11 +108,12 @@
                     </div>
                 </div>
             </div>
-            <div id="globalpresurvey" class="node">
+            <div id="globalpresurvey" class="node" ng-controller="survey" ng-init="survey = specification.preTest">
                 <h2>Pre Test Survey</h2>
-                <button type="button" class="btn btn-success" ng-click="specification.preTest.addOption()">Add Entry</button>
-                <div class="node" ng-repeat="opt in specification.preTest.options" ng-controller="surveyOption">
+                <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
+                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
+                    <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
                     <div class="attributes">
                         <div class="attribute">
                             <span>Survey Type: </span>
@@ -223,14 +224,14 @@
                                     <span>Jump To On Pass: </span>
                                     <select ng-model="condition.jumpToOnPass">
                                         <option value="">None</option>
-                                        <option ng-repeat="entry in specification.preTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
                                     </select>
                                 </div>
                                 <div class="attribute">
                                     <span>Jump To On Fail: </span>
                                     <select ng-model="condition.jumpToOnFail">
                                         <option value="">None</option>
-                                        <option ng-repeat="entry in specification.preTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -238,11 +239,12 @@
                     </div>
                 </div>
             </div>
-            <div id="globalpostsurvey" class="node">
+            <div id="globalpostsurvey" class="node" ng-controller="survey" ng-init="survey = specification.postTest">
                 <h2>Post Test Survey</h2>
-                <button type="button" class="btn btn-success" ng-click="specification.postTest.addOption()">Add Entry</button>
-                <div class="node" ng-repeat="opt in specification.postTest.options" ng-controller="surveyOption">
+                <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
+                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
+                    <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
                     <div class="attributes">
                         <div class="attribute">
                             <span>Survey Type: </span>
@@ -353,14 +355,14 @@
                                     <span>Jump To On Pass: </span>
                                     <select ng-model="condition.jumpToOnPass">
                                         <option value="">None</option>
-                                        <option ng-repeat="entry in specification.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
                                     </select>
                                 </div>
                                 <div class="attribute">
                                     <span>Jump To On Fail: </span>
                                     <select ng-model="condition.jumpToOnFail">
                                         <option value="">None</option>
-                                        <option ng-repeat="entry in specification.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
                                     </select>
                                 </div>
                             </div>
