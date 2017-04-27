@@ -57,6 +57,16 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
     $s.addPage = function () {
         $s.specification.createNewPage();
     };
+
+    $s.exportXML = function () {
+        var s = new XMLSerializer();
+        var doc = specification.encode();
+        var bb = new Blob([s.serializeToString(doc)], {
+            type: 'application/xml'
+        });
+        var dnlk = window.URL.createObjectURL(bb);
+        window.location.href = dnlk;
+    }
 }]);
 
 AngularInterface.controller("introduction", ['$scope', '$element', '$window', function ($s, $e, $w) {
