@@ -11,7 +11,8 @@
             "interface": "MUSHRA",
             "description": {
                 "en": "Multi-stimulus with hidden reference and anchor. Each fragment is shown on its own vertical slider. One fragment must be labelled as a reference and another labelled as an anchor. One external reference must also be shown."
-            }
+            },
+            "scale": "ACR"
         }, {
             "name": "Vertical Sliders",
             "interface": "MUSHRA",
@@ -41,43 +42,50 @@
             "interface": "discrete",
             "description": {
                 "en": "Each stimulus is placed on a discrete scale. The scale is fixed to the Likert scale options of 'Strongly Disagree', 'Disagree', 'Neutral', 'Agree' and 'Strongly Agree'"
-            }
+            },
+            "scale": "Likert"
         }, {
             "name": "ABC/HR",
             "interface": "MUSHRA",
             "description": {
                 "en": "Each stimulus is placed on a vertical slider. The scale is fixed with the labels 'Imperceptible' to 'Very Annoying'"
-            }
+            },
+            "scale": "ABC"
         }, {
             "name": "Bipolar",
             "interface": "horizontal",
             "description": {
                 "en": "Each stimulus is placed on a horizontal slider and initialised to the value '0'. The scale operates from -50 to +5-. In the results this is normalised, like all other interfaces, from 0 (-50) to 1 (+50)"
-            }
+            },
+            "scale": "Bipolar"
         }, {
             "name": "Absolute Category Rating",
             "interface": "discrete",
             "description": {
                 "en": "Each element is on a discrete scale of 'Bad', 'Poor', 'Fair', 'Good' and 'Excellent'. Each element must be given a rating."
-            }
+            },
+            "scale": "ACR"
         }, {
             "name": "Discrete Category Rating",
             "interface": "discrete",
             "description": {
                 "en": ""
-            }
+            },
+            "scale": "DCR"
         }, {
             "name": "HCRS",
             "interface": "MUSHRA",
             "description": {
                 "en": ""
-            }
+            },
+            "scale": "Hedonic Category Rating Scale"
         }, {
             "name": "ITUR5PCIS",
             "interface": "MUSHRA",
             "description": {
                 "en": ""
-            }
+            },
+            "scale": "ACR"
         }, {
             "name": "AB",
             "interface": "AB",
@@ -96,6 +104,193 @@
             "description": {
                 "en": "Each fragment is displayed with a clickable waveform of itself. The user must click on the waveform at the location that a specific event occured. Users can then enter in information about this event. This test is unit-/value-less."
             }
+        }
+    ],
+    "scales": [
+        {
+            "name": "Likert",
+            "scales": [
+                {
+                    "text": "Strongly Disagree",
+                    "position": 0
+                },
+                {
+                    "text": "Disagree",
+                    "position": 25
+                },
+                {
+                    "text": "Neutral",
+                    "position": 50
+                },
+                {
+                    "text": "Agree",
+                    "position": 75
+                },
+                {
+                    "text": "Strongly Agree",
+                    "position": 100
+                }
+            ]
+        }, {
+            "name": "ABC",
+            "scales": [
+                {
+                    "text": "Very annoying",
+                    "position": 0
+                },
+                {
+                    "text": "Annoying",
+                    "position": 25
+                },
+                {
+                    "text": "Slightly annoying",
+                    "position": 50
+                },
+                {
+                    "text": "Perceptible but not annoying",
+                    "position": 75
+                },
+                {
+                    "text": "Imperceptible",
+                    "position": 100
+                }
+            ]
+        }, {
+            "name": "Bipolar",
+            "scales": [
+                {
+                    "text": "-50",
+                    "position": 0
+                },
+                {
+                    "text": "0",
+                    "position": 50
+                },
+                {
+                    "text": "50",
+                    "position": 100
+                }
+            ]
+        }, {
+            "name": "ACR",
+            "scales": [
+                {
+                    "text": "Bad",
+                    "position": 0
+                },
+                {
+                    "text": "Poor",
+                    "position": 25
+                },
+                {
+                    "text": "Fair",
+                    "position": 50
+                },
+                {
+                    "text": "Good",
+                    "position": 75
+                },
+                {
+                    "text": "Excellent",
+                    "position": 100
+                }
+            ]
+        }, {
+            "name": "DCR",
+            "scales": [
+                {
+                    "text": "(1) Very Annoying",
+                    "position": 0
+                },
+                {
+                    "text": "(2) Annoying",
+                    "position": 25
+                },
+                {
+                    "text": "(3) Slightly Annoying",
+                    "position": 50
+                },
+                {
+                    "text": "(4) Audible but not Annoying",
+                    "position": 75
+                },
+                {
+                    "text": "(5) Inaudible",
+                    "position": 100
+                }
+            ]
+        }, {
+            "name": "CCR",
+            "scales": [
+                {
+                    "text": "Much Worse",
+                    "position": 12
+                },
+                {
+                    "text": "Worse",
+                    "position": 25
+                },
+                {
+                    "text": "Slightly Worse",
+                    "position": 38
+                },
+                {
+                    "text": "About the same",
+                    "position": 50
+                },
+                {
+                    "text": "Slightly Better",
+                    "position": 62
+                },
+                {
+                    "text": "Better",
+                    "position": 75
+                },
+                {
+                    "text": "Much Better",
+                    "position": 88
+                }
+            ]
+        }, {
+            "name": "Hedonic Category Rating Scale",
+            "scales": [
+                {
+                    "text": "Dislike Extremeley",
+                    "position": 10
+                },
+                {
+                    "text": "Dislike Very Much",
+                    "position": 20
+                },
+                {
+                    "text": "Dislike Moderate",
+                    "position": 30
+                },
+                {
+                    "text": "Dislike Slightly",
+                    "position": 40
+                },
+                {
+                    "text": "Neither like nor dislike",
+                    "position": 50
+                },
+                {
+                    "text": "Like Slightly",
+                    "position": 60
+                },
+                {
+                    "text": "Like Moderate",
+                    "position": 70
+                },
+                {
+                    "text": "Like Very Much",
+                    "position": 80
+                },
+                {
+                    "text": "Like Extremely",
+                    "position": 90
+                }
+            ]
         }
     ]
 }
