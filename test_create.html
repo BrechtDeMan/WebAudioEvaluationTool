@@ -1000,7 +1000,9 @@
                         <div>
                             <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.1 version.</span>
                         </div>
-                        <div class="drag-drop" id="introdragdrop"><span>Upload XML here</span></div>
+                        <div>
+                            <input type="file" id="files" ng-model="files" onchange="handleFiles(event)" />
+                        </div>
                     </div>
                     <div ng-switch-when="1">
                         <div>

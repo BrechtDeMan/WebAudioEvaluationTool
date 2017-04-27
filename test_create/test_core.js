@@ -1,4 +1,4 @@
-/* globals document, angular, window, Promise, XMLHttpRequest, Specification */
+/* globals document, angular, window, Promise, XMLHttpRequest, Specification, XMLSerializer, Blob, DOMParser*/
 function get(url) {
     // Return a new promise.
     return new Promise(function (resolve, reject) {
@@ -38,6 +38,12 @@ window.onload = function () {
 
 };
 
+function handleFiles(event) {
+    var s = angular.element(event.currentTarget).scope();
+    s.handleFiles(event);
+    s.$apply();
+}
+
 AngularInterface.controller("view", ['$scope', '$element', '$window', function ($s, $e, $w) {
     $s.popupVisible = true;
 
@@ -66,14 +72,14 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
         });
         var dnlk = window.URL.createObjectURL(bb);
         window.location.href = dnlk;
-    }
+    };
 }]);
 
 AngularInterface.controller("introduction", ['$scope', '$element', '$window', function ($s, $e, $w) {
     $s.state = 0;
     $s.next = function () {
         $s.state++;
-        if ($s.state > 1) {
+        if ($s.state > 1 || $s.file) {
             $s.hidePopup();
         }
     };
@@ -96,6 +102,7 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
     };
     // Get the test interface specifications
     $s.interfaces = {};
+    $s.file = undefined;
     $s.description = "";
     var interfaceCollection = new Promise(function (resolve, reject) {
         var xml = new XMLHttpRequest();
@@ -115,6 +122,17 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         $s.interfaces = data.interfaces;
         $s.$apply();
     });
+
+    $s.handleFiles = function ($event) {
+        $s.file = $event.currentTarget.files[0];
+        var r = new FileReader();
+        r.onload = function () {
+            var p = new DOMParser();
+            specification.decode(p.parseFromString(r.result, "text/xml"));
+            $s.$apply();
+        }
+        r.readAsText($s.file);
+    };
 }]);
 
 AngularInterface.controller("setup", ['$scope', '$element', '$window', function ($s, $e, $w) {
