@@ -839,7 +839,17 @@
                 </div>
                 <div class="node">
                     <h3>Axis Scales</h3>
-                    <button type="button" class="btn btn-default" ng-click="addScale();">Add</button>
+                    <button type="button" class="btn btn-success" ng-click="addScale();">Add</button>
+                    <button type="button" class="btn btn-danger" ng-click="clearScales()" ng-show="interface.scales.length > 0">Clear Scales</button>
+                    <div class="dropdown" style="display: inline-block;">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            Use scale...
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li ng-repeat="scale in testSpecifications.scales" ng-click="useScales(scale.scales)"><a href="#">{{scale.name}}</a></li>
+                        </ul>
+                    </div>
                     <div class="node" ng-repeat="scale in interface.scales">
                         <div class="attributes">
                             <div class="attribute">
@@ -1011,7 +1021,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
-                                <div class="new-test" ng-repeat="i in interfaces" ng-mouseover="mouseover(i.name)" ng-click="initialise(i.name)">
+                                <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="initialise(i.name)">
                                     <label style="cursor:pointer">
                                         <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
                                     </label>

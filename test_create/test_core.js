@@ -46,6 +46,28 @@ function handleFiles(event) {
 
 AngularInterface.controller("view", ['$scope', '$element', '$window', function ($s, $e, $w) {
     $s.popupVisible = true;
+    $s.testSpecifications = {};
+
+    (function () {
+        new Promise(function (resolve, reject) {
+            var xml = new XMLHttpRequest();
+            xml.open("GET", "test_create/interfaces/specifications.json");
+            xml.onload = function () {
+                if (xml.status === 200) {
+                    resolve(xml.responseText);
+                    return;
+                }
+                reject(xml.status);
+            };
+            xml.onerror = function () {
+                reject(new Error("Network Error"));
+            };
+            xml.send();
+        }).then(JSON.parse).then(function (data) {
+            $s.testSpecifications = data;
+            $s.$apply();
+        })
+    })();
 
     $s.showPopup = function () {
         $s.popupVisible = true;
@@ -97,7 +119,7 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         $s.state--;
     };
     $s.mouseover = function (name) {
-        var obj = $s.interfaces.find(function (i) {
+        var obj = $s.testSpecifications.interfaces.find(function (i) {
             return i.name == name;
         });
         if (obj) {
@@ -111,27 +133,8 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         specification.interface = obj.interface;
     };
     // Get the test interface specifications
-    $s.interfaces = {};
     $s.file = undefined;
     $s.description = "";
-    var interfaceCollection = new Promise(function (resolve, reject) {
-        var xml = new XMLHttpRequest();
-        xml.open("GET", "test_create/interfaces/specifications.json");
-        xml.onload = function () {
-            if (xml.status === 200) {
-                resolve(xml.responseText);
-                return;
-            }
-            reject(xml.status);
-        };
-        xml.onerror = function () {
-            reject(new Error("Network Error"));
-        };
-        xml.send();
-    }).then(JSON.parse).then(function (data) {
-        $s.interfaces = data.interfaces;
-        $s.$apply();
-    });
 
     $s.handleFiles = function ($event) {
         $s.file = $event.currentTarget.files[0];
@@ -290,6 +293,15 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
         $s.interface.scales.push({
             position: undefined,
             text: undefined
+        });
+    };
+    $s.clearScales = function () {
+        $s.interface.scales = [];
+    };
+    $s.useScales = function (scales) {
+        $s.clearScales();
+        scales.forEach(function (s) {
+            $s.interface.scales.push(s);
         });
     };
 }]);
