@@ -1,4 +1,4 @@
-/* globals document, angular, window, Promise, XMLHttpRequest, Specification, XMLSerializer, Blob, DOMParser*/
+/* globals document, angular, window, Promise, XMLHttpRequest, Specification, XMLSerializer, Blob, DOMParser, FileReader*/
 function get(url) {
     // Return a new promise.
     return new Promise(function (resolve, reject) {
@@ -62,6 +62,16 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
 
     $s.addPage = function () {
         $s.specification.createNewPage();
+    };
+
+    $s.removePage = function (page) {
+        var index = $s.specification.pages.findIndex(function (a) {
+            return a == page;
+        });
+        if (index === -1) {
+            throw ("Invalid Page");
+        }
+        $s.specification.pages.splice(index, 1);
     };
 
     $s.exportXML = function () {
@@ -130,7 +140,7 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
             var p = new DOMParser();
             specification.decode(p.parseFromString(r.result, "text/xml"));
             $s.$apply();
-        }
+        };
         r.readAsText($s.file);
     };
 }]);

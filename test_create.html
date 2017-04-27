@@ -424,6 +424,7 @@
         </div>
         <div class="node pageNode" ng-controller="page" ng-repeat="page in specification.pages">
             <h2>Page</h2>
+            <button type="button" class="btn btn-danger" ng-click="removePage(page)">Remove Page</button>
             <div class="attributes">
                 <div class="attribute">
                     <span>Unique ID: </span>
