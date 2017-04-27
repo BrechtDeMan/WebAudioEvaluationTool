@@ -32,7 +32,7 @@ function Specification() {
         var newpage = new page(this);
         this.pages.push(newpage);
         return newpage;
-    }
+    };
 
     var processAttribute = function (attribute, schema) {
         // attribute is the string returned from getAttribute on the XML
@@ -218,7 +218,7 @@ function Specification() {
             var node = new this.OptionNode(this.specification);
             this.options.push(node);
             return node;
-        }
+        };
 
         this.OptionNode = function (specification) {
             this.type = undefined;
@@ -419,7 +419,7 @@ function Specification() {
             }
             return node;
         };
-    };
+    }
 
     function interfaceNode(specification) {
         this.title = undefined;
@@ -513,7 +513,7 @@ function Specification() {
             }
             return node;
         };
-    };
+    }
 
     function metricNode() {
         this.enabled = [];
@@ -538,7 +538,7 @@ function Specification() {
             }
             return node;
         };
-    };
+    }
 
     function page(specification) {
         this.presentedId = undefined;
@@ -563,6 +563,22 @@ function Specification() {
         this.schema = schemaRoot.querySelector("[name=page]");
         this.specification = specification;
         this.parent = undefined;
+
+        this.addInterface = function () {
+            var node = new interfaceNode(specification);
+            this.interfaces.push(node);
+            return node;
+        };
+        this.addCommentQuestion = function () {
+            var node = new commentQuestionNode(specification);
+            this.commentQuestions.push(node);
+            return node;
+        };
+        this.addAudioElement = function () {
+            var node = new audioElementNode(specification);
+            this.audioElements.push(node);
+            return node;
+        };
 
         this.decode = function (parent, xml) {
             this.parent = parent;
@@ -801,7 +817,7 @@ function Specification() {
                 }
                 return node;
             };
-        };
+        }
 
         function audioElementNode(specification) {
             this.url = undefined;
@@ -864,6 +880,6 @@ function Specification() {
                 });
                 return AENode;
             };
-        };
-    };
+        }
+    }
 }

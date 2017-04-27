@@ -511,11 +511,12 @@
                     <span style="font-weight:600">{{page.commentboxprefix}} A</span>
                 </p>
             </div>
-            <div class="node">
+            <div class="node" ng-controller="survey" ng-init="survey = page.preTest">
                 <h2>Pre Page Survey</h2>
-                <button type="button" class="btn btn-success" ng-click="page.preTest.addOption()">Add Entry</button>
-                <div class="node" ng-repeat="opt in page.preTest.options" ng-controller="surveyOption">
+                <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
+                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
+                    <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
                     <div class="attributes">
                         <div class="attribute">
                             <span>Survey Type: </span>
@@ -626,14 +627,14 @@
                                     <span>Jump To On Pass: </span>
                                     <select ng-model="condition.jumpToOnPass">
                                         <option value="">None</option>
-                                        <option ng-repeat="entry in page.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
                                     </select>
                                 </div>
                                 <div class="attribute">
                                     <span>Jump To On Fail: </span>
                                     <select ng-model="condition.jumpToOnFail">
                                         <option value="">None</option>
-                                        <option ng-repeat="entry in page.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -641,11 +642,12 @@
                     </div>
                 </div>
             </div>
-            <div class="node">
+            <div class="node" ng-controller="survey" ng-init="survey = specification.postTest">
                 <h2>Post Page Survey</h2>
-                <button type="button" class="btn btn-success" ng-click="page.postTest.addOption()">Add Entry</button>
-                <div class="node" ng-repeat="opt in page.postTest.options" ng-controller="surveyOption">
+                <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
+                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
+                    <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
                     <div class="attributes">
                         <div class="attribute">
                             <span>Survey Type: </span>
@@ -756,14 +758,14 @@
                                     <span>Jump To On Pass: </span>
                                     <select ng-model="condition.jumpToOnPass">
                                         <option value="">None</option>
-                                        <option ng-repeat="entry in page.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
                                     </select>
                                 </div>
                                 <div class="attribute">
                                     <span>Jump To On Fail: </span>
                                     <select ng-model="condition.jumpToOnFail">
                                         <option value="">None</option>
-                                        <option ng-repeat="entry in page.postTest.options" value="{{entry.id}}">{{entry.id}}</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -771,8 +773,10 @@
                     </div>
                 </div>
             </div>
+            <button type="button" class="btn btn-success" ng-show="specification.interface == 'APE' || page.interfaces.length == 0" ng-click="addInterface()">Add Interface/Axis</button>
             <div class="node" ng-repeat="interface in page.interfaces" ng-controller="interfaceNode">
                 <h2>Interface</h2>
+                <button type="button" class="btn btn-danger" ng-click="removeInterface(interface)">Remove Interface/Axis</button>
                 <div class="node interfaceOptions">
                     <div class="attributes">
                         <div class="attribute" name="fragmentPlayed" type="check">
@@ -853,7 +857,9 @@
             </div>
             <div class="node">
                 <h3>Comment Questions</h3>
+                <button type="button" class="btn btn-success" ng-click="addCommentQuestion()">Add Comment Question</button>
                 <div class="node" ng-repeat="cq in page.commentQuestions">
+                    <button type="button" class="btn btn-danger" ng-click="removeCommentQuestion(cq)">Remove Comment Question</button>
                     <div class="attributes">
                         <div class="attribute">
                             <span>Unique ID:</span>
@@ -904,8 +910,10 @@
                     </div>
                 </div>
             </div>
+            <button type="button" class="btn btn-success" ng-click="addAudioElement()">Add Fragment</button>
             <div class="node" ng-repeat="fragment in page.audioElements">
                 <h3>Audio Fragment</h3>
+                <button type="button" class="btn btn-danger" ng-click="removeAudioElement(fragment)">Remove Fragment</button>
                 <div class="attributes">
                     <div class="attribute">
                         <span>Unique ID: </span>

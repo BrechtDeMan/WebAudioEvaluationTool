@@ -56,7 +56,7 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
 
     $s.addPage = function () {
         $s.specification.createNewPage();
-    }
+    };
 }]);
 
 AngularInterface.controller("introduction", ['$scope', '$element', '$window', function ($s, $e, $w) {
@@ -255,4 +255,42 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
         });
     };
 }]);
-AngularInterface.controller("page", ['$scope', '$element', '$window', function ($s, $e, $w) {}]);
+AngularInterface.controller("page", ['$scope', '$element', '$window', function ($s, $e, $w) {
+    $s.addInterface = function () {
+        $s.page.addInterface();
+    };
+    $s.removeInterface = function (node) {
+        var index = $s.page.interfaces.findIndex(function (a) {
+            return a == node;
+        });
+        if (index === -1) {
+            throw ("Invalid node");
+        }
+        $s.page.interfaces.splice(index, 1);
+    };
+
+    $s.addCommentQuestion = function () {
+        $s.page.addCommentQuestion();
+    };
+    $s.removeCommentQuestion = function (node) {
+        var index = $s.page.commentQuestions.findIndex(function (a) {
+            return a == node;
+        });
+        if (index === -1) {
+            throw ("Invalid node");
+        }
+        $s.page.commentQuestions.splice(index, 1);
+    };
+    $s.addAudioElement = function () {
+        $s.page.addAudioElement();
+    };
+    $s.removeAudioElement = function (element) {
+        var index = $s.page.audioElements.findIndex(function (a) {
+            return a == element;
+        });
+        if (index === -1) {
+            throw ("Invalid node");
+        }
+        $s.page.audioElements.splice(index, 1);
+    };
+}]);
