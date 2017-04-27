@@ -66,7 +66,7 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
         }).then(JSON.parse).then(function (data) {
             $s.testSpecifications = data;
             $s.$apply();
-        })
+        });
     })();
 
     $s.showPopup = function () {
