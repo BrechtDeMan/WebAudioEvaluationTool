@@ -644,7 +644,7 @@
                     </div>
                 </div>
             </div>
-            <div class="node" ng-controller="survey" ng-init="survey = specification.postTest">
+            <div class="node" ng-controller="survey" ng-init="survey = page.postTest">
                 <h2>Post Page Survey</h2>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
                 <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
