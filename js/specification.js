@@ -22,6 +22,8 @@ function Specification() {
     this.metrics = new metricNode();
     this.preTest = new surveyNode(this);
     this.postTest = new surveyNode(this);
+    this.preTest.location = "pre";
+    this.postTest.location = "post";
     this.pages = [];
     this.interfaces = new interfaceNode(this);
     this.errors = [];
@@ -553,6 +555,8 @@ function Specification() {
         this.labelStart = undefined;
         this.preTest = new surveyNode(specification);
         this.postTest = new surveyNode(specification);
+        this.preTest.location = "pre";
+        this.postTest.location = "post";
         this.interfaces = [];
         this.playOne = undefined;
         this.restrictMovement = undefined;
