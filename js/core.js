@@ -2903,32 +2903,20 @@ function Interface(specificationObject) {
                     }
                 }
             }
+            if (this.playbackObject !== undefined && this.interval === undefined) {
+                window.requestAnimationFrame(this.update.bind(this));
+            }
         };
 
         playhead.interval = undefined;
 
         playhead.start = function () {
             if (this.playbackObject !== undefined && this.interval === undefined) {
-                if (this.maxTime < 60) {
-                    this.interval = window.setInterval(function () {
-                        interfaceContext.playhead.update();
-                    }, 10);
-                } else {
-                    this.interval = window.setInterval(function () {
-                        interfaceContext.playhead.update();
-                    }, 100);
-                }
+                window.requestAnimationFrame(this.update.bind(this));
             }
         };
         playhead.stop = function () {
-            window.clearInterval(this.interval);
-            this.interval = undefined;
-            this.scrubberHead.style.left = '0px';
-            if (this.maxTime < 60) {
-                this.curTimeSpan.textContent = '0.00';
-            } else {
-                this.curTimeSpan.textContent = '00:00';
-            }
+            this.timePerPixel = 0;
         };
         return playhead;
     })();
