@@ -847,7 +847,9 @@ function pageXMLSave(store, pageSpecification) {
                 for (var j = 0; j < mrnodes.length; j++) {
                     var name = mrnodes[j].getAttribute("name");
                     if (name == "elementTracker" || name == "elementTrackerFull" || name == "elementInitialPosition" || name == "elementFlagMoved") {
-                        mrnodes[j].setAttribute("interface-name", interfaceContext.interfaceSliders[k].name);
+                        if (interfaceContext.interfaceSliders[k].name !== null) {
+                            mrnodes[j].setAttribute("interface-name", interfaceContext.interfaceSliders[k].name);
+                        }
                         mrnodes[j].setAttribute("interface-id", k);
                     }
                 }
