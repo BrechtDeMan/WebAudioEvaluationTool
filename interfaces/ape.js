@@ -655,7 +655,9 @@ function sliderObject(audioObject, interfaceObjects, index) {
         var obj = [];
         $(this.trackSliderObjects).each(function (i, trackObj) {
             var node = storage.document.createElement('value');
-            node.setAttribute("interface-name", trackObj.getAttribute("interface-name"));
+            if (trackObj.getAttribute("interface-name") !== "null") {
+                node.setAttribute("interface-name", trackObj.getAttribute("interface-name"));
+            }
             node.textContent = convSliderPosToRate(trackObj);
             obj.push(node);
         });
@@ -847,7 +849,9 @@ function pageXMLSave(store, pageSpecification) {
                 for (var j = 0; j < mrnodes.length; j++) {
                     var name = mrnodes[j].getAttribute("name");
                     if (name == "elementTracker" || name == "elementTrackerFull" || name == "elementInitialPosition" || name == "elementFlagMoved") {
-                        mrnodes[j].setAttribute("interface-name", interfaceContext.interfaceSliders[k].name);
+                        if (interfaceContext.interfaceSliders[k].name !== null) {
+                            mrnodes[j].setAttribute("interface-name", interfaceContext.interfaceSliders[k].name);
+                        }
                         mrnodes[j].setAttribute("interface-id", k);
                     }
                 }
