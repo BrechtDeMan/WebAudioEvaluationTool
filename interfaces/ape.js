@@ -655,7 +655,9 @@ function sliderObject(audioObject, interfaceObjects, index) {
         var obj = [];
         $(this.trackSliderObjects).each(function (i, trackObj) {
             var node = storage.document.createElement('value');
-            node.setAttribute("interface-name", trackObj.getAttribute("interface-name"));
+            if (trackObj.getAttribute("interface-name") !== "null") {
+                node.setAttribute("interface-name", trackObj.getAttribute("interface-name"));
+            }
             node.textContent = convSliderPosToRate(trackObj);
             obj.push(node);
         });
