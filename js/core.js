@@ -3342,7 +3342,7 @@ function Interface(specificationObject) {
             return true;
         });
         if (failedObjects.length === 0) {
-            return false;
+            return true;
         }
         var failedString = [];
         failedObjects.forEach(function (a) {
@@ -3351,7 +3351,7 @@ function Interface(specificationObject) {
         var str = "You have not played fragments " + failedString.join(", ") + " enough. Please keep listening";
         interfaceContext.lightbox.post("Message", str);
         this.storeErrorNode(str);
-        return true;
+        return false;
     };
 
 
