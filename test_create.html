@@ -71,6 +71,14 @@
                     <span>Play audio one-at-a-time: </span>
                     <input type="checkbox" ng-model="specification.playOne" />
                 </div>
+                <div class="attribute">
+                    <span>Minimum number of fragment plays</span>
+                    <input type="number" ng-model="specification.minNumberPlays" min="0" max="{{specification.maxNumberPlays}}" />
+                </div>
+                <div class="attribute">
+                    <span>Maximum number of fragment plays</span>
+                    <input type="number" ng-model="specification.maxNumberPlays" min="{{specification.minNumberPlays || 0}}" />
+                </div>
             </div>
             <div class="node">
                 <h2>Test Completed Message</h2>
@@ -500,6 +508,14 @@
                 <div class="attribute">
                     <span>Only move playing audio: </span>
                     <input type="checkbox" ng-model="page.restrictMovement" />
+                </div>
+                <div class="attribute">
+                    <span>Minimum number of fragment plays</span>
+                    <input type="number" ng-model="page.minNumberPlays" min="0" max="{{page.maxNumberPlays || specification.maxNumberPlays}}" />
+                </div>
+                <div class="attribute">
+                    <span>Maximum number of fragment plays</span>
+                    <input type="number" ng-model="page.maxNumberPlays" min="{{page.minNumberPlays || specification.minNumberPlays || 0}}" />
                 </div>
             </div>
             <div class="node">
@@ -996,6 +1012,14 @@
                     <div class="attribute">
                         <span>Fragment Image (URL): </span>
                         <input type="text" ng-model="fragment.image" />
+                    </div>
+                    <div class="attribute">
+                        <span>Minimum number of plays</span>
+                        <input type="number" ng-model="fragment.minNumberPlays" min="0" max="{{fragment.maxNumberPlays || page.maxNumberPlays || specification.maxNumberPlays}}" />
+                    </div>
+                    <div class="attribute">
+                        <span>Maximum number of plays</span>
+                        <input type="number" ng-model="fragment.maxNumberPlays" min="{{fragment.minNumberPlays || page.minNumberPlays || specification.minNumberPlays || 0}}" />
                     </div>
                 </div>
             </div>
