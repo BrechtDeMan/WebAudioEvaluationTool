@@ -3333,6 +3333,27 @@ function Interface(specificationObject) {
         }
         return state;
     };
+    this.checkFragmentMinPlays = function () {
+        var failedObjects = audioEngineContext.audioObjects.filter(function (a) {
+            var minPlays = a.specification.minNumberPlays || a.specification.parent.minNumberPlays || specification.minNumberPlays;
+            if (minPlays === undefined || a.numberOfPlays >= minPlays) {
+                return false;
+            }
+            return true;
+        });
+        if (failedObjects.length === 0) {
+            return false;
+        }
+        var failedString = [];
+        failedObjects.forEach(function (a) {
+            failedString.push(a.interfaceDOM.getPresentedId());
+        });
+        var str = "You have not played fragments " + failedString.join(", ") + " enough. Please keep listening";
+        interfaceContext.lightbox.post("Message", str);
+        this.storeErrorNode(str);
+        return true;
+    };
+
 
     this.storeErrorNode = function (errorMessage) {
         var time = audioEngineContext.timer.getTestTime();
