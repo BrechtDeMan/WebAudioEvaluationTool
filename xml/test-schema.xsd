@@ -28,7 +28,7 @@
         </xs:attribute>
 
         <xs:attribute name="minNumberPlays" type="xs:nonNegativeInteger" default="0" />
-        <xs:attribute name="maxNumberPlays" type="xs:nonNegativeInteger" use="optional" />
+        <xs:attribute name="maxNumberPlays" type="xs:nonNegativeInteger" />
 
         <xs:attribute name="playOne" type="xs:boolean" default="false" />
 
@@ -70,8 +70,8 @@
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
                 <xs:attribute ref="playOne" />
-                <xs:attribute ref="minNumberPlays" />
-                <xs:attribute ref="maxNumberPlays" />
+                <xs:attribute ref="minNumberPlays" use="optional" />
+                <xs:attribute ref="maxNumberPlays" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -112,8 +112,8 @@
                 <xs:attribute ref="postSilence" />
                 <xs:attribute ref="playOne" />
                 <xs:attribute name="restrictMovement" type="xs:boolean" default="false" use="optional" />
-                <xs:attribute ref="minNumberPlays" />
-                <xs:attribute ref="maxNumberPlays" />
+                <xs:attribute ref="minNumberPlays" use="optional" />
+                <xs:attribute ref="maxNumberPlays" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -245,8 +245,8 @@
                     </xs:simpleType>
                 </xs:attribute>
                 <xs:attribute name="image" type="xs:anyURI" use="optional" />
-                <xs:attribute ref="minNumberPlays" />
-                <xs:attribute ref="maxNumberPlays" />
+                <xs:attribute ref="minNumberPlays" use="optional" />
+                <xs:attribute ref="maxNumberPlays" use="optional" />
             </xs:complexType>
         </xs:element>
 
