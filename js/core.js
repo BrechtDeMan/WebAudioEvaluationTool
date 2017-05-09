@@ -1717,6 +1717,11 @@ function AudioEngine(specification) {
         if (typeof id !== "number" || id < 0 || id > this.audioObjects.length) {
             throw ('FATAL - Passed id was undefined - AudioEngineContext.play(id)');
         }
+        var maxPlays = this.audioObjects[id].specification.maxNumberPlays || this.audioObjects[id].specification.parent.maxNumberPlays || specification.maxNumberPlays;
+        if (maxPlays !== undefined && this.audioObjects[id].numberOfPlays >= maxPlays) {
+            interfaceContext.lightbox.post("Error", "Cannot play this fragment more than " + maxPlays + " times");
+            return;
+        }
         if (this.status === 1) {
             this.timer.startTest();
             interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
@@ -1850,6 +1855,8 @@ function AudioEngine(specification) {
 function audioObject(id) {
     // The main buffer object with common control nodes to the AudioEngine
 
+    var playCounter = 0;
+
     this.specification = undefined;
     this.id = id;
     this.state = 0; // 0 - no data, 1 - ready
@@ -1946,6 +1953,7 @@ function audioObject(id) {
 
     this.play = function (startTime) {
         if (this.bufferNode === undefined && this.buffer.buffer !== undefined) {
+            playCounter++;
             this.bufferNode = audioContext.createBufferSource();
             this.bufferNode.owner = this;
             this.bufferNode.connect(this.outputGain);
@@ -2025,6 +2033,17 @@ function audioObject(id) {
         }
         this.metric.exportXMLDOM(this.storeDOM.getElementsByTagName('metric')[0]);
     };
+
+    Object.defineProperties(this, {
+        "numberOfPlays": {
+            'get': function () {
+                return playCounter;
+            },
+            'set': function () {
+                return playCounter;
+            }
+        }
+    });
 }
 
 function timer() {
