@@ -17,6 +17,8 @@ function Specification() {
     this.preSilence = undefined;
     this.postSilence = undefined;
     this.playOne = undefined;
+    this.minNumberPlays = undefined;
+    this.maxNumberPlays = undefined;
 
     // nodes
     this.metrics = undefined;
@@ -548,6 +550,8 @@ function Specification() {
         this.restrictMovement = undefined;
         this.position = undefined;
         this.commentBoxPrefix = "Comment on track";
+        this.minNumberPlays = undefined;
+        this.maxNumberPlays = undefined;
         this.audioElements = [];
         this.commentQuestions = [];
         this.schema = schemaRoot.getAllElementsByName("page")[0];
@@ -809,6 +813,8 @@ function Specification() {
             this.stopTime = undefined;
             this.sampleRate = undefined;
             this.image = undefined;
+            this.minNumberPlays = undefined;
+            this.maxNumberPlays = undefined;
             this.alternatives = [];
             this.schema = schemaRoot.getAllElementsByName('audioelement')[0];
             this.parent = undefined;
