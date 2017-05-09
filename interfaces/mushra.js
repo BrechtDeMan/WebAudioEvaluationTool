@@ -525,6 +525,9 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
     if (interfaceContext.checkHiddenReference() === false) {
         return;
     }
+    if (interfaceContext.checkFragmentMinPlays() === false) {
+        return;
+    }
 
     for (var i = 0; i < checks.length; i++) {
         var checkState = true;
