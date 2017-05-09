@@ -496,6 +496,9 @@ function buttonSubmitClick() {
     }
     var checks = testState.currentStateMap.interfaces[0].options,
         canContinue = true;
+    if (interfaceContext.checkFragmentMinPlays() === false) {
+        return;
+    }
     for (var i = 0; i < checks.length; i++) {
         var checkState = true;
         if (checks[i].type == 'check') {
