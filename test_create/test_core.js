@@ -103,7 +103,7 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
             type: 'application/xml'
         });
         var dnlk = window.URL.createObjectURL(bb);
-        window.location.href = dnlk;
+        $w.open(dnlk, "_blank");
     };
 }]);
 
