@@ -298,12 +298,14 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
     $s.clearScales = function () {
         $s.interface.scales = [];
     };
-    $s.useScales = function (scales) {
+    $s.useScales = function (scale) {
         $s.clearScales();
-        scales.forEach(function (s) {
+        scale.scales.forEach(function (s) {
             $s.interface.scales.push(s);
         });
+        $s.selectedScale = "Scale: " + scale.name
     };
+    $s.selectedScale = "Scale: Custom";
 }]);
 AngularInterface.controller("page", ['$scope', '$element', '$window', function ($s, $e, $w) {
     $s.addInterface = function () {
