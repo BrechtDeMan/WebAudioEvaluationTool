@@ -239,20 +239,15 @@ function loadTest(audioHolderObject) {
                     interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder, true);
                     break;
                 case "fragmentSort":
-                    (function () {
-                        var button = document.createElement("button");
+                    var button = document.getElementById('sort');
+                    if (button === null) {
+                        button = document.createElement("button");
+                        button.id = 'sort';
                         button.textContent = "Sort";
                         button.style.display = 'inline-block';
                         var container = document.getElementById("interface-buttons");
                         var neighbour = container.lastElementChild;
-                        while (neighbour.nodeName !== "BUTTON") {
-                            neighbour = neighbour.previousElementSibling;
-                        }
-                        if (neighbour.nextElementSibling) {
-                            container.insertBefore(button, neighbour.nextElementSibling);
-                        } else {
-                            container.appendChild(button);
-                        }
+                        container.appendChild(button);
                         button.onclick = function () {
                             var sortIndex = interfaceContext.sortFragmentsByScore();
                             var sliderBox = document.getElementById("slider-holder");
@@ -268,7 +263,7 @@ function loadTest(audioHolderObject) {
                                 sliderBox.appendChild(nodes[j].interfaceDOM.holder);
                             }
                         };
-                    })();
+                    }
                     break;
             }
         }
