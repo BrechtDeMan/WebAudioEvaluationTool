@@ -1,4 +1,4 @@
-/* globals document, angular, window, Promise, XMLHttpRequest, Specification, XMLSerializer, Blob, DOMParser, FileReader*/
+/* globals document, angular, window, Promise, XMLHttpRequest, Specification, XMLSerializer, Blob, DOMParser, FileReader, $*/
 function get(url) {
     // Return a new promise.
     return new Promise(function (resolve, reject) {
@@ -129,7 +129,7 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         }
     };
     $s.initialise = function (name) {
-        var obj = $s.interfaces.find(function (i) {
+        var obj = $s.testSpecifications.interfaces.find(function (i) {
             return i.name == name;
         });
         specification.interface = obj.interface;
@@ -305,7 +305,7 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
         scale.scales.forEach(function (s) {
             $s.interface.scales.push(s);
         });
-        $s.selectedScale = "Scale: " + scale.name
+        $s.selectedScale = "Scale: " + scale.name;
     };
     $s.selectedScale = "Scale: Custom";
 }]);
