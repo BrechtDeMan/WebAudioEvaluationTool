@@ -85,7 +85,7 @@ for file_name in os.listdir(folder_name):
                 audioElement = page.find("./audioelement/[@ref='"+ fragmentname+ "']") # Get the element
                 for value in audioElement.findall('./value'):
                     axisName = value.get('interface-name')
-                    if axisName == None:
+                    if axisName == None or axisName == "null":
                         axisName = 'default'
                     axisStore = storage[page_name]['axis'][axisName]
                     if hasattr(value, 'text'):
