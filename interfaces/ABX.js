@@ -14,7 +14,7 @@ function loadInterface() {
     interfaceContext.insertPoint.innerHTML = ""; // Clear the current schema
 
     // Custom comparator Object
-    Interface.prototype.comparator = null;
+    interfaceContext.comparator = null;
 
     // The injection point into the HTML page
     interfaceContext.insertPoint = document.getElementById("topLevelBody");
@@ -375,7 +375,7 @@ function comparator(page) {
         this.boxHolders.appendChild(node.box);
     }, this);
     var elementId = Math.floor(Math.random() * 2); //Randomly pick A or B to be X
-    var element = new page.audioElementNode(specification);
+    var element = page.addAudioElement();
     for (var atr in page.audioElements[elementId]) {
         element[atr] = page.audioElements[elementId][atr];
     }
