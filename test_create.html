@@ -27,91 +27,91 @@
                     <span>Interface: </span>
                     <input type="text" ng-model="specification.interface" required/>
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="If you would like to save to a server other than your hosting server, you can place the full WAET URL here">
                     <span>Save URL: </span>
                     <input type="text" ng-model="specification.projectReturn" placeholder="save.php" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Once the test is completed and save confirmed, the browser will redirect to this page, if not defined.">
                     <span>Exit URL: </span>
                     <input type="text" ng-model="specification.returnURL" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Randomise the page order">
                     <span>Randomise Page Order: </span>
                     <input type="checkbox" ng-model="specification.randomiseOrder" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the number of pages to present to the user. This includes repeated pages. Set to '0' or blank to ignore. Randomise page order must be selected.">
                     <span>Page Pool Size: </span>
                     <input type="number" ng-model="specification.poolSize" min="0" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Automatically analyse and normalsie audio to this target LUFS. If unsure, use -25LUFS. 0 or blank disables normalisation">
                     <span>Loudness Normalisation (LUFS): </span>
                     <input type="number" ng-model="specification.loudness" max="0" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Only perform the test if the browser reported sampling rate matches this.">
                     <span>Fixed Sampling Rate: </span>
                     <input type="number" ng-model="specification.sampleRate" min="0" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show a 'method of adjustment' audio calibration before testing.">
                     <span>Pre-Test audio calibration: </span>
                     <input type="checkbox" ng-model="specification.calibration" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default cross-fade time when switching between elements. Can be over-ridden on each page">
                     <span>Global Cross-fade time: </span>
                     <input type="number" ng-model="specification.crossFade" min="0" step="0.1" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default pre-play element silence. Can be over-ridden on each page and element">
                     <span>Global Fragment Pre-Silence: </span>
                     <input type="number" ng-model="specification.preSilence" min="0" step="0.1" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default post-play element silence. Can be over-ridden on each page and element">
                     <span>Global Fragment Post-Silence: </span>
                     <input type="number" ng-model="specification.preSilence" min="0" step="0.1" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Disable switching of audio elements">
                     <span>Play audio one-at-a-time: </span>
                     <input type="checkbox" ng-model="specification.playOne" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum number of times an audio fragment must be played">
                     <span>Minimum number of fragment plays</span>
                     <input type="number" ng-model="specification.minNumberPlays" min="0" max="{{specification.maxNumberPlays}}" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum number of times an audio fragment can be played">
                     <span>Maximum number of fragment plays</span>
                     <input type="number" ng-model="specification.maxNumberPlays" min="{{specification.minNumberPlays || 0}}" />
                 </div>
             </div>
             <div class="node">
                 <h2>Test Completed Message</h2>
-                <textarea ng-model="specification.exitText"></textarea>
+                <textarea ng-model="specification.exitText" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Once the test is completed, you can show a message to the user. Markdown syntax is supported for formatting."></textarea>
             </div>
             <div id="metricsNode" class="node">
                 <h3>Session Metrics</h3>
                 <div class="attributes">
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Report the total test participation time">
                         <span>Collect Total Test Time: </span>
                         <input type="checkbox" value="testTimer" ng-click="enableMetric($event)" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Collect the accumulative listening time for each fragment">
                         <span>Collect Fragment Listen Time: </span>
                         <input type="checkbox" value="elementTimer" ng-click="enableMetric($event)" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store the initial position of the fragment">
                         <span>Collect Fragment Initial Position: </span>
                         <input type="checkbox" value="elementInitialPosition" ng-click="enableMetric($event)" />
                     </div>
-                    <div class="attribute">
-                        <span>Collect Fragment Position over Time: </span>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store each movement / value change of each fragment with page-relative timestamps.">
+                        <span>Collect Fragment Movements: </span>
                         <input type="checkbox" value="elementTracker" ng-click="enableMetric($event)" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store boolean reporting if a fragment has been played">
                         <span>Collect Fragment Listened To Flag: </span>
                         <input type="checkbox" value="elementFlagListenedTo" ng-click="enableMetric($event)" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store boolean reporting if a fragment has been moved">
                         <span>Collect Fragment Moved Flag: </span>
                         <input type="checkbox" value="elementFlagMoved" ng-click="enableMetric($event)" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store each time a fragment starts and stops playback with page relative timestamps. Also holds fragment relative timestamps.">
                         <span>Collect Fragment Listened Flag: </span>
                         <input type="checkbox" value="elementListenTracker" ng-click="enableMetric($event)" />
                     </div>
@@ -438,7 +438,7 @@
                     <span>Unique ID: </span>
                     <input type="text" ng-model="page.id" required/>
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Define the common root of each fragment URL. For example if every fragment URL starts with 'http://example.org/media/' then this can be placed here and the remainder for each fragment in their respective URL boxed.">
                     <span>Fragment common-root URL: </span>
                     <input type="text" ng-model="page.hostURL" />
                 </div>
@@ -446,23 +446,23 @@
                     <span>Randomise Fragment Order: </span>
                     <input type="checkbox" ng-model="page.randomiseOrder" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Specify if this page should be repeated and how many times. Please note, that if page-pooling is also selected then it 'may' not repeat as many times.">
                     <span>Repeat Page N-times: </span>
                     <input type="number" ng-model="page.repeatCount" value="0" step="1" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Loop audio playback until manually stopped or the page submit button is pressed">
                     <span>Loop audio: </span>
                     <input type="checkbox" ng-model="page.loop" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Synchronise playback of each fragment in this page. If all fragments have the same audio (such as mix evaluations) then this can enable users to seemlessly transition. Otherwise audio will start from the beginning of each fragment">
                     <span>Synchronous audio playback: </span>
                     <input type="checkbox" ng-model="page.synchronous" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global loudness normalisation">
                     <span>Loudness (page): </span>
                     <input type="number" ng-model="page.loudness" max="0" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Label type to display on the fragments.">
                     <span>Label type: </span>
                     <select ng-model="page.label">
                         <option value="default">Default</option>
@@ -477,48 +477,44 @@
                     <span>Label Start: </span>
                     <input type="text" ng-model="page.labelStart" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Select a subgroup of the given audio fragments to display. 0 or blank means all fragments will be displayed.">
                     <span>Fragment pool size: </span>
                     <input type="number" ng-model="page.poolSize" min="0" max="page.audioElements.length" />
                 </div>
-                <div class="attribute" ng-show="specification.poolSize > 0">
+                <div class="attribute" ng-show="specification.poolSize > 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Always display this page, even after sub-pooling of pages">
                     <span>Always include page: </span>
                     <input type="checkbox" ng-model="page.alwaysInclude" />
                 </div>
-                <div class="attribute">
-                    <span>Fixed Page Position: </span>
-                    <input type="number" ng-model="page.position" max="{{specification.pages.length}}" />
-                </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Always show this page in this position. Useful for training pages to ensure they are always positioned first.">
                     <span>Fixed Page Position: </span>
                     <input type="number" ng-model="page.position" min="0" max="{{specification.pages.length}}" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global pre-silence">
                     <span>Fragment pre-silence: </span>
                     <input type="number" ng-model="page.preSilence" min="0" step="0.1" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global post-silence">
                     <span>Fragment post-silence: </span>
                     <input type="number" ng-model="page.postSilence" min="0" step="0.1" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Disable switching of audio">
                     <span>Cannot interupt audio: </span>
                     <input type="checkbox" ng-model="page.playOne" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Only allow playing fragments' interface handle to be manipulated during playback.">
                     <span>Only move playing audio: </span>
                     <input type="checkbox" ng-model="page.restrictMovement" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global minimum number of fragment plays">
                     <span>Minimum number of fragment plays</span>
                     <input type="number" ng-model="page.minNumberPlays" min="0" max="{{page.maxNumberPlays || specification.maxNumberPlays}}" />
                 </div>
-                <div class="attribute">
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global maximum number of fragment plays">
                     <span>Maximum number of fragment plays</span>
                     <input type="number" ng-model="page.maxNumberPlays" min="{{page.minNumberPlays || specification.minNumberPlays || 0}}" />
                 </div>
             </div>
-            <div class="node">
+            <div class="node" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the title of the page">
                 <h3>Page Title</h3>
                 <textarea ng-model="page.title"></textarea>
             </div>
@@ -952,11 +948,11 @@
                         <input type="text" ng-model="fragment.url" required/>
                         <span>Full URL: </span><span style="font-weight=600">{{page.hostURL}}{{fragment.url}}</span>
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the gain of this fragment. This is applied after any normalisation">
                         <span>Fragment Gain (dB): </span>
                         <input type="number" ng-model="fragment.gain" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Manually set the label">
                         <span>Fragment Label: </span>
                         <input type="text" ng-model="fragment.label" />
                     </div>
@@ -981,27 +977,27 @@
                         <span>Reference must be above: </span>
                         <input type="number" ng-model="fragment.marker" min="0" max="100" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global and page loudness">
                         <span>Loudness: </span>
                         <input type="number" ng-model="fragment.loudness" max="0" />
                     </div>
-                    <div class="attribute" ng-show="page.poolSize > 0">
+                    <div class="attribute" ng-show="page.poolSize > 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Always include this fragment after any sub-pooling">
                         <span>Always include fragment: </span>
                         <input type="checkbox" ng-model="fragment.alwaysInclude" max="0" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global / page pre-silence">
                         <span>Fragment Pre-Silence: </span>
                         <input type="number" ng-model="fragment.preSilence" max="0" step="0.1" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global / page post-silence">
                         <span>Fragment Post-Silence: </span>
                         <input type="number" ng-model="fragment.postSilence" max="0" step="0.1" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="By default the fragment will start playback at the beginning.">
                         <span>Fragment playback start position (s): </span>
                         <input type="number" ng-model="fragment.startTime" min="0" max="{{fragment.stopTime}}" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="By default the fragment will play until the end">
                         <span>Fragment playback stop position (s): </span>
                         <input type="number" ng-model="fragment.stopTime" min="{{fragment.startTime}}" />
                     </div>
@@ -1009,7 +1005,7 @@
                         <span>Fragment sampling rate: </span>
                         <input type="number" ng-model="fragment.sampleRate" min="1" />
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Associate an image with this fragment">
                         <span>Fragment Image (URL): </span>
                         <input type="text" ng-model="fragment.image" />
                     </div>

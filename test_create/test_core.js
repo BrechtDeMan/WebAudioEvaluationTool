@@ -35,7 +35,9 @@ var specification = new Specification();
 
 window.onload = function () {
     // Get the test interface specifications
-
+    $(function () {
+        $('[data-toggle="popover"]').popover();
+    });
 };
 
 function handleFiles(event) {
