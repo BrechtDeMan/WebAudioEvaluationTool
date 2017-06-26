@@ -402,13 +402,9 @@ function sliderObject(audioObject, label) {
         return this.slider.value;
     };
 
-    this.resize = function (event) {
-        var imgHeight = 0;
-        if (document.getElementById("imageController")) {
-            imgHeight = $(interfaceContext.imageHolder.root).height();
-        }
-        this.holder.style.height = window.innerHeight - 200 - imgHeight + 'px';
-        this.slider.style.height = window.innerHeight - 250 - imgHeight + 'px';
+    this.resize = function (event, height) {
+        this.holder.style.height = height - 20 + 'px';
+        this.slider.style.height = height - 70 + 'px';
     };
     this.updateLoading = function (progress) {
         progress = String(progress);
@@ -437,7 +433,9 @@ function resizeWindow(event) {
     // MANDATORY FUNCTION
 
     var outsideRef = document.getElementById('outside-reference'),
-        imageHeight = 0;
+        imageHeight = 0,
+        minHeight = Math.max(Math.floor(window.screen.height * 0.33), 200),
+        maxHeight = Math.floor(window.screen.height * 0.5);
     if (document.getElementById("imageController")) {
         imageHeight = $(interfaceContext.imageHolder.root).height();
     }
@@ -449,18 +447,21 @@ function resizeWindow(event) {
     var numObj = document.getElementsByClassName('track-slider').length;
     var totalWidth = (numObj - 1) * 150 + 100;
     var diff = (window.innerWidth - totalWidth) / 2;
-    document.getElementById('slider').style.height = window.innerHeight - 180 - imageHeight + 'px';
+    var height = window.innerHeight - 180 - imageHeight;
+    height = Math.min(height, maxHeight);
+    height = Math.max(height, minHeight);
+    document.getElementById('slider').style.height = height + 'px';
     if (diff <= 0) {
         diff = 0;
     }
     document.getElementById('slider-holder').style.marginLeft = diff + 'px';
     for (var i in audioEngineContext.audioObjects) {
         if (audioEngineContext.audioObjects[i].specification.type != 'outside-reference') {
-            audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
+            audioEngineContext.audioObjects[i].interfaceDOM.resize(event, height);
         }
     }
     document.getElementById('scale-holder').style.marginLeft = (diff - 100) + 'px';
-    document.getElementById('scale-text-holder').style.height = window.innerHeight - imageHeight - 194 + 'px';
+    document.getElementById('scale-text-holder').style.height = height - 14 + 'px';
     // Cheers edge for making me delete a canvas every resize.
     var canvas = document.getElementById('scale-canvas');
     var new_canvas = document.createElement("canvas");
@@ -468,7 +469,7 @@ function resizeWindow(event) {
     canvas.parentElement.appendChild(new_canvas);
     canvas.parentElement.removeChild(canvas);
     new_canvas.width = totalWidth;
-    new_canvas.height = window.innerHeight - 194 - imageHeight;
+    new_canvas.height = height - 14;
     drawScale();
 }
 
