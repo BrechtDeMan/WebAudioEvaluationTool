@@ -1198,9 +1198,9 @@ function stateMachine() {
 
         // First extract those excluded from picking process
         var picked = [];
-        pool.forEach(function (e) {
+        pool.forEach(function (e, i) {
             if (e.alwaysInclude) {
-                picked.push(e);
+                picked.push(pool.splice(i, 1)[0]);
             }
         });
 
