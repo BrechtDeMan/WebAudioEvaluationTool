@@ -441,9 +441,15 @@ function interfaceObject(audioObject, labelstr) {
     };
     this.startPlayback = function () {
         // Called when playback has begun
-        canvasIntervalID = window.setInterval(this.canvas.drawTicker.bind(this.canvas), 100);
+        var animate = function () {
+            this.canvas.drawTicker.call(this.canvas);
+            if (this.playButton.DOM.textContent == "Stop") {
+                window.requestAnimationFrame(animate);
+            }
+        }.bind(this);
         this.playButton.DOM.textContent = "Stop";
         interfaceContext.commentBoxes.highlightById(audioObject.id);
+        canvasIntervalID = window.requestAnimationFrame(animate);
     };
     this.stopPlayback = function () {
         // Called when playback has stopped. This gets called even if playback never started!
