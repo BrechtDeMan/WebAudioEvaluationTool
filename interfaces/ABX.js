@@ -238,9 +238,9 @@ function comparator(page) {
             $(".comparator-selector").removeClass('selected');
             $(this.selector).addClass('selected');
             interfaceContext.comparator.pair.forEach(function (obj) {
-                obj.value = 1.0 * obj === this;
+                obj.value = 1.0 * (obj === this);
                 obj.parent.metric.moved(time, obj.value);
-            });
+            }, this);
             console.log("Selected " + this.id + ' (' + time + ')');
         };
         this.playback.setAttribute("playstate", "ready");
