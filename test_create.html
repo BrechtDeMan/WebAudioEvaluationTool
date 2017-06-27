@@ -10,16 +10,36 @@
     <script type="text/javascript" src="js/specification.js"></script>
     <script type="text/javascript" src="test_create/test_core.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/xmllint.js"></script>
 
     <title>WAET 1.2.1 Test Creator</title>
 </head>
 
-<body>
-    <div ng-app="creator" ng-controller="view">
+<body ng-app="creator" ng-controller="view">
+    <div class="container">
         <div id="pageRoot">
             <h1>Web Audio Evaluation Tool - Test Creator</h1>
         </div>
-        <button type="button" class="btn btn-success" ng-click="exportXML()">Export XML</button>
+        <button type="button" class="btn btn-info" ng-click="validate()">Validate</button>
+        <button type="button" class="btn btn-success" ng-click="exportXML()" ng-disabled="validated == false">Export XML</button>
+        <div ng-switch on="validated" ng-show="showValidationMessages">
+            <div class="panel panel-danger" ng-switch-when="false">
+                <div class="panel-heading">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="hideValidationMessages"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="panel-title">Invalid Specification!</h3>
+                </div>
+                <div class="panel-body">
+                    <p>Your specification is invalid. Please fix the following issues!</p>
+                    <ul id="validation-error-list">
+                        <li>Errors</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="alert alert-success" role="alert" ng-switch-when="true">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="hideValidationMessages"><span aria-hidden="true">&times;</span></button>
+                <strong>Validates!</strong><span>Well done, you can export this specification!</span>
+            </div>
+        </div>
         <div id="setupNode" class="node" ng-controller="setup">
             <h2>Setup</h2>
             <div class="attributes">
@@ -1020,47 +1040,47 @@
                 </div>
             </div>
         </div>
-        <div id="popupHolder" ng-show="popupVisible">
-            <div ng-controller="introduction" class="popup" ng-show="popupVisible">
-                <div class="popupTitle" ng-switch="state">
-                    <span ng-switch-when="0">Test Creator</span>
-                    <span ng-switch-when="1">Create New Test</span>
-                </div>
-                <div class="popupContent container-fluid" ng-switch="state">
-                    <div ng-switch-when="0">
-                        <div>
-                            <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.1 version.</span>
-                        </div>
-                        <div>
-                            <input type="file" id="files" ng-model="files" onchange="handleFiles(event)" />
-                        </div>
+    </div>
+    <div id="popupHolder" ng-show="popupVisible">
+        <div ng-controller="introduction" class="popup" ng-show="popupVisible">
+            <div class="popupTitle" ng-switch="state">
+                <span ng-switch-when="0">Test Creator</span>
+                <span ng-switch-when="1">Create New Test</span>
+            </div>
+            <div class="popupContent container-fluid" ng-switch="state">
+                <div ng-switch-when="0">
+                    <div>
+                        <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.1 version.</span>
                     </div>
-                    <div ng-switch-when="1">
-                        <div>
-                            <span>Please select the interface you would like to use below. Selecting an interface will give a brief description of the interface type.</span>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
-                                <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="initialise(i.name)">
-                                    <label style="cursor:pointer">
-                                        <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <span>{{description}}</span>
-                            </div>
-                        </div>
+                    <div>
+                        <input type="file" id="files" ng-model="files" onchange="handleFiles(event)" />
                     </div>
                 </div>
-                <div class="popupButtons">
-                    <button id="popupBack" type="button" class="btn btn-default" ng-show="state>0" ng-click="back()">Back</button>
-                    <button id="popupNext" type="button" class="btn btn-default" ng-click="next()">Next</button>
+                <div ng-switch-when="1">
+                    <div>
+                        <span>Please select the interface you would like to use below. Selecting an interface will give a brief description of the interface type.</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
+                            <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="initialise(i.name)">
+                                <label style="cursor:pointer">
+                                    <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <span>{{description}}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="popupButtons">
+                <button id="popupBack" type="button" class="btn btn-default" ng-show="state>0" ng-click="back()">Back</button>
+                <button id="popupNext" type="button" class="btn btn-default" ng-click="next()">Next</button>
+            </div>
         </div>
-        <div id="screenblank" ng-show="popupVisible"></div>
     </div>
+    <div id="screenblank" ng-show="popupVisible"></div>
 </body>
 
 </html>

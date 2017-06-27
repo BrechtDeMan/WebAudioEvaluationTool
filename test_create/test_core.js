@@ -112,6 +112,38 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
         var dnlk = window.URL.createObjectURL(bb);
         $w.open(dnlk, "_blank");
     };
+    $s.validated = false;
+    $s.showValidationMessages = false;
+    $s.validate = function () {
+        var s = new XMLSerializer();
+        var Module = {
+            xml: s.serializeToString(specification.encode()),
+            schema: specification.getSchemaString(),
+            arguments: ["--noout", "--schema", 'test-schema.xsd', 'document.xml']
+        };
+        var xmllint = validateXML(Module);
+        console.log(xmllint);
+        if (xmllint != 'document.xml validates\n') {
+            $s.validated = false;
+            var list = $e[0].querySelector("#validation-error-list");
+            while (list.firstChild) {
+                list.removeChild(list.firstChild);
+            }
+            var errors = xmllint.split('\n');
+            errors = errors.slice(0, errors.length - 2);
+            errors.forEach(function (str) {
+                var li = document.createElement("li");
+                li.textContent = str;
+                list.appendChild(li);
+            });
+        } else {
+            $s.validated = true;
+        }
+        $s.showValidationMessages = true;
+    }
+    $s.hideValidationMessages = function () {
+        $s.showValidationMessages = false;
+    }
 }]);
 
 AngularInterface.controller("introduction", ['$scope', '$element', '$window', function ($s, $e, $w) {
