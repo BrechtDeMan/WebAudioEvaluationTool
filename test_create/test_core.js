@@ -83,6 +83,11 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
         $s.globalSchema = specification.getSchema();
     });
     $s.specification = specification;
+    $s.selectedTestPrototype = undefined;
+    $s.setTestPrototype = function (obj) {
+        $s.selectedTestPrototype = obj;
+        $w.specification.interface = obj.interface;
+    }
 
     $s.addPage = function () {
         $s.specification.createNewPage();
@@ -132,7 +137,10 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         var obj = $s.testSpecifications.interfaces.find(function (i) {
             return i.name == name;
         });
-        specification.interface = obj.interface;
+        if (obj === undefined) {
+            throw ("Cannot find specification");
+        }
+        $s.setTestPrototype(obj);
     };
     // Get the test interface specifications
     $s.file = undefined;
@@ -191,6 +199,10 @@ AngularInterface.controller("setup", ['$scope', '$element', '$window', function 
             }
         }
     };
+
+    $s.configure = function () {}
+
+    $s.$watch("selectedTestPrototype", $s.configure);
 }]);
 
 AngularInterface.controller("survey", ['$scope', '$element', '$window', function ($s, $e, $w) {
@@ -283,6 +295,7 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
             $s.interface.options.splice(index, 1);
         }
     };
+    $s.scales = [];
     $s.removeScale = function (scale) {
         var index = $s.interface.scales.findIndex(function (s) {
             return s == scale;
@@ -305,9 +318,62 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
         scale.scales.forEach(function (s) {
             $s.interface.scales.push(s);
         });
-        $s.selectedScale = "Scale: " + scale.name;
+        $s.selectedScale = scale.name;
     };
-    $s.selectedScale = "Scale: Custom";
+    $s.selectedScale = undefined;
+
+    $s.configure = function () {
+        if ($s.selectedTestPrototype === undefined) {
+            return;
+        }
+        if ($s.selectedTestPrototype.checks && $s.selectedTestPrototype.checks.length >= 1) {
+            $s.selectedTestPrototype.checks.forEach(function (entry) {
+                var dom = $e[0].querySelector("[name=\"" + entry.name + "\"] input");
+                if (entry.support == "none") {
+                    dom.checked = false;
+                    dom.disabled = true;
+                }
+            });
+        }
+        if ($s.selectedTestPrototype.show && $s.selectedTestPrototype.show.length >= 1) {
+            $s.selectedTestPrototype.show.forEach(function (entry) {
+                var dom = $e[0].querySelector("[name=\"" + entry.name + "\"] input");
+                if (entry.support == "none") {
+                    dom.checked = false;
+                    dom.disabled = true;
+                }
+            });
+        }
+        if ($s.interface !== specification.interfaces) {
+            // Page specific interface nodes
+            if ($s.selectedTestPrototype.hasScales !== undefined && ($s.selectedTestPrototype.hasScales == "false" || $s.selectedTestPrototype.hasScales == false)) {
+                var elem = $e[0].querySelector("[name=\"scale-selection\"]")
+                elem.style.visibility = "hidden";
+                elem.style.height = "0px";
+            }
+            if ($s.selectedTestPrototype.scales && $s.selectedTestPrototype.show.length >= 1) {
+                $s.scales = [];
+                $s.selectedTestPrototype.scales.forEach(function (scalename) {
+                    var obj = $s.testSpecifications.scales.find(function (a) {
+                        return a.name == scalename;
+                    });
+                    $s.scales.push(obj);
+                });
+                if ($s.selectedTestPrototype.scales.includes($s.selectedScale) == false) {
+                    $s.clearScales();
+                }
+                if ($s.scales.length == 1) {
+                    $s.clearScales();
+                    $s.useScales($s.scales[0]);
+                }
+            } else {
+                $s.scales = $s.testSpecifications.scales;
+            }
+        }
+    };
+
+    $s.$watch("selectedTestPrototype", $s.configure);
+    $s.configure();
 }]);
 AngularInterface.controller("page", ['$scope', '$element', '$window', function ($s, $e, $w) {
     $s.addInterface = function () {

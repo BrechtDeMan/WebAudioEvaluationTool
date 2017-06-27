@@ -849,17 +849,17 @@
                     <h3>Axis Image</h3>
                     <textarea ng-model="interface.image"></textarea>
                 </div>
-                <div class="node">
+                <div class="node" name="scale-selection">
                     <h3>Axis Scales</h3>
                     <button type="button" class="btn btn-success" ng-click="addScale();">Add</button>
                     <button type="button" class="btn btn-danger" ng-click="clearScales()" ng-show="interface.scales.length > 0">Clear Scales</button>
                     <div class="dropdown" style="display: inline-block;">
                         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            {{selectedScale}}
+                            Scales: {{selectedScale}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                            <li ng-repeat="scale in testSpecifications.scales" ng-click="useScales(scale)"><a href="#">{{scale.name}}</a></li>
+                            <li ng-repeat="scale in scales" ng-click="useScales(scale)"><a href="#">{{scale.name}}</a></li>
                         </ul>
                     </div>
                     <div class="node" ng-repeat="scale in interface.scales">
