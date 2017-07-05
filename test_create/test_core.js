@@ -106,11 +106,16 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
     $s.exportXML = function () {
         var s = new XMLSerializer();
         var doc = specification.encode();
+        var xmlstr = s.serializeToString(doc);
         var bb = new Blob([s.serializeToString(doc)], {
             type: 'application/xml'
         });
         var dnlk = window.URL.createObjectURL(bb);
-        $w.open(dnlk, "_blank");
+        var a = document.createElement("a");
+        a.href = dnlk;
+        a.download = "test.xml";
+        a.click();
+        window.URL.revokeObjectURL(dnlk);
     };
     $s.validated = false;
     $s.showValidationMessages = false;
