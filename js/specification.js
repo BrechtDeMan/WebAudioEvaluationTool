@@ -188,7 +188,7 @@ function Specification() {
         var attributes = schemaSetup.querySelectorAll('attribute');
         for (var i = 0; i < attributes.length; i++) {
             var name = attributes[i].getAttribute("name");
-            if (name === undefined) {
+            if (name === null) {
                 name = attributes[i].getAttribute("ref");
             }
             if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
