@@ -78,12 +78,12 @@
                 "en": "Each element is given a horizontal scale broken into a number of discrete choices. The number of choices is defined by the scale markers."
             }
         }, {
-            "name": "Rank",
+            "name": "Rank/Ordinal",
             "interface": "ordinal",
             "description": {
                 "en": "Each stimulus is placed on a discrete scale equalling the number of fragments. The fragments are then ranked based on the question posed. Only one element can occupy a rank position"
             }
-        }, {
+        },{
             "name": "Likert",
             "interface": "discrete",
             "description": {
