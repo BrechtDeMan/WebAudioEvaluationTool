@@ -30,6 +30,10 @@
             "name": "timeline",
             "scripts": ["interfaces/timeline.js"],
             "css": ["interfaces/timeline.css"]
+        }, {
+            "name": "ordinal",
+            "scripts": ["interfaces/ordinal.js"],
+            "css": ["interfaces/ordinal.css"]
         }
     ]
 }

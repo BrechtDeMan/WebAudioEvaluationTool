@@ -89,3 +89,11 @@ div#master-volume-holder {
     top: 10px;
     left: 120px;
 }
+div.imageController {
+    align-content: center;
+    text-align: center;
+    height: 250px;
+}
+div.imageController img {
+    max-height: 250px;
+}

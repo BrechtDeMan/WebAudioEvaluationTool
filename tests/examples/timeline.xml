@@ -30,8 +30,8 @@
                     <scalelabel position="100">(5) Inaudible</scalelabel>
                 </scales>
             </interface>
-            <audioelement url="0.wav" id="track-1" />
-            <audioelement url="1.wav" id="track-2" />
+            <audioelement url="0.wav" id="track-1" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+            <audioelement url="1.wav" id="track-2" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
             <commentquestions>
                 <commentradio id="preference">
                     <statement>Please enter your overall preference</statement>
@@ -61,8 +61,8 @@
                     <scalelabel position="100">(5) Inaudible</scalelabel>
                 </scales>
             </interface>
-            <audioelement url="0.wav" id="track-3" />
-            <audioelement url="1.wav" id="track-4" />
+            <audioelement url="0.wav" id="track-3" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+            <audioelement url="1.wav" id="track-4" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
             <commentquestions>
                 <commentradio id="preference1">
                     <statement>Please enter your overall preference</statement>

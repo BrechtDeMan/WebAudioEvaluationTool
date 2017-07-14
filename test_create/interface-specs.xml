@@ -500,7 +500,7 @@
             </test>
             <test name="AB" interface="AB">
                 <descriptions>
-                    <description lang="en">Each page has only two audio fragments. The user must select one of the two fragments to proceed. There can be one hidden reference.</description>
+                    <description lang="en">A page contains a number of audio fragments. The user must select one of the fragments to proceed. There can be a hidden reference.</description>
                 </descriptions>
                 <checks>
                     <entry name="fragmentPlayed" support="none" />
@@ -520,7 +520,7 @@
             </test>
             <test name="ABX" interface="ABX">
                 <descriptions>
-                    <description lang="en">Each page has two audio fragments presented as A and B. The test duplicates one of the fragments and presents it as X. The user must choose which, out of A or B, is closest to X.</description>
+                    <description lang="en">Each page has a number of audio fragments presented as A and B (and C, ...). The test duplicates one of the fragments and presents it as X. The user must choose which, out of A or B (or C, ...), is closest to X.</description>
                 </descriptions>
             </test>
             <test name="timeline" interface="timeline">

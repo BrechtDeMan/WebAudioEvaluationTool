@@ -3,29 +3,1084 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <!-- This defines the test creator tool for the Web Audio Evaluation Toolbox -->
-    <link rel='stylesheet' type="text/css" href="test_create/style.css" />
-    <link rel='stylesheet' type="text/css" href="test_create/custom.css" />
-    <script type="text/javascript">
-        window.onbeforeunload = function(e) {
-            var message = 'If you leave the page now, any unsaved changes will be lost',
-                e = e || window.event;
-            if (e) {
-                e.returnValue = message;
-            }
-            return message;
-        };
-        // Copy of Specifiation node from Core.js
-
-    </script>
+    <link rel="stylesheet" type="text/css" href="test_create/style.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="js/jquery-2.1.4.js"></script>
-    <script type="text/javascript" src='js/specification.js'></script>
+    <script src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/specification.js"></script>
     <script type="text/javascript" src="test_create/test_core.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/xmllint.js"></script>
+
+    <title>WAET 1.2.1 Test Creator</title>
 </head>
 
-<body>
-    <div id="popupHolder"></div>
-    <div id="blanket"></div>
-    <div id="content"></div>
+<body ng-app="creator" ng-controller="view">
+    <div class="container">
+        <div id="pageRoot">
+            <h1>Web Audio Evaluation Tool - Test Creator</h1>
+        </div>
+        <button type="button" class="btn btn-info" ng-click="validate()">Validate</button>
+        <button type="button" class="btn btn-success" ng-click="exportXML()" ng-disabled="validated == false">Export XML</button>
+        <div ng-switch on="validated" ng-show="showValidationMessages">
+            <div class="panel panel-danger" ng-switch-when="false">
+                <div class="panel-heading">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="hideValidationMessages"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="panel-title">Invalid Specification!</h3>
+                </div>
+                <div class="panel-body">
+                    <p>Your specification is invalid. Please fix the following issues!</p>
+                    <ul id="validation-error-list">
+                        <li>Errors</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="alert alert-success" role="alert" ng-switch-when="true">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="hideValidationMessages"><span aria-hidden="true">&times;</span></button>
+                <strong>Validates!</strong><span>Well done, you can export this specification!</span>
+            </div>
+        </div>
+        <div id="setupNode" class="node" ng-controller="setup">
+            <h2>Setup</h2>
+            <div class="attributes">
+                <div class="attribute">
+                    <span>Interface: </span>
+                    <input type="text" ng-model="specification.interface" required/>
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="If you would like to save to a server other than your hosting server, you can place the full WAET URL here">
+                    <span>Save URL: </span>
+                    <input type="text" ng-model="specification.projectReturn" placeholder="save.php" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Once the test is completed and save confirmed, the browser will redirect to this page, if not defined.">
+                    <span>Exit URL: </span>
+                    <input type="text" ng-model="specification.returnURL" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Randomise the page order">
+                    <span>Randomise Page Order: </span>
+                    <input type="checkbox" ng-model="specification.randomiseOrder" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the number of pages to present to the user. This includes repeated pages. Set to '0' or blank to ignore. Randomise page order must be selected.">
+                    <span>Page Pool Size: </span>
+                    <input type="number" ng-model="specification.poolSize" min="0" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Automatically analyse and normalsie audio to this target LUFS. If unsure, use -25LUFS. 0 or blank disables normalisation">
+                    <span>Loudness Normalisation (LUFS): </span>
+                    <input type="number" ng-model="specification.loudness" max="0" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Only perform the test if the browser reported sampling rate matches this.">
+                    <span>Fixed Sampling Rate: </span>
+                    <input type="number" ng-model="specification.sampleRate" min="0" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show a 'method of adjustment' audio calibration before testing.">
+                    <span>Pre-Test audio calibration: </span>
+                    <input type="checkbox" ng-model="specification.calibration" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default cross-fade time when switching between elements. Can be over-ridden on each page">
+                    <span>Global Cross-fade time: </span>
+                    <input type="number" ng-model="specification.crossFade" min="0" step="0.1" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default pre-play element silence. Can be over-ridden on each page and element">
+                    <span>Global Fragment Pre-Silence: </span>
+                    <input type="number" ng-model="specification.preSilence" min="0" step="0.1" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default post-play element silence. Can be over-ridden on each page and element">
+                    <span>Global Fragment Post-Silence: </span>
+                    <input type="number" ng-model="specification.preSilence" min="0" step="0.1" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Disable switching of audio elements">
+                    <span>Play audio one-at-a-time: </span>
+                    <input type="checkbox" ng-model="specification.playOne" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum number of times an audio fragment must be played">
+                    <span>Minimum number of fragment plays</span>
+                    <input type="number" ng-model="specification.minNumberPlays" min="0" max="{{specification.maxNumberPlays}}" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum number of times an audio fragment can be played">
+                    <span>Maximum number of fragment plays</span>
+                    <input type="number" ng-model="specification.maxNumberPlays" min="{{specification.minNumberPlays || 0}}" />
+                </div>
+            </div>
+            <div class="node">
+                <h2>Test Completed Message</h2>
+                <textarea ng-model="specification.exitText" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Once the test is completed, you can show a message to the user. Markdown syntax is supported for formatting."></textarea>
+            </div>
+            <div id="metricsNode" class="node">
+                <h3>Session Metrics</h3>
+                <div class="attributes">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Report the total test participation time">
+                        <span>Collect Total Test Time: </span>
+                        <input type="checkbox" value="testTimer" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Collect the accumulative listening time for each fragment">
+                        <span>Collect Fragment Listen Time: </span>
+                        <input type="checkbox" value="elementTimer" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store the initial position of the fragment">
+                        <span>Collect Fragment Initial Position: </span>
+                        <input type="checkbox" value="elementInitialPosition" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store each movement / value change of each fragment with page-relative timestamps.">
+                        <span>Collect Fragment Movements: </span>
+                        <input type="checkbox" value="elementTracker" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store boolean reporting if a fragment has been played">
+                        <span>Collect Fragment Listened To Flag: </span>
+                        <input type="checkbox" value="elementFlagListenedTo" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store boolean reporting if a fragment has been moved">
+                        <span>Collect Fragment Moved Flag: </span>
+                        <input type="checkbox" value="elementFlagMoved" ng-click="enableMetric($event)" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Store each time a fragment starts and stops playback with page relative timestamps. Also holds fragment relative timestamps.">
+                        <span>Collect Fragment Listened Flag: </span>
+                        <input type="checkbox" value="elementListenTracker" ng-click="enableMetric($event)" />
+                    </div>
+                </div>
+            </div>
+            <div id="globalpresurvey" class="node" ng-controller="survey" ng-init="survey = specification.preTest">
+                <h2>Pre Test Survey</h2>
+                <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
+                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
+                    <h3>Survey Entry</h3>
+                    <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Survey Type: </span>
+                            <select ng-model="opt.type">
+                                <option value="question">Question</option>
+                                <option value="radio">Radio</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="statement">Statement</option>
+                                <option value="number">Number</option>
+                                <option value="slider">Slider</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
+                            <span>Unique Survey Entry ID:</span>
+                            <input type="text" ng-model="opt.id" required/>
+                        </div>
+                        <div class="attribute">
+                            <span>Entry Name:</span>
+                            <input type="text" ng-model="opt.name" />
+                        </div>
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="opt.mandatory" />
+                        </div>
+                        <div class="attribute">
+                            <span>Minimum Wait Time (s):</span>
+                            <input type="number" ng-model="opt.minWait" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="opt.type == 'question'">
+                            <span>Box Size:</span>
+                            <select ng-model="opt.boxsize">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Minimum Selected:</span>
+                            <input type="number" ng-model="opt.min" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Maximum Selected:</span>
+                            <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Minimum Value:</span>
+                            <input type="number" ng-model="opt.min" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Maximum Value:</span>
+                            <input type="number" ng-model="opt.max" />
+                        </div>
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                            <span>Video URL:</span>
+                            <input type="text" ng-model="opt.url" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Statement</h4>
+                        <textarea ng-model="opt.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <h4>Options</h4>
+                        <div>
+                            <button type="button" class="btn btn-default" ng-click="addOption();">Add Option</button>
+                        </div>
+                        <div class="node" ng-repeat="option in opt.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-default" ng-click="removeOption(option);">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Displayed Text: </span>
+                                    <input type="text" ng-model="option.text" required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Conditionals</h4>
+                        <button type="button" class="btn btn-default" ng-click="addCondition()">Add Condition</button>
+                        <div class="node" ng-repeat="condition in opt.conditions">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCondition(condition)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Check Type:</span>
+                                    <select ng-model="condition.check">
+                                        <option value="equals">Equal To</option>
+                                        <option value="lessThan">Less Than</option>
+                                        <option value="greaterThan">Greater Than</option>
+                                        <option value="stringContains">String Contains</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Value: </span>
+                                    <input type="text" ng-model="condition.value" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Pass: </span>
+                                    <select ng-model="condition.jumpToOnPass">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Fail: </span>
+                                    <select ng-model="condition.jumpToOnFail">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="globalpostsurvey" class="node" ng-controller="survey" ng-init="survey = specification.postTest">
+                <h2>Post Test Survey</h2>
+                <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
+                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
+                    <h3>Survey Entry</h3>
+                    <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Survey Type: </span>
+                            <select ng-model="opt.type">
+                                <option value="question">Question</option>
+                                <option value="radio">Radio</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="statement">Statement</option>
+                                <option value="number">Number</option>
+                                <option value="slider">Slider</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
+                            <span>Unique Survey Entry ID:</span>
+                            <input type="text" ng-model="opt.id" required/>
+                        </div>
+                        <div class="attribute">
+                            <span>Entry Name:</span>
+                            <input type="text" ng-model="opt.name" />
+                        </div>
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="opt.mandatory" />
+                        </div>
+                        <div class="attribute">
+                            <span>Minimum Wait Time (s):</span>
+                            <input type="number" ng-model="opt.minWait" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="opt.type == 'question'">
+                            <span>Box Size:</span>
+                            <select ng-model="opt.boxsize">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Minimum Selected:</span>
+                            <input type="number" ng-model="opt.min" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Maximum Selected:</span>
+                            <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Minimum Value:</span>
+                            <input type="number" ng-model="opt.min" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Maximum Value:</span>
+                            <input type="number" ng-model="opt.max" />
+                        </div>
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                            <span>Video URL:</span>
+                            <input type="text" ng-model="opt.url" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Statement</h4>
+                        <textarea ng-model="opt.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <h4>Options</h4>
+                        <div>
+                            <button type="button" class="btn btn-default" ng-click="addOption();">Add Option</button>
+                        </div>
+                        <div class="node" ng-repeat="option in opt.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-default" ng-click="removeOption(option);">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Displayed Text: </span>
+                                    <input type="text" ng-model="option.text" required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Conditionals</h4>
+                        <button type="button" class="btn btn-default" ng-click="addCondition()">Add Condition</button>
+                        <div class="node" ng-repeat="condition in opt.conditions">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCondition(condition)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Check Type:</span>
+                                    <select ng-model="condition.check">
+                                        <option value="equals">Equal To</option>
+                                        <option value="lessThan">Less Than</option>
+                                        <option value="greaterThan">Greater Than</option>
+                                        <option value="stringContains">String Contains</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Value: </span>
+                                    <input type="text" ng-model="condition.value" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Pass: </span>
+                                    <select ng-model="condition.jumpToOnPass">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Fail: </span>
+                                    <select ng-model="condition.jumpToOnFail">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="globalinterface" class="node" ng-controller="interfaceNode" ng-init="interface = specification.interfaces">
+                <h2>Interface (Globals)</h2>
+                <div class="node interfaceOptions">
+                    <div class="attributes">
+                        <div class="attribute" name="fragmentPlayed" type="check">
+                            <span>Check all fragments played: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentFullPlayback" type="check">
+                            <span>Check all fragments fully played: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentMoved" type="check">
+                            <span>Check all fragments have been moved: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentComments" type="check">
+                            <span>Check all fragments have comments: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="scalerange" type="check">
+                            <span>Enforce a scale usage: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                            <span>Minimum:</span>
+                            <input type="number" min="0" max="100" name="min" />
+                            <span>Maximum:</span>
+                            <input type="number" min="0" max="100" name="max" />
+                        </div>
+                        <div class="attribute" name="volume" type="show">
+                            <span>Show master volume control: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="playhead" type="show">
+                            <span>Show playhead: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="page-count" type="show">
+                            <span>Show Page Count: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="comments" type="show">
+                            <span>Show Fragment Comments: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <button type="button" class="btn btn-success" ng-click="addPage()">Add Page</button>
+        </div>
+        <div class="node pageNode" ng-controller="page" ng-repeat="page in specification.pages">
+            <h2>Page</h2>
+            <button type="button" class="btn btn-danger" ng-click="removePage(page)">Remove Page</button>
+            <div class="attributes">
+                <div class="attribute">
+                    <span>Unique ID: </span>
+                    <input type="text" ng-model="page.id" required/>
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Define the common root of each fragment URL. For example if every fragment URL starts with 'http://example.org/media/' then this can be placed here and the remainder for each fragment in their respective URL boxed.">
+                    <span>Fragment common-root URL: </span>
+                    <input type="text" ng-model="page.hostURL" />
+                </div>
+                <div class="attribute">
+                    <span>Randomise Fragment Order: </span>
+                    <input type="checkbox" ng-model="page.randomiseOrder" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Specify if this page should be repeated and how many times. Please note, that if page-pooling is also selected then it 'may' not repeat as many times.">
+                    <span>Repeat Page N-times: </span>
+                    <input type="number" ng-model="page.repeatCount" value="0" step="1" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Loop audio playback until manually stopped or the page submit button is pressed">
+                    <span>Loop audio: </span>
+                    <input type="checkbox" ng-model="page.loop" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Synchronise playback of each fragment in this page. If all fragments have the same audio (such as mix evaluations) then this can enable users to seemlessly transition. Otherwise audio will start from the beginning of each fragment">
+                    <span>Synchronous audio playback: </span>
+                    <input type="checkbox" ng-model="page.synchronous" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global loudness normalisation">
+                    <span>Loudness (page): </span>
+                    <input type="number" ng-model="page.loudness" max="0" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Label type to display on the fragments.">
+                    <span>Label type: </span>
+                    <select ng-model="page.label">
+                        <option value="default">Default</option>
+                        <option value="none">None</option>
+                        <option value="number">[1, 2, 3...]</option>
+                        <option value="letter">[a, b, c...]</option>
+                        <option value="capital">[A, B, C...]</option>
+                        <option value="samediff" ng-show="specification.interface == 'AB'">[Same, Different]</option>
+                    </select>
+                </div>
+                <div class="attribute" ng-show="page.label != 'default' && page.label != 'none'">
+                    <span>Label Start: </span>
+                    <input type="text" ng-model="page.labelStart" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Select a subgroup of the given audio fragments to display. 0 or blank means all fragments will be displayed.">
+                    <span>Fragment pool size: </span>
+                    <input type="number" ng-model="page.poolSize" min="0" max="page.audioElements.length" />
+                </div>
+                <div class="attribute" ng-show="specification.poolSize > 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Always display this page, even after sub-pooling of pages">
+                    <span>Always include page: </span>
+                    <input type="checkbox" ng-model="page.alwaysInclude" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Always show this page in this position. Useful for training pages to ensure they are always positioned first.">
+                    <span>Fixed Page Position: </span>
+                    <input type="number" ng-model="page.position" min="0" max="{{specification.pages.length}}" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global pre-silence">
+                    <span>Fragment pre-silence: </span>
+                    <input type="number" ng-model="page.preSilence" min="0" step="0.1" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global post-silence">
+                    <span>Fragment post-silence: </span>
+                    <input type="number" ng-model="page.postSilence" min="0" step="0.1" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Disable switching of audio">
+                    <span>Cannot interupt audio: </span>
+                    <input type="checkbox" ng-model="page.playOne" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Only allow playing fragments' interface handle to be manipulated during playback.">
+                    <span>Only move playing audio: </span>
+                    <input type="checkbox" ng-model="page.restrictMovement" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global minimum number of fragment plays">
+                    <span>Minimum number of fragment plays</span>
+                    <input type="number" ng-model="page.minNumberPlays" min="0" max="{{page.maxNumberPlays || specification.maxNumberPlays}}" />
+                </div>
+                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global maximum number of fragment plays">
+                    <span>Maximum number of fragment plays</span>
+                    <input type="number" ng-model="page.maxNumberPlays" min="{{page.minNumberPlays || specification.minNumberPlays || 0}}" />
+                </div>
+            </div>
+            <div class="node" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the title of the page">
+                <h3>Page Title</h3>
+                <textarea ng-model="page.title"></textarea>
+            </div>
+            <div class="node">
+                <h3>Comment box text prefix</h3>
+                <textarea ng-model="page.commentboxprefix"></textarea>
+                <p>Example:
+                    <span style="font-weight:600">{{page.commentboxprefix}} A</span>
+                </p>
+            </div>
+            <div class="node" ng-controller="survey" ng-init="survey = page.preTest">
+                <h2>Pre Page Survey</h2>
+                <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
+                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
+                    <h3>Survey Entry</h3>
+                    <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Survey Type: </span>
+                            <select ng-model="opt.type">
+                                <option value="question">Question</option>
+                                <option value="radio">Radio</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="statement">Statement</option>
+                                <option value="number">Number</option>
+                                <option value="slider">Slider</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
+                            <span>Unique Survey Entry ID:</span>
+                            <input type="text" ng-model="opt.id" required/>
+                        </div>
+                        <div class="attribute">
+                            <span>Entry Name:</span>
+                            <input type="text" ng-model="opt.name" />
+                        </div>
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="opt.mandatory" />
+                        </div>
+                        <div class="attribute">
+                            <span>Minimum Wait Time (s):</span>
+                            <input type="number" ng-model="opt.minWait" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="opt.type == 'question'">
+                            <span>Box Size:</span>
+                            <select ng-model="opt.boxsize">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Minimum Selected:</span>
+                            <input type="number" ng-model="opt.min" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Maximum Selected:</span>
+                            <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Minimum Value:</span>
+                            <input type="number" ng-model="opt.min" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Maximum Value:</span>
+                            <input type="number" ng-model="opt.max" />
+                        </div>
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                            <span>Video URL:</span>
+                            <input type="text" ng-model="opt.url" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Statement</h4>
+                        <textarea ng-model="opt.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <h4>Options</h4>
+                        <div>
+                            <button type="button" class="btn btn-default" ng-click="addOption();">Add Option</button>
+                        </div>
+                        <div class="node" ng-repeat="option in opt.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-default" ng-click="removeOption(option);">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Displayed Text: </span>
+                                    <input type="text" ng-model="option.text" required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Conditionals</h4>
+                        <button type="button" class="btn btn-default" ng-click="addCondition()">Add Condition</button>
+                        <div class="node" ng-repeat="condition in opt.conditions">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCondition(condition)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Check Type:</span>
+                                    <select ng-model="condition.check">
+                                        <option value="equals">Equal To</option>
+                                        <option value="lessThan">Less Than</option>
+                                        <option value="greaterThan">Greater Than</option>
+                                        <option value="stringContains">String Contains</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Value: </span>
+                                    <input type="text" ng-model="condition.value" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Pass: </span>
+                                    <select ng-model="condition.jumpToOnPass">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Fail: </span>
+                                    <select ng-model="condition.jumpToOnFail">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="node" ng-controller="survey" ng-init="survey = page.postTest">
+                <h2>Post Page Survey</h2>
+                <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
+                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
+                    <h3>Survey Entry</h3>
+                    <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Survey Type: </span>
+                            <select ng-model="opt.type">
+                                <option value="question">Question</option>
+                                <option value="radio">Radio</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="statement">Statement</option>
+                                <option value="number">Number</option>
+                                <option value="slider">Slider</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
+                            <span>Unique Survey Entry ID:</span>
+                            <input type="text" ng-model="opt.id" required />
+                        </div>
+                        <div class="attribute">
+                            <span>Entry Name:</span>
+                            <input type="text" ng-model="opt.name" />
+                        </div>
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="opt.mandatory" />
+                        </div>
+                        <div class="attribute">
+                            <span>Minimum Wait Time (s):</span>
+                            <input type="number" ng-model="opt.minWait" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="opt.type == 'question'">
+                            <span>Box Size:</span>
+                            <select ng-model="opt.boxsize">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Minimum Selected:</span>
+                            <input type="number" ng-model="opt.min" min="0" />
+                        </div>
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                            <span>Maximum Selected:</span>
+                            <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Minimum Value:</span>
+                            <input type="number" ng-model="opt.min" />
+                        </div>
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                            <span>Maximum Value:</span>
+                            <input type="number" ng-model="opt.max" />
+                        </div>
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                            <span>Video URL:</span>
+                            <input type="text" ng-model="opt.url" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Statement</h4>
+                        <textarea ng-model="opt.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <h4>Options</h4>
+                        <div>
+                            <button type="button" class="btn btn-default" ng-click="addOption();">Add Option</button>
+                        </div>
+                        <div class="node" ng-repeat="option in opt.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-default" ng-click="removeOption(option);">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Displayed Text: </span>
+                                    <input type="text" ng-model="option.text" required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Conditionals</h4>
+                        <button type="button" class="btn btn-default" ng-click="addCondition()">Add Condition</button>
+                        <div class="node" ng-repeat="condition in opt.conditions">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCondition(condition)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Check Type:</span>
+                                    <select ng-model="condition.check">
+                                        <option value="equals">Equal To</option>
+                                        <option value="lessThan">Less Than</option>
+                                        <option value="greaterThan">Greater Than</option>
+                                        <option value="stringContains">String Contains</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Value: </span>
+                                    <input type="text" ng-model="condition.value" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Pass: </span>
+                                    <select ng-model="condition.jumpToOnPass">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                                <div class="attribute">
+                                    <span>Jump To On Fail: </span>
+                                    <select ng-model="condition.jumpToOnFail">
+                                        <option value="">None</option>
+                                        <option ng-repeat="entry in survey.options" value="{{entry.id}}">{{entry.id}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-success" ng-show="specification.interface == 'APE' || page.interfaces.length == 0" ng-click="addInterface()">Add Interface/Axis</button>
+            <div class="node" ng-repeat="interface in page.interfaces" ng-controller="interfaceNode">
+                <h2>Interface</h2>
+                <button type="button" class="btn btn-danger" ng-click="removeInterface(interface)">Remove Interface/Axis</button>
+                <div class="node interfaceOptions">
+                    <div class="attributes">
+                        <div class="attribute" name="fragmentPlayed" type="check">
+                            <span>Check all fragments played: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentFullPlayback" type="check">
+                            <span>Check all fragments fully played: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentMoved" type="check">
+                            <span>Check all fragments have been moved: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="fragmentComments" type="check">
+                            <span>Check all fragments have comments: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="scalerange" type="check">
+                            <span>Enforce a scale usage: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                            <span>Minimum:</span>
+                            <input type="number" min="0" max="100" name="min" />
+                            <span>Maximum:</span>
+                            <input type="number" min="0" max="100" name="max" />
+                        </div>
+                        <div class="attribute" name="volume" type="show">
+                            <span>Show master volume control: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="playhead" type="show">
+                            <span>Show playhead: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="page-count" type="show">
+                            <span>Show Page Count: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                        <div class="attribute" name="comments" type="show">
+                            <span>Show Fragment Comments: </span>
+                            <input type="checkbox" ng-click="enableInterfaceOption($event)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="node">
+                    <h3>Axis Title</h3>
+                    <textarea ng-model="interface.title"></textarea>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Axis name (in saves): </span>
+                            <input type="text" ng-model="interface.name" />
+                        </div>
+                    </div>
+                </div>
+                <div class="node">
+                    <h3>Axis Image</h3>
+                    <textarea ng-model="interface.image"></textarea>
+                </div>
+                <div class="node" name="scale-selection">
+                    <h3>Axis Scales</h3>
+                    <button type="button" class="btn btn-success" ng-click="addScale();">Add</button>
+                    <button type="button" class="btn btn-danger" ng-click="clearScales()" ng-show="interface.scales.length > 0">Clear Scales</button>
+                    <div class="dropdown" style="display: inline-block;">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            Scales: {{selectedScale}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li ng-repeat="scale in scales" ng-click="useScales(scale)"><a href="#">{{scale.name}}</a></li>
+                        </ul>
+                    </div>
+                    <div class="node" ng-repeat="scale in interface.scales">
+                        <div class="attributes">
+                            <div class="attribute">
+                                <button type="button" class="btn btn-danger" ng-click="removeScale(scale);">Remove</button>
+                            </div>
+                            <div class="attribute">
+                                <span>Position: </span>
+                                <input type="number" min="0" max="100" ng-model="scale.position" required/>
+                            </div>
+                            <div class="attribute">
+                                <span>Text: </span>
+                                <input type="text" ng-model="scale.text" required/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="node">
+                <h3>Comment Questions</h3>
+                <button type="button" class="btn btn-success" ng-click="addCommentQuestion()">Add Comment Question</button>
+                <div class="node" ng-repeat="cq in page.commentQuestions">
+                    <button type="button" class="btn btn-danger" ng-click="removeCommentQuestion(cq)">Remove Comment Question</button>
+                    <div class="attributes">
+                        <div class="attribute">
+                            <span>Unique ID:</span>
+                            <input type="text" ng-model="cq.id" required/>
+                        </div>
+                        <div class="attribute">
+                            <span>Common Name:</span>
+                            <input type="text" ng-model="cq.name" />
+                        </div>
+                        <div class="attribute" ng-show="cq.type == 'slider'">
+                            <span>Minimum:</span>
+                            <input type="number" ng-model="cq.min" />
+                        </div>
+                        <div class="attribute" ng-show="cq.type == 'slider'">
+                            <span>Maximum:</span>
+                            <input type="number" ng-model="cq.max" />
+                        </div>
+                        <div class="attribute" ng-show="cq.type == 'slider'">
+                            <span>Step size:</span>
+                            <input type="number" ng-model="cq.step" />
+                        </div>
+                        <div class="attribute" ng-show="cq.type == 'slider'">
+                            <span>Initial Value:</span>
+                            <input type="number" ng-model="cq.value" />
+                        </div>
+                    </div>
+                    <div class="node">
+                        <h4>Question:</h4>
+                        <textarea ng-model="cq.statement"></textarea>
+                    </div>
+                    <div class="node" ng-show="['radio', 'checkbox'].indexOf(cq.type) >= 0">
+                        <h4>Options</h4>
+                        <div class="node" ng-repeat="option in cq.options">
+                            <div class="attributes">
+                                <div class="attribute">
+                                    <button type="button" class="btn btn-danger" ng-click="removeCommentQuestionOption(cq,option)">Remove</button>
+                                </div>
+                                <div class="attribute">
+                                    <span>Name: </span>
+                                    <input type="text" ng-model="option.name" required/>
+                                </div>
+                                <div class="attribute">
+                                    <span>Display Text: </span>
+                                    <input type="text" ng-model="option.text" required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-success" ng-click="addAudioElement()">Add Fragment</button>
+            <div class="node" ng-repeat="fragment in page.audioElements">
+                <h3>Audio Fragment</h3>
+                <button type="button" class="btn btn-danger" ng-click="removeAudioElement(fragment)">Remove Fragment</button>
+                <div class="attributes">
+                    <div class="attribute">
+                        <span>Unique ID: </span>
+                        <input type="text" ng-model="fragment.id" required/>
+                    </div>
+                    <div class="attribute">
+                        <span>URL: </span>
+                        <input type="text" ng-model="fragment.url" required/>
+                        <span>Full URL: </span><span style="font-weight=600">{{page.hostURL}}{{fragment.url}}</span>
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the gain of this fragment. This is applied after any normalisation">
+                        <span>Fragment Gain (dB): </span>
+                        <input type="number" ng-model="fragment.gain" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Manually set the label">
+                        <span>Fragment Label: </span>
+                        <input type="text" ng-model="fragment.label" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Common name: </span>
+                        <input type="text" ng-model="fragment.name" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment Type: </span>
+                        <select ng-model="fragment.type">
+                            <option value="normal">Normal</option>
+                            <option value="anchor">Hidden Anchor</option>
+                            <option value="reference">Hidden Reference</option>
+                            <option value="outside-reference">Outside Reference</option>
+                        </select>
+                    </div>
+                    <div class="attribute" ng-show="fragment.type == 'anchor'">
+                        <span>Anchor must be below: </span>
+                        <input type="number" ng-model="fragment.marker" min="0" max="100" />
+                    </div>
+                    <div class="attribute" ng-show="fragment.type == 'reference'">
+                        <span>Reference must be above: </span>
+                        <input type="number" ng-model="fragment.marker" min="0" max="100" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global and page loudness">
+                        <span>Loudness: </span>
+                        <input type="number" ng-model="fragment.loudness" max="0" />
+                    </div>
+                    <div class="attribute" ng-show="page.poolSize > 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Always include this fragment after any sub-pooling">
+                        <span>Always include fragment: </span>
+                        <input type="checkbox" ng-model="fragment.alwaysInclude" max="0" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global / page pre-silence">
+                        <span>Fragment Pre-Silence: </span>
+                        <input type="number" ng-model="fragment.preSilence" max="0" step="0.1" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global / page post-silence">
+                        <span>Fragment Post-Silence: </span>
+                        <input type="number" ng-model="fragment.postSilence" max="0" step="0.1" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="By default the fragment will start playback at the beginning.">
+                        <span>Fragment playback start position (s): </span>
+                        <input type="number" ng-model="fragment.startTime" min="0" max="{{fragment.stopTime}}" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="By default the fragment will play until the end">
+                        <span>Fragment playback stop position (s): </span>
+                        <input type="number" ng-model="fragment.stopTime" min="{{fragment.startTime}}" />
+                    </div>
+                    <div class="attribute">
+                        <span>Fragment sampling rate: </span>
+                        <input type="number" ng-model="fragment.sampleRate" min="1" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Associate an image with this fragment">
+                        <span>Fragment Image (URL): </span>
+                        <input type="text" ng-model="fragment.image" />
+                    </div>
+                    <div class="attribute">
+                        <span>Minimum number of plays</span>
+                        <input type="number" ng-model="fragment.minNumberPlays" min="0" max="{{fragment.maxNumberPlays || page.maxNumberPlays || specification.maxNumberPlays}}" />
+                    </div>
+                    <div class="attribute">
+                        <span>Maximum number of plays</span>
+                        <input type="number" ng-model="fragment.maxNumberPlays" min="{{fragment.minNumberPlays || page.minNumberPlays || specification.minNumberPlays || 0}}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="popupHolder" ng-show="popupVisible">
+        <div ng-controller="introduction" class="popup" ng-show="popupVisible">
+            <div class="popupTitle" ng-switch="state">
+                <span ng-switch-when="0">Test Creator</span>
+                <span ng-switch-when="1">Create New Test</span>
+            </div>
+            <div class="popupContent container-fluid" ng-switch="state">
+                <div ng-switch-when="0">
+                    <div>
+                        <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.1 version.</span>
+                    </div>
+                    <div>
+                        <input type="file" id="files" ng-model="files" onchange="handleFiles(event)" />
+                    </div>
+                </div>
+                <div ng-switch-when="1">
+                    <div>
+                        <span>Please select the interface you would like to use below. Selecting an interface will give a brief description of the interface type.</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
+                            <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="initialise(i.name)">
+                                <label style="cursor:pointer">
+                                    <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <span>{{description}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="popupButtons">
+                <button id="popupBack" type="button" class="btn btn-default" ng-show="state>0" ng-click="back()">Back</button>
+                <button id="popupNext" type="button" class="btn btn-default" ng-click="next()">Next</button>
+            </div>
+        </div>
+    </div>
+    <div id="screenblank" ng-show="popupVisible"></div>
 </body>
 
 </html>

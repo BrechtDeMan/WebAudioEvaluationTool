@@ -1,45 +1,58 @@
+/* globals document, console, DOMParser */
 function Specification() {
+    var schemaRoot;
+    var schemaString;
     // Handles the decoding of the project specification XML into a simple JavaScript Object.
 
     // <setup> attributes
-    this.interface = null;
-    this.projectReturn = null;
-    this.returnURL = null;
-    this.randomiseOrder = null;
-    this.poolSize = null;
-    this.loudness = null;
-    this.sampleRate = null;
-    this.calibration = null;
-    this.crossFade = null;
-    this.preSilence = null;
-    this.postSilence = null;
-    this.playOne = null;
+    this.interface = undefined;
+    this.projectReturn = undefined;
+    this.returnURL = undefined;
+    this.randomiseOrder = undefined;
+    this.poolSize = undefined;
+    this.loudness = undefined;
+    this.sampleRate = undefined;
+    this.calibration = undefined;
+    this.crossFade = undefined;
+    this.preSilence = undefined;
+    this.postSilence = undefined;
+    this.playOne = undefined;
+    this.minNumberPlays = undefined;
+    this.maxNumberPlays = undefined;
 
     // nodes
-    this.metrics = null;
-    this.preTest = undefined;
-    this.postTest = undefined;
+    this.metrics = new metricNode();
+    this.preTest = new surveyNode(this);
+    this.postTest = new surveyNode(this);
+    this.preTest.location = "pre";
+    this.postTest.location = "post";
     this.pages = [];
-    this.interfaces = null;
+    this.interfaces = new interfaceNode(this);
     this.errors = [];
-    this.schema = null;
     this.exitText = "Thank you.";
 
-    this.processAttribute = function (attribute, schema, schemaRoot) {
+    // Creators
+    this.createNewPage = function () {
+        var newpage = new page(this);
+        this.pages.push(newpage);
+        return newpage;
+    };
+
+    var processAttribute = function (attribute, schema) {
         // attribute is the string returned from getAttribute on the XML
         // schema is the <xs:attribute> node
-        if (schema.getAttribute('name') == undefined && schema.getAttribute('ref') != undefined) {
-            schema = schemaRoot.getAllElementsByName(schema.getAttribute('ref'))[0];
+        if (schema.getAttribute('name') === null && schema.getAttribute('ref') !== undefined) {
+            schema = schemaRoot.querySelector("[name=" + schema.getAttribute('ref') + "]");
         }
         var defaultOpt = schema.getAttribute('default');
-        if (attribute == null) {
+        if (attribute === null) {
             attribute = defaultOpt;
         }
         var dataType = schema.getAttribute('type');
         if (typeof dataType == "string") {
             dataType = dataType.substr(3);
         } else {
-            var rest = schema.getAllElementsByTagName("xs:restriction").concat(schema.getAllElementsByTagName("xs:enumeration"));
+            var rest = schema.querySelectorAll("restriction,enumeration");
             if (rest.length > 0) {
                 dataType = rest[0].getAttribute("base");
                 if (typeof dataType == "string") {
@@ -51,7 +64,7 @@ function Specification() {
                 dataType = "string";
             }
         }
-        if (attribute == null) {
+        if (attribute === null) {
             return attribute;
         }
         switch (dataType) {
@@ -71,7 +84,6 @@ function Specification() {
             case "short":
                 attribute = Number(attribute);
                 break;
-            case "string":
             default:
                 attribute = String(attribute);
                 break;
@@ -79,26 +91,44 @@ function Specification() {
         return attribute;
     };
 
+    this.processSchema = function (schemaXSD) {
+        if (schemaRoot === undefined) {
+            schemaString = schemaXSD;
+            var parse = new DOMParser();
+            schemaRoot = parse.parseFromString(schemaString, 'text/xml');
+            Object.defineProperties(this, {
+                'schema': {
+                    'value': schemaRoot
+                },
+                'schemaString': {
+                    'value': schemaString
+                }
+            });
+        }
+    };
+    this.getSchema = function () {
+        return schemaRoot;
+    };
+    this.getSchemaString = function () {
+        return schemaString;
+    };
+
     this.decode = function (projectXML) {
+        schemaRoot = this.schema;
         this.errors = [];
         // projectXML - DOM Parsed document
         this.projectXML = projectXML.childNodes[0];
         var setupNode = projectXML.getElementsByTagName('setup')[0];
-        var schemaSetup = this.schema.getAllElementsByName('setup')[0];
+        var schemaSetup = schemaRoot.querySelector('[name=setup]');
         // First decode the attributes
-        var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
-        for (var i = 0; i < attributes.length; i++) {
+        var attributes = schemaSetup.querySelectorAll('attribute');
+        var i;
+        for (i = 0; i < attributes.length; i++) {
             var attributeName = attributes[i].getAttribute('name') || attributes[i].getAttribute('ref');
             var projectAttr = setupNode.getAttribute(attributeName);
-            projectAttr = this.processAttribute(projectAttr, attributes[i], this.schema);
-            switch (typeof projectAttr) {
-                case "number":
-                case "boolean":
-                    eval('this.' + attributeName + ' = ' + projectAttr);
-                    break;
-                case "string":
-                    eval('this.' + attributeName + ' = "' + projectAttr + '"');
-                    break;
+            projectAttr = processAttribute(projectAttr, attributes[i]);
+            if (projectAttr !== null) {
+                this[attributeName] = projectAttr;
             }
 
         }
@@ -108,23 +138,19 @@ function Specification() {
             this.exitText = exitTextNode[0].textContent;
         }
 
-        this.metrics = new this.metricNode();
-
         this.metrics.decode(this, setupNode.getElementsByTagName('metric')[0]);
 
         // Now process the survey node options
         var survey = setupNode.getElementsByTagName('survey');
-        for (var i = 0; i < survey.length; i++) {
+        for (i = 0; i < survey.length; i++) {
             var location = survey[i].getAttribute('location');
             switch (location) {
                 case 'pre':
                 case 'before':
-                    this.preTest = new this.surveyNode(this);
                     this.preTest.decode(this, survey[i]);
                     break;
                 case 'post':
                 case 'after':
-                    this.postTest = new this.surveyNode(this);
                     this.postTest.decode(this, survey[i]);
                     break;
             }
@@ -134,17 +160,17 @@ function Specification() {
         if (interfaceNode.length > 1) {
             this.errors.push("Only one <interface> node in the <setup> node allowed! Others except first ingnored!");
         }
-        this.interfaces = new this.interfaceNode(this);
-        if (interfaceNode.length != 0) {
+
+        if (interfaceNode.length !== 0) {
             interfaceNode = interfaceNode[0];
-            this.interfaces.decode(this, interfaceNode, this.schema.getAllElementsByName('interface')[1]);
+            this.interfaces.decode(this, interfaceNode, this.schema.querySelectorAll('[name=interface]')[1]);
         }
 
         // Page tags
         var pageTags = projectXML.getElementsByTagName('page');
-        var pageSchema = this.schema.getAllElementsByName('page')[0];
-        for (var i = 0; i < pageTags.length; i++) {
-            var node = new this.page(this);
+        var pageSchema = this.schema.querySelector('[name=page]');
+        for (i = 0; i < pageTags.length; i++) {
+            var node = new page(this);
             node.decode(this, pageTags[i], pageSchema);
             this.pages.push(node);
         }
@@ -157,21 +183,21 @@ function Specification() {
         root.setAttribute("xsi:noNamespaceSchemaLocation", "test-schema.xsd");
         // Build setup node
         var setup = RootDocument.createElement("setup");
-        var schemaSetup = this.schema.getAllElementsByName('setup')[0];
+        var schemaSetup = schemaRoot.querySelector('[name=setup]');
         // First decode the attributes
-        var attributes = schemaSetup.getAllElementsByTagName('xs:attribute');
+        var attributes = schemaSetup.querySelectorAll('attribute');
         for (var i = 0; i < attributes.length; i++) {
             var name = attributes[i].getAttribute("name");
-            if (name == undefined) {
+            if (name === null) {
                 name = attributes[i].getAttribute("ref");
             }
-            if (eval("this." + name + " != undefined") || attributes[i].getAttribute("use") == "required") {
-                eval("setup.setAttribute('" + name + "',this." + name + ")");
+            if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
+                setup.setAttribute(name, this[name]);
             }
         }
         root.appendChild(setup);
         // Survey node
-        if (this.exitText != null) {
+        if (this.exitText !== null) {
             var exitTextNode = RootDocument.createElement('exitText');
             exitTextNode.textContent = this.exitText;
             setup.appendChild(exitTextNode);
@@ -180,18 +206,23 @@ function Specification() {
         setup.appendChild(this.postTest.encode(RootDocument));
         setup.appendChild(this.metrics.encode(RootDocument));
         setup.appendChild(this.interfaces.encode(RootDocument));
-        for (var page of this.pages) {
+        this.pages.forEach(function (page) {
             root.appendChild(page.encode(RootDocument));
-        }
+        });
         return RootDocument;
     };
 
-    this.surveyNode = function (specification) {
-        this.location = null;
+    function surveyNode(specification) {
+        this.location = undefined;
         this.options = [];
-        this.parent = null;
-        this.schema = specification.schema.getAllElementsByName('survey')[0];
+        this.parent = undefined;
         this.specification = specification;
+
+        this.addOption = function () {
+            var node = new this.OptionNode(this.specification);
+            this.options.push(node);
+            return node;
+        };
 
         this.OptionNode = function (specification) {
             this.type = undefined;
@@ -204,27 +235,23 @@ function Specification() {
             this.options = [];
             this.min = undefined;
             this.max = undefined;
+            this.minWait = undefined;
             this.step = undefined;
             this.conditions = [];
 
             this.decode = function (parent, child) {
-                this.schema = specification.schema.getAllElementsByName(child.nodeName)[0];
-                var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
-                for (var i in attributeMap) {
-                    if (isNaN(Number(i)) == true) {
+                this.schema = schemaRoot.querySelector("[name=" + child.nodeName + "]");
+                var attributeMap = this.schema.querySelectorAll('attribute');
+                var i;
+                for (i in attributeMap) {
+                    if (isNaN(Number(i)) === true) {
                         break;
                     }
                     var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                     var projectAttr = child.getAttribute(attributeName);
-                    projectAttr = parent.processAttribute(projectAttr, attributeMap[i], parent.schema);
-                    switch (typeof projectAttr) {
-                        case "number":
-                        case "boolean":
-                            eval('this.' + attributeName + ' = ' + projectAttr);
-                            break;
-                        case "string":
-                            eval('this.' + attributeName + ' = "' + projectAttr + '"');
-                            break;
+                    projectAttr = processAttribute(projectAttr, attributeMap[i]);
+                    if (projectAttr !== null) {
+                        this[attributeName] = projectAttr;
                     }
                 }
                 if (child.nodeName == 'surveyentry') {
@@ -239,13 +266,13 @@ function Specification() {
                 this.statement = child.getElementsByTagName('statement')[0].textContent;
                 if (this.type == "checkbox" || this.type == "radio") {
                     var children = child.getElementsByTagName('option');
-                    if (children.length == null) {
+                    if (children.length === null) {
                         console.log('Malformed' + child.nodeName + 'entry');
                         this.statement = 'Malformed' + child.nodeName + 'entry';
                         this.type = 'statement';
                     } else {
                         this.options = [];
-                        for (var i = 0; i < children.length; i++) {
+                        for (i = 0; i < children.length; i++) {
                             this.options.push({
                                 name: children[i].getAttribute('name'),
                                 text: children[i].textContent
@@ -265,14 +292,14 @@ function Specification() {
                     }
                 }
                 var conditionElements = child.getElementsByTagName("conditional");
-                for (var i = 0; i < conditionElements.length; i++) {
+                for (i = 0; i < conditionElements.length; i++) {
                     var condition = conditionElements[i];
                     var obj = {
                         check: condition.getAttribute("check"),
                         value: condition.getAttribute("value"),
                         jumpToOnPass: condition.getAttribute("jumpToOnPass"),
                         jumpToOnFail: condition.getAttribute("jumpToOnFail")
-                    }
+                    };
                     this.conditions.push(obj);
                 }
             };
@@ -283,28 +310,28 @@ function Specification() {
                 statement.textContent = this.statement;
                 node.appendChild(statement);
                 node.id = this.id;
-                if (this.name != undefined) {
+                if (this.name !== undefined) {
                     node.setAttribute("name", this.name);
                 }
-                if (this.mandatory != undefined) {
+                if (this.mandatory !== undefined) {
                     node.setAttribute("mandatory", this.mandatory);
                 }
                 node.id = this.id;
-                if (this.name != undefined) {
+                if (this.name !== undefined) {
                     node.setAttribute("name", this.name);
                 }
                 switch (this.type) {
                     case "checkbox":
-                        if (this.min != undefined) {
+                        if (this.min !== undefined) {
                             node.setAttribute("min", this.min);
                         } else {
                             node.setAttribute("min", "0");
                         }
-                        if (this.max != undefined) {
+                        if (this.max !== undefined) {
                             node.setAttribute("max", this.max);
                         } else {
                             node.setAttribute("max", "undefined");
-                        }
+                        } /* falls through */
                     case "radio":
                         for (var i = 0; i < this.options.length; i++) {
                             var option = this.options[i];
@@ -315,27 +342,27 @@ function Specification() {
                         }
                         break;
                     case "number":
-                        if (this.min != undefined) {
+                        if (this.min !== undefined) {
                             node.setAttribute("min", this.min);
                         }
-                        if (this.max != undefined) {
+                        if (this.max !== undefined) {
                             node.setAttribute("max", this.max);
                         }
                         break;
                     case "question":
-                        if (this.boxsize != undefined) {
+                        if (this.boxsize !== undefined) {
                             node.setAttribute("boxsize", this.boxsize);
                         }
-                        if (this.mandatory != undefined) {
+                        if (this.mandatory !== undefined) {
                             node.setAttribute("mandatory", this.mandatory);
                         }
                         break;
                     case "video":
-                        if (this.mandatory != undefined) {
+                        if (this.mandatory !== undefined) {
                             node.setAttribute("mandatory", this.mandatory);
-                        }
+                        } /* falls through */
                     case "youtube":
-                        if (this.url != undefined) {
+                        if (this.url !== undefined) {
                             node.setAttribute("url", this.url);
                         }
                         break;
@@ -352,21 +379,23 @@ function Specification() {
                             maxText.textContent = this.rightText;
                             node.appendChild(maxText);
                         }
+                        break;
                     default:
                         break;
                 }
-                for (var condition of this.conditions) {
+                this.conditions.forEach(function (condition) {
                     var conditionDOM = doc.createElement("conditional");
                     conditionDOM.setAttribute("check", condition.check);
                     conditionDOM.setAttribute("value", condition.value);
                     conditionDOM.setAttribute("jumpToOnPass", condition.jumpToOnPass);
                     conditionDOM.setAttribute("jumpToOnFail", condition.jumpToOnFail);
                     node.appendChild(conditionDOM);
-                }
+                });
                 return node;
             };
         };
         this.decode = function (parent, xml) {
+            this.schema = schemaRoot.querySelector('[name=survey]');
             this.parent = parent;
             this.location = xml.getAttribute('location');
             if (this.location == 'before') {
@@ -374,14 +403,14 @@ function Specification() {
             } else if (this.location == 'after') {
                 this.location = 'post';
             }
-            var child = xml.firstElementChild
+            var child = xml.firstElementChild;
             while (child) {
                 var node = new this.OptionNode(this.specification);
                 node.decode(parent, child);
                 this.options.push(node);
                 child = child.nextElementSibling;
             }
-            if (this.options.length == 0) {
+            if (this.options.length === 0) {
                 console.log("Empty survey node");
                 console.log(this);
             }
@@ -394,16 +423,18 @@ function Specification() {
             }
             return node;
         };
-    };
+    }
 
-    this.interfaceNode = function (specification) {
-        this.title = null;
-        this.name = null;
+    function interfaceNode(specification) {
+        this.title = undefined;
+        this.name = undefined;
+        this.image = undefined;
         this.options = [];
         this.scales = [];
-        this.schema = specification.schema.getAllElementsByName('interface')[1];
+        this.schema = undefined;
 
         this.decode = function (parent, xml) {
+            this.schema = schemaRoot.querySelectorAll('[name=interface]')[1];
             this.name = xml.getAttribute('name');
             var titleNode = xml.getElementsByTagName('title');
             if (titleNode.length == 1) {
@@ -411,38 +442,36 @@ function Specification() {
             }
             var interfaceOptionNodes = xml.getElementsByTagName('interfaceoption');
             // Extract interfaceoption node schema
-            var interfaceOptionNodeSchema = this.schema.getAllElementsByName('interfaceoption')[0];
-            var attributeMap = interfaceOptionNodeSchema.getAllElementsByTagName('xs:attribute');
-            for (var i = 0; i < interfaceOptionNodes.length; i++) {
+            var interfaceOptionNodeSchema = this.schema.querySelector('[name=interfaceoption]');
+            var attributeMap = interfaceOptionNodeSchema.querySelectorAll('attribute');
+            var i, j;
+            for (i = 0; i < interfaceOptionNodes.length; i++) {
                 var ioNode = interfaceOptionNodes[i];
                 var option = {};
-                for (var j = 0; j < attributeMap.length; j++) {
+                for (j = 0; j < attributeMap.length; j++) {
                     var attributeName = attributeMap[j].getAttribute('name') || attributeMap[j].getAttribute('ref');
                     var projectAttr = ioNode.getAttribute(attributeName);
-                    if (parent.processAttribute) {
-                        parent.processAttribute(projectAttr, attributeMap[j], parent.schema)
-                    } else {
-                        parent.parent.processAttribute(projectAttr, attributeMap[j], parent.parent.schema)
+                    projectAttr = processAttribute(projectAttr, attributeMap[j]);
+                    if (projectAttr !== null) {
+                        option[attributeName] = projectAttr;
                     }
-                    switch (typeof projectAttr) {
-                        case "number":
-                        case "boolean":
-                            eval('option.' + attributeName + ' = ' + projectAttr);
-                            break;
-                        case "string":
-                            eval('option.' + attributeName + ' = "' + projectAttr + '"');
-                            break;
-                    }
+                }
+                if (option.type == "check" && ioNode.firstElementChild) {
+                    option.errorMessage = ioNode.firstElementChild.textContent;
                 }
                 this.options.push(option);
             }
-
+            // Get the image node
+            var imageNode = xml.getElementsByTagName("image");
+            if (imageNode.length == 1) {
+                this.image = imageNode[0].getAttribute("src");
+            }
             // Now the scales nodes
             var scaleParent = xml.getElementsByTagName('scales');
             if (scaleParent.length == 1) {
                 scaleParent = scaleParent[0];
-                var scalelabels = scaleParent.getAllElementsByTagName('scalelabel');
-                for (var i = 0; i < scalelabels.length; i++) {
+                var scalelabels = scaleParent.querySelectorAll('scalelabel');
+                for (i = 0; i < scalelabels.length; i++) {
                     this.scales.push({
                         text: scalelabels[i].textContent,
                         position: Number(scalelabels[i].getAttribute('position'))
@@ -453,48 +482,58 @@ function Specification() {
 
         this.encode = function (doc) {
             var node = doc.createElement("interface");
-            if (typeof name == "string" && name.length > 0)
+            if (typeof this.name == "string" && this.name.length > 0)
                 node.setAttribute("name", this.name);
             if (typeof this.title == "string") {
                 var titleNode = doc.createElement("title");
                 titleNode.textContent = this.title;
                 node.appendChild(titleNode);
             }
-            for (var option of this.options) {
+            this.options.forEach(function (option) {
                 var child = doc.createElement("interfaceoption");
                 child.setAttribute("type", option.type);
                 child.setAttribute("name", option.name);
+                if (option.type == "check" && option.errorMessage !== undefined) {
+                    var errorMessage = doc.createElement("errormessage");
+                    errorMessage.textContent = option.errorMessage;
+                    child.appendChild(errorMessage);
+                }
                 node.appendChild(child);
+            });
+            if (typeof this.image == "string" && this.image.length !== 0) {
+                var imgNode = doc.createElement("image");
+                imgNode.setAttribute("src", this.image);
+                node.appendChild(imgNode);
             }
-            if (this.scales.length != 0) {
+            if (this.scales.length !== 0) {
                 var scales = doc.createElement("scales");
-                for (var scale of this.scales) {
+                this.scales.forEach(function (scale) {
                     var child = doc.createElement("scalelabel");
                     child.setAttribute("position", scale.position);
                     child.textContent = scale.text;
                     scales.appendChild(child);
-                }
+                });
                 node.appendChild(scales);
             }
             return node;
         };
-    };
+    }
 
-    this.metricNode = function () {
+    function metricNode() {
         this.enabled = [];
         this.decode = function (parent, xml) {
             var children = xml.getElementsByTagName('metricenable');
             for (var i in children) {
-                if (isNaN(Number(i)) == true) {
+                if (isNaN(Number(i)) === true) {
                     break;
                 }
                 this.enabled.push(children[i].textContent);
             }
-        }
+        };
         this.encode = function (doc) {
             var node = doc.createElement('metric');
             for (var i in this.enabled) {
-                if (isNaN(Number(i)) == true) {
+                if (isNaN(Number(i)) === true) {
                     break;
                 }
                 var child = doc.createElement('metricenable');
@@ -502,87 +541,101 @@ function Specification() {
                 node.appendChild(child);
             }
             return node;
-        }
+        };
     }
 
-    this.page = function (specification) {
+    function page(specification) {
         this.presentedId = undefined;
         this.id = undefined;
         this.title = undefined;
         this.hostURL = undefined;
         this.randomiseOrder = undefined;
         this.loop = undefined;
-        this.outsideReference = null;
-        this.loudness = null;
-        this.label = null;
-        this.labelStart = "";
-        this.preTest = null;
-        this.postTest = null;
+        this.outsideReference = undefined;
+        this.loudness = undefined;
+        this.label = undefined;
+        this.labelStart = undefined;
+        this.preTest = new surveyNode(specification);
+        this.postTest = new surveyNode(specification);
+        this.preTest.location = "pre";
+        this.postTest.location = "post";
         this.interfaces = [];
-        this.playOne = null;
-        this.restrictMovement = null;
+        this.playOne = undefined;
+        this.restrictMovement = undefined;
+        this.position = undefined;
         this.commentBoxPrefix = "Comment on track";
+        this.minNumberPlays = undefined;
+        this.maxNumberPlays = undefined;
         this.audioElements = [];
         this.commentQuestions = [];
-        this.schema = specification.schema.getAllElementsByName("page")[0];
+        this.schema = schemaRoot.querySelector("[name=page]");
         this.specification = specification;
-        this.parent = null;
+        this.parent = undefined;
+
+        this.addInterface = function () {
+            var node = new interfaceNode(specification);
+            this.interfaces.push(node);
+            return node;
+        };
+        this.addCommentQuestion = function () {
+            var node = new commentQuestionNode(specification);
+            this.commentQuestions.push(node);
+            return node;
+        };
+        this.addAudioElement = function () {
+            var node = new audioElementNode(specification);
+            this.audioElements.push(node);
+            return node;
+        };
 
         this.decode = function (parent, xml) {
             this.parent = parent;
-            var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
-            for (var i = 0; i < attributeMap.length; i++) {
+            var attributeMap = this.schema.querySelectorAll('attribute');
+            var i, node;
+            for (i = 0; i < attributeMap.length; i++) {
                 var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                 var projectAttr = xml.getAttribute(attributeName);
-                projectAttr = parent.processAttribute(projectAttr, attributeMap[i], parent.schema);
-                switch (typeof projectAttr) {
-                    case "number":
-                    case "boolean":
-                        eval('this.' + attributeName + ' = ' + projectAttr);
-                        break;
-                    case "string":
-                        eval('this.' + attributeName + ' = "' + projectAttr + '"');
-                        break;
+                projectAttr = processAttribute(projectAttr, attributeMap[i]);
+                if (projectAttr !== null) {
+                    this[attributeName] = projectAttr;
                 }
             }
 
             // Get the title
             var title = xml.getElementsByTagName('title');
-            if (title.length != 0 && title[0].parentElement == xml) {
+            if (title.length !== 0 && title[0].parentElement == xml) {
                 this.title = title[0].textContent;
             }
 
             // Get the Comment Box Prefix
             var CBP = xml.getElementsByTagName('commentboxprefix');
-            if (CBP.length != 0 && CBP[0].parentElement == xml) {
+            if (CBP.length !== 0 && CBP[0].parentElement == xml) {
                 this.commentBoxPrefix = CBP[0].textContent;
             }
 
             // Now decode the interfaces
-            var interfaceNode = xml.getElementsByTagName('interface');
-            for (var i = 0; i < interfaceNode.length; i++) {
-                var node = new parent.interfaceNode(this.specification);
-                node.decode(this, interfaceNode[i], parent.schema.getAllElementsByName('interface')[1]);
+            var interfaceNodes = xml.getElementsByTagName('interface');
+            for (i = 0; i < interfaceNodes.length; i++) {
+                node = new interfaceNode(this.specification);
+                node.decode(this, interfaceNodes[i], parent.schema.querySelectorAll('[name=interface]')[1]);
                 this.interfaces.push(node);
             }
 
             // Now process the survey node options
             var survey = xml.getElementsByTagName('survey');
-            var surveySchema = parent.schema.getAllElementsByName('survey')[0];
-            for (var i = 0; i < survey.length; i++) {
+            var surveySchema = parent.schema.querySelector('[name=survey]');
+            for (i = 0; i < survey.length; i++) {
                 var location = survey[i].getAttribute('location');
                 if (location == 'pre' || location == 'before') {
-                    if (this.preTest != null) {
+                    if (this.preTest.options.length !== 0) {
                         this.errors.push("Already a pre/before test survey defined! Ignoring second!!");
                     } else {
-                        this.preTest = new parent.surveyNode(this.specification);
                         this.preTest.decode(parent, survey[i], surveySchema);
                     }
                 } else if (location == 'post' || location == 'after') {
-                    if (this.postTest != null) {
+                    if (this.postTest.options.length !== 0) {
                         this.errors.push("Already a post/after test survey defined! Ignoring second!!");
                     } else {
-                        this.postTest = new parent.surveyNode(this.specification);
                         this.postTest.decode(parent, survey[i], surveySchema);
                     }
                 }
@@ -590,19 +643,19 @@ function Specification() {
 
             // Now process the audioelement tags
             var audioElements = xml.getElementsByTagName('audioelement');
-            for (var i = 0; i < audioElements.length; i++) {
-                var node = new this.audioElementNode(this.specification);
-                node.decode(this, audioElements[i]);
-                this.audioElements.push(node);
+            for (i = 0; i < audioElements.length; i++) {
+                var audioNode = new audioElementNode(this.specification);
+                audioNode.decode(this, audioElements[i]);
+                this.audioElements.push(audioNode);
             }
 
             // Now decode the commentquestions
             var cqNode = xml.getElementsByTagName('commentquestions');
-            if (cqNode.length != 0) {
+            if (cqNode.length !== 0) {
                 cqNode = cqNode[0];
                 var commentQuestion = cqNode.firstElementChild;
                 while (commentQuestion) {
-                    var node = new this.commentQuestionNode(this.specification);
+                    node = new commentQuestionNode(this.specification);
                     node.decode(parent, commentQuestion);
                     this.commentQuestions.push(node);
                     commentQuestion = commentQuestion.nextElementSibling;
@@ -613,33 +666,31 @@ function Specification() {
         this.encode = function (root) {
             var AHNode = root.createElement("page");
             // First decode the attributes
-            var attributes = this.schema.getAllElementsByTagName('xs:attribute');
-            for (var i = 0; i < attributes.length; i++) {
+            var attributes = this.schema.querySelectorAll('attribute');
+            var i;
+            for (i = 0; i < attributes.length; i++) {
                 var name = attributes[i].getAttribute("name");
-                if (name == undefined) {
+                if (name === null) {
                     name = attributes[i].getAttribute("ref");
                 }
-                if (eval("this." + name + " != undefined") || attributes[i].getAttribute("use") == "required") {
-                    eval("AHNode.setAttribute('" + name + "',this." + name + ")");
+                if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
+                    AHNode.setAttribute(name, this[name]);
                 }
-            }
-            if (this.loudness != null) {
-                AHNode.setAttribute("loudness", this.loudness);
             }
             // <commentboxprefix>
             var commentboxprefix = root.createElement("commentboxprefix");
             commentboxprefix.textContent = this.commentBoxPrefix;
             AHNode.appendChild(commentboxprefix);
 
-            for (var i = 0; i < this.interfaces.length; i++) {
+            for (i = 0; i < this.interfaces.length; i++) {
                 AHNode.appendChild(this.interfaces[i].encode(root));
             }
 
-            for (var i = 0; i < this.audioElements.length; i++) {
+            for (i = 0; i < this.audioElements.length; i++) {
                 AHNode.appendChild(this.audioElements[i].encode(root));
             }
             // Create <CommentQuestion>
-            for (var i = 0; i < this.commentQuestions.length; i++) {
+            for (i = 0; i < this.commentQuestions.length; i++) {
                 AHNode.appendChild(this.commentQuestions[i].encode(root));
             }
 
@@ -648,15 +699,18 @@ function Specification() {
             return AHNode;
         };
 
-        this.commentQuestionNode = function (specification) {
-            this.id = null;
+        function commentQuestionNode(specification) {
+            this.id = undefined;
             this.name = undefined;
             this.type = undefined;
             this.statement = undefined;
-            this.schema = specification.schema.getAllElementsByName('commentquestion')[0];
+            this.schema = schemaRoot.querySelector('[name=commentquestion]');
             this.decode = function (parent, xml) {
                 this.id = xml.id;
                 this.name = xml.getAttribute('name');
+                if (this.name === null) {
+                    this.name = undefined;
+                }
                 switch (xml.nodeName) {
                     case "commentradio":
                         this.type = "radio";
@@ -673,9 +727,10 @@ function Specification() {
                         this.step = undefined;
                         break;
                     case "commentquestion":
-                    default:
                         this.type = "question";
                         break;
+                    default:
+                        throw ("Unknown comment type " + xml.nodeName);
                 }
                 this.statement = xml.getElementsByTagName('statement')[0].textContent;
                 if (this.type == "radio" || this.type == "checkbox") {
@@ -692,12 +747,12 @@ function Specification() {
                     this.min = Number(xml.getAttribute("min"));
                     this.max = Number(xml.getAttribute("max"));
                     this.step = Number(xml.getAttribute("step"));
-                    if (this.step == undefined) {
+                    if (this.step === undefined) {
                         this.step = 1;
                     }
                     this.value = Number(xml.getAttribute("value"));
-                    if (this.value == undefined) {
-                        this.value = min;
+                    if (this.value === undefined) {
+                        this.value = this.min;
                     }
                     this.leftText = xml.getElementsByTagName("minText");
                     if (this.leftText && this.leftText.length > 0) {
@@ -727,25 +782,26 @@ function Specification() {
                         node = root.createElement("commentslider");
                         break;
                     case "question":
-                    default:
                         node = root.createElement("commentquestion");
                         break;
+                    default:
+                        throw ("Unknown type " + this.type);
                 }
                 node.id = this.id;
                 node.setAttribute("type", this.type);
-                if (this.name != undefined) {
+                if (this.name !== undefined) {
                     node.setAttribute("name", this.name);
                 }
                 var statement = root.createElement("statement");
                 statement.textContent = this.statement;
                 node.appendChild(statement);
                 if (this.type == "radio" || this.type == "checkbox") {
-                    for (var option of this.options) {
+                    this.options.forEach(function (option) {
                         var child = root.createElement("option");
                         child.setAttribute("name", option.name);
                         child.textContent = option.text;
                         node.appendChild(child);
-                    }
+                    });
                 }
                 if (this.type == "slider") {
                     node.setAttribute("min", this.min);
@@ -769,39 +825,36 @@ function Specification() {
                 }
                 return node;
             };
-        };
+        }
 
-        this.audioElementNode = function (specification) {
-            this.url = null;
-            this.id = null;
-            this.name = null;
-            this.parent = null;
-            this.type = null;
-            this.marker = null;
+        function audioElementNode(specification) {
+            this.url = undefined;
+            this.id = undefined;
+            this.name = undefined;
+            this.parent = undefined;
+            this.type = undefined;
+            this.marker = undefined;
             this.enforce = false;
             this.gain = 0.0;
-            this.label = null;
+            this.label = undefined;
             this.startTime = undefined;
             this.stopTime = undefined;
             this.sampleRate = undefined;
+            this.image = undefined;
+            this.minNumberPlays = undefined;
+            this.maxNumberPlays = undefined;
             this.alternatives = [];
-            this.schema = specification.schema.getAllElementsByName('audioelement')[0];;
-            this.parent = null;
+            this.schema = schemaRoot.querySelector('[name=audioelement]');
+            this.parent = undefined;
             this.decode = function (parent, xml) {
                 this.parent = parent;
-                var attributeMap = this.schema.getAllElementsByTagName('xs:attribute');
+                var attributeMap = this.schema.querySelectorAll('attribute');
                 for (var i = 0; i < attributeMap.length; i++) {
                     var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
                     var projectAttr = xml.getAttribute(attributeName);
-                    projectAttr = parent.parent.processAttribute(projectAttr, attributeMap[i], parent.parent.schema);
-                    switch (typeof projectAttr) {
-                        case "number":
-                        case "boolean":
-                            eval('this.' + attributeName + ' = ' + projectAttr);
-                            break;
-                        case "string":
-                            eval('this.' + attributeName + ' = "' + projectAttr + '"');
-                            break;
+                    projectAttr = processAttribute(projectAttr, attributeMap[i]);
+                    if (projectAttr !== null) {
+                        this[attributeName] = projectAttr;
                     }
                 }
                 // Get the alternative nodes
@@ -819,14 +872,14 @@ function Specification() {
             };
             this.encode = function (root) {
                 var AENode = root.createElement("audioelement");
-                var attributes = this.schema.getAllElementsByTagName('xs:attribute');
+                var attributes = this.schema.querySelectorAll('attribute');
                 for (var i = 0; i < attributes.length; i++) {
                     var name = attributes[i].getAttribute("name");
-                    if (name == undefined) {
+                    if (name === null) {
                         name = attributes[i].getAttribute("ref");
                     }
-                    if (eval("this." + name + " != undefined") || attributes[i].getAttribute("use") == "required") {
-                        eval("AENode.setAttribute('" + name + "',this." + name + ")");
+                    if (this[name] !== undefined || attributes[i].getAttribute("use") == "required") {
+                        AENode.setAttribute(name, this[name]);
                     }
                 }
                 this.alternatives.forEach(function (alt) {
@@ -837,6 +890,6 @@ function Specification() {
                 });
                 return AENode;
             };
-        };
-    };
+        }
+    }
 }

@@ -57,7 +57,7 @@ for file in os.listdir(folder_name):
 
                 # for page [page_name], print comments related to fragment [id]
                 for audioelement in audioholder.findall("./audioelement"):
-                    if audioelement is not None: # Check it exists
+                    if audioelement is not None and audioelement.get('type') != "outside-reference":
                         audio_id = str(audioelement.get('ref'))
 
                         csv_name = folder_name +'/' + page_name+'/'+page_name+'-comments-'+audio_id+'.csv'
@@ -73,7 +73,10 @@ for file in os.listdir(folder_name):
                                             delimiter=',', 
                                             dialect="excel",
                                             quoting=csv.QUOTE_ALL)
-                        commentstr = audioelement.find("./comment/response").text
+                        try:
+                            commentstr = audioelement.find("./comment/response").text
+                        except AttributeError:
+                            commentstr = ""
                         valuestr = audioelement.find("./value").text
 
                         if commentstr is None:

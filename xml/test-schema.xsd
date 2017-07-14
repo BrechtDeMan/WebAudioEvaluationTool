@@ -27,7 +27,12 @@
             </xs:simpleType>
         </xs:attribute>
 
+        <xs:attribute name="minNumberPlays" type="xs:nonNegativeInteger" default="0" />
+        <xs:attribute name="maxNumberPlays" type="xs:nonNegativeInteger" />
+
         <xs:attribute name="playOne" type="xs:boolean" default="false" />
+
+        <xs:attribute name="minWait" type="xs:nonNegativeInteger" default="0" />
 
         <!-- define complex elements-->
         <xs:element name="waet">
@@ -65,6 +70,8 @@
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
                 <xs:attribute ref="playOne" />
+                <xs:attribute ref="minNumberPlays" use="optional" />
+                <xs:attribute ref="maxNumberPlays" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -100,10 +107,13 @@
                 <xs:attribute name="labelStart" type="xs:string" use="optional" default="" />
                 <xs:attribute ref="poolSize" />
                 <xs:attribute ref="alwaysInclude" />
+                <xs:attribute name="position" use="optional" type="xs:nonNegativeInteger" />
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
                 <xs:attribute ref="playOne" />
                 <xs:attribute name="restrictMovement" type="xs:boolean" default="false" use="optional" />
+                <xs:attribute ref="minNumberPlays" use="optional" />
+                <xs:attribute ref="maxNumberPlays" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -119,8 +129,16 @@
             <xs:complexType>
                 <xs:sequence>
                     <xs:element ref="title" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="image" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:attribute name="src" type="xs:anyURI" use="required" />
+                        </xs:complexType>
+                    </xs:element>
                     <xs:element name="interfaceoption" minOccurs="0" maxOccurs="unbounded">
                         <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="errormessage" type="xs:string" minOccurs="0" maxOccurs="1" />
+                            </xs:sequence>
                             <xs:attribute name="type" use="required">
                                 <xs:simpleType>
                                     <xs:restriction base="xs:string">
@@ -226,6 +244,9 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute name="image" type="xs:anyURI" use="optional" />
+                <xs:attribute ref="minNumberPlays" use="optional" />
+                <xs:attribute ref="maxNumberPlays" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -331,6 +352,7 @@
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
                 <xs:attribute ref="mandatory" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="boxsize" default="normal">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -364,6 +386,7 @@
                 <xs:attribute ref="mandatory" />
                 <xs:attribute name="min" type="xs:decimal" />
                 <xs:attribute name="max" type="xs:decimal" />
+                <xs:attribute ref="minWait" />
             </xs:complexType>
         </xs:element>
 
@@ -385,6 +408,7 @@
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
                 <xs:attribute ref="mandatory" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="min" type="xs:decimal" />
                 <xs:attribute name="max" type="xs:decimal" />
             </xs:complexType>
@@ -395,6 +419,7 @@
                 <xs:sequence>
                     <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
                 </xs:sequence>
+                <xs:attribute ref="minWait" />
                 <xs:attribute ref="id" use="required" />
             </xs:complexType>
         </xs:element>
@@ -408,6 +433,7 @@
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
                 <xs:attribute ref="mandatory" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="min" type="xs:decimal" />
                 <xs:attribute name="max" type="xs:decimal" />
             </xs:complexType>
@@ -423,6 +449,7 @@
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
                 <xs:attribute ref="name" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="min" use="required" type="xs:decimal" />
                 <xs:attribute name="max" use="required" type="xs:decimal" />
             </xs:complexType>
@@ -434,6 +461,7 @@
                     <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="url" use="required" type="xs:string" />
             </xs:complexType>
         </xs:element>
@@ -444,13 +472,14 @@
                     <xs:element ref="statement" minOccurs="1" maxOccurs="1" />
                 </xs:sequence>
                 <xs:attribute ref="id" use="required" />
+                <xs:attribute ref="minWait" />
                 <xs:attribute name="url" use="required" type="xs:string" />
             </xs:complexType>
         </xs:element>
 
         <xs:element name="survey">
             <xs:complexType>
-                <xs:choice maxOccurs="unbounded">
+                <xs:choice maxOccurs="unbounded" minOccurs="0">
                     <xs:element name="surveyentry" maxOccurs="unbounded">
                         <xs:complexType>
                             <xs:sequence>

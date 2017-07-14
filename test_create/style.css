@@ -1,131 +1,95 @@
-div#blanket {
-    z-index: 2;
-    background-color: rgba(0, 0, 0, 0.5);
+#screenblank {
+    z-index: 1;
     width: 100%;
     height: 100%;
     position: fixed;
-    left: 0px;
     top: 0px;
+    left: 0px;
+    background-color: rgba(0, 0, 0, 0.75);
 }
-div#popupHolder {
+#popupHolder {
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0px;
+    z-index: 2;
+}
+.popup {
+    position: relative;
     z-index: 3;
     background-color: rgba(255, 255, 255, 1);
     width: 730px;
     height: 480px;
-    position: fixed;
+    display: inline-block;
+    text-align: left;
     border-radius: 10px;
     box-shadow: 0px 0px 50px #000;
     padding: 10px;
+    margin-top: 20px;
 }
-div#popup-title-holder {
+.popupTitle {
     width: 100%;
     height: 50px;
     font-size: 2em;
+    text-align: center;
 }
-button.popup-button {
-    width: 60px;
-    height: 27px;
-    padding: 5px;
+.popupButtons {
     position: absolute;
-    bottom: 10px;
+    bottom: 5px;
+    width: 90%;
+    margin-left: 30px;
+    display: block;
+    align-self: center;
 }
-button#popup-proceed {
-    right: 10px;
-}
-button#popup-back {
-    left: 10px;
-}
-div.drag-area {
-    border: 3px black dashed;
-}
-div.drag-over {
-    background-color: aquamarine;
-}
-div.drag-dropped {
-    background-color: aqua;
-}
-div.drag-error {
-    background-color: coral
-}
-div#project-drop {
-    width: 99%;
-    height: 50px;
-    margin: 10px 0px;
-}
-div.popup-checkbox {
-    padding: 5px;
-}
-div.popup-checkbox input {
-    margin: 0px 5px;
-}
-div.popup-option-entry {
-    padding: 5px 0px;
-    border-bottom: 1px solid;
-}
-div.disabled {
-    color: rgb(100, 100, 100);
-}
-div#page-holder > div.node {
-    background-color: rgb(200, 228, 151);
-}
-div#content > div#setup {
-    background-color: coral;
-}
-div.node {
+#popupBack {
     float: left;
-    padding: 10px;
-    border: black 2px solid;
-    border-radius: 10px;
-    margin: 10px;
-    min-width: 92%;
-    background-color: rgba(255, 255, 255, 0.5);
 }
-div.node-title {
-    float: left;
+#popupNext {
+    float: right;
+}
+#introdragdrop {
     width: 100%;
-    font-size: 2em;
-    margin: 5px 0px;
+    height: 100px;
+    border: 2px dashed black;
+    font-size: 1.5em;
+    text-align: center;
+    padding-top: 30px;
+    color: grey;
 }
-div.node-attributes {
-    min-width: 92%;
-    float: none;
-    padding: 10px;
+.new-test {
+    cursor: pointer;
 }
-div.attribute {
-    float: left;
-    margin-right: 10px;
+.new-test:hover {
+    font-style: italic;
 }
-div.node-children {
-    float: left;
-    min-width: 92%;
+.node {
+    padding: 10px 20px;
+    border: 2px solid black;
+    margin: 20px;
+    border-radius: 20px;
+    background-color: inherit;
 }
-div.node-buttons {
-    float: left;
-    min-width: 92%;
+.node > textarea {
+    width: 80%;
 }
-div.attribute input {
-    max-width: 100%;
-    width: 300px;
-    margin-right: 10px;
+.node > h1,
+h2,
+h3,
+h4,
+h5 {
+    text-align: center;
 }
-div.attribute input[type=number] {
-    width: 80px;
+.attribute {
+    display: inline-block;
+    margin: 0px 10px;
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    padding: 5px 5px;
 }
-div.attribute input[type=radio],
-div.attribute input[type=checkbox] {
-    width: 10px;
+#setupNode {
+    background-color: rgba(255, 10, 10, 0.25);
 }
-input:disabled+label {
-    text-decoration: line-through;
-}
-div.survey-entry-attribute {
-    margin: 10px 0px;
-    border: 1px gray solid;
-    border-radius: 5px;
-    height: 40px;
-    line-height: 40px;
-    padding: 0px 10px;
-}
-div.survey-entry-attribute span {
-    margin-right: 10px;
+.pageNode {
+    background-color: rgba(10, 255, 10, 0.25);
 }
