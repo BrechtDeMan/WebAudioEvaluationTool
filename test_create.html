@@ -12,13 +12,14 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script type="text/javascript" src="js/xmllint.js"></script>
 
-    <title>WAET 1.2.1 Test Creator</title>
+    <title>WAET 1.2.2 Test Creator</title>
 </head>
 
 <body ng-app="creator" ng-controller="view">
     <div class="container">
         <div id="pageRoot">
-            <h1>Web Audio Evaluation Tool - Test Creator</h1>
+            <h1>Web Audio Evaluation Tool</h1>
+            <h3>Test Creator <span class="label label-primary">v1.2.2</span></h3>
         </div>
         <button type="button" class="btn btn-info" ng-click="validate()">Validate</button>
         <button type="button" class="btn btn-success" ng-click="exportXML()" ng-disabled="validated == false">Export XML</button>
@@ -53,7 +54,7 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Once the test is completed and save confirmed, the browser will redirect to this page, if not defined.">
                     <span>Exit URL: </span>
-                    <input type="text" ng-model="specification.returnURL" />
+                    <input type="text" ng-model="specification.returnURL" placeholder="{{placeholder('returnURL')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Randomise the page order">
                     <span>Randomise Page Order: </span>
@@ -61,15 +62,15 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the number of pages to present to the user. This includes repeated pages. Set to '0' or blank to ignore. Randomise page order must be selected.">
                     <span>Page Pool Size: </span>
-                    <input type="number" ng-model="specification.poolSize" min="0" />
+                    <input type="number" ng-model="specification.poolSize" min="0" placeholder="{{placeholder('poolSize')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Automatically analyse and normalsie audio to this target LUFS. If unsure, use -25LUFS. 0 or blank disables normalisation">
                     <span>Loudness Normalisation (LUFS): </span>
-                    <input type="number" ng-model="specification.loudness" max="0" />
+                    <input type="number" ng-model="specification.loudness" max="0" placeholder="{{placeholder('loudness')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Only perform the test if the browser reported sampling rate matches this.">
                     <span>Fixed Sampling Rate: </span>
-                    <input type="number" ng-model="specification.sampleRate" min="0" />
+                    <input type="number" ng-model="specification.sampleRate" min="0" placeholder="{{placeholder('sampleRate')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show a 'method of adjustment' audio calibration before testing.">
                     <span>Pre-Test audio calibration: </span>
@@ -77,15 +78,15 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default cross-fade time when switching between elements. Can be over-ridden on each page">
                     <span>Global Cross-fade time: </span>
-                    <input type="number" ng-model="specification.crossFade" min="0" step="0.1" />
+                    <input type="number" ng-model="specification.crossFade" min="0" step="0.1" placeholder="{{placeholder('crossFade')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default pre-play element silence. Can be over-ridden on each page and element">
                     <span>Global Fragment Pre-Silence: </span>
-                    <input type="number" ng-model="specification.preSilence" min="0" step="0.1" />
+                    <input type="number" ng-model="specification.preSilence" min="0" step="0.1" placeholder="{{placeholder('preSilence')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default post-play element silence. Can be over-ridden on each page and element">
                     <span>Global Fragment Post-Silence: </span>
-                    <input type="number" ng-model="specification.preSilence" min="0" step="0.1" />
+                    <input type="number" ng-model="specification.postSilence" min="0" step="0.1" placeholder="{{placeholder('postSilence')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Disable switching of audio elements">
                     <span>Play audio one-at-a-time: </span>
@@ -93,11 +94,11 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum number of times an audio fragment must be played">
                     <span>Minimum number of fragment plays</span>
-                    <input type="number" ng-model="specification.minNumberPlays" min="0" max="{{specification.maxNumberPlays}}" />
+                    <input type="number" ng-model="specification.minNumberPlays" min="0" max="{{specification.maxNumberPlays}}" placeholder="{{placeholder('minNumberPlays')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum number of times an audio fragment can be played">
                     <span>Maximum number of fragment plays</span>
-                    <input type="number" ng-model="specification.maxNumberPlays" min="{{specification.minNumberPlays || 0}}" />
+                    <input type="number" ng-model="specification.maxNumberPlays" min="{{specification.minNumberPlays || 0}}" placeholder="{{placeholder('maxNumberPlays')}}" />
                 </div>
             </div>
             <div class="node">
@@ -468,7 +469,7 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Specify if this page should be repeated and how many times. Please note, that if page-pooling is also selected then it 'may' not repeat as many times.">
                     <span>Repeat Page N-times: </span>
-                    <input type="number" ng-model="page.repeatCount" value="0" step="1" />
+                    <input type="number" ng-model="page.repeatCount" value="0" step="1" placeholder="{{placeholder('repeatCount')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Loop audio playback until manually stopped or the page submit button is pressed">
                     <span>Loop audio: </span>
@@ -480,7 +481,7 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global loudness normalisation">
                     <span>Loudness (page): </span>
-                    <input type="number" ng-model="page.loudness" max="0" />
+                    <input type="number" ng-model="page.loudness" max="0" placeholder="{{specification.loudness || placeholder('loudness')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Label type to display on the fragments.">
                     <span>Label type: </span>
@@ -499,7 +500,7 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Select a subgroup of the given audio fragments to display. 0 or blank means all fragments will be displayed.">
                     <span>Fragment pool size: </span>
-                    <input type="number" ng-model="page.poolSize" min="0" max="page.audioElements.length" />
+                    <input type="number" ng-model="page.poolSize" min="0" max="page.audioElements.length" placeholder="{{placeholder('poolSize')}}" />
                 </div>
                 <div class="attribute" ng-show="specification.poolSize > 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Always display this page, even after sub-pooling of pages">
                     <span>Always include page: </span>
@@ -511,11 +512,11 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global pre-silence">
                     <span>Fragment pre-silence: </span>
-                    <input type="number" ng-model="page.preSilence" min="0" step="0.1" />
+                    <input type="number" ng-model="page.preSilence" min="0" step="0.1" placeholder="{{specification.preSilence ||  placeholder('preSilence')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global post-silence">
                     <span>Fragment post-silence: </span>
-                    <input type="number" ng-model="page.postSilence" min="0" step="0.1" />
+                    <input type="number" ng-model="page.postSilence" min="0" step="0.1" placeholder="{{specification.postSilence ||  placeholder('postSilence')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Disable switching of audio">
                     <span>Cannot interupt audio: </span>
@@ -527,11 +528,11 @@
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global minimum number of fragment plays">
                     <span>Minimum number of fragment plays</span>
-                    <input type="number" ng-model="page.minNumberPlays" min="0" max="{{page.maxNumberPlays || specification.maxNumberPlays}}" />
+                    <input type="number" ng-model="page.minNumberPlays" min="0" max="{{page.maxNumberPlays || specification.maxNumberPlays}}" placeholder="{{specification.minNumberPlays ||  placeholder('minNumberPlays')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global maximum number of fragment plays">
                     <span>Maximum number of fragment plays</span>
-                    <input type="number" ng-model="page.maxNumberPlays" min="{{page.minNumberPlays || specification.minNumberPlays || 0}}" />
+                    <input type="number" ng-model="page.maxNumberPlays" min="{{page.minNumberPlays || specification.minNumberPlays || 0}}" placeholder="{{specification.maxNumberPlays ||  placeholder('maxNumberPlays')}}" />
                 </div>
             </div>
             <div class="node" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the title of the page">
@@ -999,7 +1000,7 @@
                     </div>
                     <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global and page loudness">
                         <span>Loudness: </span>
-                        <input type="number" ng-model="fragment.loudness" max="0" />
+                        <input type="number" ng-model="fragment.loudness" max="0" placeholder="{{page.loudness || specification.loudness || ''}}" />
                     </div>
                     <div class="attribute" ng-show="page.poolSize > 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Always include this fragment after any sub-pooling">
                         <span>Always include fragment: </span>
@@ -1044,13 +1045,13 @@
     <div id="popupHolder" ng-show="popupVisible">
         <div ng-controller="introduction" class="popup" ng-show="popupVisible">
             <div class="popupTitle" ng-switch="state">
-                <span ng-switch-when="0">Test Creator</span>
+                <span ng-switch-when="0">Test Creator <span class="label label-primary">v1.2.2</span></span>
                 <span ng-switch-when="1">Create New Test</span>
             </div>
             <div class="popupContent container-fluid" ng-switch="state">
                 <div ng-switch-when="0">
                     <div>
-                        <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.1 version.</span>
+                        <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.2 version.</span>
                     </div>
                     <div>
                         <input type="file" id="files" ng-model="files" onchange="handleFiles(event)" />

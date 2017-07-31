@@ -74,10 +74,10 @@
     width: 80%;
 }
 .node > h1,
-h2,
-h3,
-h4,
-h5 {
+.node > h2,
+.node > h3,
+.node > h4,
+.node > h5 {
     text-align: center;
 }
 .attribute {

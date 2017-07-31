@@ -240,6 +240,15 @@ AngularInterface.controller("setup", ['$scope', '$element', '$window', function 
     $s.configure = function () {}
 
     $s.$watch("selectedTestPrototype", $s.configure);
+
+    $s.placeholder = function (name) {
+        var spec = $s.schema.querySelector("attribute[name=\"" + name + "\"]") || $w.specification.schema.querySelector("attribute[name=\"" + name + "\"]");
+        var attr = spec.getAttribute("default");
+        if (attr === undefined) {
+            return "";
+        }
+        return attr;
+    }
 }]);
 
 AngularInterface.controller("survey", ['$scope', '$element', '$window', function ($s, $e, $w) {
@@ -413,6 +422,8 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
     $s.configure();
 }]);
 AngularInterface.controller("page", ['$scope', '$element', '$window', function ($s, $e, $w) {
+    $s.schema = $w.specification.schema.querySelector("element[name=\"page\"]");
+    $s.page.label = "default";
     $s.addInterface = function () {
         $s.page.addInterface();
     };
@@ -450,4 +461,13 @@ AngularInterface.controller("page", ['$scope', '$element', '$window', function (
         }
         $s.page.audioElements.splice(index, 1);
     };
+
+    $s.placeholder = function (name) {
+        var spec = $s.schema.querySelector("attribute[name=\"" + name + "\"]") || $w.specification.schema.querySelector("attribute[name=\"" + name + "\"]");
+        var attr = spec.getAttribute("default");
+        if (attr === undefined) {
+            return "";
+        }
+        return attr;
+    }
 }]);

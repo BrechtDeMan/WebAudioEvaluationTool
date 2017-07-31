@@ -12,14 +12,14 @@
         <xs:attribute name="poolSize" type="xs:nonNegativeInteger" default="0" />
         <xs:attribute name="alwaysInclude" type="xs:boolean" default="false" />
 
-        <xs:attribute name="preSilence">
+        <xs:attribute name="preSilence" default="0.0">
             <xs:simpleType>
                 <xs:restriction base="xs:decimal">
                     <xs:minInclusive value="0.0" />
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
-        <xs:attribute name="postSilence">
+        <xs:attribute name="postSilence" default="0.0">
             <xs:simpleType>
                 <xs:restriction base="xs:decimal">
                     <xs:minInclusive value="0.0" />
