@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+        <setup interface="MUSHRA" projectReturn="save.php" randomiseOrder="true" loudness="-23">
+            <exitText>Thank you for participating in this listening test. You may now exit the test environment</exitText>
+            <metric>
+                <metricenable>testTimer</metricenable>
+                <metricenable>elementTimer</metricenable>
+                <metricenable>elementInitialPosition</metricenable>
+                <metricenable>elementTracker</metricenable>
+                <metricenable>elementFlagListenedTo</metricenable>
+                <metricenable>elementFlagMoved</metricenable>
+                <metricenable>elementListenTracker</metricenable>
+            </metric>
+            <interface>
+                <interfaceoption type="check" name="fragmentMoved" />
+            </interface>
+        </setup>
+        <page id="training" randomiseOrder="true" repeatCount="0" loop="true" synchronous="true" position="0" label="capital">
+            <interface>
+                <title>Quality</title>
+                <scales>
+                    <scalelabel position="100">Imperceptible</scalelabel>
+                    <scalelabel position="75">Perceptible but not annoying</scalelabel>
+                    <scalelabel position="50">Slightly annoying</scalelabel>
+                    <scalelabel position="25">Annoying</scalelabel>
+                    <scalelabel position="0">Very annoying</scalelabel>
+                </scales>
+            </interface>
+            <audioelement url="0.wav" id="training-0" type="reference" />
+            <audioelement url="1.wav" id="training-1" type="anchor" />
+            <audioelement url="0.wav" id="training-2" />
+        </page>
+        <page id="test-0" randomiseOrder="true" repeatCount="0" loop="true" synchronous="true" position="0" label="capital">
+            <interface>
+                <title>Quality</title>
+                <scales>
+                    <scalelabel position="100">Imperceptible</scalelabel>
+                    <scalelabel position="75">Perceptible but not annoying</scalelabel>
+                    <scalelabel position="50">Slightly annoying</scalelabel>
+                    <scalelabel position="25">Annoying</scalelabel>
+                    <scalelabel position="0">Very annoying</scalelabel>
+                </scales>
+            </interface>
+            <audioelement url="0.wav" id="test-0-0" type="reference" />
+            <audioelement url="1.wav" id="test-0-1" type="anchor" />
+            <audioelement url="0.wav" id="test-0-2" />
+        </page>
+    </waet>
