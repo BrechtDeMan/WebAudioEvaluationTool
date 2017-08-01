@@ -1216,6 +1216,39 @@ function stateMachine() {
     this.currentStore = null;
     this.initialise = function () {
 
+        function randomiseElements(page) {
+            // Get the elements which are fixed / labelled
+            var fixed = [],
+                or = [],
+                remainder = [];
+            page.audioElements.forEach(function (a) {
+                if (a.label.length > 0 || a.postion !== undefined) {
+                    fixed.push(a);
+                } else if (a.type === "outside-reference") {
+                    or.push(a);
+                } else {
+                    remainder.push(a);
+                }
+            })
+            if (page.poolSize > 0 || page.randomiseOrder) {
+                page.randomiseOrder = true;
+                if (page.poolSize === 0) {
+                    page.poolSize = page.audioElements.length;
+                }
+                page.poolSize -= fixed.length;
+                remainder = pickSubPool(remainder, page.poolSize);
+            }
+            // Randomise the remainders
+            if (page.randomiseOrder) {
+                remainder = randomiseOrder(remainder);
+            }
+            fixed = fixed.concat(remainder);
+            page.audioElements = fixed.concat(or);
+            page.audioElements.forEach(function (a, i) {
+                a.position = i;
+            });
+        }
+
         // Get the data from Specification
         var pagePool = [];
         specification.pages.forEach(function (page) {
@@ -1253,17 +1286,7 @@ function stateMachine() {
             page.presentedId = i;
             this.stateMap.push(page);
             var elements = page.audioElements;
-            if (page.poolSize > 0 || page.randomiseOrder) {
-                page.randomiseOrder = true;
-                if (page.poolSize === 0) {
-                    page.poolSize = elements.length;
-                }
-                elements = pickSubPool(elements, page.poolSize);
-            }
-            if (page.randomiseOrder) {
-                elements = randomiseOrder(elements);
-            }
-            page.audioElements = elements;
+            randomiseElements(page);
             storage.createTestPageStore(page);
             audioEngineContext.loadPageData(page);
         }, this);
@@ -1325,23 +1348,6 @@ function stateMachine() {
             popup.hidePopup();
             if (this.currentStateMap === null) {
                 this.currentStateMap = this.stateMap[this.stateIndex];
-                // Find and extract the outside reference
-                var elements = [],
-                    ref = [];
-                var elem = this.currentStateMap.audioElements.pop();
-                while (elem) {
-                    if (elem.type == "outside-reference") {
-                        ref.push(elem);
-                    } else {
-                        elements.push(elem);
-                    }
-                    elem = this.currentStateMap.audioElements.pop();
-                }
-                elements = elements.reverse();
-                if (this.currentStateMap.randomiseOrder) {
-                    elements = randomiseOrder(elements);
-                }
-                this.currentStateMap.audioElements = elements.concat(ref);
 
                 this.currentStore = storage.testPages[this.stateIndex];
                 if (this.currentStateMap.preTest !== undefined) {

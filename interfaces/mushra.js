@@ -179,7 +179,7 @@ function loadTest(audioHolderObject) {
             audioObject.bindInterface(orNode);
         } else {
             // Create a slider per track
-            var label = interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
+            var label = element.label || interfaceContext.getLabel(labelType, index, audioHolderObject.labelStart);
             var sliderObj = new sliderObject(audioObject, label);
 
             if (typeof audioHolderObject.initialPosition === "number") {

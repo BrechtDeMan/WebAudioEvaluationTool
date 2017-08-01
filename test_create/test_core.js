@@ -440,7 +440,7 @@ AngularInterface.controller("interfaceNode", ['$scope', '$element', '$window', f
 }]);
 AngularInterface.controller("page", ['$scope', '$element', '$window', function ($s, $e, $w) {
     $s.schema = $w.specification.schema.querySelector("element[name=\"page\"]");
-    $s.page.label = "default";
+    $s.page.label = $s.page.label || "default";
     $s.addInterface = function () {
         $s.page.addInterface();
     };
