@@ -2407,6 +2407,7 @@ function Interface(specificationObject) {
         show: function () {
             this.root.style.visibility = "visible";
             this.blanker.style.visibility = "visible";
+            this.accept.focus();
         },
         clear: function () {
             this.root.style.visibility = "";
