@@ -46,7 +46,9 @@
             <div class="attributes">
                 <div class="attribute">
                     <span>Interface: </span>
-                    <input type="text" ng-model="specification.interface" required/>
+                    <select type="text" ng-model="specification.interface" required>
+                        <option value="{{i.name}}" ng-repeat="i in availableInterfaceModules">{{i.name}}</option>
+                    </select>
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="If you would like to save to a server other than your hosting server, you can place the full WAET URL here">
                     <span>Save URL: </span>

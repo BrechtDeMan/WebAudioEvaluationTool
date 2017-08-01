@@ -86,6 +86,11 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
         specification.processSchema(text);
         $s.globalSchema = specification.getSchema();
     });
+    $s.availableInterfaceModules = [];
+    get("interfaces/interfaces.json").then(JSON.parse).then(function (d) {
+        $s.availableInterfaceModules = d.interfaces;
+        $s.$apply();
+    });
     $s.specification = specification;
     $s.selectedTestPrototype = undefined;
     $s.setTestPrototype = function (obj) {
@@ -276,8 +281,8 @@ AngularInterface.controller("setup", ['$scope', '$element', '$window', function 
         if ($s.schema) {
             var spec = $s.schema.querySelector("attribute[name=\"" + name + "\"]") || $w.specification.schema.querySelector("attribute[name=\"" + name + "\"]");
             var attr = spec.getAttribute("default");
-            if (attr === undefined) {
-                return "";
+            if (attr === null) {
+                return "Not set";
             }
             return attr;
         }
@@ -498,8 +503,8 @@ AngularInterface.controller("page", ['$scope', '$element', '$window', function (
     $s.placeholder = function (name) {
         var spec = $s.schema.querySelector("attribute[name=\"" + name + "\"]") || $w.specification.schema.querySelector("attribute[name=\"" + name + "\"]");
         var attr = spec.getAttribute("default");
-        if (attr === undefined) {
-            return "";
+        if (attr === null) {
+            return "Not set";
         }
         return attr;
     }
