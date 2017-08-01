@@ -13,52 +13,10 @@
             "name": "MUSHRA",
             "interface": "MUSHRA",
             "description": {
-                "en": "Multi-stimulus with hidden reference and anchor. Each fragment is shown on its own vertical slider. One fragment must be labelled as a reference and another labelled as an anchor. One external reference must also be shown."
+                "en": "Multi-stimulus with hidden reference and anchor. Each fragment is shown on its own vertical slider. One fragment must be labelled as a reference and another labelled as an anchor. One external reference must also be shown. ITU-R BS.1116-3"
             },
             "scales": ["ACR"],
-            "checks": [{
-                "name": "fragmentMoved",
-                "support": "none"
-            }, {
-                "name": "fragmentPlayed",
-                "support": "none"
-            }, {
-                "name": "fragmentFullPlayback",
-                "support": "none"
-            }, {
-                "name": "fragmentComments",
-                "support": "none"
-            }, {
-                "name": "scalerange",
-                "support": "none"
-            }],
-            "show": [{
-                "name": "volume",
-                "support": "none"
-            }, {
-                "name": "page-count",
-                "support": "none"
-            }, {
-                "name": "playhead",
-                "support": "none"
-            }, {
-                "name": "comments",
-                "support": "none"
-            }],
-            "elements": [{
-                "anchor": {
-                    "min": 1,
-                    "max": "undefined"
-                },
-                "reference": {
-                    "min": 1,
-                    "max": "undefined"
-                },
-                "outsidereference": {
-                    "min": 1,
-                    "max": "undefined"
-                }
-            }]
+            "template": "./tests/templates/itur1116.xml"
         }, {
             "name": "Vertical Sliders",
             "interface": "MUSHRA",
@@ -83,7 +41,7 @@
             "description": {
                 "en": "Each stimulus is placed on a discrete scale equalling the number of fragments. The fragments are then ranked based on the question posed. Only one element can occupy a rank position"
             }
-        },{
+        }, {
             "name": "Likert",
             "interface": "discrete",
             "description": {

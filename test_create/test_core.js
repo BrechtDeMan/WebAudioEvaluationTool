@@ -153,10 +153,12 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
 
 AngularInterface.controller("introduction", ['$scope', '$element', '$window', function ($s, $e, $w) {
     $s.state = 0;
+    $s.selected = undefined;
     $s.next = function () {
         $s.state++;
         if ($s.state > 1 || $s.file) {
             $s.hidePopup();
+            $s.initialise($s.selected);
         }
     };
     $s.back = function () {
@@ -177,19 +179,32 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         if (obj === undefined) {
             throw ("Cannot find specification");
         }
-        $s.setTestPrototype(obj);
+        if (typeof obj.template === "string") {
+            get(obj.template).then(function (data) {
+                $s.parseFile(data);
+            }, function (err) {})
+        } else {
+            $s.setTestPrototype(obj);
+        }
     };
-    // Get the test interface specifications
+    $s.select = function (name) {
+            $s.selected = name;
+        }
+        // Get the test interface specifications
     $s.file = undefined;
     $s.description = "";
+
+    $s.parseFile = function (f) {
+        var p = new DOMParser();
+        specification.decode(p.parseFromString(f, "text/xml"));
+        $s.$apply();
+    }
 
     $s.handleFiles = function ($event) {
         $s.file = $event.currentTarget.files[0];
         var r = new FileReader();
         r.onload = function () {
-            var p = new DOMParser();
-            specification.decode(p.parseFromString(r.result, "text/xml"));
-            $s.$apply();
+            $s.parseFile(r.result);
         };
         r.readAsText($s.file);
     };
@@ -242,12 +257,14 @@ AngularInterface.controller("setup", ['$scope', '$element', '$window', function 
     $s.$watch("selectedTestPrototype", $s.configure);
 
     $s.placeholder = function (name) {
-        var spec = $s.schema.querySelector("attribute[name=\"" + name + "\"]") || $w.specification.schema.querySelector("attribute[name=\"" + name + "\"]");
-        var attr = spec.getAttribute("default");
-        if (attr === undefined) {
-            return "";
+        if ($s.schema) {
+            var spec = $s.schema.querySelector("attribute[name=\"" + name + "\"]") || $w.specification.schema.querySelector("attribute[name=\"" + name + "\"]");
+            var attr = spec.getAttribute("default");
+            if (attr === undefined) {
+                return "";
+            }
+            return attr;
         }
-        return attr;
     }
 }]);
 

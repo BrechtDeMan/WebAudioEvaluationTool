@@ -1063,7 +1063,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
-                            <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="initialise(i.name)">
+                            <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="select(i.name)">
                                 <label style="cursor:pointer">
                                     <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
                                 </label>
