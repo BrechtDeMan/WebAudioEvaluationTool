@@ -141,11 +141,11 @@
             <div id="globalpresurvey" class="node" ng-controller="survey" ng-init="survey = specification.preTest">
                 <h2>Pre Test Survey</h2>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
-                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
+                <div class="node surveyentry" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
                     <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
                     <div class="attributes">
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Type of survey entry.">
                             <span>Survey Type: </span>
                             <select ng-model="opt.type">
                                 <option value="question">Question</option>
@@ -158,23 +158,23 @@
                                 <option value="youtube">YouTube</option>
                             </select>
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Unique across the entire session of all ID entries. ">
                             <span>Unique Survey Entry ID:</span>
                             <input type="text" ng-model="opt.id" required/>
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Friendly name. Will be used in test results parsers instead of the ID, if defined.">
                             <span>Entry Name:</span>
                             <input type="text" ng-model="opt.name" />
                         </div>
-                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="An answer must be given to continue with the test.">
                             <span>Mandatory:</span>
                             <input type="checkbox" ng-model="opt.mandatory" />
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum time in seconds before continuing.">
                             <span>Minimum Wait Time (s):</span>
                             <input type="number" ng-model="opt.minWait" min="0" />
                         </div>
-                        <div class="attribute" ng-show="opt.type == 'question'">
+                        <div class="attribute" ng-show="opt.type == 'question'" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Size of the displayed text box. Does not limit entry but may discourage (or encourage) longer ansewrs if bigger.">
                             <span>Box Size:</span>
                             <select ng-model="opt.boxsize">
                                 <option value="small">Small</option>
@@ -183,28 +183,28 @@
                                 <option value="huge">Huge</option>
                             </select>
                         </div>
-                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="The minimum number of options that must be selected before continuing">
                             <span>Minimum Selected:</span>
                             <input type="number" ng-model="opt.min" min="0" />
                         </div>
-                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum number of options that can be selected to continue.">
                             <span>Maximum Selected:</span>
                             <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
                         </div>
-                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum numerical value">
                             <span>Minimum Value:</span>
                             <input type="number" ng-model="opt.min" />
                         </div>
-                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum numerical value">
                             <span>Maximum Value:</span>
                             <input type="number" ng-model="opt.max" />
                         </div>
-                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="URL of the video to embed.">
                             <span>Video URL:</span>
                             <input type="text" ng-model="opt.url" />
                         </div>
                     </div>
-                    <div class="node">
+                    <div class="node" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Statement / Question to pose to the subject.">
                         <h4>Statement</h4>
                         <textarea ng-model="opt.statement"></textarea>
                     </div>
@@ -272,11 +272,11 @@
             <div id="globalpostsurvey" class="node" ng-controller="survey" ng-init="survey = specification.postTest">
                 <h2>Post Test Survey</h2>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
-                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
+                <div class="node surveyentry" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
                     <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
                     <div class="attributes">
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Type of survey entry.">
                             <span>Survey Type: </span>
                             <select ng-model="opt.type">
                                 <option value="question">Question</option>
@@ -289,23 +289,23 @@
                                 <option value="youtube">YouTube</option>
                             </select>
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Unique across the entire session of all ID entries. ">
                             <span>Unique Survey Entry ID:</span>
                             <input type="text" ng-model="opt.id" required/>
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Friendly name. Will be used in test results parsers instead of the ID, if defined.">
                             <span>Entry Name:</span>
                             <input type="text" ng-model="opt.name" />
                         </div>
-                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="An answer must be given to continue with the test.">
                             <span>Mandatory:</span>
                             <input type="checkbox" ng-model="opt.mandatory" />
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum time in seconds before continuing.">
                             <span>Minimum Wait Time (s):</span>
                             <input type="number" ng-model="opt.minWait" min="0" />
                         </div>
-                        <div class="attribute" ng-show="opt.type == 'question'">
+                        <div class="attribute" ng-show="opt.type == 'question'" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Size of the displayed text box. Does not limit entry but may discourage (or encourage) longer ansewrs if bigger.">
                             <span>Box Size:</span>
                             <select ng-model="opt.boxsize">
                                 <option value="small">Small</option>
@@ -314,28 +314,28 @@
                                 <option value="huge">Huge</option>
                             </select>
                         </div>
-                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="The minimum number of options that must be selected before continuing">
                             <span>Minimum Selected:</span>
                             <input type="number" ng-model="opt.min" min="0" />
                         </div>
-                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum number of options that can be selected to continue.">
                             <span>Maximum Selected:</span>
                             <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
                         </div>
-                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum numerical value">
                             <span>Minimum Value:</span>
                             <input type="number" ng-model="opt.min" />
                         </div>
-                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum numerical value">
                             <span>Maximum Value:</span>
                             <input type="number" ng-model="opt.max" />
                         </div>
-                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="URL of the video to embed.">
                             <span>Video URL:</span>
                             <input type="text" ng-model="opt.url" />
                         </div>
                     </div>
-                    <div class="node">
+                    <div class="node" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Statement / Question to pose to the subject.">
                         <h4>Statement</h4>
                         <textarea ng-model="opt.statement"></textarea>
                     </div>
@@ -404,23 +404,23 @@
                 <h2>Interface (Globals)</h2>
                 <div class="node interfaceOptions">
                     <div class="attributes">
-                        <div class="attribute" name="fragmentPlayed" type="check">
+                        <div class="attribute" name="fragmentPlayed" type="check" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="A page can only be submitted if all fragments have been played">
                             <span>Check all fragments played: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                         </div>
-                        <div class="attribute" name="fragmentFullPlayback" type="check">
+                        <div class="attribute" name="fragmentFullPlayback" type="check" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="A page can only be submitted if all fragments have been played completely.">
                             <span>Check all fragments fully played: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                         </div>
-                        <div class="attribute" name="fragmentMoved" type="check">
+                        <div class="attribute" name="fragmentMoved" type="check" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="A page can only be submitted if all fragments have been moved">
                             <span>Check all fragments have been moved: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                         </div>
-                        <div class="attribute" name="fragmentComments" type="check">
+                        <div class="attribute" name="fragmentComments" type="check" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="A page can only be submitted if all fragments have their comment boxes completed.">
                             <span>Check all fragments have comments: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                         </div>
-                        <div class="attribute" name="scalerange" type="check">
+                        <div class="attribute" name="scalerange" type="check" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="A page can only be submitted if there are fragments above and below the maximum and minimum ranges.">
                             <span>Enforce a scale usage: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                             <span>Minimum:</span>
@@ -428,19 +428,19 @@
                             <span>Maximum:</span>
                             <input type="number" min="0" max="100" name="max" />
                         </div>
-                        <div class="attribute" name="volume" type="show">
+                        <div class="attribute" name="volume" type="show" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show the master volume control on each page.">
                             <span>Show master volume control: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                         </div>
-                        <div class="attribute" name="playhead" type="show">
+                        <div class="attribute" name="playhead" type="show" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show the playhead for the fragments.">
                             <span>Show playhead: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                         </div>
-                        <div class="attribute" name="page-count" type="show">
+                        <div class="attribute" name="page-count" type="show" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show number of completed and remaining pages.">
                             <span>Show Page Count: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                         </div>
-                        <div class="attribute" name="comments" type="show">
+                        <div class="attribute" name="comments" type="show" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show comment boxes for each fragment.">
                             <span>Show Fragment Comments: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
                         </div>
@@ -468,7 +468,7 @@
                     <input type="checkbox" ng-model="page.randomiseOrder" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Specify if this page should be repeated and how many times. Please note, that if page-pooling is also selected then it 'may' not repeat as many times.">
-                    <span>Repeat Page N-times: </span>
+                    <span>Numer of repetitions: </span>
                     <input type="number" ng-model="page.repeatCount" value="0" step="1" placeholder="{{placeholder('repeatCount')}}" />
                 </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Loop audio playback until manually stopped or the page submit button is pressed">
@@ -549,11 +549,11 @@
             <div class="node" ng-controller="survey" ng-init="survey = page.preTest">
                 <h2>Pre Page Survey</h2>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
-                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
+                <div class="node surveyentry" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
                     <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
                     <div class="attributes">
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Type of survey entry.">
                             <span>Survey Type: </span>
                             <select ng-model="opt.type">
                                 <option value="question">Question</option>
@@ -566,23 +566,23 @@
                                 <option value="youtube">YouTube</option>
                             </select>
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Unique across the entire session of all ID entries. ">
                             <span>Unique Survey Entry ID:</span>
                             <input type="text" ng-model="opt.id" required/>
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Friendly name. Will be used in test results parsers instead of the ID, if defined.">
                             <span>Entry Name:</span>
                             <input type="text" ng-model="opt.name" />
                         </div>
-                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="An answer must be given to continue with the test.">
                             <span>Mandatory:</span>
                             <input type="checkbox" ng-model="opt.mandatory" />
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum time in seconds before continuing.">
                             <span>Minimum Wait Time (s):</span>
                             <input type="number" ng-model="opt.minWait" min="0" />
                         </div>
-                        <div class="attribute" ng-show="opt.type == 'question'">
+                        <div class="attribute" ng-show="opt.type == 'question'" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Size of the displayed text box. Does not limit entry but may discourage (or encourage) longer ansewrs if bigger.">
                             <span>Box Size:</span>
                             <select ng-model="opt.boxsize">
                                 <option value="small">Small</option>
@@ -591,28 +591,28 @@
                                 <option value="huge">Huge</option>
                             </select>
                         </div>
-                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="The minimum number of options that must be selected before continuing">
                             <span>Minimum Selected:</span>
                             <input type="number" ng-model="opt.min" min="0" />
                         </div>
-                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum number of options that can be selected to continue.">
                             <span>Maximum Selected:</span>
                             <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
                         </div>
-                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum numerical value">
                             <span>Minimum Value:</span>
                             <input type="number" ng-model="opt.min" />
                         </div>
-                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum numerical value">
                             <span>Maximum Value:</span>
                             <input type="number" ng-model="opt.max" />
                         </div>
-                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="URL of the video to embed.">
                             <span>Video URL:</span>
                             <input type="text" ng-model="opt.url" />
                         </div>
                     </div>
-                    <div class="node">
+                    <div class="node" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Statement / Question to pose to the subject.">
                         <h4>Statement</h4>
                         <textarea ng-model="opt.statement"></textarea>
                     </div>
@@ -680,11 +680,11 @@
             <div class="node" ng-controller="survey" ng-init="survey = page.postTest">
                 <h2>Post Page Survey</h2>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
-                <div class="node" ng-repeat="opt in survey.options" ng-controller="surveyOption">
+                <div class="node surveyentry" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
                     <button type="button" class="btn btn-danger" ng-click="removeSurveyEntry(opt);">Delete Entry</button>
                     <div class="attributes">
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Type of survey entry.">
                             <span>Survey Type: </span>
                             <select ng-model="opt.type">
                                 <option value="question">Question</option>
@@ -697,23 +697,23 @@
                                 <option value="youtube">YouTube</option>
                             </select>
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Unique across the entire session of all ID entries. ">
                             <span>Unique Survey Entry ID:</span>
-                            <input type="text" ng-model="opt.id" required />
+                            <input type="text" ng-model="opt.id" required/>
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Friendly name. Will be used in test results parsers instead of the ID, if defined.">
                             <span>Entry Name:</span>
                             <input type="text" ng-model="opt.name" />
                         </div>
-                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['question', 'checkbox', 'radio', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="An answer must be given to continue with the test.">
                             <span>Mandatory:</span>
                             <input type="checkbox" ng-model="opt.mandatory" />
                         </div>
-                        <div class="attribute">
+                        <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum time in seconds before continuing.">
                             <span>Minimum Wait Time (s):</span>
                             <input type="number" ng-model="opt.minWait" min="0" />
                         </div>
-                        <div class="attribute" ng-show="opt.type == 'question'">
+                        <div class="attribute" ng-show="opt.type == 'question'" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Size of the displayed text box. Does not limit entry but may discourage (or encourage) longer ansewrs if bigger.">
                             <span>Box Size:</span>
                             <select ng-model="opt.boxsize">
                                 <option value="small">Small</option>
@@ -722,28 +722,28 @@
                                 <option value="huge">Huge</option>
                             </select>
                         </div>
-                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="The minimum number of options that must be selected before continuing">
                             <span>Minimum Selected:</span>
                             <input type="number" ng-model="opt.min" min="0" />
                         </div>
-                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['checkbox', 'radio'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum number of options that can be selected to continue.">
                             <span>Maximum Selected:</span>
                             <input type="number" ng-model="opt.max" max="{{opt.options.length}}" />
                         </div>
-                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Minimum numerical value">
                             <span>Minimum Value:</span>
                             <input type="number" ng-model="opt.min" />
                         </div>
-                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['slider', 'number'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Maximum numerical value">
                             <span>Maximum Value:</span>
                             <input type="number" ng-model="opt.max" />
                         </div>
-                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0">
+                        <div class="attribute" ng-show="['video', 'youtube'].indexOf(opt.type) >= 0" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="URL of the video to embed.">
                             <span>Video URL:</span>
                             <input type="text" ng-model="opt.url" />
                         </div>
                     </div>
-                    <div class="node">
+                    <div class="node" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Statement / Question to pose to the subject.">
                         <h4>Statement</h4>
                         <textarea ng-model="opt.statement"></textarea>
                     </div>
@@ -809,7 +809,7 @@
                 </div>
             </div>
             <button type="button" class="btn btn-success" ng-show="specification.interface == 'APE' || page.interfaces.length == 0" ng-click="addInterface()">Add Interface/Axis</button>
-            <div class="node" ng-repeat="interface in page.interfaces" ng-controller="interfaceNode">
+            <div class="node interface" ng-repeat="interface in page.interfaces" ng-controller="interfaceNode">
                 <h2>Interface</h2>
                 <button type="button" class="btn btn-danger" ng-click="removeInterface(interface)">Remove Interface/Axis</button>
                 <div class="node interfaceOptions">
@@ -956,15 +956,15 @@
                 </div>
             </div>
             <button type="button" class="btn btn-success" ng-click="addAudioElement()">Add Fragment</button>
-            <div class="node" ng-repeat="fragment in page.audioElements">
+            <div class="node audioelement" ng-repeat="fragment in page.audioElements">
                 <h3>Audio Fragment</h3>
                 <button type="button" class="btn btn-danger" ng-click="removeAudioElement(fragment)">Remove Fragment</button>
                 <div class="attributes">
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="The unique ID of this fragment. Must be unique across the entire session">
                         <span>Unique ID: </span>
                         <input type="text" ng-model="fragment.id" required/>
                     </div>
-                    <div class="attribute">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="URL of the fragment.">
                         <span>URL: </span>
                         <input type="text" ng-model="fragment.url" required/>
                         <span>Full URL: </span><span style="font-weight=600">{{page.hostURL}}{{fragment.url}}</span>
@@ -992,11 +992,11 @@
                     </div>
                     <div class="attribute" ng-show="fragment.type == 'anchor'">
                         <span>Anchor must be below: </span>
-                        <input type="number" ng-model="fragment.marker" min="0" max="100" />
+                        <input type="number" ng-model="fragment.marker" min="0" max="100" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="If this is set, the page cannot be submitted if this fragment is above this point." />
                     </div>
                     <div class="attribute" ng-show="fragment.type == 'reference'">
                         <span>Reference must be above: </span>
-                        <input type="number" ng-model="fragment.marker" min="0" max="100" />
+                        <input type="number" ng-model="fragment.marker" min="0" max="100" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="If this is set, the page cannot be submitted if this fragment is below this point." />
                     </div>
                     <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Over-ride global and page loudness">
                         <span>Loudness: </span>

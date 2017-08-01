@@ -35,10 +35,14 @@ var specification = new Specification();
 
 window.onload = function () {
     // Get the test interface specifications
+    toggleDropdowns();
+};
+
+function toggleDropdowns() {
     $(function () {
         $('[data-toggle="popover"]').popover();
     });
-};
+}
 
 function handleFiles(event) {
     var s = angular.element(event.currentTarget).scope();
@@ -149,6 +153,18 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
     $s.hideValidationMessages = function () {
         $s.showValidationMessages = false;
     }
+    $s.$watch(function () {
+        return document.querySelectorAll("div.pageNode").length;
+    }, $w.toggleDropdowns);
+    $s.$watch(function () {
+        return document.querySelectorAll("div.surveyentry").length;
+    }, $w.toggleDropdowns);
+    $s.$watch(function () {
+        return document.querySelectorAll("div.interface").length;
+    }, $w.toggleDropdowns);
+    $s.$watch(function () {
+        return document.querySelectorAll("div.audioelement").length;
+    }, $w.toggleDropdowns);
 }]);
 
 AngularInterface.controller("introduction", ['$scope', '$element', '$window', function ($s, $e, $w) {
