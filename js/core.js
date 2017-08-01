@@ -555,7 +555,7 @@ function interfacePopup() {
     this.store = null;
     var lastNodeStart;
     $(window).keypress(function (e) {
-        if (e.keyCode == 13 && popup.popup.style.visibility == 'visible') {
+        if (e.keyCode == 13 && popup.popup.style.visibility == 'visible' && interfaceContext.lightbox.isVisible() === false) {
             console.log(e);
             popup.buttonProceed.onclick();
             e.preventDefault();
@@ -2421,6 +2421,9 @@ function Interface(specificationObject) {
         },
         resize: function (event) {
             this.root.style.left = (window.innerWidth / 2) - 250 + 'px';
+        },
+        isVisible: function () {
+            return this.root.style.visibility == "visible";
         }
     };
 
