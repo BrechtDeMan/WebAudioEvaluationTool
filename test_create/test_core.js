@@ -121,10 +121,12 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
         });
         var dnlk = window.URL.createObjectURL(bb);
         var a = document.createElement("a");
+        document.body.appendChild(a)
         a.href = dnlk;
         a.download = "test.xml";
         a.click();
         window.URL.revokeObjectURL(dnlk);
+        document.body.removeChild(a);
     };
     $s.validated = false;
     $s.showValidationMessages = false;
