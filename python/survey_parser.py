@@ -3,6 +3,11 @@ import xml.etree.ElementTree as ET
 import os
 import sys
 import csv
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy as sp
+import scipy.stats
+
 
 # COMMAND LINE ARGUMENTS
 
@@ -146,3 +151,61 @@ for page_name in storage["pages"].keys():
                 filewriter.writerow(storage["pages"][page_name][position][ref]["header"])
                 for row in storage["pages"][page_name][position][ref]["responses"]:
                     filewriter.writerow(row)
+
+#Time to plot
+
+def plotDurationHistogram(store, plot_id, saveloc):
+    x = []
+    for row in store["responses"]:
+        x.append(float(row[1]))
+    x = np.asarray(x)
+    plt.figure()
+    n, bins, patches = plt.hist(x, 10, facecolor='green', alpha=0.75)
+    plt.xlabel("Duration")
+    plt.ylabel("Count")
+    plt.grid(True)
+    plt.title("Histogram of durations for "+plot_id)
+    plt.savefig(saveloc+plot_id+"-duration.pdf", bbox_inches='tight')
+
+def plotRadio(store, plot_id, saveloc):
+    plt.figure()
+    data = {}
+    for row in store["responses"]:
+        try:
+            data[row[2]] += 1
+        except KeyError:
+            data[row[2]] = 1
+    labels = data.keys()
+    sizes = data.values()
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    plt.title("Selections of "+plot_id)
+    plt.savefig(saveloc+plot_id+".pdf", bbox_inches='tight')
+
+def plotCheckbox(store, plot_id, saveloc):
+    data = []
+    labels = []
+    for h in store["header"][2::1]:
+        labels.append(h)
+        data.append(0)
+    for row in store["responses"]:
+        for i in range(2, len(labels)+2):
+            if row[i] == "true":
+                data[i-2] += 1
+    x = scipy.arange(4)
+    plt.figure()
+    plt.bar(x, data, width=0.8)
+    plt.xticks(x+0.4, labels)
+    plt.xlabel("Option")
+    plt.ylabel("Count")
+    plt.title("Selection counts of "+plot_id)
+    plt.savefig(saveloc+plot_id+".pdf", bbox_inches='tight')
+
+for page_name in storage["pages"].keys():
+    for position in storage["pages"][page_name].keys():
+        saveloc = file_store_root+page_name+"/"
+        for ref in storage["pages"][page_name][position].keys():
+            plotDurationHistogram(storage["pages"][page_name][position][ref],ref, saveloc)
+            if storage["pages"][page_name][position][ref]["type"] == "radio":
+                plotRadio(storage["pages"][page_name][position][ref],ref, saveloc)
+            if storage["pages"][page_name][position][ref]["type"] == "checkbox":
+                plotCheckbox(storage["pages"][page_name][position][ref],ref, saveloc)
