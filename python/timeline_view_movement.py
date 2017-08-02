@@ -112,6 +112,10 @@ for file in os.listdir(folder_name):
                 if audioelement is not None: # Check it exists
                     audio_id = str(audioelement.get('ref'))
                     
+                    # break if outside-reference
+                    if audioelement.get("type") == "outside-reference":
+                        break;
+                    
                     # break if no initial position....
                     initial_position_temp = audioelement.find("./metric/metricresult/[@name='elementInitialPosition']")
                     if initial_position_temp is None:

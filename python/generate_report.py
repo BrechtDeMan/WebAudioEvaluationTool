@@ -227,17 +227,18 @@ for file in files_list: # iterate over all files in files_list
             
             # number of comments (interesting if comments not mandatory)
             for audioelement in audioelements:
-                response = audioelement.find("./comment/response")
-                was_played = audioelement.find("./metric/metricresult/[@name='elementFlagListenedTo']")
-                was_moved = audioelement.find("./metric/metricresult/[@name='elementFlagMoved']")
-                if response is not None and response.text is not None and len(response.text) > 1: 
-                    number_of_comments += 1
-                else: 
-                    number_of_missing_comments += 1
-                if was_played is not None and was_played.text == 'false': 
-                    not_played.append(audioelement.get('name'))
-                if was_moved is not None and was_moved.text == 'false': 
-                    not_moved.append(audioelement.get('name'))
+                if audioelement.get("type") != "outside-reference":
+                    response = audioelement.find("./comment/response")
+                    was_played = audioelement.find("./metric/metricresult/[@name='elementFlagListenedTo']")
+                    was_moved = audioelement.find("./metric/metricresult/[@name='elementFlagMoved']")
+                    if response is not None and response.text is not None and len(response.text) > 1: 
+                        number_of_comments += 1
+                    else: 
+                        number_of_missing_comments += 1
+                    if was_played is not None and was_played.text == 'false': 
+                        not_played.append(audioelement.get('name'))
+                    if was_moved is not None and was_moved.text == 'false': 
+                        not_moved.append(audioelement.get('name'))
             
             # update global counters
             total_empty_comments += number_of_missing_comments

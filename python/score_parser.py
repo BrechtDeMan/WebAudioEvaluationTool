@@ -76,7 +76,8 @@ for file_name in os.listdir(folder_name):
             # get alphabetical array of fragment IDs from this subject's XML
             fragmentnamelist = []    # make empty list
             for audioelement in page.findall("./audioelement"): # iterate over all audioelements
-                fragmentnamelist.append(audioelement.get('ref')) # add to list
+                if audioelement.get("type") != "outside-reference":
+                    fragmentnamelist.append(audioelement.get('ref')) # add to list
             
             fragmentnamelist = sorted(fragmentnamelist);    # Sort the list
             storage[page_name]['header'] = fragmentnamelist;
