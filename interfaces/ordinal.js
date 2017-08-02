@@ -222,6 +222,7 @@ function interfaceObject(audioObject, label) {
     root.addEventListener('dragleave', this, true);
     root.addEventListener('drop', this, true);
     root.addEventListener('dragend', this, true);
+    this.dragging = false;
     this.handleEvent = function (event) {
         if (event.type == "click") {
             if (playing === false) {
@@ -252,6 +253,7 @@ function interfaceObject(audioObject, label) {
 
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', audioObject.id);
+        this.dragging = "true";
     }
 
     function dragEnter(e) {
@@ -267,13 +269,10 @@ function interfaceObject(audioObject, label) {
         if (e.preventDefault) {
             e.preventDefault(); // Necessary. Allows us to drop.
         }
-
         e.dataTransfer.dropEffect = 'move'; // See the section on the DataTransfer object.
-
-        var srcid = Number(e.dataTransfer.getData("text/plain"));
         var elements = container.childNodes;
         var srcObject = audioEngineContext.audioObjects.find(function (ao) {
-            return ao.id === srcid;
+            return ao.interfaceDOM.dragging;
         });
         var src = srcObject.interfaceDOM.root;
         if (src !== root) {
@@ -293,8 +292,6 @@ function interfaceObject(audioObject, label) {
             }
 
         }
-
-        return false;
     }
 
     function drop(e) {
@@ -318,6 +315,7 @@ function interfaceObject(audioObject, label) {
         // this/e.target is the source node.
         $(".ordinal-element").removeClass("dragging");
         $(".ordinal-element").removeClass("over");
+        this.dragging = false;
     }
 
     this.getElementPosition = function () {
