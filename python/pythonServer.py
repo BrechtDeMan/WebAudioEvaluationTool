@@ -138,12 +138,15 @@ def saveFile(self):
     global curSaveIndex
     options = self.path.rsplit('?')
     options = options[1].rsplit('&')
+    update = False
     for option in options:
         optionPair = option.rsplit('=')
         if optionPair[0] == "key":
             key = optionPair[1]
         elif optionPair[0] == "saveFilenamePrefix":
             prefix = optionPair[1]
+        elif optionPair[0] == "state":
+            update = optionPair[1] == "update"
     if key == None:
         self.send_response(404)
         return
@@ -153,6 +156,8 @@ def saveFile(self):
     postVars = self.rfile.read(varLen)
     print("Saving file key "+key)
     filename = prefix+'-'+key+'.xml'
+    if update:
+        filename = "update-"+filename
     file = open('../saves/'+filename,'wb')
     file.write(postVars)
     file.close()
@@ -173,6 +178,8 @@ def saveFile(self):
         self.wfile.write(bytes(reply, "utf-8"))
     curSaveIndex += 1
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
+    if update == False:
+        os.remove("../saves/update-"+filename)
 
 def poolXML(s):
     pool = ET.parse('../tests/pool.xml')

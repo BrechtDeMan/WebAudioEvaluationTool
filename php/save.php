@@ -33,7 +33,17 @@ if (isset($_GET['saveFilenamePrefix'])) {
 }
 $postText = file_get_contents('php://input');
 $file_key = $_GET['key'];
-$filename = '../saves/'.$saveFilenamePrefix.$file_key.".xml";
+
+$update = false;
+if (isset($_GET["update"])) {
+    $update = $_GET["update"] == "update";
+}
+
+if ($update) {
+    $filename = '../saves/update-'.$saveFilenamePrefix.$file_key.".xml";
+} else {
+    $filename = '../saves/'.$saveFilenamePrefix.$file_key.".xml";
+}
 
 if (!file_exists($filename)) {
     die('<response state="error"><message>Could not find save</message></response>');
@@ -132,4 +142,8 @@ $wbytes = $doc->save($filename);
 // Return XML confirmation data
 $xml = '<response state="OK"><message>OK</message><file bytes="'.$wbytes.'">"'.$filename.'"</file></response>';
 echo $xml;
+
+if (!$update) {
+    unlink('../saves/update-'.$saveFilenamePrefix.$file_key.".xml");
+}
 ?>

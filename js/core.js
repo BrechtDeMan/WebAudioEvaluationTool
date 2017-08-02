@@ -3575,7 +3575,7 @@ function Storage() {
                     returnURL = specification.projectReturn;
                 }
             }
-            xmlhttp.open("POST", returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=" + this.parent.filenamePrefix);
+            xmlhttp.open("POST", returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=" + this.parent.filenamePrefix + "&state=update");
             xmlhttp.setRequestHeader('Content-Type', 'text/xml');
             xmlhttp.onerror = function () {
                 console.log('Error updating file to server!');
@@ -3613,6 +3613,7 @@ function Storage() {
             } else {
                 saveURL += this.parent.filenamePrefix;
             }
+            saveURL += "&state=finish";
             return new Promise(function (resolve, reject) {
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.open("POST", saveURL);
