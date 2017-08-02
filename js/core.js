@@ -671,12 +671,13 @@ function interfacePopup() {
     }
 
     function postCheckbox(node) {
-        if (node.response === null) {
-            node.response = [];
+        if (node.response === undefined) {
+            node.response = Array(node.specification.options.length);
         }
         var table = document.createElement("table");
         table.className = "popup-option-list";
         table.border = "0";
+        node.response = [];
         node.specification.options.forEach(function (option, index) {
             var tr = document.createElement("tr");
             table.appendChild(tr);
