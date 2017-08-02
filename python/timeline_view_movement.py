@@ -74,6 +74,10 @@ for file in os.listdir(folder_name):
             if page_name is None: # ignore 'empty' audio_holders
                 print("Skipping empty page name from "+subject_id+".")
                 break
+            
+            if page.get("state") != "complete":
+                print("Skipping non-completed page "+page_name+" from "+subject_id+".")
+                break
                 
             # subtract total page length from subsequent page event times
             page_time_temp = page.find("./metric/metricresult/[@id='testTime']")
@@ -108,10 +112,15 @@ for file in os.listdir(folder_name):
                 if audioelement is not None: # Check it exists
                     audio_id = str(audioelement.get('ref'))
                     
-                    # break if no initial position or move events registered
+                    # break if no initial position....
                     initial_position_temp = audioelement.find("./metric/metricresult/[@name='elementInitialPosition']")
                     if initial_position_temp is None:
                         print("Skipping "+page_name+" from "+subject_id+": does not have initial positions specified.")
+                        break
+                    # ... or move events registered
+                    movements = audioelement.find("./metric/metricresult[@name='elementTrackerFull']")
+                    if movements is None:
+                        print("Skipping "+page_name+" from "+subject_id+": does not have trackers.")
                         break
                     
                     # get move events, initial and eventual position
@@ -299,13 +308,20 @@ for file in os.listdir(folder_name):
                 interfaces = page_setup.findall("./interface")
                 interface_title = interfaces[0].find("./title")
                 scales = interfaces[0].findall("./scales") # get first interface by default
-                scalelabels = scales[0].findall("./scalelabel") # get first scale by default
-
+                
                 labelpos = [] # array of scalelabel positions
                 labelstr = [] # array of strings at labels
-                for scalelabel in scalelabels:
-                    labelpos.append(float(scalelabel.get('position'))/100.0)
-                    labelstr.append(scalelabel.text)
+                
+                # No scales given. Use normal floats
+                if len(scales) is 0:
+                    labelpos = [0.0, 1.0]
+                    labelstr = ["0", "100"]
+                else:
+                    scalelabels = scales[0].findall("./scalelabel") # get first scale by default
+                
+                    for scalelabel in scalelabels:
+                        labelpos.append(float(scalelabel.get('position'))/100.0)
+                        labelstr.append(scalelabel.text)
 
                 # use interface name as Y axis label
                 if interface_title is not None:

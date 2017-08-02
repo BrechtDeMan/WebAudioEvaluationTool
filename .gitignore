@@ -11,3 +11,6 @@ saves/*.xml
 *.DS_STORE
 *.swp
 *.swo
+saves/ratings/*
+saves/timelines/*
+saves/timelines_movement/*
