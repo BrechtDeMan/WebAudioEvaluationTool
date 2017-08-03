@@ -58,7 +58,7 @@ for file_name in os.listdir(folder_name):
             
             # Check if page in the store
             if storage.get(page_name) == None:
-                storage[page_name] = {'header':[], 'axis':{}} # add to the store
+                storage[page_name] = {'header':[], 'axis':{"default": {}}} # add to the store
             
             # Get the axis names
             pageConfig = root.find('./waet/page/[@id="'+page_name+'"]')
@@ -66,9 +66,8 @@ for file_name in os.listdir(folder_name):
                 interfaceName = interface.get("name"); # Get the axis name
                 if interfaceName == None or interfaceName == "null":
                     interfaceName = "default"   # If name not set, make name 'default'
-                if storage[page_name]['axis'].get(interfaceName) == None:
+                if interfaceName not in storage[page_name]['axis'].keys():
                     storage[page_name]['axis'][interfaceName] = {}  # If not in store for page, add empty dict
-                storage[page_name]['axis'][interfaceName][subject_id] = [] # Add the store for the session
                     
             # header: fragment IDs in 'alphabetical' order
             # go to fragment column, or create new column if it doesn't exist yet
@@ -88,11 +87,17 @@ for file_name in os.listdir(folder_name):
                     axisName = value.get('interface-name')
                     if axisName == None or axisName == "null":
                         axisName = 'default'
+                    print(storage[page_name]['axis'])
                     axisStore = storage[page_name]['axis'][axisName]
+                    try:
+                        subjectStore = axisStore[subject_id]
+                    except KeyError:
+                        axisStore[subject_id] = []
+                        subjectStore = axisStore[subject_id]
                     if hasattr(value, 'text'):
-                        axisStore[subject_id].append(value.text)
+                        subjectStore.append(value.text)
                     else:
-                        axisStore[subject_id].append('')
+                        subjectStore.append('')
 
 # Now create the individual files
 for page_name in storage:
