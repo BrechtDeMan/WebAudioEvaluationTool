@@ -64,7 +64,7 @@ for file_name in os.listdir(folder_name):
             pageConfig = root.find('./waet/page/[@id="'+page_name+'"]')
             for interface in pageConfig.findall('./interface'):    # Get the <interface> noeds
                 interfaceName = interface.get("name"); # Get the axis name
-                if interfaceName == None:
+                if interfaceName == None or interfaceName == "null":
                     interfaceName = "default"   # If name not set, make name 'default'
                 if storage[page_name]['axis'].get(interfaceName) == None:
                     storage[page_name]['axis'][interfaceName] = {}  # If not in store for page, add empty dict
