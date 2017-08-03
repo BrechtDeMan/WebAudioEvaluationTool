@@ -343,6 +343,10 @@ function sliderObject(audioObject, label) {
         // Called by the audioObject holding this element. Must be present
         var node = storage.document.createElement('value');
         node.textContent = this.slider.value;
+        var iname = testState.getCurrentTestPage().interfaces[0].name;
+        if (typeof iname == "string") {
+            node.setAttribute("interface-name", iname);
+        }
         return node;
     };
     this.startPlayback = function () {
