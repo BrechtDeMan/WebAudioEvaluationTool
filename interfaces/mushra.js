@@ -67,9 +67,20 @@ function loadInterface() {
     submit.onclick = buttonSubmitClick;
     submit.id = 'submit-button';
     submit.style.display = 'inline-block';
+
+    // Create the sort button
+    var sort = document.createElement("button");
+    sort.id = "sort-fragments";
+    sort.textContent = "Sort";
+    sort.style.display = "inline-block";
+    sort.style.visibility = "hidden";
+    sort.onclick = buttonSortFragmentClick;
+
     // Append the interface buttons into the interfaceButtons object.
     interfaceButtons.appendChild(playback);
     interfaceButtons.appendChild(submit);
+    interfaceButtons.appendChild(sort);
+
 
     // Create outside reference holder
     var outsideRef = document.createElement("div");
@@ -206,6 +217,8 @@ function loadTest(audioHolderObject) {
 
 
     var interfaceOptions = interfaceObj.options;
+    var sortButton = document.getElementById("sort-fragments");
+    sortButton.style.visibility = "hidden";
     interfaceOptions.forEach(function (option) {
         if (option.type == "show") {
             switch (option.name) {
@@ -239,31 +252,8 @@ function loadTest(audioHolderObject) {
                     interfaceContext.commentBoxes.showCommentBoxes(feedbackHolder, true);
                     break;
                 case "fragmentSort":
-                    var button = document.getElementById('sort');
-                    if (button === null) {
-                        button = document.createElement("button");
-                        button.id = 'sort';
-                        button.textContent = "Sort";
-                        button.style.display = 'inline-block';
-                        var container = document.getElementById("interface-buttons");
-                        var neighbour = container.lastElementChild;
-                        container.appendChild(button);
-                        button.onclick = function () {
-                            var sortIndex = interfaceContext.sortFragmentsByScore();
-                            var sliderBox = document.getElementById("slider-holder");
-                            var nodes = audioEngineContext.audioObjects.filter(function (ao) {
-                                return ao.specification.type !== "outside-reference";
-                            });
-                            var i;
-                            nodes.forEach(function (ao) {
-                                sliderBox.removeChild(ao.interfaceDOM.holder);
-                            });
-                            for (i = 0; i < nodes.length; i++) {
-                                var j = sortIndex[i];
-                                sliderBox.appendChild(nodes[j].interfaceDOM.holder);
-                            }
-                        };
-                    }
+                    var button = document.getElementById('sort-fragments');
+                    button.style.visibility = "visible";
                     break;
             }
         }
@@ -511,6 +501,22 @@ function drawScale() {
         text.style.left = 100 - ($(text).width() + 3) + 'px';
         lastHeight = posPix;
     });
+}
+
+function buttonSortFragmentClick() {
+    var sortIndex = interfaceContext.sortFragmentsByScore();
+    var sliderBox = document.getElementById("slider-holder");
+    var nodes = audioEngineContext.audioObjects.filter(function (ao) {
+        return ao.specification.type !== "outside-reference";
+    });
+    var i;
+    nodes.forEach(function (ao) {
+        sliderBox.removeChild(ao.interfaceDOM.holder);
+    });
+    for (i = 0; i < nodes.length; i++) {
+        var j = sortIndex[i];
+        sliderBox.appendChild(nodes[j].interfaceDOM.holder);
+    }
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
