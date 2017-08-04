@@ -7,7 +7,6 @@
 /*globals metricTracker */
 // Once this is loaded and parsed, begin execution
 loadInterface();
-window.APE = undefined;
 
 function loadInterface() {
 
@@ -22,107 +21,13 @@ function loadInterface() {
     testContent.id = 'testContent';
 
     // Bindings for interfaceContext
-    interfaceContext.checkAllPlayed = function () {
-        var hasBeenPlayed = audioEngineContext.checkAllPlayed();
-        if (hasBeenPlayed.length > 0) // if a fragment has not been played yet
-        {
-            var str = "";
-            if (hasBeenPlayed.length > 1) {
-                for (var i = 0; i < hasBeenPlayed.length; i++) {
-                    var ao_id = audioEngineContext.audioObjects[hasBeenPlayed[i]].interfaceDOM.getPresentedId();
-                    str = str + ao_id; // start from 1
-                    if (i < hasBeenPlayed.length - 2) {
-                        str += ", ";
-                    } else if (i == hasBeenPlayed.length - 2) {
-                        str += " or ";
-                    }
-                }
-                str = 'You have not played fragments ' + str + ' yet. Please listen, rate and comment all samples before submitting.';
-            } else {
-                str = 'You have not played fragment ' + (audioEngineContext.audioObjects[hasBeenPlayed[0]].interfaceDOM.getPresentedId()) + ' yet. Please listen, rate and comment all samples before submitting.';
-            }
-            this.storeErrorNode(str);
-            interfaceContext.lightbox.post("Message", str);
-            return false;
-        }
-        return true;
-    };
 
     interfaceContext.checkAllMoved = function () {
-        var state = true;
-        var str = 'You have not moved the following sliders. ';
-        for (var i = 0; i < this.interfaceSliders.length; i++) {
-            var interfaceTID = [];
-            for (var j = 0; j < this.interfaceSliders[i].metrics.length; j++) {
-                var ao_id = this.interfaceSliders[i].sliders[j].getAttribute("trackIndex");
-                if (this.interfaceSliders[i].metrics[j].wasMoved === false && audioEngineContext.audioObjects[ao_id].interfaceDOM.canMove()) {
-                    state = false;
-                    interfaceTID.push(j);
-                }
-            }
-            if (interfaceTID.length !== 0) {
-                var interfaceName = this.interfaceSliders[i].interfaceObject.title;
-                if (interfaceName === undefined) {
-                    str += 'On axis ' + String(i + 1) + ' you must move ';
-                } else {
-                    str += 'On axis "' + interfaceName + '" you must move ';
-                }
-                if (interfaceTID.length == 1) {
-                    str += 'slider ' + (audioEngineContext.audioObjects[interfaceTID[0]].interfaceDOM.getPresentedId()) + '. '; // start from 1
-                } else {
-                    str += 'sliders ';
-                    for (var k = 0; k < interfaceTID.length - 1; k++) {
-                        str += (audioEngineContext.audioObjects[interfaceTID[k]].interfaceDOM.getPresentedId()) + ', '; // start from 1
-                    }
-                    str += (audioEngineContext.audioObjects[interfaceTID[interfaceTID.length - 1]].interfaceDOM.getPresentedId()) + '. ';
-                }
-            }
-        }
-        if (state !== true) {
-            this.storeErrorNode(str);
-            interfaceContext.lightbox.post("Message", str);
-            console.log(str);
-        }
-        return state;
+        module.checkAllMoved();
     };
 
     interfaceContext.checkScaleRange = function () {
-        var audioObjs = audioEngineContext.audioObjects;
-        var audioHolder = testState.stateMap[testState.stateIndex];
-        var interfaceObject = this.interfaceSliders[0].interfaceObject;
-        var state = true;
-        var str = '';
-        this.interfaceSliders.forEach(function (sliderHolder, i) {
-            var scales = (function () {
-                var scaleRange = interfaceObject.options.find(function (a) {
-                    return a.name == "scalerange";
-                });
-                return {
-                    min: scaleRange.min,
-                    max: scaleRange.max
-                };
-            })();
-            var range = sliderHolder.sliders.reduce(function (a, b) {
-                var v = convSliderPosToRate(b) * 100.0;
-                return {
-                    min: Math.min(a.min, v),
-                    max: Math.max(a.max, v)
-                };
-            }, {
-                min: 100,
-                max: 0
-            });
-            if (range.min >= scales.min || range.max <= scales.max) {
-                state = false;
-                str += 'On axis "' + sliderHolder.interfaceObject.title + '" you have not used the full width of the scale. ';
-            }
-        });
-        if (state !== true) {
-            this.storeErrorNode(str);
-            interfaceContext.lightbox.post("Message", str);
-            console.log(str);
-        }
-        return state;
+        module.checkScaleRange();
     };
 
     // Bindings for audioObjects
@@ -194,13 +99,13 @@ function loadInterface() {
     interfaceContext.insertPoint.appendChild(testContent);
 
     // Load the full interface
-    window.APE = new ape();
+    window.module = new ape();
     testState.initialise();
     testState.advanceState();
 }
 
 function loadTest(audioHolderObject) {
-    APE.clear();
+    module.clear();
     var width = window.innerWidth;
     var height = window.innerHeight;
     var id = audioHolderObject.id;
@@ -268,7 +173,7 @@ function loadTest(audioHolderObject) {
 
     var loopPlayback = audioHolderObject.loop;
 
-    APE.initialisePage(audioHolderObject);
+    module.initialisePage(audioHolderObject);
 
     var interfaceList = audioHolderObject.interfaces.concat(specification.interfaces);
     for (var k = 0; k < interfaceList.length; k++) {
@@ -468,6 +373,9 @@ function ape() {
                     }
                 });
             }
+            this.hasMoved = function () {
+                return metric.wasMoved;
+            }
             Object.defineProperties(this, {
                 "DOM": {
                     "value": trackObj
@@ -514,6 +422,7 @@ function ape() {
         }
         this.name = interfaceObject.name;
         var DOMRoot = document.createElement("div");
+        parent.getDOMRoot().appendChild(DOMRoot);
         DOMRoot.className = "sliderCanvasDiv";
         DOMRoot.id = "sliderCanvasHolder-" + this.name;
         var sliders = [];
@@ -567,8 +476,6 @@ function ape() {
         scale.slign = "left";
         DOMRoot.appendChild(scale);
         createScaleMarkers(interfaceObject, scale, $(sliderRail).width());
-
-        parent.getDOMRoot().appendChild(DOMRoot);
 
         this.resize = function (event) {
             var w = $(sliderRail).width();
@@ -632,6 +539,49 @@ function ape() {
                 UI.selected.moveToPixel(move);
             }
         }
+        this.checkAllMoved = function () {
+            var notMoved = sliders.filter(function (s) {
+                return !s.hasMoved();
+            });
+            if (notMoved.length !== 0) {
+                var ls = [];
+                notMoved.forEach(function (s) {
+                    ls.push(s.label);
+                })
+                var str = "On axis \"" + interfaceObject.title + "\", ";
+                if (ls.length == 1) {
+                    str += "slider " + ls[0];
+                } else {
+                    str += "sliders " + [ls.slice(0, ls.length - 1).join(", ")].concat(ls[ls.length - 1]).join(" and ");
+                }
+                str += ".";
+                return str;
+            } else {
+                return "";
+            }
+        }
+        this.checkScaleRange = function () {
+            var scaleRange = interfaceObject.options.find(function (a) {
+                return a.name == "scalerange";
+            });
+            if (scaleRange === undefined) {
+                return "";
+            }
+            var scales = {
+                min: scaleRange.min,
+                max: scaleRange.max
+            };
+            var maxSlider = sliders.reduce(function (a, b) {
+                return Math.max(a, b.value);
+            }, 0);
+            var minSlider = sliders.reduce(function (a, b) {
+                return Math.min(a, b.value);
+            }, 100);
+            if (minSlider >= scales.min || maxSlider <= scales.max) {
+                return "On axis \"" + interfaceObject.title + "\", you have not used the required width of the scales";
+            }
+            return "";
+        }
         sliderRail.addEventListener("mousemove", this);
         sliderRail.addEventListener("touchmove", this);
         Object.defineProperties(this, {
@@ -680,6 +630,40 @@ function ape() {
                 });
             }
         });
+    }
+    this.checkAllMoved = function () {
+        var str = "You have not moved the following sliders. "
+        var cont = true;
+        axis.forEach(function (a) {
+            var msg = a.checkAllMoved();
+            if (msg.length > 0) {
+                cont = false;
+                str += msg;
+            }
+        });
+        if (!cont) {
+            interfaceContext.lightbox.post("Error", str);
+            interfaceContext.storeErrorNode(str);
+            console.log(str);
+        }
+        return cont;
+    }
+    this.checkScaleRange = function () {
+        var str = "";
+        var cont = true;
+        axis.forEach(function (a) {
+            var msg = a.checkScaleRange();
+            if (msg.length > 0) {
+                cont = false;
+                str += msg;
+            }
+        });
+        if (!cont) {
+            interfaceContext.lightbox.post("Error", str);
+            interfaceContext.storeErrorNode(str);
+            console.log(str);
+        }
+        return cont;
     }
     this.pageXMLSave = function (store, pageSpecification) {
         AOIs.forEach(function (ao) {
@@ -841,5 +825,5 @@ function pageXMLSave(store, pageSpecification) {
     // pageSpecification is the current page node configuration
     // To create new XML nodes, use storage.document.createElement();
 
-    APE.pageXMLSave(store, pageSpecification);
+    module.pageXMLSave(store, pageSpecification);
 }
