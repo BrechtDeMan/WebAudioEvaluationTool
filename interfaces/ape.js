@@ -7,6 +7,7 @@
 /*globals metricTracker */
 // Once this is loaded and parsed, begin execution
 loadInterface();
+window.APE = undefined;
 
 function loadInterface() {
 
@@ -124,33 +125,6 @@ function loadInterface() {
         return state;
     };
 
-    Interface.prototype.objectSelected = null;
-    Interface.prototype.objectMoved = false;
-    Interface.prototype.selectObject = function (object) {
-        if (this.objectSelected === null) {
-            this.objectSelected = object;
-            this.objectMoved = false;
-        }
-    };
-    Interface.prototype.moveObject = function () {
-        if (this.objectMoved === false) {
-            this.objectMoved = true;
-        }
-    };
-    Interface.prototype.releaseObject = function () {
-        this.objectSelected = null;
-        this.objectMoved = false;
-    };
-    Interface.prototype.getSelectedObject = function () {
-        return this.objectSelected;
-    };
-    Interface.prototype.hasSelectedObjectMoved = function () {
-        return this.objectMoved;
-    };
-
-    // Bindings for slider interfaces
-    Interface.prototype.interfaceSliders = [];
-
     // Bindings for audioObjects
 
     // Create the top div for the Title element
@@ -220,12 +194,13 @@ function loadInterface() {
     interfaceContext.insertPoint.appendChild(testContent);
 
     // Load the full interface
+    window.APE = new ape();
     testState.initialise();
     testState.advanceState();
-
 }
 
 function loadTest(audioHolderObject) {
+    APE.clear();
     var width = window.innerWidth;
     var height = window.innerHeight;
     var id = audioHolderObject.id;
@@ -246,15 +221,10 @@ function loadTest(audioHolderObject) {
         document.getElementById("test-title").textContent = audioHolderObject.title;
     }
 
-
     // Delete outside reference
     document.getElementById("outside-reference-holder").innerHTML = "";
 
     var interfaceObj = interfaceContext.getCombinedInterfaces(audioHolderObject);
-    interfaceObj.forEach(function (interfaceObjectInstance) {
-        // Create the div box to center align
-        interfaceContext.interfaceSliders.push(new interfaceSliderHolder(interfaceObjectInstance, audioHolderObject));
-    });
     interfaceObj.forEach(function (interface) {
         interface.options.forEach(function (option) {
             if (option.type == "show") {
@@ -298,113 +268,7 @@ function loadTest(audioHolderObject) {
 
     var loopPlayback = audioHolderObject.loop;
 
-    var currentTestHolder = document.createElement('audioHolder');
-    currentTestHolder.id = audioHolderObject.id;
-    currentTestHolder.repeatCount = audioHolderObject.repeatCount;
-
-    // Find all the audioElements from the audioHolder
-    $(audioHolderObject.audioElements).each(function (index, element) {
-        // Find URL of track
-        // In this jQuery loop, variable 'this' holds the current audioElement.
-        var audioObject = audioEngineContext.newTrack(element);
-        // Check if an outside reference
-        if (element.type == 'outside-reference') {
-            // Construct outside reference;
-            var orNode = new outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
-            audioObject.bindInterface(orNode);
-        } else {
-            // Create a slider per track
-            var sliderNode = new sliderObject(audioObject, interfaceObj, index);
-            audioObject.bindInterface(sliderNode);
-            interfaceContext.commentBoxes.createCommentBox(audioObject);
-        }
-    });
-
-    // Initialse the interfaceSlider object metrics
-
-    $('.track-slider').mousedown(function (event) {
-        interfaceContext.selectObject($(this)[0]);
-    });
-    $('.track-slider').on('touchstart', null, function (event) {
-        interfaceContext.selectObject($(this)[0]);
-    });
-
-    $('.track-slider').mousemove(function (event) {
-        event.preventDefault();
-    });
-
-    $('.slider').mousemove(function (event) {
-        event.preventDefault();
-        var obj = interfaceContext.getSelectedObject();
-        if (obj === null) {
-            return;
-        }
-        var move = event.clientX - 6;
-        var w = $(event.currentTarget).width();
-        move = Math.max(50, move);
-        move = Math.min(w + 50, move);
-        $(obj).css("left", move + "px");
-        interfaceContext.moveObject();
-    });
-
-    $('.slider').on('touchmove', null, function (event) {
-        event.preventDefault();
-        var obj = interfaceContext.getSelectedObject();
-        if (obj === null) {
-            return;
-        }
-        var move = event.originalEvent.targetTouches[0].clientX - 6;
-        var w = $(event.currentTarget).width();
-        move = Math.max(50, move);
-        move = Math.min(w + 50, move);
-        $(obj).css("left", move + "px");
-        interfaceContext.moveObject();
-    });
-
-    $(document).mouseup(function (event) {
-        event.preventDefault();
-        var obj = interfaceContext.getSelectedObject();
-        if (obj === null) {
-            return;
-        }
-        var interfaceID = obj.parentElement.getAttribute("interfaceid");
-        var trackID = obj.getAttribute("trackindex");
-        var id;
-        if (interfaceContext.hasSelectedObjectMoved() === true) {
-            var l = $(obj).css("left");
-            id = obj.getAttribute('trackIndex');
-            var time = audioEngineContext.timer.getTestTime();
-            var rate = convSliderPosToRate(obj);
-            audioEngineContext.audioObjects[id].metric.moved(time, rate);
-            interfaceContext.interfaceSliders[interfaceID].metrics[trackID].moved(time, rate);
-            console.log("slider " + id + " moved to " + rate + ' (' + time + ')');
-            obj.setAttribute("slider-value", convSliderPosToRate(obj));
-        } else {
-            id = Number(obj.attributes.trackIndex.value);
-            //audioEngineContext.metric.sliderPlayed(id);
-            audioEngineContext.play(id);
-        }
-        interfaceContext.releaseObject();
-    });
-
-    $('.slider').on('touchend', null, function (event) {
-        var obj = interfaceContext.getSelectedObject();
-        if (obj === null) {
-            return;
-        }
-        var interfaceID = obj.parentElement.getAttribute("interfaceid");
-        var trackID = obj.getAttribute("trackindex");
-        if (interfaceContext.hasSelectedObjectMoved() === true) {
-            var l = $(obj).css("left");
-            var id = obj.getAttribute('trackIndex');
-            var time = audioEngineContext.timer.getTestTime();
-            var rate = convSliderPosToRate(obj);
-            audioEngineContext.audioObjects[id].metric.moved(time, rate);
-            interfaceContext.interfaceSliders[interfaceID].metrics[trackID].moved(time, rate);
-            console.log("slider " + id + " moved to " + rate + ' (' + time + ')');
-        }
-        interfaceContext.releaseObject();
-    });
+    APE.initialisePage(audioHolderObject);
 
     var interfaceList = audioHolderObject.interfaces.concat(specification.interfaces);
     for (var k = 0; k < interfaceList.length; k++) {
@@ -447,237 +311,381 @@ function loadTest(audioHolderObject) {
     //testWaitIndicator();
 }
 
-function interfaceSliderHolder(interfaceObject, page) {
-    this.sliders = [];
-    this.metrics = [];
-    this.id = document.getElementsByClassName("sliderCanvasDiv").length;
-    this.name = interfaceObject.name;
-    this.interfaceObject = interfaceObject;
-    this.sliderDOM = document.createElement('div');
-    this.sliderDOM.className = 'sliderCanvasDiv';
-    this.sliderDOM.id = 'sliderCanvasHolder-' + this.id;
-    this.imageHolder = (function () {
-        var imageController = {};
-        imageController.root = document.createElement("div");
-        imageController.root.className = "imageController";
-        imageController.img = document.createElement("img");
-        imageController.root.appendChild(imageController.img);
-        imageController.setImage = function (src) {
-            imageController.img.src = "";
-            if (typeof src !== "string" || src.length === undefined) {
+function ape() {
+    var axis = []
+    var DOMRoot = document.getElementById("slider-holder");
+    var AOIs = [];
+    var page = undefined;
+
+    function audioObjectInterface(audioObject, parent) {
+        // The audioObject communicates with this object
+        var playing = false;
+        var sliders = [];
+        this.enable = function () {
+            sliders.forEach(function (s) {
+                s.enable();
+            })
+        }
+
+        this.updateLoading = function (p) {
+            sliders.forEach(function (s) {
+                s.updateLoading(p);
+            })
+        }
+
+        this.startPlayback = function () {
+            playing = true;
+            sliders.forEach(function (s) {
+                s.playing();
+            });
+        }
+
+        this.stopPlayback = function () {
+            playing = false;
+            sliders.forEach(function (s) {
+                s.stopped();
+            });
+        }
+
+        this.getValue = function () {
+            return sliders[0].value();
+        }
+
+        this.getPresentedId = function () {
+            return sliders[0].label;
+        }
+
+        this.canMove = function () {
+            return true;
+        }
+
+        this.exportXMLDOM = function (audioObject) {
+            var elements = [];
+            sliders.forEach(function (s) {
+                elements.push(s.exportXMLDOM());
+            });
+            return elements;
+        }
+
+        this.error = function () {
+            sliders.forEach(function (s) {
+                s.error();
+            });
+        }
+
+        this.addSlider = function (s) {
+            sliders.push(s);
+        }
+
+        this.clicked = function (event) {
+            if (!playing) {
+                audioEngineContext.play(audioObject.id);
+            } else {
+                audioEngineContext.stop();
+            }
+            playing = !playing;
+        }
+
+        this.pageXMLSave = function (store) {
+            var inject = audioObject.storeDOM.getElementsByTagName("metric")[0];
+            sliders.forEach(function (s) {
+                s.pageXMLSave(inject);
+            });
+        }
+
+    }
+
+    function axisObject(interfaceObject, parent) {
+
+        function sliderInterface(AOI, axisInterface) {
+            var trackObj = document.createElement('div');
+            var labelHolder = document.createElement("span");
+            var label = "";
+            var metric = new metricTracker(this);
+            trackObj.align = "center";
+            trackObj.className = 'track-slider track-slider-disabled';
+            trackObj.appendChild(labelHolder);
+            trackObj.style.left = (Math.random() * $(sliderRail).width()) - 50 + "px";
+            axisInterface.sliderRail.appendChild(trackObj);
+            metric.initialise(this.value);
+            this.setLabel = function (s) {
+                label = s;
+            }
+            this.resize = function (event) {
+                var width = $(axisInterface.sliderRail).width();
+                var w = Number(value * width + 50);
+                trackObj.style.left = String(w) + "px";
+            }
+            this.playing = function () {
+                trackObj.classList.add("track-slider-playing");
+            }
+            this.stopped = function () {
+                trackObj.classList.remove("track-slider-playing");
+            }
+            this.enable = function () {
+                trackObj.addEventListener("mousedown", this);
+                trackObj.addEventListener("mouseup", this);
+                trackObj.addEventListener("touchstart", this);
+                trackObj.classList.remove("track-slider-disabled");
+                labelHolder.textContent = label;
+            }
+            this.updateLoading = function (progress) {
+                labelHolder.textContent = progress + "%";
+            }
+            this.exportXMLDOM = function () {
+                var node = storage.document.createElement('value');
+                node.setAttribute("interface-name", axisInterface.name)
+                node.textContent = this.value();
+                return node;
+            }
+            this.error = function () {
+                trackObj.classList.add("error-colour");
+                trackObj.removeEventListener("mousedown");
+                trackObj.removeEventListener("mouseup");
+                trackObj.removeEventListener("touchstart");
+            }
+            var timing = undefined;
+            this.handleEvent = function (e) {
+                // This is only for the mousedown / touchdown
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                if (e.type == "mousedown" || e.type == "touchstart") {
+                    axisInterface.mousedown(this);
+                } else if (e.type == "mouseup") {
+                    axisInterface.mouseup(this);
+                }
+            }
+            this.clicked = function (e) {
+                AOI.clicked();
+            }
+            this.pageXMLSave = function (inject) {
+                var nodes = metric.exportXMLDOM(inject);
+                nodes.forEach(function (elem) {
+                    var name = elem.getAttribute("name");
+                    if (name == "elementTracker" || name == "elementTrackerFull" || name == "elementInitialPosition" || name == "elementFlagMoved") {
+                        mrnodes[j].setAttribute("interface-name", axisInterface.name);
+                    }
+                });
+            }
+            Object.defineProperties(this, {
+                "DOM": {
+                    "value": trackObj
+                },
+                "value": {
+                    "value": function () {
+                        var maxPix = $(axisInterface.sliderRail).width();
+                        var pix = trackObj.style.left.substr(0, trackObj.style.left.length - 2);
+                        return (pix - 50) / maxPix;
+                    }
+                },
+                "moveToPixel": {
+                    "value": function (pix) {
+                        var t = audioEngineContext.timer.getTestTime();
+                        trackObj.style.left = String(pix) + "px";
+                        metric.moved(t, this.value);
+                    }
+                },
+                "label": {
+                    "get": function () {
+                        return label;
+                    },
+                    "set": function () {}
+                }
+            });
+        }
+
+        function createScaleMarkers(interfaceObject, root, w) {
+            interfaceObject.scales.forEach(function (scaleObj) {
+                var position = Number(scaleObj.position) * 0.01;
+                var pixelPosition = (position * w) + 50;
+                var scaleDOM = document.createElement('span');
+                scaleDOM.className = "ape-marker-text";
+                scaleDOM.textContent = scaleObj.text;
+                scaleDOM.setAttribute('value', position);
+                root.appendChild(scaleDOM);
+                scaleDOM.style.left = Math.floor((pixelPosition - ($(scaleDOM).width() / 2))) + 'px';
+            }, this);
+        }
+        var sliders = [];
+        var UI = {
+            selected: undefined,
+            startTime: undefined
+        }
+        this.name = interfaceObject.name;
+        var DOMRoot = document.createElement("div");
+        DOMRoot.className = "sliderCanvasDiv";
+        DOMRoot.id = "sliderCanvasHolder-" + this.name;
+        var sliders = [];
+
+        var axisTitle = document.createElement("div");
+        axisTitle.className = "pageTitle";
+        axisTitle.align = "center";
+        var titleSpan = document.createElement('span');
+        titleSpan.id = "pageTitle-" + this.name;
+        if (interfaceObject.title !== undefined && typeof interfaceObject.title == "string") {
+            titleSpan.textContent = interfaceObject.title;
+        } else {
+            titleSpan.textContent = "Axis " + String(this.id + 1);
+        }
+        axisTitle.appendChild(titleSpan);
+        DOMRoot.appendChild(axisTitle);
+
+        var imageHolder = (function () {
+            var imageController = {};
+            imageController.root = document.createElement("div");
+            imageController.root.className = "imageController";
+            imageController.img = document.createElement("img");
+            imageController.root.appendChild(imageController.img);
+            imageController.setImage = function (src) {
+                imageController.img.src = "";
+                if (typeof src !== "string" || src.length === undefined) {
+                    return;
+                }
+                imageController.img.src = src;
+            };
+            return imageController;
+        })();
+        if (interfaceObject.image !== undefined || page.audioElements.some(function (a) {
+                return a.image !== undefined;
+            })) {
+            DOMRoot.appendChild(imageHolder.root);
+            imageHolder.setImage(interfaceObject.image);
+        }
+
+        // Now create the slider box to hold the fragment sliders
+        var sliderRail = document.createElement("div");
+        sliderRail.id = "sliderrail-" + this.name;
+        sliderRail.className = "slider";
+        sliderRail.align = "left";
+        DOMRoot.appendChild(sliderRail);
+
+        // Create the div to hold any scale objects
+        var scale = document.createElement("div");
+        scale.className = "sliderScale";
+        scale.id = "slider-scale-holder-" + this.name;
+        scale.slign = "left";
+        DOMRoot.appendChild(scale);
+        createScaleMarkers(interfaceObject, scale, $(sliderRail).width());
+
+        parent.getDOMRoot().appendChild(DOMRoot);
+
+        this.resize = function (event) {
+            var w = $(sliderRail).width();
+            var marginsize = 50;
+            sliders.forEach(function (s) {
+                s.resize();
+            });
+            scale.innerHTML = "";
+            createScaleMarkers(interfaceObject, scale, $(sliderRail).width());
+        }
+        this.playing = function (id) {
+            var node = audioEngineContext.audioObjects.find(function (a) {
+                return a.id == id;
+            });
+            if (node === undefined) {
+                this.imageHolder.setImage(interfaceObject.image || "");
                 return;
             }
-            imageController.img.src = src;
-        };
-        return imageController;
-    })();
-
-    var pagetitle = document.createElement('div');
-    pagetitle.className = "pageTitle";
-    pagetitle.align = "center";
-    var titleSpan = document.createElement('span');
-    titleSpan.id = "pageTitle-" + this.id;
-    if (interfaceObject.title !== undefined && typeof interfaceObject.title == "string") {
-        titleSpan.textContent = interfaceObject.title;
-    } else {
-        titleSpan.textContent = "Axis " + String(this.id + 1);
-    }
-    pagetitle.appendChild(titleSpan);
-    this.sliderDOM.appendChild(pagetitle);
-
-    if (interfaceObject.image !== undefined || page.audioElements.some(function (a) {
-            return a.image !== undefined;
-        })) {
-        this.sliderDOM.appendChild(this.imageHolder.root);
-        this.imageHolder.setImage(interfaceObject.image);
-    }
-    // Create the slider box to hold the slider elements
-    this.canvas = document.createElement('div');
-    if (this.name !== undefined)
-        this.canvas.id = 'slider-' + this.name;
-    else
-        this.canvas.id = 'slider-' + this.id;
-    this.canvas.setAttribute("interfaceid", this.id);
-    this.canvas.className = 'slider';
-    this.canvas.align = "left";
-    this.canvas.addEventListener('dragover', function (event) {
-        event.preventDefault();
-        event.dataTransfer.effectAllowed = 'none';
-        event.dataTransfer.dropEffect = 'copy';
-        return false;
-    }, false);
-    this.sliderDOM.appendChild(this.canvas);
-
-    // Create the div to hold any scale objects
-    this.scale = document.createElement('div');
-    this.scale.className = 'sliderScale';
-    this.scale.id = 'sliderScaleHolder-' + this.id;
-    this.scale.align = 'left';
-    this.sliderDOM.appendChild(this.scale);
-    var positionScale = this.canvas.style.width.substr(0, this.canvas.style.width.length - 2);
-    var offset = 50;
-    var dest = document.getElementById("slider-holder").appendChild(this.sliderDOM);
-    interfaceObject.scales.forEach(function (scaleObj) {
-        var position = Number(scaleObj.position) * 0.01;
-        var pixelPosition = (position * $(this.canvas).width()) + offset;
-        var scaleDOM = document.createElement('span');
-        scaleDOM.className = "ape-marker-text";
-        scaleDOM.textContent = scaleObj.text;
-        scaleDOM.setAttribute('value', position);
-        this.scale.appendChild(scaleDOM);
-        scaleDOM.style.left = Math.floor((pixelPosition - ($(scaleDOM).width() / 2))) + 'px';
-    }, this);
-
-    this.createSliderObject = function (audioObject, label) {
-        var trackObj = document.createElement('div');
-        trackObj.align = "center";
-        trackObj.className = 'track-slider track-slider-disabled track-slider-' + audioObject.id;
-        trackObj.id = 'track-slider-' + this.id + '-' + audioObject.id;
-        trackObj.setAttribute('trackIndex', audioObject.id);
-        if (this.name !== undefined) {
-            trackObj.setAttribute('interface-name', this.name);
-        } else {
-            trackObj.setAttribute('interface-name', this.id);
+            var imgurl = node.specification.image || interfaceObject.image || "";
+            this.imageHolder.setImage(imgurl);
         }
-        var offset = 50;
-        // Distribute it randomnly
-        var w = window.innerWidth - (offset + 8) * 2;
-        w = Math.random() * w;
-        w = Math.floor(w + (offset + 8));
-        trackObj.style.left = w + 'px';
-        this.canvas.appendChild(trackObj);
-        this.sliders.push(trackObj);
-        this.metrics.push(new metricTracker(this));
-        var labelHolder = document.createElement("span");
-        labelHolder.textContent = label;
-        trackObj.appendChild(labelHolder);
-        var rate = convSliderPosToRate(trackObj);
-        this.metrics[this.metrics.length - 1].initialise(rate);
-        trackObj.setAttribute("slider-value", rate);
-        return trackObj;
-    };
-
-    this.resize = function (event) {
-        var sliderDiv = this.canvas;
-        var sliderScaleDiv = this.scale;
-        var width = $(sliderDiv).width();
-        var marginsize = 50;
-        // Move sliders into new position
-        this.sliders.forEach(function (slider, index) {
-            var pix = Number(slider.getAttribute("slider-value")) * width;
-            slider.style.left = (pix + marginsize) + 'px';
+        this.stopped = function () {
+            var imgurl = interfaceObject.image || "";
+            this.imageHolder.setImage(imgurl);
+        }
+        this.addSlider = function (aoi) {
+            var node = new sliderInterface(aoi, this);
+            sliders.push(node);
+            return node;
+        }
+        this.mousedown = function (sliderUI) {
+            UI.selected = sliderUI;
+            UI.startTime = new Date();
+        }
+        this.mouseup = function (sliderUI) {
+            var delta = new Date() - UI.startTime;
+            if (delta < 200) {
+                UI.selected.clicked();
+            }
+            UI.selected = undefined;
+            UI.startTime = undefined;
+        }
+        this.handleEvent = function (event) {
+            if (event.preventDefault) {
+                event.preventDefault();
+            }
+            if (UI.selected === undefined) {
+                return;
+            }
+            if (event.type == "mousemove") {
+                var move = event.clientX - 6;
+                var w = $(sliderRail).width();
+                move = Math.max(50, move);
+                move = Math.min(w + 50, move);
+                UI.selected.moveToPixel(move);
+            } else if (event.type == "touchmove") {
+                var move = event.originalEvent.targetTouches[0].clientX - 6;
+                var w = $(event.currentTarget).width();
+                move = Math.max(50, move);
+                move = Math.min(w + 50, move);
+                UI.selected.moveToPixel(move);
+            }
+        }
+        sliderRail.addEventListener("mousemove", this);
+        sliderRail.addEventListener("touchmove", this);
+        Object.defineProperties(this, {
+            "sliderRail": {
+                "value": sliderRail
+            }
         });
-
-        // Move scale labels
-        for (var index = 0; index < this.scale.children.length; index++) {
-            var scaleObj = this.scale.children[index];
-            var position = Number(scaleObj.attributes.value.value);
-            var pixelPosition = (position * width) + marginsize;
-            scaleObj.style.left = Math.floor((pixelPosition - ($(scaleObj).width() / 2))) + 'px';
-        }
-    };
-
-    this.playing = function (id) {
-        var node = audioEngineContext.audioObjects.find(function (a) {
-            return a.id == id;
-        });
-        if (node === undefined) {
-            this.imageHolder.setImage(interfaceObject.image || "");
-            return;
-        }
-        var imgurl = node.specification.image || interfaceObject.image || "";
-        this.imageHolder.setImage(imgurl);
     }
-}
-
-function sliderObject(audioObject, interfaceObjects, index) {
-    // Create a new slider object;
-    this.parent = audioObject;
-    this.trackSliderObjects = [];
-    this.label = interfaceContext.getLabel(audioObject.specification.parent.label, index, audioObject.specification.parent.labelStart);
-    this.playing = false;
-    for (var i = 0; i < interfaceContext.interfaceSliders.length; i++) {
-        var trackObj = interfaceContext.interfaceSliders[i].createSliderObject(audioObject, this.label);
-        this.trackSliderObjects.push(trackObj);
+    this.getDOMRoot = function () {
+        return DOMRoot;
     }
-
-    // Onclick, switch playback to that track
-
-    this.enable = function () {
-        if (this.parent.state == 1) {
-            $(this.trackSliderObjects).each(function (i, trackObj) {
-                $(trackObj).removeClass('track-slider-disabled');
-            });
-        }
-    };
-    this.updateLoading = function (progress) {
-        if (progress != 100) {
-            progress = String(progress);
-            progress = progress.split('.')[0];
-            this.trackSliderObjects[0].children[0].textContent = progress + '%';
-        } else {
-            this.trackSliderObjects[0].children[0].textContent = this.label;
-        }
-    };
-    this.startPlayback = function () {
-        $('.track-slider').removeClass('track-slider-playing');
-        var name = ".track-slider-" + this.parent.id;
-        $(name).addClass('track-slider-playing');
-        interfaceContext.commentBoxes.highlightById(audioObject.id);
-        $('.outside-reference').removeClass('track-slider-playing');
-        this.playing = true;
-
-        if (this.parent.specification.parent.playOne || specification.playOne) {
-            $('.track-slider').addClass('track-slider-disabled');
-            $('.outside-reference').addClass('track-slider-disabled');
-        }
-        interfaceContext.interfaceSliders.forEach(function (ts) {
-            ts.playing(this.parent.id);
+    this.getPage = function () {
+        return page;
+    }
+    this.clear = function () {
+        page = undefined;
+        axis = [];
+        AOIs = [];
+        DOMRoot.innerHTML = "";
+    }
+    this.initialisePage = function (page_init) {
+        this.clear();
+        page = page_init;
+        var interfaceObj = interfaceContext.getCombinedInterfaces(page);
+        // Create each of the interface axis
+        interfaceObj.forEach(function (i) {
+            var node = new axisObject(i, this);
+            axis.push(node);
         }, this);
-    };
-    this.stopPlayback = function () {
-        if (this.playing) {
-            this.playing = false;
-            var name = ".track-slider-" + this.parent.id;
-            $(name).removeClass('track-slider-playing');
-            $('.track-slider').removeClass('track-slider-disabled');
-            $('.outside-reference').removeClass('track-slider-disabled');
-            var box = interfaceContext.commentBoxes.boxes.find(function (a) {
-                return a.id === audioObject.id;
-            });
-            if (box) {
-                box.highlight(false);
-            }
-        }
-    };
-    this.exportXMLDOM = function (audioObject) {
-        // Called by the audioObject holding this element. Must be present
-        var obj = [];
-        $(this.trackSliderObjects).each(function (i, trackObj) {
-            var node = storage.document.createElement('value');
-            if (trackObj.getAttribute("interface-name") !== "null") {
-                node.setAttribute("interface-name", trackObj.getAttribute("interface-name"));
-            }
-            node.textContent = convSliderPosToRate(trackObj);
-            obj.push(node);
-        });
 
-        return obj;
-    };
-    this.getValue = function () {
-        return convSliderPosToRate(this.trackSliderObjects[0]);
-    };
-    this.getPresentedId = function () {
-        return this.label;
-    };
-    this.canMove = function () {
-        return true;
-    };
-    this.error = function () {
-        // audioObject has an error!!
-        this.playback.textContent = "Error";
-        $(this.playback).addClass("error-colour");
-    };
+        // Create the audioObject interface objects for each aO.
+        page.audioElements.forEach(function (element, index) {
+            var audioObject = audioEngineContext.newTrack(element);
+            if (element.type == 'outside-reference') {
+                // Construct outside reference;
+                var orNode = new outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
+                audioObject.bindInterface(orNode);
+            } else {
+                var aoi = new audioObjectInterface(audioObject, this);
+                var label = interfaceContext.getLabel(page.label, index, page.labelStart);
+                axis.forEach(function (a) {
+                    var node = a.addSlider(aoi);
+                    node.setLabel(label);
+                    aoi.addSlider(node);
+                    audioObject.bindInterface(aoi);
+                });
+            }
+        });
+    }
+    this.pageXMLSave = function (store, pageSpecification) {
+        AOIs.forEach(function (ao) {
+            ao.pageXMLSave(store);
+        });
+    }
 }
 
 function outsideReferenceDOM(audioObject, index, inject) {
@@ -833,32 +841,5 @@ function pageXMLSave(store, pageSpecification) {
     // pageSpecification is the current page node configuration
     // To create new XML nodes, use storage.document.createElement();
 
-    if (interfaceContext.interfaceSliders.length == 1) {
-        // If there is only one axis, there only needs to be one metric return
-        return;
-    }
-    var audioelements = store.getElementsByTagName("audioelement");
-    for (var i = 0; i < audioelements.length; i++) {
-        // Have to append the metric specific nodes
-        if (pageSpecification.outsideReference === undefined || pageSpecification.outsideReference.id != audioelements[i].id) {
-            var inject = audioelements[i].getElementsByTagName("metric");
-            if (inject.length === 0) {
-                inject = storage.document.createElement("metric");
-            } else {
-                inject = inject[0];
-            }
-            for (var k = 0; k < interfaceContext.interfaceSliders.length; k++) {
-                var mrnodes = interfaceContext.interfaceSliders[k].metrics[i].exportXMLDOM(inject);
-                for (var j = 0; j < mrnodes.length; j++) {
-                    var name = mrnodes[j].getAttribute("name");
-                    if (name == "elementTracker" || name == "elementTrackerFull" || name == "elementInitialPosition" || name == "elementFlagMoved") {
-                        if (interfaceContext.interfaceSliders[k].name !== null) {
-                            mrnodes[j].setAttribute("interface-name", interfaceContext.interfaceSliders[k].name);
-                        }
-                        mrnodes[j].setAttribute("interface-id", k);
-                    }
-                }
-            }
-        }
-    }
+    APE.pageXMLSave(store, pageSpecification);
 }
