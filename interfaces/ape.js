@@ -23,11 +23,11 @@ function loadInterface() {
     // Bindings for interfaceContext
 
     interfaceContext.checkAllMoved = function () {
-        module.checkAllMoved();
+        return module.checkAllMoved();
     };
 
     interfaceContext.checkScaleRange = function () {
-        module.checkScaleRange();
+        return module.checkScaleRange();
     };
 
     // Bindings for audioObjects
@@ -310,7 +310,7 @@ function ape() {
             trackObj.align = "center";
             trackObj.className = 'track-slider track-slider-disabled';
             trackObj.appendChild(labelHolder);
-            trackObj.style.left = (Math.random() * $(sliderRail).width()) - 50 + "px";
+            trackObj.style.left = (Math.random() * $(sliderRail).width()) + 50 + "px";
             axisInterface.sliderRail.appendChild(trackObj);
             metric.initialise(this.value);
             this.setLabel = function (s) {
@@ -369,7 +369,9 @@ function ape() {
                 nodes.forEach(function (elem) {
                     var name = elem.getAttribute("name");
                     if (name == "elementTracker" || name == "elementTrackerFull" || name == "elementInitialPosition" || name == "elementFlagMoved") {
-                        mrnodes[j].setAttribute("interface-name", axisInterface.name);
+                        elem.setAttribute("interface-name", axisInterface.name);
+                    } else {
+                        inject.removeChild(elem);
                     }
                 });
             }
@@ -621,6 +623,7 @@ function ape() {
                 audioObject.bindInterface(orNode);
             } else {
                 var aoi = new audioObjectInterface(audioObject, this);
+                AOIs.push(aoi);
                 var label = interfaceContext.getLabel(page.label, index, page.labelStart);
                 axis.forEach(function (a) {
                     var node = a.addSlider(aoi);
@@ -666,9 +669,11 @@ function ape() {
         return cont;
     }
     this.pageXMLSave = function (store, pageSpecification) {
-        AOIs.forEach(function (ao) {
-            ao.pageXMLSave(store);
-        });
+        if (axis.length > 1) {
+            AOIs.forEach(function (ao) {
+                ao.pageXMLSave(store);
+            });
+        }
     }
 }
 
