@@ -386,6 +386,7 @@
                 <xs:attribute ref="mandatory" />
                 <xs:attribute name="min" type="xs:decimal" />
                 <xs:attribute name="max" type="xs:decimal" />
+                <xs:attribute name="randomise" type="xs:boolean" default="false" />
                 <xs:attribute ref="minWait" />
             </xs:complexType>
         </xs:element>
@@ -411,6 +412,7 @@
                 <xs:attribute ref="minWait" />
                 <xs:attribute name="min" type="xs:decimal" />
                 <xs:attribute name="max" type="xs:decimal" />
+                <xs:attribute name="randomise" type="xs:boolean" default="false" />
             </xs:complexType>
         </xs:element>
 

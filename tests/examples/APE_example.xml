@@ -2,24 +2,24 @@
     <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
         <setup interface="APE" projectReturn="save.php" randomiseOrder='true' poolSize="2" loudness="-23" calibration="true">
             <survey location="before">
-                <surveyentry type="question" id="sessionId" mandatory="true">
+                <surveyquestion id="sessionId" mandatory="true">
                     <statement>Please enter your name.</statement>
                     <conditional check="equals" value="John" jumpToOnPass="test-intro" jumpToOnFail="checkboxtest" />
-                </surveyentry>
-                <surveyentry type="checkbox" id="checkboxtest" mandatory="true" min="2" max="4">
+                </surveyquestion>
+                <surveycheckbox id="checkboxtest" mandatory="true" min="2" max="4" randomise="true">
                     <statement>Please select with which activities you have any experience (example checkbox question)</statement>
                     <option name="musician">Playing a musical instrument</option>
                     <option name="soundengineer">Recording or mixing audio</option>
                     <option name="developer">Developing audio software</option>
                     <option name="hwdesigner">Designing or building audio hardware</option>
                     <option name="researcher">Research in the field of audio</option>
-                </surveyentry>
-                <surveyentry type="question" id="instrument" mandatory="false">
+                </surveycheckbox>
+                <surveyquestion id="instrument" mandatory="false">
                     <statement>What instrument did you play</statement>
-                </surveyentry>
-                <surveyentry type="statement" id="test-intro">
+                </surveyquestion>
+                <surveystatement id="test-intro">
                     <statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
-                </surveyentry>
+                </surveystatement>
             </survey>
             <survey location="after">
                 <surveyentry type="question" id="location" mandatory="true" boxsize="large">
