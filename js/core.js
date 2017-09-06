@@ -671,13 +671,12 @@ function interfacePopup() {
     }
 
     function postCheckbox(node) {
-        if (node.response === undefined) {
-            node.response = Array(node.specification.options.length);
+        if (node.response === null) {
+            node.response = [];
         }
         var table = document.createElement("table");
         table.className = "popup-option-list";
         table.border = "0";
-        node.response = [];
         var nodelist = [];
         node.specification.options.forEach(function (option, index) {
             var tr = document.createElement("tr");
@@ -697,10 +696,22 @@ function interfacePopup() {
             tr = document.createElement('div');
             tr.setAttribute('name', 'option');
             tr.className = "popup-option-checbox";
-            if (node.response[index] !== undefined) {
-                if (node.response[index].checked === true) {
+            var resp = undefined;
+            if (node.response.length > 0) {
+                resp = node.response.find(function (a) {
+                    return a.name == option.name;
+                });
+            }
+            if (resp !== undefined) {
+                if (resp.checked === true) {
                     input.checked = "true";
                 }
+            } else {
+                node.response.push({
+                    "name": option.name,
+                    "text": option.text,
+                    "checked": false
+                });
             }
             index++;
         });
@@ -716,7 +727,6 @@ function interfacePopup() {
     function processCheckbox(node) {
         console.log("Checkbox: " + node.specification.statement);
         var inputs = this.popupResponse.getElementsByTagName('input');
-        node.response = [];
         var numChecked = 0,
             i;
         for (i = 0; i < node.specification.options.length; i++) {
@@ -746,10 +756,9 @@ function interfacePopup() {
             }
         }
         for (i = 0; i < node.specification.options.length; i++) {
-            node.response.push({
-                name: node.specification.options[i].name,
-                text: node.specification.options[i].text,
-                checked: inputs[i].checked
+            node.response.forEach(function (a) {
+                var input = this.popupResponse.querySelector("#" + a.name);
+                a.checked = input.checked;
             });
             console.log(node.specification.options[i].name + ": " + inputs[i].checked);
         }
@@ -789,12 +798,10 @@ function interfacePopup() {
         var table = document.createElement("table");
         table.className = "popup-option-list";
         table.border = "0";
-        if (node.response === null || node.response.length === 0) {
-            node.response = [];
-        }
+        var nodelist = [];
         node.specification.options.forEach(function (option, index) {
             var tr = document.createElement("tr");
-            table.appendChild(tr);
+            nodelist.push(tr);
             var td = document.createElement("td");
             tr.appendChild(td);
             var input = document.createElement('input');
@@ -810,8 +817,16 @@ function interfacePopup() {
             td.appendChild(span);
             tr = document.createElement('div');
             tr.setAttribute('name', 'option');
-            tr.className = "popup-option-checbox";
-            table.appendChild(tr);
+            tr.className = "popup-option-checkbox";
+            if (node.response.name === option.name) {
+                input.checked = true;
+            }
+        });
+        if (node.specification.randomise) {
+            nodelist = randomiseOrder(nodelist);
+        }
+        nodelist.forEach(function (e) {
+            table.appendChild(e);
         });
         this.popupResponse.appendChild(table);
     }
