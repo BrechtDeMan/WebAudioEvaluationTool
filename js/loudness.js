@@ -31,7 +31,7 @@ function calculateLoudness(buffer, timescale, target, offlineContext) {
         target = -23;
     }
     if (offlineContext === undefined) {
-        offlineContext = new OfflineAudioContext(audioContext.destination.channelCount, buffer.buffer.duration * audioContext.sampleRate, audioContext.sampleRate);
+        offlineContext = new OfflineAudioContext(audioContext.destination.channelCount, Math.max(0.4, buffer.buffer.duration) * audioContext.sampleRate, audioContext.sampleRate);
     }
     // Create the required filters
     var KFilter = offlineContext.createBiquadFilter();
@@ -80,7 +80,7 @@ function calculateMeanSquared(buffer, frame_dur, frame_overlap) {
     var frame_size = Math.floor(buffer.sampleRate * frame_dur);
     var step_size = Math.floor(frame_size * (1.0 - frame_overlap));
     var num_frames = Math.floor((buffer.length - frame_size) / step_size);
-    num_frames = Math.max(num_frames, 0);
+    num_frames = Math.max(num_frames, 1);
 
     var MS = Array(buffer.numberOfChannels);
     for (var c = 0; c < buffer.numberOfChannels; c++) {
