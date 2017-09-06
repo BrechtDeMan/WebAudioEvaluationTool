@@ -678,9 +678,10 @@ function interfacePopup() {
         table.className = "popup-option-list";
         table.border = "0";
         node.response = [];
+        var nodelist = [];
         node.specification.options.forEach(function (option, index) {
             var tr = document.createElement("tr");
-            table.appendChild(tr);
+            nodelist.push(tr);
             var td = document.createElement("td");
             tr.appendChild(td);
             var input = document.createElement('input');
@@ -702,6 +703,12 @@ function interfacePopup() {
                 }
             }
             index++;
+        });
+        if (node.specification.randomise) {
+            nodelist = randomiseOrder(nodelist);
+        }
+        nodelist.forEach(function (e) {
+            table.appendChild(e);
         });
         this.popupResponse.appendChild(table);
     }
@@ -1969,13 +1976,15 @@ function audioObject(id) {
                 // Safari does not like using 'this' to reference the calling object!
                 //event.currentTarget.owner.metric.stopListening(audioEngineContext.timer.getTestTime(),event.currentTarget.owner.getCurrentPosition());
                 if (event.currentTarget !== null) {
-                    event.currentTarget.owner.stop(audioContext.currentTime + 1);
+                    event.currentTarget.owner.stop(audioContext.currentTime + 0.1);
                 }
             };
             this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
             if (!audioEngineContext.loopPlayback || !audioEngineContext.synchPlayback) {
                 this.metric.startListening(audioEngineContext.timer.getTestTime());
-                this.outputGain.gain.linearRampToValueAtTime(this.onplayGain, startTime + specification.crossFade);
+                if (this.outputGain.gain.value !== this.onplayGain) {
+                    this.outputGain.gain.linearRampToValueAtTime(this.onplayGain, startTime + Number(specification.crossFade));
+                }
                 this.interfaceDOM.startPlayback();
             } else {
                 this.outputGain.gain.linearRampToValueAtTime(0.0, startTime);
