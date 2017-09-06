@@ -271,6 +271,9 @@ function comparator(page) {
         };
         this.updateLoading = function (progress) {
             // progress is a value from 0 to 100 indicating the current download state of media files
+            if (label == "X" || label == "x") {
+                this.playback.textContent = "Play";
+            }
             if (progress != 100) {
                 progress = String(progress);
                 progress = progress.split('.')[0];
@@ -335,6 +338,9 @@ function comparator(page) {
         this.error = function () {
             // If there is an error with the audioObject, this will be called to indicate a failure
         };
+        if (label == "X" || label == "x") {
+            this.enable();
+        }
     };
     // Ensure there are only two comparisons per page
     if (page.audioElements.length != 2) {
