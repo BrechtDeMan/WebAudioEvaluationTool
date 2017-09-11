@@ -70,36 +70,19 @@
                 xhr.send();
             });
         });
-        describe("save.php", function() {
-            it("should return an empty file on empty payload", function(done) {
+        describe("Saves permissions", function() {
+            it("should write \"test-save.xml\" to saves and delete", function(done) {
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", "save.php?key=" + key1 + "&saveFilenamePrefix=tests");
+                xhr.open("GET", "test_write.php");
                 xhr.onload = function() {
                     var doc = xhr.response;
-                    var state = doc.querySelector("message").textContent;
-                    var file = doc.querySelector("file");
-                    expect(file.textContent).to.equal("\"saves/tests-" + key1 + ".xml\"");
-                    expect(file.getAttribute("bytes")).to.equal("0");
-                    expect(state).to.equal("OK");
+                    var response = doc.querySelector("response");
+                    var message = doc.querySelector("message");
+                    expect(response.getAttribute("state")).to.equal("OK");
                     done();
                 }
                 xhr.responseType = "document";
                 xhr.send();
-            });
-            it("should return a file on payload save", function(done) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "save.php?key=" + key1 + "&saveFilenamePrefix=tests");
-                xhr.onload = function() {
-                    var doc = xhr.response;
-                    var state = doc.querySelector("message").textContent;
-                    var file = doc.querySelector("file");
-                    expect(file.textContent).to.equal("\"saves/tests-" + key1 + ".xml\"");
-                    expect(file.getAttribute("bytes")).not.to.equal("0");
-                    expect(state).to.equal("OK");
-                    done();
-                }
-                xhr.responseType = "document";
-                xhr.send("<xml></xml>");
             });
         });
         window.onload = function() {

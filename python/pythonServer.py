@@ -173,6 +173,35 @@ def saveFile(self):
         self.wfile.write(bytes(reply, "utf-8"))
     curSaveIndex += 1
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
+    
+def testSave(self):
+    self.send_response(200)
+    self.send_header("Content-type", "text/xml")
+    self.end_headers()
+    filename = "../saves/test-save.xml"
+    file = open(filename,'wb')
+    if sys.version_info[0] == 2:
+        file.write("<xml></xml>")
+    elif sys.version_info[0] == 3:
+        file.write(bytes("<xml></xml>", "utf-8"))
+    file.close()
+    message = ""
+    try:
+        wbytes = os.path.getsize(filename)
+    except OSError:
+        message = '<response state="error"><message>Could not open file</message></response>';
+        if sys.version_info[0] == 2:
+            self.wfile.write(message)
+        elif sys.version_info[0] == 3:
+            self.wfile.write(bytes(message, "utf-8"))
+        return
+    os.remove(filename)
+    message = '<response state="OK"><message>OK</message></response>';
+    if sys.version_info[0] == 2:
+        self.wfile.write(message)
+    elif sys.version_info[0] == 3:
+        self.wfile.write(bytes(message, "utf-8"))
+    
 
 def poolXML(s):
     pool = ET.parse('../tests/pool.xml')
@@ -243,6 +272,8 @@ def http_do_GET(request):
             requestKey(request);
         elif (request.path.split('?',1)[0] == "/php/pool.php"):
             poolXML(request);
+        elif (request.path.split('?',1)[0] == "/php/test_write.php"):
+            testSave(request);
         else:
             request.path = request.path.split('?',1)[0]
             if (request.path == '/'):
