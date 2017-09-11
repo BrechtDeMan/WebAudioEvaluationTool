@@ -42,6 +42,19 @@
                 xhr.responseType = "document";
                 xhr.send();
             });
+            it("should create an empty file with that key", function(done) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "../saves/save-" + key1 + ".xml");
+                xhr.onload = function() {
+                    var parser = new DOMParser();
+                    doc = parser.parseFromString(xhr.responseText, "text/xml");
+                    var state = doc.querySelector("waetresult").getAttribute("key");
+                    expect(state).to.equal(key1);
+                    done();
+                }
+                xhr.responseType = "";
+                xhr.send();
+            });
             it("should give a different key on second request", function(done) {
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", "requestKey.php");
@@ -64,8 +77,6 @@
                     var doc = xhr.response;
                     var state = doc.querySelector("message").textContent;
                     var file = doc.querySelector("file");
-                    console.log("saves/save-" + key1 + ".xml");
-                    console.log(file);
                     expect(file.textContent).to.equal("\"saves/tests-" + key1 + ".xml\"");
                     expect(file.getAttribute("bytes")).to.equal("0");
                     expect(state).to.equal("OK");
@@ -74,15 +85,13 @@
                 xhr.responseType = "document";
                 xhr.send();
             });
-            it("should return an URL on payload", function(done) {
+            it("should return a file on payload save", function(done) {
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", "save.php?key=" + key1 + "&saveFilenamePrefix=tests");
                 xhr.onload = function() {
                     var doc = xhr.response;
                     var state = doc.querySelector("message").textContent;
                     var file = doc.querySelector("file");
-                    console.log("saves/save-" + key1 + ".xml");
-                    console.log(file);
                     expect(file.textContent).to.equal("\"saves/tests-" + key1 + ".xml\"");
                     expect(file.getAttribute("bytes")).not.to.equal("0");
                     expect(state).to.equal("OK");
@@ -103,6 +112,7 @@
     <div>
         <h1>WAET PHP Server Tests</h1>
         <p class="lead">This page will test your PHP server for any implementation issues.</p>
+        <p>Make sure your <span>saves</span> directory is clean before testing and that you empty it afterwards as intermediary files will be made there.</p>
 
     </div>
     <div id="mocha"></div>
