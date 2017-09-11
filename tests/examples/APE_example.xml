@@ -15,7 +15,7 @@
                     <option name="researcher">Research in the field of audio</option>
                 </surveycheckbox>
                 <surveyquestion id="instrument" mandatory="false">
-                    <statement>What instrument did you play</statement>
+                    <statement>What instrument did you play?</statement>
                 </surveyquestion>
                 <surveystatement id="test-intro">
                     <statement>This is an example of an 'APE'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
@@ -123,7 +123,7 @@
                     <option name="Good"></option>
                     <option name="Great">Great</option>
                 </commentradio>
-                <commentcheckbox id="character" type="checkbox">
+                <commentcheckbox id="character">
                     <statement>Please describe the overall character</statement>
                     <option name="funky">Funky</option>
                     <option name="mellow">Mellow</option>

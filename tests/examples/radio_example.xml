@@ -29,9 +29,9 @@
                     <scalelabel position="100">(5) Inaudible</scalelabel>
                 </scales>
             </interface>
-            <audioelement url="0.wav" id="track-1" alwaysInclude="true" />
-            <audioelement url="1.wav" id="track-2" />
-            <audioelement url="3.wav" id="track-4" />
-            <audioelement url="3.wav" id="track-5" />
+            <audioelement url="0.wav" id="track-0" alwaysInclude="true" />
+            <audioelement url="1.wav" id="track-1" />
+            <audioelement url="2.wav" id="track-2" />
+            <audioelement url="3.wav" id="track-3" />
         </page>
     </waet>

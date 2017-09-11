@@ -45,10 +45,6 @@
                 <metricenable>elementListenTracker</metricenable>
             </metric>
             <interface>
-                <interfaceoption type="check" name="fragmentMoved" />
-                <interfaceoption type="check" name="scalerange" min="25" max="75">
-                    <errormessage>Test Error Message</errormessage>
-                </interfaceoption>
                 <interfaceoption type="show" name='playhead' />
                 <interfaceoption type="show" name="page-count" />
                 <interfaceoption type="show" name='volume' />
