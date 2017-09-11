@@ -62,6 +62,7 @@
                     var doc = xhr.response;
                     var state = doc.querySelector("state").textContent;
                     var key = doc.querySelector("key").textContent;
+                    expect(state).to.equal("OK");
                     expect(key).not.to.equal(key1);
                     done();
                 }
