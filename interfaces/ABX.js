@@ -271,10 +271,7 @@ function comparator(page) {
         };
         this.updateLoading = function (progress) {
             // progress is a value from 0 to 100 indicating the current download state of media files
-            if (label == "X" || label == "x") {
-                this.playback.textContent = "Play";
-            }
-            if (progress != 100) {
+            if (progress != 100 && label.toLowerCase() != "x") {
                 progress = String(progress);
                 progress = progress.split('.')[0];
                 this.playback.textContent = progress + '%';
