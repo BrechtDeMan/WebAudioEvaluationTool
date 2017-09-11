@@ -129,7 +129,7 @@ def requestKey(s):
     elif sys.version_info[0] == 3:
         s.wfile.write(bytes(reply, "utf-8"))
     file = open("../saves/save-"+key+".xml",'w')
-    file.write("<waetresult key="+key+"/>")
+    file.write("<waetresult key=\""+key+"\"/>")
     file.close()
     
 
