@@ -425,6 +425,7 @@ function Specification() {
         this.encode = function (doc) {
             var node = doc.createElement('survey');
             node.setAttribute('location', this.location);
+            node.setAttribute('showBackButton', this.showBackButton);
             for (var i = 0; i < this.options.length; i++) {
                 node.appendChild(this.options[i].exportXML(doc));
             }

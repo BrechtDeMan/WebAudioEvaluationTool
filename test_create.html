@@ -142,6 +142,12 @@
             </div>
             <div id="globalpresurvey" class="node" ng-controller="survey" ng-init="survey = specification.preTest">
                 <h2>Pre Test Survey</h2>
+                <div class="attributes">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Allow users to go both back and forward in the test">
+                        <span>Show back button: </span>
+                        <input type="checkbox" ng-model="survey.showBackButton" />
+                    </div>
+                </div>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
                 <div class="node surveyentry" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
@@ -273,6 +279,12 @@
             </div>
             <div id="globalpostsurvey" class="node" ng-controller="survey" ng-init="survey = specification.postTest">
                 <h2>Post Test Survey</h2>
+                <div class="attributes">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Allow users to go both back and forward in the test">
+                        <span>Show back button: </span>
+                        <input type="checkbox" ng-model="survey.showBackButton" />
+                    </div>
+                </div>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
                 <div class="node surveyentry" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
@@ -550,6 +562,12 @@
             </div>
             <div class="node" ng-controller="survey" ng-init="survey = page.preTest">
                 <h2>Pre Page Survey</h2>
+                <div class="attributes">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Allow users to go both back and forward in the test">
+                        <span>Show back button: </span>
+                        <input type="checkbox" ng-model="survey.showBackButton" />
+                    </div>
+                </div>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
                 <div class="node surveyentry" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
@@ -681,6 +699,12 @@
             </div>
             <div class="node" ng-controller="survey" ng-init="survey = page.postTest">
                 <h2>Post Page Survey</h2>
+                <div class="attributes">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Allow users to go both back and forward in the test">
+                        <span>Show back button: </span>
+                        <input type="checkbox" ng-model="survey.showBackButton" />
+                    </div>
+                </div>
                 <button type="button" class="btn btn-success" ng-click="addSurveyEntry()">Add Entry</button>
                 <div class="node surveyentry" ng-repeat="opt in survey.options" ng-controller="surveyOption">
                     <h3>Survey Entry</h3>
