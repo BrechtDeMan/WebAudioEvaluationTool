@@ -837,7 +837,8 @@ function interfacePopup() {
         node.response = null;
         var i = 0;
         var inputs = optHold.getElementsByTagName('input');
-        while (node.response === null) {
+        var checked;
+        while (checked === undefined) {
             if (i == inputs.length) {
                 if (node.specification.mandatory === true) {
                     interfaceContext.lightbox.post("Error", "Please select one option");
@@ -846,11 +847,18 @@ function interfacePopup() {
                 break;
             }
             if (inputs[i].checked === true) {
-                node.response = node.specification.options[i];
-                console.log("Selected: " + node.specification.options[i].name);
+                checked = inputs[i];
             }
             i++;
         }
+        var option = node.specification.options.find(function (a) {
+            return checked.id == a.name;
+        });
+        if (option === undefined) {
+            interfaceContext.lightbox.post("Error", "A configuration error has occured, the test cannot be continued");
+            throw ("ERROR - Cannot find option");
+        }
+        node.response = option;
         processConditional.call(this, node, node.response.name);
         return true;
     }
