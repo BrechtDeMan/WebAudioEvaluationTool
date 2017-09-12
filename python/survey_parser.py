@@ -70,9 +70,13 @@ def decodeSurveyStatement(session_id, survey_entry, store):
     return store
 
 def decodeSurveyQuestion(session_id, survey_entry, store):
-    resp = (session_id, survey_entry.get("duration"), survey_entry.find("./response").text)
+    if survey_entry.find("./response") is not None:
+        resp = (session_id, survey_entry.get("duration"), survey_entry.find("./response").text)
+    else:
+        resp = (session_id, survey_entry.get("duration"), None)
     store["responses"].append(resp)
     return store
+    # return None
 
 def decodeSurveyCheckbox(session_id, survey_entry, store):
     response = [session_id, survey_entry.get("duration")]
@@ -82,9 +86,13 @@ def decodeSurveyCheckbox(session_id, survey_entry, store):
     return store
 
 def decodeSurveyRadio(session_id, survey_entry, store):
-    response = (session_id, survey_entry.get("duration"), survey_entry.find("./response").get("name"))
+    if survey_entry.find("./response") is not None:
+        response = (session_id, survey_entry.get("duration"), survey_entry.find("./response").get("name"))
+    else:
+        response = (session_id, survey_entry.get("duration"), None)
     store["responses"].append(response)
     return store
+    # return None
 
 if folder_name.endswith("/") is False:
     folder_name += "/"
@@ -100,15 +108,18 @@ for file_name in os.listdir(folder_name):
         root = tree.getroot()
         subject_id = root.get('key')
         pre_survey = root.find("./survey[@location='pre']")
-        if len(pre_survey) is not 0:
-            if "pre" not in storage["globals"].keys():
-                storage["globals"]["pre"] = {}
-            storage["globals"]["pre"] = decodeSurveyTree(subject_id, pre_survey, storage["globals"]["pre"])
+        # print pre_survey
+        if pre_survey is not None:
+            if len(pre_survey) is not 0:
+                if "pre" not in storage["globals"].keys():
+                    storage["globals"]["pre"] = {}
+                storage["globals"]["pre"] = decodeSurveyTree(subject_id, pre_survey, storage["globals"]["pre"])
         post_survey = root.find("./survey[@location='post']")
-        if len(post_survey) is not 0:
-            if "post" not in storage["globals"].keys():
-                storage["globals"]["post"] = {}
-            storage["globals"]["post"] = decodeSurveyTree(subject_id, post_survey, storage["globals"]["post"])
+        if post_survey is not None:
+            if len(post_survey) is not 0:
+                if "post" not in storage["globals"].keys():
+                    storage["globals"]["post"] = {}
+                storage["globals"]["post"] = decodeSurveyTree(subject_id, post_survey, storage["globals"]["post"])
         
         # Now iterate through the page specifics
         for page in root.findall("./page[@state='complete']"):
@@ -119,14 +130,16 @@ for file_name in os.listdir(folder_name):
             except KeyError:
                 storage["pages"][page_name] = {}
                 page_store = storage["pages"][page_name]
-            if len(pre_survey) is not 0:
-                if "pre" not in page_store.keys():
-                    page_store["pre"] = {}
-                page_store["pre"] = decodeSurveyTree(subject_id, pre_survey, page_store["pre"])
+            if pre_survey is not None:
+                if len(pre_survey) is not 0:
+                    if "pre" not in page_store.keys():
+                        page_store["pre"] = {}
+                    page_store["pre"] = decodeSurveyTree(subject_id, pre_survey, page_store["pre"])
             post_survey = page.find("./survey[@location='post']")
-            if len(post_survey) is not 0:
-                if "post" not in page_store.keys():
-                    page_store["post"] = {}
+            if post_survey is not None:
+                if len(post_survey) is not 0:
+                    if "post" not in page_store.keys():
+                        page_store["post"] = {}
                 page_store["post"] = decodeSurveyTree(subject_id, post_survey, page_store["post"])
 
 #Storage now holds entire survey structure
@@ -157,7 +170,10 @@ for page_name in storage["pages"].keys():
 def plotDurationHistogram(store, plot_id, saveloc):
     x = []
     for row in store["responses"]:
-        x.append(float(row[1]))
+        r_temp = row[1]
+        if r_temp  is None:
+            r_temp = 0;
+        x.append(float(r_temp))
     x = np.asarray(x)
     plt.figure()
     n, bins, patches = plt.hist(x, 10, facecolor='green', alpha=0.75)
