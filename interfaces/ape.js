@@ -229,13 +229,13 @@ function ape() {
         this.enable = function () {
             sliders.forEach(function (s) {
                 s.enable();
-            })
+            });
         }
 
         this.updateLoading = function (p) {
             sliders.forEach(function (s) {
                 s.updateLoading(p);
-            })
+            });
         }
 
         this.startPlayback = function () {
@@ -608,10 +608,16 @@ function ape() {
         this.clear();
         page = page_init;
         var interfaceObj = interfaceContext.getCombinedInterfaces(page);
+        var commentBoxes = false;
         // Create each of the interface axis
         interfaceObj.forEach(function (i) {
             var node = new axisObject(i, this);
             axis.push(node);
+            i.options.forEach(function (o) {
+                if (o.type == "show" && o.name == "comments") {
+                    commentBoxes = true;
+                }
+            });
         }, this);
 
         // Create the audioObject interface objects for each aO.
@@ -630,6 +636,9 @@ function ape() {
                     node.setLabel(label);
                     aoi.addSlider(node);
                     audioObject.bindInterface(aoi);
+                    if (commentBoxes) {
+                        interfaceContext.commentBoxes.createCommentBox(audioObject);
+                    }
                 });
             }
         });
