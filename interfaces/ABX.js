@@ -298,8 +298,8 @@ function comparator(page) {
         };
         this.stopPlayback = function () {
             if (this.playback.getAttribute("playstate") == "playing") {
-                $('.comparator-button').text('Listen');
-                $('.comparator-button').removeAttr("disabled");
+                $(this.playback).text('Listen');
+                $(this.playback).removeAttr("disabled");
                 this.playback.setAttribute("playstate", "ready");
             }
             var box = interfaceContext.commentBoxes.boxes.find(function (a) {
