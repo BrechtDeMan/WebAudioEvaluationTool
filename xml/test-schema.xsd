@@ -547,6 +547,7 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute name="showBackButton" type="xs:boolean" default="true" />
             </xs:complexType>
         </xs:element>
 

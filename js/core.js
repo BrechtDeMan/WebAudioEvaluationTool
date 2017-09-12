@@ -1099,7 +1099,7 @@ function interfacePopup() {
         } else {
             this.buttonProceed.textContent = 'Next';
         }
-        if (this.currentIndex > 0)
+        if (this.currentIndex > 0 && this.node.showBackButton)
             this.buttonPrevious.style.visibility = 'visible';
         else
             this.buttonPrevious.style.visibility = 'hidden';

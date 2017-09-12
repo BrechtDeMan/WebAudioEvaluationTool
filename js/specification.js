@@ -216,6 +216,7 @@ function Specification() {
         this.location = undefined;
         this.options = [];
         this.parent = undefined;
+        this.showBackButton = true;
         this.specification = specification;
 
         this.addOption = function () {
@@ -402,6 +403,12 @@ function Specification() {
                 this.location = 'pre';
             } else if (this.location == 'after') {
                 this.location = 'post';
+            }
+            this.showBackButton = xml.getAttribute("showBackButton");
+            if (this.showBackButton == "false") {
+                this.showBackButton = false;
+            } else {
+                this.showBackButton = true;
             }
             var child = xml.firstElementChild;
             while (child) {
