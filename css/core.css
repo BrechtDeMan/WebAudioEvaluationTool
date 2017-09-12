@@ -65,9 +65,6 @@ div#popupTitleHolder {
     padding: 8px;
     text-align: center;
 }
-#popupTitle {
-    white-space: pre-line;
-}
 div#popupResponse {
     width: inherit;
     min-height: 50px;

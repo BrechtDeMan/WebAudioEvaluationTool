@@ -271,10 +271,7 @@ function comparator(page) {
         };
         this.updateLoading = function (progress) {
             // progress is a value from 0 to 100 indicating the current download state of media files
-            if (label == "X" || label == "x") {
-                this.playback.textContent = "Play";
-            }
-            if (progress != 100) {
+            if (progress != 100 && label.toLowerCase() != "x") {
                 progress = String(progress);
                 progress = progress.split('.')[0];
                 this.playback.textContent = progress + '%';
@@ -301,8 +298,8 @@ function comparator(page) {
         };
         this.stopPlayback = function () {
             if (this.playback.getAttribute("playstate") == "playing") {
-                $('.comparator-button').text('Listen');
-                $('.comparator-button').removeAttr("disabled");
+                $(this.playback).text('Listen');
+                $(this.playback).removeAttr("disabled");
                 this.playback.setAttribute("playstate", "ready");
             }
             var box = interfaceContext.commentBoxes.boxes.find(function (a) {
@@ -372,15 +369,22 @@ function comparator(page) {
     this.boxHolders = document.getElementById('box-holders');
     var node;
     page.audioElements.forEach(function (element, index) {
-        if (element.type != 'normal') {
-            console.log("WARNING - ABX can only have normal elements. Page " + page.id + ", Element " + element.id);
+        if (element.type != 'normal' && element.type != "reference") {
+            console.log("WARNING - ABX can only have normal or reference elements. Page " + page.id + ", Element " + element.id);
             element.type = "normal";
         }
         node = buildElement.call(this, index, audioEngineContext.newTrack(element));
         this.pair.push(node);
         this.boxHolders.appendChild(node.box);
     }, this);
-    var elementId = Math.floor(Math.random() * 2); //Randomly pick A or B to be X
+    //    var elementId = Math.floor(Math.random() * 2); //Randomly pick A or B to be X
+    var elementId = page.audioElements.findIndex(function (a) {
+        return a.type == "reference";
+    });
+    if (elementId == -1) {
+        elementId = Math.floor(Math.random() * 2);
+        console.log("No defined 'X' given. Selecting element id " + page.audioElements[elementId].id);
+    }
     var element = page.addAudioElement();
     for (var atr in page.audioElements[elementId]) {
         element[atr] = page.audioElements[elementId][atr];

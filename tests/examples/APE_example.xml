@@ -22,22 +22,22 @@
                 </surveystatement>
             </survey>
             <survey location="after">
-                <surveyentry type="question" id="location" mandatory="true" boxsize="large">
+                <surveyquestion id="location" mandatory="true" boxsize="large">
                     <statement>Please enter your location. (example mandatory text question)</statement>
-                </surveyentry>
-                <surveyentry type="number" id="age" min="0">
+                </surveyquestion>
+                <surveynumber id="age" min="0">
                     <statement>Please enter your age (example non-mandatory number question)</statement>
-                </surveyentry>
-                <surveyentry type="radio" id="rating">
+                </surveynumber>
+                <surveyradio id="rating">
                     <statement>Please rate this interface (example radio button question)</statement>
                     <option name="bad">Bad</option>
                     <option name="poor">Poor</option>
                     <option name="good">Good</option>
                     <option name="great">Great</option>
-                </surveyentry>
-                <surveyentry type="statement" id="thankyou">
+                </surveyradio>
+                <surveystatement id="thankyou">
                     <statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
-                </surveyentry>
+                </surveystatement>
             </survey>
             <metric>
                 <metricenable>testTimer</metricenable>
