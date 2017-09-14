@@ -17,6 +17,13 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 // Get the current test URL
+// Load up the parameters
+$saveFilenamePrefix = '';
+if (isset($_GET['saveFilenamePrefix'])) {
+    $saveFilenamePrefix = $_GET['saveFilenamePrefix'].'-';
+} else {
+    $saveFilenamePrefix = "save-";
+}
 $testURL = "";
 if (isset($_GET['url'])) {
     $testURL = "../".$_GET["url"];
@@ -47,7 +54,7 @@ while ($key == "") {
     }
 }
 
-$filename = "../saves/save-".$key.".xml";
+$filename = "../saves/".$saveFilenamePrefix.$key.".xml";
 $fileHandle = fopen($filename, 'w');
 if ($fileHandle == FALSE) {
     die("<response><state>ERROR</state><key>".$key."</key><message>Could not open file for writing</message></response>");

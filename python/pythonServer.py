@@ -120,6 +120,14 @@ def requestKey(s):
         tempKey = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32));
         if (os.path.isfile("saves/save-"+tempKey+".xml") == False):
             key = tempKey
+    options = s.path.rsplit('?')
+    options = options[1].rsplit('&')
+    for option in options:
+        optionPair = option.rsplit('=')
+        if optionPair[0] == "saveFilenamePrefix":
+            prefix = optionPair[1]
+    if prefix == None:
+        prefix = "save"
     s.send_response(200)
     s.send_header("Content-type", "application/xml");
     s.end_headers()
@@ -128,7 +136,7 @@ def requestKey(s):
         s.wfile.write(reply)
     elif sys.version_info[0] == 3:
         s.wfile.write(bytes(reply, "utf-8"))
-    file = open("../saves/save-"+key+".xml",'w')
+    file = open("../saves/"+prefix+"-"+key+".xml",'w')
     file.write("<waetresult key=\""+key+"\"/>")
     file.close()
     
