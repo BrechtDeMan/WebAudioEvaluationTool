@@ -3591,7 +3591,7 @@ function Storage() {
                     returnURL = specification.projectReturn;
                 }
             }
-            this.request.open("GET", returnURL + "php/requestKey.php", true);
+            this.request.open("GET", returnURL + "php/requestKey.php?saveFilenamePrefix=" + this.parent.filenamePrefix, true);
             this.request.addEventListener("load", this);
             this.request.send();
         },
