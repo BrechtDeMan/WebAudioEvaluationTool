@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 import copy
 import string
 import random
+import errno
 
 if sys.version_info[0] == 2:
     # Version 2.x
@@ -27,6 +28,12 @@ elif sys.version_info[0] == 3:
 # Go to right folder. 
 scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
 os.chdir(scriptdir) # does this work?
+
+try:
+    os.makedirs("../saves")
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
 
 PSEUDO_PATH = '../tests/'
 pseudo_files = []

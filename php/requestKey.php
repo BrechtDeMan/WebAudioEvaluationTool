@@ -11,6 +11,10 @@ function generateRandomString($length = 32) {
     return $randomString;
 }
 
+if (!file_exists("../saves")) {
+    mkdir("../saves");
+}
+
 // Request a new session key from the server
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
