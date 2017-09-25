@@ -1728,22 +1728,26 @@ function AudioEngine(specification) {
         var stopTime = playTime + specification.crossFade;
         this.audioObjects.forEach(function (ao) {
             if (ao.id === id) {
-                ao.play(playTime);
+                ao.setupPlayback();
+                ao.bufferStart(playTime);
+                ao.listenStart(playTime);
             } else {
-                ao.stop(stopTime);
+                ao.listenStop(playTime);
+                ao.bufferStop(stopTime);
             }
         });
     }
 
-    function playLoopSync(id) {
+    function playSync(id) {
         var playTime = audioContext.currentTime + 0.1;
         var stopTime = playTime + specification.crossFade;
         this.audioObjects.forEach(function (ao) {
-            ao.play(playTime);
+            ao.setupPlayback();
+            ao.bufferStart(playTime);
             if (ao.id === id) {
-                ao.loopStart(playTime);
+                ao.listenStart(playTime);
             } else {
-                ao.loopStop(stopTime);
+                ao.listenStop(playTime);
             }
         });
     }
@@ -1761,9 +1765,9 @@ function AudioEngine(specification) {
         if (this.status === 1) {
             this.timer.startTest();
             interfaceContext.playhead.setTimePerPixel(this.audioObjects[id]);
-            if (this.synchPlayback && this.loopPlayback) {
+            if (this.synchPlayback) {
                 // Traditional looped playback
-                playLoopSync.call(this, id);
+                playSync.call(this, id);
             } else {
                 if (this.bufferReady(id) === false) {
                     console.log("Cannot play. Buffer not ready");
@@ -1780,7 +1784,8 @@ function AudioEngine(specification) {
         if (this.status == 1) {
             var setTime = audioContext.currentTime + 0.1;
             this.audioObjects.forEach(function (a) {
-                a.stop(setTime);
+                a.listenStop(setTime);
+                a.bufferStop(setTime);
             });
             interfaceContext.playhead.stop();
         }
@@ -1907,6 +1912,7 @@ function audioObject(id) {
     // Create a buffer and external gain control to allow internal patching of effects and volume leveling.
     this.bufferNode = undefined;
     this.outputGain = audioContext.createGain();
+    this.outputGain.gain.value = 0.0;
 
     this.onplayGain = 1.0;
 
@@ -1973,60 +1979,61 @@ function audioObject(id) {
         this.storeDOM.setAttribute('presentedId', interfaceObject.getPresentedId());
     };
 
-    this.loopStart = function (setTime) {
-        this.outputGain.gain.linearRampToValueAtTime(this.onplayGain, setTime);
-        this.metric.startListening(audioEngineContext.timer.getTestTime());
-        this.interfaceDOM.startPlayback();
+    this.listenStart = function (setTime) {
+        if (this.outputGain.gain.value !== this.onplayGain) {
+            playCounter++;
+            this.outputGain.gain.linearRampToValueAtTime(this.onplayGain, setTime);
+            this.metric.startListening(audioEngineContext.timer.getTestTime());
+            this.bufferNode.playbackStartTime = audioEngineContext.timer.getTestTime();
+            this.interfaceDOM.startPlayback();
+        }
     };
 
-    this.loopStop = function (setTime) {
+    this.listenStop = function (setTime) {
         if (this.outputGain.gain.value !== 0.0) {
             this.outputGain.gain.linearRampToValueAtTime(0.0, setTime);
-            this.metric.stopListening(audioEngineContext.timer.getTestTime());
+            this.metric.stopListening(audioEngineContext.timer.getTestTime(), this.getCurrentPosition());
         }
         this.interfaceDOM.stopPlayback();
     };
 
-    this.play = function (startTime) {
+    this.setupPlayback = function () {
         if (this.bufferNode === undefined && this.buffer.buffer !== undefined) {
-            playCounter++;
             this.bufferNode = audioContext.createBufferSource();
             this.bufferNode.owner = this;
             this.bufferNode.connect(this.outputGain);
             this.bufferNode.buffer = this.buffer.buffer;
-            this.bufferNode.loop = audioEngineContext.loopPlayback;
+            if (audioEngineContext.loopPlayback) {
+                this.bufferNode.loopStart = this.specification.startTime || 0;
+                this.bufferNode.loopEnd = this.specification.stopTime - this.specification.startTime || this.buffer.buffer.duration;
+                this.bufferNode.loop = true;
+            }
             this.bufferNode.onended = function (event) {
                 // Safari does not like using 'this' to reference the calling object!
                 //event.currentTarget.owner.metric.stopListening(audioEngineContext.timer.getTestTime(),event.currentTarget.owner.getCurrentPosition());
                 if (event.currentTarget !== null) {
-                    event.currentTarget.owner.stop(audioContext.currentTime + 0.1);
+                    event.currentTarget.owner.bufferStop(audioContext.currentTime + 0.1);
                 }
             };
-            this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
-            if (!audioEngineContext.loopPlayback || !audioEngineContext.synchPlayback) {
-                this.metric.startListening(audioEngineContext.timer.getTestTime());
-                if (this.outputGain.gain.value !== this.onplayGain) {
-                    this.outputGain.gain.linearRampToValueAtTime(this.onplayGain, startTime + Number(specification.crossFade));
-                }
-                this.interfaceDOM.startPlayback();
-            } else {
-                this.outputGain.gain.linearRampToValueAtTime(0.0, startTime);
-            }
-            if (audioEngineContext.loopPlayback) {
-                this.bufferNode.loopStart = this.specification.startTime || 0;
-                this.bufferNode.loopEnd = this.specification.stopTime - this.specification.startTime || this.buffer.buffer.duration;
+            this.bufferNode.state = 0;
+        }
+    };
+
+    this.bufferStart = function (startTime) {
+        this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
+        if (this.bufferNode && this.bufferNode.state == 0) {
+            this.bufferNode.state = 1;
+            if (this.bufferNode.loop == true) {
                 this.bufferNode.start(startTime);
             } else {
                 this.bufferNode.start(startTime, this.specification.startTime || 0, this.specification.stopTime - this.specification.startTime || this.buffer.buffer.duration);
             }
-            this.bufferNode.playbackStartTime = audioEngineContext.timer.getTestTime();
         }
     };
 
-    this.stop = function (stopTime) {
+    this.bufferStop = function (stopTime) {
         this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
-        if (this.bufferNode !== undefined) {
-            this.metric.stopListening(audioEngineContext.timer.getTestTime(), this.getCurrentPosition());
+        if (this.bufferNode !== undefined && this.bufferNode.state > 0) {
             this.bufferNode.stop(stopTime);
             this.bufferNode = undefined;
         }
