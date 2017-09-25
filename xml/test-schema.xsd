@@ -277,6 +277,7 @@
                 </xs:sequence>
                 <xs:attribute ref="id" use="optional" />
                 <xs:attribute ref="name" use="optional" />
+                <xs:attribute ref="mandatory" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -296,6 +297,7 @@
                 </xs:sequence>
                 <xs:attribute ref="id" use="optional" />
                 <xs:attribute ref="name" use="optional" />
+                <xs:attribute ref="mandatory" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -306,6 +308,7 @@
                 </xs:sequence>
                 <xs:attribute ref="id" use="optional" />
                 <xs:attribute ref="name" use="optional" />
+                <xs:attribute ref="mandatory" use="optional" />
             </xs:complexType>
         </xs:element>
 
@@ -322,6 +325,7 @@
                 <xs:attribute name="max" type="xs:decimal" use="required" />
                 <xs:attribute name="step" type="xs:decimal" use="optional" default="1" />
                 <xs:attribute name="value" type="xs:decimal" use="optional" />
+                <xs:attribute ref="mandatory" use="optional" />
             </xs:complexType>
         </xs:element>
 
