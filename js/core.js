@@ -1082,7 +1082,15 @@ function interfacePopup() {
         lastNodeStart = new Date();
         this.popupResponse.innerHTML = "";
         this.popupTitle.innerHTML = "";
-        this.popupTitle.appendChild(p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").getElementsByTagName("body")[0].firstElementChild);
+        var strings = node.specification.statement.split("\n");
+        strings.forEach(function(e,i,a){
+            a[i] = e.trim();
+        });
+        node.specification.statement = strings.join("\n");
+        var statementElements = p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").querySelector("body").children;
+        while(statementElements.length > 0) {
+            this.popupTitle.appendChild(statementElements[0]);
+        }
         if (node.specification.type == 'question') {
             postQuestion.call(this, node);
         } else if (node.specification.type == 'checkbox') {
