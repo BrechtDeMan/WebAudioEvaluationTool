@@ -173,6 +173,12 @@ function Specification() {
             var node = new page(this);
             node.decode(this, pageTags[i], pageSchema);
             this.pages.push(node);
+            for (var r = 0; r < node.repeatCount; r++) {
+                var repeat = new page(this);
+                repeat.decode(this, pageTags[i], pageSchema);
+                repeat.id += "-repeat-" + r;
+                this.pages.push(repeat);
+            }
         }
     };
 
