@@ -470,6 +470,14 @@ function resizeWindow(event) {
 function drawScale() {
     var interfaceObj = testState.currentStateMap.interfaces[0];
     var scales = testState.currentStateMap.interfaces[0].scales;
+    var ticks = specification.interfaces.options.concat(interfaceObj.options).find(function (a) {
+        return (a.type == "show" && a.name == "ticks");
+    });
+    if (ticks !== undefined) {
+        ticks = true;
+    } else {
+        ticks = false;
+    }
     scales = scales.sort(function (a, b) {
         return a.position - b.position;
     });
@@ -485,11 +493,13 @@ function drawScale() {
     scales.forEach(function (scale) {
         var posPercent = scale.position / 100.0;
         var posPix = (1 - posPercent) * (draw_heights[1] - draw_heights[0]) + draw_heights[0];
-        ctx.fillStyle = "#000000";
-        ctx.setLineDash([1, 2]);
-        ctx.moveTo(0, posPix);
-        ctx.lineTo(width, posPix);
-        ctx.stroke();
+        if (ticks) {
+            ctx.fillStyle = "#000000";
+            ctx.setLineDash([1, 2]);
+            ctx.moveTo(0, posPix);
+            ctx.lineTo(width, posPix);
+            ctx.stroke();
+        }
         var text = document.createElement('div');
         text.align = "right";
         var textC = document.createElement('span');
