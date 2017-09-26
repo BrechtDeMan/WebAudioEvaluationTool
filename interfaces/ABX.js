@@ -77,15 +77,15 @@ function loadInterface() {
     var boxes = document.createElement('div');
     boxes.align = "center";
     boxes.id = "box-holders";
-    boxes.style.float = "left";
 
+    var submitHolder = document.createElement("div");
+    submitHolder.id = "submit-holder"
     var submit = document.createElement('button');
     submit.id = "submit";
     submit.onclick = buttonSubmitClick;
     submit.className = "big-button";
     submit.textContent = "submit";
-    submit.style.position = "relative";
-    submit.style.left = (window.innerWidth - 250) / 2 + 'px';
+    submitHolder.appendChild(submit);
 
     feedbackHolder.appendChild(boxes);
 
@@ -98,7 +98,7 @@ function loadInterface() {
     testContent.appendChild(pagetitle);
     testContent.appendChild(interfaceButtons);
     testContent.appendChild(feedbackHolder);
-    testContent.appendChild(submit);
+    testContent.appendChild(submitHolder);
     testContent.appendChild(comments);
     interfaceContext.insertPoint.appendChild(testContent);
 
@@ -425,9 +425,6 @@ function resizeWindow(event) {
         boxW = numObj * 312;
         diff = window.innerWidth - boxW;
     }
-    document.getElementById('box-holders').style.marginLeft = diff / 2 + 'px';
-    document.getElementById('box-holders').style.marginRight = diff / 2 + 'px';
-    document.getElementById('box-holders').style.width = boxW + 'px';
 }
 
 function buttonSubmitClick() {

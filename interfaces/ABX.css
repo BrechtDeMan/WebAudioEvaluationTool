@@ -20,9 +20,12 @@ button.big-button {
     height: 40px;
     font-size: 1.2em;
 }
-div#box-holders {
+div#submit-holder {
     width: 100%;
     text-align: center;
+}
+div#box-holders {
+    width: 100%;
 }
 div#playback-holder {
     float: none;
