@@ -499,6 +499,9 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
     if (interfaceContext.checkFragmentMinPlays() === false) {
         return;
     }
+    if (interfaceContext.checkCommentQuestions() === false) {
+        return;
+    }
 
     for (var i = 0; i < checks.length; i++) {
         var checkState;

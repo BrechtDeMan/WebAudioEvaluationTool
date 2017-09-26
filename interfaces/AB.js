@@ -395,10 +395,13 @@ function resizeWindow(event) {
 function buttonSubmitClick() {
     var checks = testState.currentStateMap.interfaces[0].options,
         canContinue = true;
-    
+
     if (interfaceContext.checkFragmentMinPlays() === false) {
-    return;
-}
+        return;
+    }
+    if (interfaceContext.checkCommentQuestions() === false) {
+        return;
+    }
 
     for (var i = 0; i < checks.length; i++) {
         if (checks[i].type == 'check') {

@@ -759,6 +759,9 @@ function buttonSubmitClick() {
     if (interfaceContext.checkFragmentMinPlays() === false) {
         return;
     }
+    if (interfaceContext.checkCommentQuestions() === false) {
+        return;
+    }
 
     for (var i = 0; i < checks.length; i++) {
         var checkState = true;
