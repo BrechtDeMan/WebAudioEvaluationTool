@@ -448,6 +448,14 @@ function resizeWindow(event) {
 function drawScale() {
     var interfaceObj = testState.currentStateMap.interfaces[0];
     var scales = testState.currentStateMap.interfaces[0].scales;
+    var ticks = specification.interfaces.options.concat(interfaceObj.options).find(function (a) {
+        return (a.type == "show" && a.name == "ticks");
+    });
+    if (ticks !== undefined) {
+        ticks = true;
+    } else {
+        ticks = false;
+    }
     scales = scales.sort(function (a, b) {
         return a.position - b.position;
     });
@@ -468,9 +476,11 @@ function drawScale() {
         if (posPix >= width) {
             posPix = width - 1;
         }
-        ctx.moveTo(posPix, 0);
-        ctx.lineTo(posPix, height);
-        ctx.stroke();
+        if (ticks) {
+            ctx.moveTo(posPix, 0);
+            ctx.lineTo(posPix, height);
+            ctx.stroke();
+        }
 
         var text = document.createElement('div');
         text.align = "center";
