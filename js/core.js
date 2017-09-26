@@ -3062,16 +3062,21 @@ function Interface(specificationObject) {
         volume.slider.max = 12;
         volume.slider.value = 0;
         volume.slider.step = 1;
+        volume.captured = false;
         volume.handleEvent = function (event) {
-            if (event.type == "mousemove") {
+            if (event.type == "mousedown") {
+                volume.captured = true;
+            } else if (event.type == "mousemove" && volume.captured) {
                 this.valueDB = Number(this.slider.value);
                 this.valueLin = decibelToLinear(this.valueDB);
                 this.valueText.textContent = this.valueDB + 'dB';
                 audioEngineContext.outputGain.gain.value = this.valueLin;
+                console.log(this.valueDB);
             } else if (event.type == "mouseup") {
+                volume.captured = false;
                 this.onmouseup();
             }
-            this.slider.value = this.valueDB;
+            //this.slider.value = this.valueDB;
 
             if (event.stopPropagation) {
                 event.stopPropagation();
@@ -3094,6 +3099,7 @@ function Interface(specificationObject) {
         };
         volume.slider.addEventListener("mousemove", volume);
         volume.root.addEventListener("mouseup", volume);
+        volume.root.addEventListener("mousedown", volume);
 
         var title = document.createElement('div');
         title.innerHTML = '<span>Master Volume Control</span>';
