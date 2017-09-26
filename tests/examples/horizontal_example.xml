@@ -17,6 +17,7 @@
                 <interfaceoption type="show" name="page-count" />
                 <interfaceoption type="show" name="volume" />
                 <interfaceoption type="show" name="comments" />
+                <interfaceoption type="show" name="ticks" />
             </interface>
         </setup>
         <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
