@@ -718,10 +718,12 @@ function Specification() {
             this.name = undefined;
             this.type = undefined;
             this.statement = undefined;
+            this.mandatory = undefined;
             this.schema = schemaRoot.querySelector('[name=commentquestion]');
             this.decode = function (parent, xml) {
                 this.id = xml.id;
                 this.name = xml.getAttribute('name');
+                this.mandatory = xml.getAttribute("mandatory") == "true";
                 if (this.name === null) {
                     this.name = undefined;
                 }

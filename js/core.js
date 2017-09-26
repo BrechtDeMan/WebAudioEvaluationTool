@@ -1083,12 +1083,12 @@ function interfacePopup() {
         this.popupResponse.innerHTML = "";
         this.popupTitle.innerHTML = "";
         var strings = node.specification.statement.split("\n");
-        strings.forEach(function(e,i,a){
+        strings.forEach(function (e, i, a) {
             a[i] = e.trim();
         });
         node.specification.statement = strings.join("\n");
         var statementElements = p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").querySelector("body").children;
-        while(statementElements.length > 0) {
+        while (statementElements.length > 0) {
             this.popupTitle.appendChild(statementElements[0]);
         }
         if (node.specification.type == 'question') {
@@ -2640,6 +2640,12 @@ function Interface(specificationObject) {
             this.textArea.style.width = boxwidth - 6 + "px";
         };
         this.resize();
+        this.check = function () {
+            if (this.specification.mandatory && this.textArea.value.length == 0) {
+                return false;
+            }
+            return true;
+        }
     };
 
     this.radioBox = function (commentQuestion) {
@@ -2715,6 +2721,17 @@ function Interface(specificationObject) {
             this.holder.style.width = boxwidth + "px";
         };
         this.resize();
+        this.check = function () {
+            if (this.specification.mandatory) {
+                var selected = this.options.find(function (o) {
+                    return o.checked;
+                });
+                if (selected === undefined) {
+                    return false;
+                }
+            }
+            return true;
+        };
     };
 
     this.checkboxBox = function (commentQuestion) {
@@ -2781,6 +2798,17 @@ function Interface(specificationObject) {
             this.holder.style.width = boxwidth + "px";
         };
         this.resize();
+        this.check = function () {
+            if (this.specification.mandatory) {
+                var selected = this.options.filter(function (o) {
+                    return o.checked;
+                });
+                if (selected.length === 0) {
+                    return false;
+                }
+            }
+            return true;
+        };
     };
 
     this.sliderBox = function (commentQuestion) {
@@ -2838,6 +2866,9 @@ function Interface(specificationObject) {
             this.slider.style.width = boxwidth - 24 + "px";
         };
         this.resize();
+        this.check = function () {
+            return true;
+        };
     };
 
     this.createCommentQuestion = function (element) {
@@ -2858,6 +2889,17 @@ function Interface(specificationObject) {
     this.deleteCommentQuestions = function () {
         this.commentQuestions = [];
     };
+
+    this.checkCommentQuestions = function () {
+        var failed = this.commentQuestions.filter(function (a) {
+            return a.check() === false;
+        });
+        if (failed.length === 0) {
+            return true;
+        }
+        this.lightbox.post("Error", "Please answer the questions on the page.");
+        return false;
+    }
 
     this.outsideReferenceDOM = function (audioObject, index, inject) {
         this.parent = audioObject;
