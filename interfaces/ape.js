@@ -214,6 +214,7 @@ function loadTest(audioHolderObject) {
     });
 
     //testWaitIndicator();
+    module.resize();
 }
 
 function ape() {
@@ -253,7 +254,7 @@ function ape() {
         }
 
         this.getValue = function () {
-            return sliders[0].value();
+            return sliders[0].value;
         }
 
         this.getPresentedId = function () {
@@ -307,10 +308,10 @@ function ape() {
             var labelHolder = document.createElement("span");
             var label = "";
             var metric = new metricTracker(this);
+            var value = Math.random();
             trackObj.align = "center";
             trackObj.className = 'track-slider track-slider-disabled';
             trackObj.appendChild(labelHolder);
-            trackObj.style.left = (Math.random() * $(sliderRail).width()) + 50 + "px";
             axisInterface.sliderRail.appendChild(trackObj);
             metric.initialise(this.value);
             this.setLabel = function (s) {
@@ -318,7 +319,7 @@ function ape() {
             }
             this.resize = function (event) {
                 var width = $(axisInterface.sliderRail).width();
-                var w = Number(value * width + 50);
+                var w = Number(value * width);
                 trackObj.style.left = String(w) + "px";
             }
             this.playing = function () {
@@ -383,17 +384,15 @@ function ape() {
                     "value": trackObj
                 },
                 "value": {
-                    "value": function () {
-                        var maxPix = $(axisInterface.sliderRail).width();
-                        var pix = trackObj.style.left.substr(0, trackObj.style.left.length - 2);
-                        return (pix - 50) / maxPix;
-                    }
-                },
-                "moveToPixel": {
-                    "value": function (pix) {
-                        var t = audioEngineContext.timer.getTestTime();
-                        trackObj.style.left = String(pix) + "px";
-                        metric.moved(t, this.value);
+                    "get": function () {
+                        return value;
+                    },
+                    "set": function (v) {
+                        if (v >= 0 && v <= 1) {
+                            value = v;
+                        }
+                        this.resize();
+                        return value;
                     }
                 },
                 "label": {
@@ -405,7 +404,31 @@ function ape() {
             });
         }
 
+        function drawTick(position) {
+            var context = tickCanvas.getContext("2d"),
+                w = tickCanvas.width,
+                h = tickCanvas.height;
+            context.beginPath();
+            context.setLineDash([1, 2]);
+            context.moveTo(position * w, 0);
+            context.lineTo(position * w, h);
+            context.closePath();
+            context.stroke();
+        }
+
+        function clearTicks() {
+            var c = tickCanvas.getContext("2d"),
+                w = tickCanvas.width,
+                h = tickCanvas.height;
+            c.clearRect(0, 0, w, h);
+        }
+
         function createScaleMarkers(interfaceObject, root, w) {
+            var ticks = interfaceObject.options.findIndex(function (a) {
+                return (a.type == "show" && a.name == "ticks");
+            });
+            ticks = (ticks >= 0);
+            clearTicks();
             interfaceObject.scales.forEach(function (scaleObj) {
                 var position = Number(scaleObj.position) * 0.01;
                 var pixelPosition = (position * w) + 50;
@@ -415,6 +438,9 @@ function ape() {
                 scaleDOM.setAttribute('value', position);
                 root.appendChild(scaleDOM);
                 scaleDOM.style.left = Math.floor((pixelPosition - ($(scaleDOM).width() / 2))) + 'px';
+                if (ticks) {
+                    drawTick(position);
+                }
             }, this);
         }
         var sliders = [];
@@ -471,6 +497,15 @@ function ape() {
         sliderRail.align = "left";
         DOMRoot.appendChild(sliderRail);
 
+        // Canvas for the markers
+        var tickCanvas = document.createElement("canvas");
+        tickCanvas.id = "ticks-" + this.name;
+        tickCanvas.className = "tick-canvas";
+        tickCanvas.height = 150;
+        tickCanvas.width = $(sliderRail).width() - 100;
+        tickCanvas.style.width = ($(sliderRail).width() - 100) + "px";
+        sliderRail.appendChild(tickCanvas);
+
         // Create the div to hold any scale objects
         var scale = document.createElement("div");
         scale.className = "sliderScale";
@@ -486,6 +521,8 @@ function ape() {
                 s.resize();
             });
             scale.innerHTML = "";
+            tickCanvas.width = $(sliderRail).width();
+            tickCanvas.style.width = tickCanvas.width + "px";
             createScaleMarkers(interfaceObject, scale, $(sliderRail).width());
         }
         this.playing = function (id) {
@@ -531,14 +568,14 @@ function ape() {
                 var move = event.clientX - 6;
                 var w = $(sliderRail).width();
                 move = Math.max(50, move);
-                move = Math.min(w + 50, move);
-                UI.selected.moveToPixel(move);
+                move = Math.min(w, move);
+                UI.selected.value = (move / w);
             } else if (event.type == "touchmove") {
                 var move = event.originalEvent.targetTouches[0].clientX - 6;
                 var w = $(event.currentTarget).width();
                 move = Math.max(50, move);
-                move = Math.min(w + 50, move);
-                UI.selected.moveToPixel(move);
+                move = Math.min(w, move);
+                UI.selected.value = (move / w);
             }
         }
         this.checkAllMoved = function () {
@@ -683,6 +720,11 @@ function ape() {
                 ao.pageXMLSave(store);
             });
         }
+    }
+    this.resize = function (event) {
+        axis.forEach(function (a) {
+            a.resize(event);
+        });
     }
 }
 
@@ -829,9 +871,7 @@ function resizeWindow(event) {
     // MANDATORY FUNCTION
 
     // Resize the slider objects
-    for (var i = 0; i < interfaceContext.interfaceSliders.length; i++) {
-        interfaceContext.interfaceSliders[i].resize(event);
-    }
+    window.module.resize(event);
 }
 
 function pageXMLSave(store, pageSpecification) {

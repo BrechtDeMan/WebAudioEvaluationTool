@@ -26,7 +26,6 @@ button {
 }
 div.slider {
     /* Specify any structure for the slider holder interface */
-    background-color: #eee;
     height: 150px;
     margin: 5px 50px;
     -moz-user-select: -moz-none;
@@ -60,6 +59,12 @@ div.track-slider {
     -khtml-user-select: none;
     -webkit-user-select: none;
     border: 1px solid black;
+}
+canvas.tick-canvas {
+    z-index: -1;
+    position: absolute;
+    height: 150px;
+    background-color: #eee;
 }
 div#outside-reference-holder {
     display: flex;
