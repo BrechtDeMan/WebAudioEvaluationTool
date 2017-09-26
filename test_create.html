@@ -933,12 +933,25 @@
                     <button type="button" class="btn btn-danger" ng-click="removeCommentQuestion(cq)">Remove Comment Question</button>
                     <div class="attributes">
                         <div class="attribute">
+                            <span>Type:</span>
+                            <select ng-model="cq.type">
+                                <option value="question">Question</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="radio">Radio</option>
+                                <option value="slider">Slider</option>
+                            </select>
+                        </div>
+                        <div class="attribute">
                             <span>Unique ID:</span>
                             <input type="text" ng-model="cq.id" required/>
                         </div>
                         <div class="attribute">
                             <span>Common Name:</span>
                             <input type="text" ng-model="cq.name" />
+                        </div>
+                        <div class="attribute">
+                            <span>Mandatory:</span>
+                            <input type="checkbox" ng-model="cq.mandatory" />
                         </div>
                         <div class="attribute" ng-show="cq.type == 'slider'">
                             <span>Minimum:</span>

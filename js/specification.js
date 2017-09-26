@@ -704,8 +704,12 @@ function Specification() {
                 AHNode.appendChild(this.audioElements[i].encode(root));
             }
             // Create <CommentQuestion>
-            for (i = 0; i < this.commentQuestions.length; i++) {
-                AHNode.appendChild(this.commentQuestions[i].encode(root));
+            if (this.commentQuestions.length > 0) {
+                var node = root.createElement("commentquestions");
+                for (i = 0; i < this.commentQuestions.length; i++) {
+                    node.appendChild(this.commentQuestions[i].encode(root));
+                }
+                AHNode.appendChild(node);
             }
 
             AHNode.appendChild(this.preTest.encode(root));
@@ -804,6 +808,7 @@ function Specification() {
                         throw ("Unknown type " + this.type);
                 }
                 node.id = this.id;
+                node.setAttribute("mandatory", this.mandatory);
                 node.setAttribute("type", this.type);
                 if (this.name !== undefined) {
                     node.setAttribute("name", this.name);
