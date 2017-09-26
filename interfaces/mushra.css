@@ -39,6 +39,8 @@ div#scale-text-holder {
 }
 div.scale-text {
     position: absolute;
+    text-align: right;
+    min-width: 100px;
 }
 canvas#scale-canvas {
     position: relative;

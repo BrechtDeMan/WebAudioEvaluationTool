@@ -508,7 +508,6 @@ function drawScale() {
         text.className = "scale-text";
         textHolder.appendChild(text);
         text.style.top = (posPix - 9) + 'px';
-        text.style.left = 100 - ($(text).width() + 3) + 'px';
         lastHeight = posPix;
     });
 }
