@@ -1,4 +1,8 @@
-/* globals interfaceContext, document, window, $, specification, audioEngineContext, console, window, testState, storage */
+/**
+ * WAET Blank Template
+ * Use this to start building your custom interface
+ */
+
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
@@ -56,11 +60,6 @@ function loadInterface() {
             console.log('Stopped at ' + time); // DEBUG/SAFETY
         }
     };
-
-    // Create outside reference holder
-    var outsideRef = document.createElement("div");
-    outsideRef.id = "outside-reference-holder";
-
     // Create Submit (save) button
     var submit = document.createElement("button");
     submit.innerHTML = 'Next';
@@ -81,29 +80,21 @@ function loadInterface() {
     interfaceButtons.appendChild(submit);
     interfaceButtons.appendChild(sort);
 
-    // Create a slider box
-    var sliderBox = document.createElement('div');
-    sliderBox.style.width = "100%";
-    sliderBox.style.height = window.innerHeight - 200 + 12 + 'px';
-    sliderBox.style.marginBottom = '10px';
-    sliderBox.id = 'slider';
-    var scaleHolder = document.createElement('div');
-    scaleHolder.id = "scale-holder";
-    scaleHolder.style.marginLeft = "107px";
-    sliderBox.appendChild(scaleHolder);
+
+    // Create outside reference holder
+    var outsideRef = document.createElement("div");
+    outsideRef.id = "outside-reference-holder";
+
+    // Create a holder for the slider rows
+    var sliderBox = document.createElement("div");
+    sliderBox.id = 'slider-box';
+    var sliderGrid = document.createElement("div");
+    sliderGrid.id = "slider-grid";
+    sliderBox.appendChild(sliderGrid);
     var scaleText = document.createElement('div');
     scaleText.id = "scale-text-holder";
-    scaleText.style.height = "25px";
-    scaleText.style.width = "100%";
-    scaleHolder.appendChild(scaleText);
-    var scaleCanvas = document.createElement('canvas');
-    scaleCanvas.id = "scale-canvas";
-    scaleCanvas.style.marginLeft = "150px";
-    scaleHolder.appendChild(scaleCanvas);
-    var sliderObjectHolder = document.createElement('div');
-    sliderObjectHolder.id = 'slider-holder';
-    sliderObjectHolder.align = "center";
-    sliderBox.appendChild(sliderObjectHolder);
+    sliderGrid.appendChild(scaleText);
+
 
     // Global parent for the comment boxes on the page
     var feedbackHolder = document.createElement('div');
@@ -124,15 +115,20 @@ function loadInterface() {
     // Load the full interface
     testState.initialise();
     testState.advanceState();
-}
+};
 
 function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
-    var id = page.id;
 
     var feedbackHolder = document.getElementById('feedbackHolder');
-    feedbackHolder.innerHTML = "";
+    var sliderBox = document.getElementById('slider-box');
+    var sliderGrid = document.getElementById("slider-grid");
+    var scaleTextHolder = document.getElementById("scale-text-holder");
     var interfaceObj = interfaceContext.getCombinedInterfaces(page);
+    var commentBoxPrefix = "Comment on track";
+    var loopPlayback = page.loop;
+    feedbackHolder.innerHTML = "";
+
     if (interfaceObj.length > 1) {
         console.log("WARNING - This interface only supports one <interface> node per page. Using first interface node");
     }
@@ -142,7 +138,7 @@ function loadTest(page) {
     if (typeof page.title == "string" && page.title.length > 0) {
         document.getElementById("test-title").textContent = page.title;
     }
-
+    // Set the axis title
     if (interfaceObj.title !== null) {
         document.getElementById("pageTitle").textContent = interfaceObj.title;
     }
@@ -157,15 +153,67 @@ function loadTest(page) {
     // Delete outside reference
     document.getElementById("outside-reference-holder").innerHTML = "";
 
-    var sliderBox = document.getElementById('slider-holder');
-    sliderBox.innerHTML = "";
-
-    var commentBoxPrefix = "Comment on track";
+    // Get the comment box prefix
     if (interfaceObj.commentBoxPrefix !== undefined) {
         commentBoxPrefix = interfaceObj.commentBoxPrefix;
     }
-    var loopPlayback = page.loop;
 
+    // Populate the comment questions
+    $(page.commentQuestions).each(function (index, element) {
+        var node = interfaceContext.createCommentQuestion(element);
+        feedbackHolder.appendChild(node.holder);
+    });
+
+    // Configure the grid
+    var numRows = page.audioElements.filter(function (a) {
+        return (a.type !== "outside-reference");
+    }).length;
+    var numColumns = page.interfaces[0].scales.length;
+    sliderGrid.style.gridTemplateRows = "50px repeat(" + numRows + ", 72px)";
+    scaleTextHolder.style.gridTemplateColumns = "100px repeat(" + numColumns + ", 1fr) 100px";
+    page.interfaces[0].scales.sort(function (a, b) {
+        if (a.position > b.position) {
+            return 1;
+        } else if (a.position < b.position) {
+            return -1;
+        }
+        return 0;
+    }).forEach(function (a, i) {
+        var h = document.createElement("div");
+        var text = document.createElement("span");
+        h.className = "scale-text";
+        h.style.gridColumn = String(i + 2) + "/" + String(i + 3);
+        text.textContent = a.text;
+        h.appendChild(text);
+        scaleTextHolder.appendChild(h);
+    })
+
+    // Find all the audioElements from the audioHolder
+    var index = 0;
+    var labelType = page.label;
+    if (labelType == "default") {
+        labelType = "number";
+    }
+    $(page.audioElements).each(function (pageIndex, element) {
+        // Find URL of track
+        // In this jQuery loop, variable 'this' holds the current audioElement.
+
+        var audioObject = audioEngineContext.newTrack(element);
+        if (element.type == 'outside-reference') {
+            // Construct outside reference;
+            var orNode = new interfaceContext.outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
+            audioObject.bindInterface(orNode);
+        } else {
+            // Create a slider per track
+            var label = interfaceContext.getLabel(labelType, index, page.labelStart);
+            var sliderObj = new discreteObject(audioObject, label);
+            sliderGrid.appendChild(sliderObj.DOMRoot);
+            audioObject.bindInterface(sliderObj);
+            interfaceContext.commentBoxes.createCommentBox(audioObject);
+            index += 1;
+        }
+
+    });
     interfaceObj.options.forEach(function (option) {
         if (option.type == "show") {
             switch (option.name) {
@@ -204,201 +252,102 @@ function loadTest(page) {
             }
         }
     });
-
-    // Find all the audioElements from the audioHolder
-    var index = 0;
-    var interfaceScales = page.interfaces[0].scales;
-    var labelType = page.label;
-    if (labelType == "default") {
-        labelType = "number";
-    }
-    $(page.audioElements).each(function (pageIndex, element) {
-        // Find URL of track
-        // In this jQuery loop, variable 'this' holds the current audioElement.
-
-        var audioObject = audioEngineContext.newTrack(element);
-        if (element.type == 'outside-reference') {
-            // Construct outside reference;
-            var orNode = new interfaceContext.outsideReferenceDOM(audioObject, index, document.getElementById("outside-reference-holder"));
-            audioObject.bindInterface(orNode);
-        } else {
-            // Create a slider per track
-            var label = interfaceContext.getLabel(labelType, index, page.labelStart);
-            var sliderObj = new discreteObject(audioObject, label, interfaceScales);
-            sliderBox.appendChild(sliderObj.holder);
-            audioObject.bindInterface(sliderObj);
-            interfaceContext.commentBoxes.createCommentBox(audioObject);
-            index += 1;
-        }
-
-    });
-
-    $(page.commentQuestions).each(function (index, element) {
-        var node = interfaceContext.createCommentQuestion(element);
-        feedbackHolder.appendChild(node.holder);
-    });
-
     // Auto-align
     resizeWindow(null);
 }
 
-function discreteObject(audioObject, label, interfaceScales) {
+function discreteObject(audioObject, label) {
     // An example node, you can make this however you want for each audioElement.
     // However, every audioObject (audioEngineContext.audioObject) MUST have an interface object with the following
     // You attach them by calling audioObject.bindInterface( )
-    if (interfaceScales === null || interfaceScales.length === 0) {
-        console.log("WARNING: The discrete radio's are built depending on the number of scale points specified! Ensure you have some specified. Defaulting to 5 for now!");
-        var numOptions = 5;
-    }
-    this.parent = audioObject;
+    var playing = false;
 
-    this.holder = document.createElement('div');
-    this.title = document.createElement('div');
-    this.discreteHolder = document.createElement('div');
-    this.discretes = [];
-    this.play = document.createElement('button');
-
-    this.holder.className = 'track-slider';
-    this.holder.style.width = window.innerWidth - 200 + 'px';
-    this.holder.appendChild(this.title);
-    this.holder.appendChild(this.discreteHolder);
-    this.holder.appendChild(this.play);
-    this.holder.setAttribute('trackIndex', audioObject.id);
-    this.title.textContent = label;
-    this.title.className = 'track-slider-title';
-
-    this.discreteHolder.className = "track-slider-range";
-    this.discreteHolder.style.width = window.innerWidth - 500 + 'px';
-    this.radioClicked = function (event) {
-        var time = audioEngineContext.timer.getTestTime();
-        if (audioEngineContext.status === 0) {
-            event.currentTarget.checked = false;
-            return;
-        }
-        var id = this.parent.id;
-        var position = this.getValue();
-        this.parent.metric.moved(time, position);
-        console.log('slider ' + id + ' moved to ' + position + ' (' + time + ')');
-
-    };
-    this.handleEvent = function (event) {
-        if (event.currentTarget.getAttribute("name") === this.parent.specification.id) {
-            this.radioClicked(event);
-        }
-    };
-    for (var i = 0; i < interfaceScales.length; i++) {
-        var node = document.createElement('input');
-        node.setAttribute('type', 'radio');
-        node.className = 'track-radio';
-        node.disabled = true;
-        node.setAttribute('position', interfaceScales[i].position);
-        node.setAttribute('name', audioObject.specification.id);
-        node.setAttribute('id', audioObject.specification.id + '-' + String(i));
-        this.discretes.push(node);
-        this.discreteHolder.appendChild(node);
-        node.addEventListener("click", this);
-    }
-
-    this.play.className = 'track-slider-button';
-    this.play.textContent = "Loading...";
-    this.play.value = audioObject.id;
-    this.play.disabled = true;
-    this.play.setAttribute("playstate", "ready");
-    this.play.onclick = function (event) {
-        var id = Number(event.currentTarget.value);
-        //audioEngineContext.metric.sliderPlayed(id);
-        if (event.currentTarget.getAttribute("playstate") == "ready")
-            audioEngineContext.play(id);
-        else if (event.currentTarget.getAttribute("playstate") == "playing")
+    function buttonClicked(event) {
+        if (!playing) {
+            audioEngineContext.play(audioObject.id);
+        } else {
             audioEngineContext.stop();
-    };
-    this.resize = function (event) {
-        this.holder.style.width = window.innerWidth - 200 + 'px';
-        this.discreteHolder.style.width = window.innerWidth - 500 + 'px';
-        //text.style.left = (posPix+150-($(text).width()/2)) +'px';
-        for (var i = 0; i < this.discretes.length; i++) {
-            var width = $(this.discreteHolder).width() - 20;
-            var node = this.discretes[i];
-            var nodeW = $(node).width();
-            var position = node.getAttribute('position');
-            var posPix = Math.round(width * (position / 100.0));
-            node.style.left = (posPix + 10 - (nodeW / 2)) + 'px';
         }
     };
+
+    function radioSelected(event) {
+        var time = audioEngineContext.timer.getTestTime();
+        audioObject.metric.moved(time, event.currentTarget.value);
+        console.log("slider " + audioObject.id + " moved to " + event.currentTarget.value + "(" + time + ")");
+    };
+
+    var root = document.createElement("div"),
+        labelHolder = document.createElement("div"),
+        button = document.createElement("button");
+    root.className = "discrete-row";
+    labelHolder.className = "discrete-label";
+    button.className = "discrete-button";
+    root.appendChild(labelHolder);
+
+    var labelSpan = document.createElement("span");
+    labelHolder.appendChild(labelSpan);
+    labelSpan.textContent = label;
+    button.textContent = "Listen";
+    button.disabled = "true";
+    button.addEventListener("click", this);
+
+    var numScales = audioObject.specification.parent.interfaces[0].scales.length;
+    root.style.gridTemplateColumns = "100px repeat(" + numScales + ", 1fr) 100px";
+    for (var n = 0; n < numScales; n++) {
+        var input = document.createElement("input");
+        input.type = "radio";
+        input.disabled = "true";
+        input.value = n / (numScales - 1);
+        input.addEventListener("click", this);
+        input.name = audioObject.specification.id;
+        root.appendChild(input);
+    }
+    root.appendChild(button);
+    this.handleEvent = function (event) {
+        if (event.currentTarget === button) {
+            buttonClicked(event);
+        } else if (event.currentTarget.type === "radio") {
+            radioSelected(event);
+        }
+    }
     this.enable = function () {
         // This is used to tell the interface object that playback of this node is ready
-        this.play.disabled = false;
-        this.play.textContent = "Play";
-        $(this.slider).removeClass('track-slider-disabled');
-        this.discretes.forEach(function (elem) {
-            elem.disabled = false;
-        });
+        button.disabled = "";
+        var a = root.querySelectorAll("input[type=\"radio\"]");
+        for (var n = 0; n < a.length; n++) {
+            a[n].disabled = false;
+        }
+        button.textContent = "Listen";
     };
     this.updateLoading = function (progress) {
         // progress is a value from 0 to 100 indicating the current download state of media files
-        if (progress != 100) {
-            progress = String(progress);
-            progress = progress.split('.')[0];
-            this.play.textContent = progress + '%';
-        } else {
-            this.play.textContent = "Play";
-        }
+        button.textContent = progress + "%";
     };
-
     this.startPlayback = function () {
-        // Called by audioObject when playback begins
-        this.play.setAttribute("playstate", "playing");
-        $(".track-slider").removeClass('track-slider-playing');
-        $(this.holder).addClass('track-slider-playing');
-        var outsideReference = document.getElementById('outside-reference');
-        this.play.textContent = "Listening";
-        if (outsideReference !== null) {
-            $(outsideReference).removeClass('track-slider-playing');
-        }
-        if (this.parent.specification.parent.playOne || specification.playOne) {
-            $('.track-slider-button').text = "Wait";
-            $('.track-slider-button').attr("disabled", "true");
-        }
-        interfaceContext.commentBoxes.highlightById(audioObject.id);
-        if (audioObject.specification.image !== undefined) {
-            interfaceContext.imageHolder.setImage(audioObject.specification.image);
-        }
+        // Called when playback has begun
+        playing = true;
+        $(root).addClass("discrete-row-playing");
+        button.textContent = "Stop";
     };
     this.stopPlayback = function () {
-        // Called by audioObject when playback stops
-        if (this.play.getAttribute("playstate") == "playing") {
-            this.play.setAttribute("playstate", "ready");
-            $(this.holder).removeClass('track-slider-playing');
-            $('.track-slider-button').text = "Play";
-            this.play.textContent = "Play";
-            $('.track-slider-button').removeAttr("disabled");
-            var box = interfaceContext.commentBoxes.boxes.find(function (a) {
-                return a.id === audioObject.id;
-            });
-            if (box) {
-                box.highlight(false);
-            }
-            if (audioObject.specification.parent.interfaces[0].image !== undefined) {
-                interfaceContext.imageHolder.setImage(audioObject.specification.parent.interfaces[0].image);
-            } else {
-                interfaceContext.imageHolder.setImage("");
-            }
-        }
+        // Called when playback has stopped. This gets called even if playback never started!
+        playing = false;
+        $(root).removeClass("discrete-row-playing");
+        button.textContent = "Listen";
     };
-
     this.getValue = function () {
-        // Return the current value of the object. If there is no value, return -1
-        var checkedElement = this.discretes.find(function (elem) {
-            return elem.checked;
-        });
-        if (checkedElement === undefined) {
-            return -1;
+        // Return the current value of the object. If there is no value, return 0
+        var a = root.querySelectorAll("input[type=\"radio\"]");
+        for (var n = 0; n < a.length; n++) {
+            if (a[n].checked) {
+                return Number(a[n].value);
+            }
         }
-        return checkedElement.getAttribute("position") / 100.0;
+        return -1;
     };
     this.getPresentedId = function () {
         // Return the presented ID of the object. For instance, the APE has sliders starting from 0. Whilst AB has alphabetical scale
-        return this.title.textContent;
+        return label;
     };
     this.canMove = function () {
         // Return either true or false if the interface object can be moved. AB / Reference cannot, whilst sliders can and therefore have a continuous scale.
@@ -413,85 +362,36 @@ function discreteObject(audioObject, label, interfaceScales) {
         var node = storage.document.createElement('value');
         node.textContent = this.getValue();
         return node;
+
     };
     this.error = function () {
-        // audioObject has an error!!
-        this.playback.textContent = "Error";
-        $(this.playback).addClass("error-colour");
+        // If there is an error with the audioObject, this will be called to indicate a failure
     };
-}
+    Object.defineProperties(this, {
+        "DOMRoot": {
+            "value": root
+        }
+    });
+};
 
 function resizeWindow(event) {
     // Called on every window resize event, use this to scale your page properly
-    var numObj = document.getElementsByClassName('track-slider').length;
-    var totalHeight = (numObj * 66) - 30;
-    document.getElementById('scale-holder').style.width = window.innerWidth - 220 + 'px';
-    // Cheers edge for making me delete a canvas every resize.
-    var canvas = document.getElementById('scale-canvas');
-    var new_canvas = document.createElement("canvas");
-    new_canvas.id = 'scale-canvas';
-    new_canvas.style.marginLeft = "150px";
-    canvas.parentElement.appendChild(new_canvas);
-    canvas.parentElement.removeChild(canvas);
-    new_canvas.width = window.innerWidth - 520;
-    new_canvas.height = totalHeight;
-    for (var i in audioEngineContext.audioObjects) {
-        if (audioEngineContext.audioObjects[i].specification.type != 'outside-reference') {
-            audioEngineContext.audioObjects[i].interfaceDOM.resize(event);
-        }
-    }
-    document.getElementById('slider-holder').style.height = totalHeight + 'px';
-    document.getElementById('slider').style.height = totalHeight + 70 + 'px';
-    drawScale();
 }
 
-function drawScale() {
-    var interfaceObj = testState.currentStateMap.interfaces[0];
-    var scales = testState.currentStateMap.interfaces[0].scales;
-    var ticks = specification.interfaces.options.concat(interfaceObj.options).find(function (a) {
-        return (a.type == "show" && a.name == "ticks");
+function buttonSortFragmentClick() {
+    var sortIndex = interfaceContext.sortFragmentsByScore();
+    var sliderBox = document.getElementById("slider-holder");
+    var nodes = audioEngineContext.audioObjects.filter(function (ao) {
+        return ao.specification.type !== "outside-reference";
     });
-    if (ticks !== undefined) {
-        ticks = true;
-    } else {
-        ticks = false;
+    var i;
+    nodes.forEach(function (ao) {
+        sliderBox.removeChild(ao.interfaceDOM.holder);
+    });
+    for (i = 0; i < nodes.length; i++) {
+        var j = sortIndex[i];
+        sliderBox.appendChild(nodes[j].interfaceDOM.holder);
     }
-    scales = scales.sort(function (a, b) {
-        return a.position - b.position;
-    });
-    var canvas = document.getElementById('scale-canvas');
-    var ctx = canvas.getContext("2d");
-    var height = canvas.height;
-    var width = canvas.width;
-    var textHolder = document.getElementById('scale-text-holder');
-    textHolder.innerHTML = "";
-    ctx.fillStyle = "#000000";
-    ctx.setLineDash([1, 4]);
-    scales.forEach(function (scale) {
-        var posPercent = scale.position / 100.0;
-        var posPix = Math.round(width * posPercent);
-        if (posPix <= 0) {
-            posPix = 1;
-        }
-        if (posPix >= width) {
-            posPix = width - 1;
-        }
-        if (ticks) {
-            ctx.moveTo(posPix, 0);
-            ctx.lineTo(posPix, height);
-            ctx.stroke();
-        }
-
-        var text = document.createElement('div');
-        text.align = "center";
-        var textC = document.createElement('span');
-        textC.textContent = scale.text;
-        text.appendChild(textC);
-        text.className = "scale-text";
-        textHolder.appendChild(text);
-        text.style.width = $(text.children[0]).width() + 'px';
-        text.style.left = (posPix + 150 - ($(text).width() / 2)) + 'px';
-    });
 }
 
 function buttonSubmitClick() // TODO: Only when all songs have been played!
@@ -514,7 +414,7 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
     }
 
     for (var i = 0; i < checks.length; i++) {
-        var checkState;
+        var checkState = true;
         if (checks[i].type == 'check') {
             switch (checks[i].name) {
                 case 'fragmentPlayed':
@@ -537,16 +437,15 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
                 case 'scalerange':
                     // Check the scale has been used effectively
                     checkState = interfaceContext.checkScaleRange(checks[i].errorMessage);
+
                     break;
                 default:
                     console.log("WARNING - Check option " + checks[i].check + " is not supported on this interface");
                     break;
             }
-            if (checkState === false) {
-                canContinue = false;
-            }
         }
-        if (!canContinue) {
+        if (checkState === false) {
+            canContinue = false;
             break;
         }
     }
@@ -563,22 +462,6 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
             }
         }
         testState.advanceState();
-    }
-}
-
-function buttonSortFragmentClick() {
-    var sortIndex = interfaceContext.sortFragmentsByScore();
-    var sliderBox = document.getElementById("slider-holder");
-    var nodes = audioEngineContext.audioObjects.filter(function (ao) {
-        return ao.specification.type !== "outside-reference";
-    });
-    var i;
-    nodes.forEach(function (ao) {
-        sliderBox.removeChild(ao.interfaceDOM.holder);
-    });
-    for (i = 0; i < nodes.length; i++) {
-        var j = sortIndex[i];
-        sliderBox.appendChild(nodes[j].interfaceDOM.holder);
     }
 }
 

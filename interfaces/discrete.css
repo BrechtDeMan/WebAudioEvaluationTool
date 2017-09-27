@@ -20,79 +20,47 @@ button {
     min-width: 20px;
     background-color: #ddd
 }
-div#slider-holder {
-    height: inherit;
-    position: absolute;
-    left: 0px;
-    z-index: 3;
-    margin-top: 25px;
+div#slider-box {
+    width: 75%;
+    height: auto;
+    margin: auto;
+    padding-bottom: 20px;
 }
-div#scale-holder {
-    position: absolute;
-    left: 0px;
-    z-index: 2;
+div#slider-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-row-gap: 10px;
 }
 div#scale-text-holder {
-    position: relative;
-    float: left;
+    display: grid;
+    grid-template-rows: 1fr;
+    min-height: 25px;
+    text-align: center;
+}
+div.discrete-row {
+    display: grid;
+    grid-template-rows: 1fr;
+    padding: 10px;
+    border: 1px solid black;
+    height: 50px;
+    line-height: 50px;
+}
+button.discrete-button {
+    width: 100px;
+}
+div.discrete-label {
+    width: 100px;
+    text-align: center;
 }
 div.scale-text {
-    position: absolute;
-    font-size: 1.2em;
-}
-canvas#scale-canvas {
-    position: relative;
-    float: left;
-}
-div.track-slider {
-    float: left;
-    height: 30px;
-    border: solid;
-    border-width: 1px;
-    border-color: black;
-    padding: 2px;
-    margin-left: 94px;
-    margin-bottom: 30px;
-}
-div.track-slider-range {
-    float: left;
-    height: 100%;
-    margin: 0px 50px;
     position: relative;
 }
-div.track-slider-title {
-    float: left;
-    padding-top: 5px;
-    width: 100px;
-}
-button.track-slider-button {
-    float: left;
-    width: 100px;
-    height: 30px;
-}
-input.track-radio {
+div.scale-text > span {
     position: absolute;
-    margin: 9px 0px;
+    bottom: 0;
+    width: 100%;
+    left: 0;
 }
-div#outside-reference-holder {
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    margin-bottom: 5px;
-}
-button.outside-reference {
-    position: inherit;
-    margin: 0px 5px;
-}
-div.track-slider-playing {
-    background-color: #FFDDDD;
-}
-div#page-count {
-    float: left;
-    margin: 0px 5px;
-}
-div#master-volume-holder {
-    position: absolute;
-    top: 10px;
-    left: 120px;
+div.discrete-row-playing {
+    background-color: rgba(255, 201, 201, 0.5);
 }
