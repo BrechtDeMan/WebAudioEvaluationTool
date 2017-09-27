@@ -75,13 +75,14 @@ function loadInterface() {
     var boxes = document.createElement('div');
     boxes.id = "box-holders";
 
+    var submitHolder = document.createElement("div");
+    submitHolder.id = "submit-holder"
     var submit = document.createElement('button');
     submit.id = "submit";
     submit.onclick = buttonSubmitClick;
     submit.className = "big-button";
-    submit.textContent = "submit";
-    submit.style.position = "relative";
-    submit.style.left = (window.innerWidth - 250) / 2 + 'px';
+    submit.textContent = "Submit";
+    submitHolder.appendChild(submit);
 
     feedbackHolder.appendChild(boxes);
 
@@ -95,7 +96,7 @@ function loadInterface() {
     testContent.appendChild(interfaceButtons);
     testContent.appendChild(outsideRef);
     testContent.appendChild(feedbackHolder);
-    testContent.appendChild(submit);
+    testContent.appendChild(submitHolder);
     testContent.appendChild(comments);
     interfaceContext.insertPoint.appendChild(testContent);
 
