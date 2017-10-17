@@ -58,16 +58,17 @@ for file_name in os.listdir(folder_name):
             
             # Check if page in the store
             if storage.get(page_name) == None:
-                storage[page_name] = {'header':[], 'axis':{"default": {}}} # add to the store
+                storage[page_name] = {'header':[], 'axis':{}} # add to the store
             
             # Get the axis names
             pageConfig = root.find('./waet/page/[@id="'+page_name+'"]')
             for interface in pageConfig.findall('./interface'):    # Get the <interface> noeds
                 interfaceName = interface.get("name"); # Get the axis name
-                if interfaceName == None or interfaceName == "null":
+                if interfaceName == None:
                     interfaceName = "default"   # If name not set, make name 'default'
-                if interfaceName not in storage[page_name]['axis'].keys():
+                if storage[page_name]['axis'].get(interfaceName) == None:
                     storage[page_name]['axis'][interfaceName] = {}  # If not in store for page, add empty dict
+                storage[page_name]['axis'][interfaceName][subject_id] = [] # Add the store for the session
                     
             # header: fragment IDs in 'alphabetical' order
             # go to fragment column, or create new column if it doesn't exist yet
@@ -75,7 +76,7 @@ for file_name in os.listdir(folder_name):
             # get alphabetical array of fragment IDs from this subject's XML
             fragmentnamelist = []    # make empty list
             for audioelement in page.findall("./audioelement"): # iterate over all audioelements
-                if audioelement.get("type") != "outside-reference":
+                if audioelement is not None and audioelement.get('type') != "outside-reference":
                     fragmentnamelist.append(audioelement.get('ref')) # add to list
             
             fragmentnamelist = sorted(fragmentnamelist);    # Sort the list
@@ -87,17 +88,11 @@ for file_name in os.listdir(folder_name):
                     axisName = value.get('interface-name')
                     if axisName == None or axisName == "null":
                         axisName = 'default'
-                    print(storage[page_name]['axis'])
                     axisStore = storage[page_name]['axis'][axisName]
-                    try:
-                        subjectStore = axisStore[subject_id]
-                    except KeyError:
-                        axisStore[subject_id] = []
-                        subjectStore = axisStore[subject_id]
                     if hasattr(value, 'text'):
-                        subjectStore.append(value.text)
+                        axisStore[subject_id].append(value.text)
                     else:
-                        subjectStore.append('')
+                        axisStore[subject_id].append('')
 
 # Now create the individual files
 for page_name in storage:

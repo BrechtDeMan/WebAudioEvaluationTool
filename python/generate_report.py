@@ -152,9 +152,14 @@ for file in files_list: # iterate over all files in files_list
         second = time_node.get("secs")
         date_array.append((int(year),int(month),int(day),\
             int(hour),int(minute),int(second)))
+
+        # prepend zero if needed
+        minute_string = str(minute) if int(minute)>9 else "0"+str(minute)
+        second_string = str(second) if int(second)>9 else "0"+str(second)
         
         # date as section title
-        body = '\n\section{'+day+' '+month_array[int(month)-1]+' '+year+' '+hour+':'+minute+':'+second+'}\n'
+        body = '\n\section{'+day+' '+month_array[int(month)-1]+' '+year+' '+hour+':'+\
+                    minute_string+':'+second_string+'}\n'
 
         # file name
         body += '\t\tFile: '+file[:-4]+'\\\\ \n'
@@ -448,7 +453,7 @@ plt.yticks(yint)
 plt.savefig(folder_name+"subjects_per_page.pdf", bbox_inches='tight')
 plt.close()
 
-# SHOW both figures
+# SHOW these figures
 body += r'''
         \begin{figure}[htbp]
         \begin{center}
@@ -487,14 +492,15 @@ body += r'''\begin{figure}[htbp]
 #TODO layout of figures
 
 # SHOW boxplot per page (in alphabetical order of page name)
+#TODO get scale names (now hardcoded 'preference' automatically)
 body += '\t\t\\clearpage \n\t\\subsection*{Ratings per page}\n'
 for page_name in sorted(page_names): # get each name
     # plot boxplot if exists (not so for the 'alt' names)
-    if os.path.isfile(folder_name+'ratings/'+page_name+'-ratings-box.pdf'):
+    if os.path.isfile(folder_name+'ratings/'+page_name+'-preference-ratings-box.pdf'):
         body += r'''\begin{figure}[H]
         \begin{center}
         \includegraphics[width=.65\textwidth]{'''+\
-         folder_name+"ratings/"+page_name+'-ratings-box.pdf'+\
+         folder_name+"ratings/"+page_name+'-preference-ratings-box.pdf'+\
         r'''}
         \caption{Box plot of ratings for page '''+\
         page_name+' ('+str(subject_count[real_page_names.index(page_name)])+\
