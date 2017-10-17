@@ -32,7 +32,7 @@ As Microsoft Internet Explorer [does not support the Web Audio API](http://caniu
 
 When using the Web Audio Evaluation Tool, please acknowledge the authors and cite 
 
-> Nicholas Jillings, Brecht De Man, David Moffat and Joshua D. Reiss, "[Web Audio Evaluation Tool: A Browser-Based Listening Test Environment](http://www.brechtdeman.com/publications/smc10.pdf)," [12th Sound and Music Computing Conference](http://www.maynoothuniversity.ie/smc15/), July 2015.
+> Nicholas Jillings, Brecht De Man, David Moffat and Joshua D. Reiss, "[Web Audio Evaluation Tool: A Browser-Based Listening Test Environment](http://smcnetwork.org/system/files/SMC2015_submission_88.pdf)," [12th Sound and Music Computing Conference](http://www.maynoothuniversity.ie/smc15/), July 2015.
 
 BibTeX: 
 
