@@ -1083,12 +1083,12 @@ function interfacePopup() {
         this.popupResponse.innerHTML = "";
         this.popupTitle.innerHTML = "";
         var strings = node.specification.statement.split("\n");
-        strings.forEach(function(e,i,a){
+        strings.forEach(function (e, i, a) {
             a[i] = e.trim();
         });
         node.specification.statement = strings.join("\n");
         var statementElements = p.parseFromString(converter.makeHtml(node.specification.statement), "text/html").querySelector("body").children;
-        while(statementElements.length > 0) {
+        while (statementElements.length > 0) {
             this.popupTitle.appendChild(statementElements[0]);
         }
         if (node.specification.type == 'question') {
@@ -1912,6 +1912,7 @@ function audioObject(id) {
     this.url = null; // Hold the URL given for the output back to the results.
     this.metric = new metricTracker(this);
     this.storeDOM = null;
+    this.playing = false;
 
     // Bindings for GUI
     this.interfaceDOM = null;
@@ -1988,21 +1989,23 @@ function audioObject(id) {
     };
 
     this.listenStart = function (setTime) {
-        if (this.outputGain.gain.value !== this.onplayGain) {
+        if (this.playing === false) {
             playCounter++;
             this.outputGain.gain.linearRampToValueAtTime(this.onplayGain, setTime);
             this.metric.startListening(audioEngineContext.timer.getTestTime());
             this.bufferNode.playbackStartTime = audioEngineContext.timer.getTestTime();
             this.interfaceDOM.startPlayback();
+            this.playing = true;
         }
     };
 
     this.listenStop = function (setTime) {
-        if (this.outputGain.gain.value !== 0.0) {
+        if (this.playing === true) {
             this.outputGain.gain.linearRampToValueAtTime(0.0, setTime);
             this.metric.stopListening(audioEngineContext.timer.getTestTime(), this.getCurrentPosition());
         }
         this.interfaceDOM.stopPlayback();
+        this.playing = false;
     };
 
     this.setupPlayback = function () {
