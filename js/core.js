@@ -2024,6 +2024,7 @@ function audioObject(id) {
                 //event.currentTarget.owner.metric.stopListening(audioEngineContext.timer.getTestTime(),event.currentTarget.owner.getCurrentPosition());
                 if (event.currentTarget !== null) {
                     event.currentTarget.owner.bufferStop(audioContext.currentTime + 0.1);
+                    event.currentTarget.owner.listenStop(audioContext.currentTime + 0.1);
                 }
             };
             this.bufferNode.state = 0;
