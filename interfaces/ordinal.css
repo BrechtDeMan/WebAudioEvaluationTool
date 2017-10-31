@@ -34,3 +34,10 @@
 .ordinal-element-label {
     font-size: 2em;
 }
+div#outside-reference-holder {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    margin-bottom: 5px;
+    min-height: 20px;
+}
