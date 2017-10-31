@@ -672,11 +672,11 @@ function ape() {
                     var node = a.addSlider(aoi);
                     node.setLabel(label);
                     aoi.addSlider(node);
-                    audioObject.bindInterface(aoi);
-                    if (commentBoxes) {
-                        interfaceContext.commentBoxes.createCommentBox(audioObject);
-                    }
                 });
+                audioObject.bindInterface(aoi);
+                if (commentBoxes) {
+                    interfaceContext.commentBoxes.createCommentBox(audioObject);
+                }
             }
         });
     }
