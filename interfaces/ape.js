@@ -360,6 +360,8 @@ function ape() {
                     axisInterface.mousedown(this);
                 } else if (e.type == "mouseup") {
                     axisInterface.mouseup(this);
+                    metric.moved(audioEngineContext.timer.getTestTime(), this.value);
+                    console.log("Slider " + label + " on axis " + axisInterface.name + " moved to " + this.value);
                 }
             }
             this.clicked = function (e) {
@@ -574,14 +576,12 @@ function ape() {
                 move = Math.max(50, move);
                 move = Math.min(w, move);
                 UI.selected.value = (move / w);
-                UI.selected.metric.moved(time, UI.selected.value);
             } else if (event.type == "touchmove") {
                 var move = event.originalEvent.targetTouches[0].clientX - 6;
                 var w = $(event.currentTarget).width();
                 move = Math.max(50, move);
                 move = Math.min(w, move);
                 UI.selected.value = (move / w);
-                UI.selected.metric.moved(time, UI.selected.value);
             }
         }
         this.checkAllMoved = function () {

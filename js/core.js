@@ -2220,10 +2220,19 @@ function metricTracker(caller) {
     };
 
     this.moved = function (time, position) {
+        var last;
         if (time > 0) {
             this.wasMoved = true;
         }
-        this.movementTracker[this.movementTracker.length] = [time, position];
+        // Get the last entry
+        if (this.movementTracker.length > 0) {
+            last = this.movementTracker[this.movementTracker.length - 1];
+        } else {
+            last = -1;
+        }
+        if (position != last[1]) {
+            this.movementTracker[this.movementTracker.length] = [time, position];
+        }
     };
 
     this.startListening = function (time) {
