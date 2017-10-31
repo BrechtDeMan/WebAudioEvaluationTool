@@ -349,6 +349,7 @@ function ape() {
                 trackObj.removeEventListener("mousedown");
                 trackObj.removeEventListener("mouseup");
                 trackObj.removeEventListener("touchstart");
+                trackObj.removeEventListener("touchend");
             }
             var timing = undefined;
             this.handleEvent = function (e) {
@@ -358,7 +359,7 @@ function ape() {
                 }
                 if (e.type == "mousedown" || e.type == "touchstart") {
                     axisInterface.mousedown(this);
-                } else if (e.type == "mouseup") {
+                } else if (e.type == "mouseup" || e.type == "touchend") {
                     axisInterface.mouseup(this);
                     metric.moved(audioEngineContext.timer.getTestTime(), this.value);
                     console.log("Slider " + label + " on axis " + axisInterface.name + " moved to " + this.value);
