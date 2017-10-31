@@ -552,10 +552,12 @@ function ape() {
             UI.selected = sliderUI;
             UI.startTime = new Date();
         }
-        this.mouseup = function (sliderUI) {
+        this.mouseup = function (event) {
             var delta = new Date() - UI.startTime;
             if (delta < 200) {
                 UI.selected.clicked();
+            } else {
+                UI.handleEvent(event);
             }
             UI.selected = undefined;
             UI.startTime = undefined;
@@ -604,7 +606,7 @@ function ape() {
                 }
             } else if (event.type == "touchend" || event.type == "touchcancel") {
                 if (UI.selected == getTargetSlider(event.target)) {
-                    this.mouseup(UI.selected);
+                    this.mouseup(event);
                 }
             }
         }
