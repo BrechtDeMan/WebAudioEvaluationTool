@@ -1115,7 +1115,7 @@ function interfacePopup() {
         } else {
             this.buttonProceed.textContent = 'Next';
         }
-        if (this.currentIndex > 0 && this.node.showBackButton)
+        if (this.currentIndex > 0)
             this.buttonPrevious.style.visibility = 'visible';
         else
             this.buttonPrevious.style.visibility = 'hidden';
@@ -2644,12 +2644,6 @@ function Interface(specificationObject) {
             this.textArea.style.width = boxwidth - 6 + "px";
         };
         this.resize();
-        this.check = function () {
-            if (this.specification.mandatory && this.textArea.value.length == 0) {
-                return false;
-            }
-            return true;
-        }
     };
 
     this.radioBox = function (commentQuestion) {
@@ -2725,17 +2719,6 @@ function Interface(specificationObject) {
             this.holder.style.width = boxwidth + "px";
         };
         this.resize();
-        this.check = function () {
-            if (this.specification.mandatory) {
-                var selected = this.options.find(function (o) {
-                    return o.checked;
-                });
-                if (selected === undefined) {
-                    return false;
-                }
-            }
-            return true;
-        };
     };
 
     this.checkboxBox = function (commentQuestion) {
@@ -2802,17 +2785,6 @@ function Interface(specificationObject) {
             this.holder.style.width = boxwidth + "px";
         };
         this.resize();
-        this.check = function () {
-            if (this.specification.mandatory) {
-                var selected = this.options.filter(function (o) {
-                    return o.checked;
-                });
-                if (selected.length === 0) {
-                    return false;
-                }
-            }
-            return true;
-        };
     };
 
     this.sliderBox = function (commentQuestion) {
@@ -2870,9 +2842,6 @@ function Interface(specificationObject) {
             this.slider.style.width = boxwidth - 24 + "px";
         };
         this.resize();
-        this.check = function () {
-            return true;
-        };
     };
 
     this.createCommentQuestion = function (element) {
@@ -2893,17 +2862,6 @@ function Interface(specificationObject) {
     this.deleteCommentQuestions = function () {
         this.commentQuestions = [];
     };
-
-    this.checkCommentQuestions = function () {
-        var failed = this.commentQuestions.filter(function (a) {
-            return a.check() === false;
-        });
-        if (failed.length === 0) {
-            return true;
-        }
-        this.lightbox.post("Error", "Please answer the questions on the page.");
-        return false;
-    }
 
     this.outsideReferenceDOM = function (audioObject, index, inject) {
         this.parent = audioObject;
@@ -3066,21 +3024,17 @@ function Interface(specificationObject) {
         volume.slider.max = 12;
         volume.slider.value = 0;
         volume.slider.step = 1;
-        volume.captured = false;
         volume.handleEvent = function (event) {
-            if (event.type == "mousedown") {
-                volume.captured = true;
-            } else if (event.type == "mousemove" && volume.captured) {
+            if (event.type == "mousemove" || event.type == "mouseup") {
                 this.valueDB = Number(this.slider.value);
                 this.valueLin = decibelToLinear(this.valueDB);
                 this.valueText.textContent = this.valueDB + 'dB';
                 audioEngineContext.outputGain.gain.value = this.valueLin;
-                console.log(this.valueDB);
-            } else if (event.type == "mouseup") {
-                volume.captured = false;
+            }
+            if (event.type == "mouseup") {
                 this.onmouseup();
             }
-            //this.slider.value = this.valueDB;
+            this.slider.value = this.valueDB;
 
             if (event.stopPropagation) {
                 event.stopPropagation();
@@ -3103,7 +3057,6 @@ function Interface(specificationObject) {
         };
         volume.slider.addEventListener("mousemove", volume);
         volume.root.addEventListener("mouseup", volume);
-        volume.root.addEventListener("mousedown", volume);
 
         var title = document.createElement('div');
         title.innerHTML = '<span>Master Volume Control</span>';
@@ -3675,7 +3628,7 @@ function Storage() {
                     returnURL = specification.projectReturn;
                 }
             }
-            xmlhttp.open("POST", returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=" + this.parent.filenamePrefix + "&state=update");
+            xmlhttp.open("POST", returnURL + "php/save.php?key=" + this.key + "&saveFilenamePrefix=" + this.parent.filenamePrefix);
             xmlhttp.setRequestHeader('Content-Type', 'text/xml');
             xmlhttp.onerror = function () {
                 console.log('Error updating file to server!');
@@ -3713,7 +3666,6 @@ function Storage() {
             } else {
                 saveURL += this.parent.filenamePrefix;
             }
-            saveURL += "&state=finish";
             return new Promise(function (resolve, reject) {
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.open("POST", saveURL);
