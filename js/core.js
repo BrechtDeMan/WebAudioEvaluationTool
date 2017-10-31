@@ -3025,12 +3025,13 @@ function Interface(specificationObject) {
         volume.slider.value = 0;
         volume.slider.step = 1;
         volume.handleEvent = function (event) {
-            if (event.type == "mousemove") {
+            if (event.type == "mousemove" || event.type == "mouseup") {
                 this.valueDB = Number(this.slider.value);
                 this.valueLin = decibelToLinear(this.valueDB);
                 this.valueText.textContent = this.valueDB + 'dB';
                 audioEngineContext.outputGain.gain.value = this.valueLin;
-            } else if (event.type == "mouseup") {
+            }
+            if (event.type == "mouseup") {
                 this.onmouseup();
             }
             this.slider.value = this.valueDB;
