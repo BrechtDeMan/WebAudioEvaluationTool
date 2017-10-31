@@ -2711,6 +2711,12 @@ function Interface(specificationObject) {
             this.textArea.style.width = boxwidth - 6 + "px";
         };
         this.resize();
+        this.check = function () {
+            if (this.specification.mandatory && this.textArea.value.length == 0) {
+                return false;
+            }
+            return true;
+        }
     };
 
     this.radioBox = function (commentQuestion) {
@@ -2785,6 +2791,15 @@ function Interface(specificationObject) {
             }
             this.holder.style.width = boxwidth + "px";
         };
+        this.check = function () {
+            var anyChecked = this.options.some(function (a) {
+                return a.checked;
+            });
+            if (this.specification.mandatory && anyChecked == false) {
+                return false;
+            }
+            return true;
+        }
         this.resize();
     };
 
@@ -2851,6 +2866,15 @@ function Interface(specificationObject) {
             }
             this.holder.style.width = boxwidth + "px";
         };
+        this.check = function () {
+            var anyChecked = this.options.some(function (a) {
+                return a.checked;
+            });
+            if (this.specification.mandatory && anyChecked == false) {
+                return false;
+            }
+            return true;
+        };
         this.resize();
     };
 
@@ -2908,6 +2932,9 @@ function Interface(specificationObject) {
             this.holder.style.width = boxwidth + "px";
             this.slider.style.width = boxwidth - 24 + "px";
         };
+        this.check = function () {
+            return true;
+        }
         this.resize();
     };
 
@@ -2929,6 +2956,19 @@ function Interface(specificationObject) {
     this.deleteCommentQuestions = function () {
         this.commentQuestions = [];
     };
+
+    this.checkCommentQuestions = function () {
+        var errored = this.commentQuestions.reduce(function (a, cq) {
+            if (cq.check() == false) {
+                a.push(cq);
+            }
+            return a;
+        }, []);
+        if (errored.length == 0) {
+            return true;
+        }
+        interfaceContext.lightbox.post("Message", "Not all the mandatory comment boxes below have been filled.");
+    }
 
     this.outsideReferenceDOM = function (audioObject, index, inject) {
         this.parent = audioObject;

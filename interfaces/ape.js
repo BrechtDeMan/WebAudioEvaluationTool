@@ -341,7 +341,7 @@ function ape() {
             this.exportXMLDOM = function () {
                 var node = storage.document.createElement('value');
                 node.setAttribute("interface-name", axisInterface.name)
-                node.textContent = this.value();
+                node.textContent = this.value;
                 return node;
             }
             this.error = function () {
@@ -400,6 +400,9 @@ function ape() {
                         return label;
                     },
                     "set": function () {}
+                },
+                "metric": {
+                    "value": metric
                 }
             });
         }
@@ -558,6 +561,7 @@ function ape() {
             UI.startTime = undefined;
         }
         this.handleEvent = function (event) {
+            var time = audioEngineContext.timer.getTestTime();
             if (event.preventDefault) {
                 event.preventDefault();
             }
@@ -570,12 +574,14 @@ function ape() {
                 move = Math.max(50, move);
                 move = Math.min(w, move);
                 UI.selected.value = (move / w);
+                UI.selected.metric.moved(time, UI.selected.value);
             } else if (event.type == "touchmove") {
                 var move = event.originalEvent.targetTouches[0].clientX - 6;
                 var w = $(event.currentTarget).width();
                 move = Math.max(50, move);
                 move = Math.min(w, move);
                 UI.selected.value = (move / w);
+                UI.selected.metric.moved(time, UI.selected.value);
             }
         }
         this.checkAllMoved = function () {
