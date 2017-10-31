@@ -603,7 +603,7 @@ function ape() {
                 }
             } else if (event.type == "touchend" || event.type == "touchcancel") {
                 if (UI.selected == getTargetSlider(event.target)) {
-                    UI.selected.handleEvent(event);
+                    this.mouseup(UI.selected);
                 }
             }
         }
