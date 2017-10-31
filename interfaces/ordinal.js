@@ -222,7 +222,6 @@ function interfaceObject(audioObject, label) {
     root.addEventListener('dragleave', this, true);
     root.addEventListener('drop', this, true);
     root.addEventListener('dragend', this, true);
-    this.dragging = false;
     this.handleEvent = function (event) {
         if (event.type == "click") {
             if (playing === false) {
@@ -252,8 +251,8 @@ function interfaceObject(audioObject, label) {
         e.currentTarget.classList.add("dragging");
 
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', audioObject.id);
-        this.dragging = "true";
+        e.dataTransfer.setData('text/plain', String(audioObject.id));
+        sessionStorage.setItem("drag-object", String(audioObject.id));
     }
 
     function dragEnter(e) {
@@ -269,10 +268,17 @@ function interfaceObject(audioObject, label) {
         if (e.preventDefault) {
             e.preventDefault(); // Necessary. Allows us to drop.
         }
+
         e.dataTransfer.dropEffect = 'move'; // See the section on the DataTransfer object.
+        var srcid = e.dataTransfer.getData('text/plain');
+        if (srcid == "") {
+            srcid = sessionStorage.getItem("drag-object");
+        }
+        console.log(srcid);
+        var srcid = Number(srcid);
         var elements = container.childNodes;
         var srcObject = audioEngineContext.audioObjects.find(function (ao) {
-            return ao.interfaceDOM.dragging;
+            return ao.id === srcid;
         });
         var src = srcObject.interfaceDOM.root;
         if (src !== root) {
@@ -292,6 +298,8 @@ function interfaceObject(audioObject, label) {
             }
 
         }
+
+        return false;
     }
 
     function drop(e) {
@@ -308,6 +316,8 @@ function interfaceObject(audioObject, label) {
             ao.interfaceDOM.processMovement();
         });
 
+        sessionStorage.removeItem("drag-object");
+
         return false;
     }
 
@@ -315,7 +325,6 @@ function interfaceObject(audioObject, label) {
         // this/e.target is the source node.
         $(".ordinal-element").removeClass("dragging");
         $(".ordinal-element").removeClass("over");
-        this.dragging = false;
     }
 
     this.getElementPosition = function () {
@@ -420,9 +429,6 @@ function buttonSubmitClick() // TODO: Only when all songs have been played!
         return;
     }
     if (interfaceContext.checkHiddenReference() === false) {
-        return;
-    }
-    if (interfaceContext.checkCommentQuestions() === false) {
         return;
     }
 
