@@ -556,8 +556,8 @@ function ape() {
             var delta = new Date() - UI.startTime;
             if (delta < 200) {
                 UI.selected.clicked();
-            } else {
-                UI.handleEvent(event);
+            } else if (event.type == "touchend" || event.type == "touchcancel") {
+                UI.selected.handleEvent(event);
             }
             UI.selected = undefined;
             UI.startTime = undefined;
