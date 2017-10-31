@@ -570,15 +570,15 @@ function ape() {
             if (event.preventDefault) {
                 event.preventDefault();
             }
-            if (UI.selected === undefined) {
-                return;
-            }
             if (event.type == "touchstart") {
                 var selected = getTargetSlider(event.target);
                 if (typeof selected != "object") {
                     return;
                 }
                 UI.selected = selected;
+            }
+            if (UI.selected === undefined) {
+                return;
             }
             if (event.type == "mousemove") {
                 var move = event.clientX - 6;
