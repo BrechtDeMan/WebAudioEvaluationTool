@@ -19,6 +19,7 @@ function Specification() {
     this.playOne = undefined;
     this.minNumberPlays = undefined;
     this.maxNumberPlays = undefined;
+    this.randomiseAxisOrder = undefined;
 
     // nodes
     this.metrics = new metricNode();
@@ -580,6 +581,7 @@ function Specification() {
         this.commentBoxPrefix = "Comment on track";
         this.minNumberPlays = undefined;
         this.maxNumberPlays = undefined;
+        this.randomiseAxisOrder = undefined;
         this.audioElements = [];
         this.commentQuestions = [];
         this.schema = schemaRoot.querySelector("[name=page]");

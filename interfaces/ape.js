@@ -644,9 +644,18 @@ function ape() {
     this.initialisePage = function (page_init) {
         this.clear();
         page = page_init;
-        var interfaceObj = interfaceContext.getCombinedInterfaces(page);
+        var randomiseAxisOrder;
+        if (page.randomiseAxisOrder !== undefined) {
+            randomiseAxisOrder = page.randomiseAxisOrder;
+        } else {
+            randomiseAxisOrder = page.parent.randomiseAxisOrder;
+        }
         var commentBoxes = false;
         // Create each of the interface axis
+        if (randomiseAxisOrder) {
+            page.interfaces = randomiseOrder(page.interfaces);
+        }
+        var interfaceObj = interfaceContext.getCombinedInterfaces(page);
         interfaceObj.forEach(function (i) {
             var node = new axisObject(i, this);
             axis.push(node);
