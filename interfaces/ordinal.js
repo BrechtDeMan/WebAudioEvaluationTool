@@ -251,7 +251,8 @@ function interfaceObject(audioObject, label) {
         e.currentTarget.classList.add("dragging");
 
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', audioObject.id);
+        //e.dataTransfer.setData('text/plain', audioObject.id);
+        sessionStorage.setItem("drag-object", audioObject.id);
     }
 
     function dragEnter(e) {
@@ -270,7 +271,7 @@ function interfaceObject(audioObject, label) {
 
         e.dataTransfer.dropEffect = 'move'; // See the section on the DataTransfer object.
 
-        var srcid = Number(e.dataTransfer.getData("text/plain"));
+        var srcid = Number(sessionStorage.getItem("drag-object"));
         var elements = container.childNodes;
         var srcObject = audioEngineContext.audioObjects.find(function (ao) {
             return ao.id === srcid;
@@ -310,6 +311,8 @@ function interfaceObject(audioObject, label) {
         audioEngineContext.audioObjects.forEach(function (ao) {
             ao.interfaceDOM.processMovement();
         });
+
+        sessionStorage.removeItem("drag-object");
 
         return false;
     }
