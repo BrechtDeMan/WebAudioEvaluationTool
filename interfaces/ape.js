@@ -575,6 +575,7 @@ function ape() {
                 if (typeof selected != "object") {
                     return;
                 }
+                UI.startTime = new Date();
                 UI.selected = selected;
             }
             if (UI.selected === undefined) {
