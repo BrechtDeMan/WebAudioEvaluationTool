@@ -577,7 +577,14 @@ function ape() {
                 move = Math.min(w, move);
                 UI.selected.value = (move / w);
             } else if (event.type == "touchmove") {
-                var move = event.originalEvent.targetTouches[0].clientX - 6;
+                var move;
+                if (event.targetTouches) {
+                    move = event.targetTouches[0].clientX - 6;
+                } else if (event.originalEvent.targetTouches) {
+                    move = event.originalEvent.targetTouches[0].clientX - 6;
+                } else {
+                    return;
+                }
                 var w = $(event.currentTarget).width();
                 move = Math.max(50, move);
                 move = Math.min(w, move);
