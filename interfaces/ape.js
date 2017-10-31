@@ -332,6 +332,8 @@ function ape() {
                 trackObj.addEventListener("mousedown", this);
                 trackObj.addEventListener("mouseup", this);
                 trackObj.addEventListener("touchstart", this);
+                trackObj.addEventListener("touchend", this);
+                trackObj.addEventListener("touchcancel", this);
                 trackObj.classList.remove("track-slider-disabled");
                 labelHolder.textContent = label;
             }
@@ -366,7 +368,7 @@ function ape() {
                     metric.moved(audioEngineContext.timer.getTestTime(), this.value);
                     console.log("Slider " + label + " on axis " + axisInterface.name + " moved to " + this.value);
                 } else if (e.type == "touchmove") {
-                    axisInterface.handleEvent(e);
+                    //axisInterface.handleEvent(e);
                 }
             }
             this.clicked = function (e) {
@@ -640,6 +642,7 @@ function ape() {
             return "";
         }
         sliderRail.addEventListener("mousemove", this);
+        sliderRail.addEventListener("touchmove", this);
         Object.defineProperties(this, {
             "sliderRail": {
                 "value": sliderRail
