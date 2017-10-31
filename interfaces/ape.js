@@ -331,9 +331,6 @@ function ape() {
             this.enable = function () {
                 trackObj.addEventListener("mousedown", this);
                 trackObj.addEventListener("mouseup", this);
-                trackObj.addEventListener("touchstart", this);
-                trackObj.addEventListener("touchend", this);
-                trackObj.addEventListener("touchcancel", this);
                 trackObj.classList.remove("track-slider-disabled");
                 labelHolder.textContent = label;
             }
@@ -350,10 +347,6 @@ function ape() {
                 trackObj.classList.add("error-colour");
                 trackObj.removeEventListener("mousedown");
                 trackObj.removeEventListener("mouseup");
-                trackObj.removeEventListener("touchstart");
-                trackObj.removeEventListener("touchmove");
-                trackObj.removeEventListener("touchend");
-                trackObj.removeEventListener("touchcancel");
             }
             var timing = undefined;
             this.handleEvent = function (e) {
@@ -361,14 +354,12 @@ function ape() {
                 if (e.preventDefault) {
                     e.preventDefault();
                 }
-                if (e.type == "mousedown" || e.type == "touchstart") {
+                if (e.type == "mousedown") {
                     axisInterface.mousedown(this);
                 } else if (e.type == "mouseup" || e.type == "touchend" || e.type == "touchcancel") {
                     axisInterface.mouseup(this);
                     metric.moved(audioEngineContext.timer.getTestTime(), this.value);
                     console.log("Slider " + label + " on axis " + axisInterface.name + " moved to " + this.value);
-                } else if (e.type == "touchmove") {
-                    //axisInterface.handleEvent(e);
                 }
             }
             this.clicked = function (e) {
@@ -570,12 +561,24 @@ function ape() {
             UI.startTime = undefined;
         }
         this.handleEvent = function (event) {
+            function getTargetSlider(target) {
+                return sliders.find(function (a) {
+                    return a.DOM == target;
+                });
+            }
             var time = audioEngineContext.timer.getTestTime();
             if (event.preventDefault) {
                 event.preventDefault();
             }
             if (UI.selected === undefined) {
                 return;
+            }
+            if (event.type == "touchstart") {
+                var selected = getTargetSlider(event.target);
+                if (typeof selected != "object") {
+                    return;
+                }
+                UI.selected = selected;
             }
             if (event.type == "mousemove") {
                 var move = event.clientX - 6;
@@ -584,18 +587,24 @@ function ape() {
                 move = Math.min(w, move);
                 UI.selected.value = (move / w);
             } else if (event.type == "touchmove") {
-                var move;
-                if (event.targetTouches) {
-                    move = event.targetTouches[0].clientX - 6;
-                } else if (event.originalEvent.targetTouches) {
-                    move = event.originalEvent.targetTouches[0].clientX - 6;
-                } else {
-                    return;
+                if (UI.selected == getTargetSlider(event.target)) {
+                    var move;
+                    if (event.targetTouches) {
+                        move = event.targetTouches[0].clientX - 6;
+                    } else if (event.originalEvent.targetTouches) {
+                        move = event.originalEvent.targetTouches[0].clientX - 6;
+                    } else {
+                        return;
+                    }
+                    var w = $(event.currentTarget).width();
+                    move = Math.max(50, move);
+                    move = Math.min(w, move);
+                    UI.selected.value = (move / w);
                 }
-                var w = $(event.currentTarget).width();
-                move = Math.max(50, move);
-                move = Math.min(w, move);
-                UI.selected.value = (move / w);
+            } else if (event.type == "touchend" || event.type == "touchcancel") {
+                if (UI.selected == getTargetSlider(event.target)) {
+                    UI.selected.handleEvent(event);
+                }
             }
         }
         this.checkAllMoved = function () {
@@ -642,7 +651,10 @@ function ape() {
             return "";
         }
         sliderRail.addEventListener("mousemove", this);
+        sliderRail.addEventListener("touchstart", this);
         sliderRail.addEventListener("touchmove", this);
+        sliderRail.addEventListener("touchend", this);
+        sliderRail.addEventListener("touchcancel", this);
         Object.defineProperties(this, {
             "sliderRail": {
                 "value": sliderRail
