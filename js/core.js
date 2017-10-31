@@ -1845,6 +1845,7 @@ function AudioEngine(specification) {
         this.timer = new timer();
         this.loopPlayback = audioHolderObject.loop;
         this.synchPlayback = audioHolderObject.synchronous;
+        interfaceContext.keyboardInterface.resetKeyBindings();
     };
 
     this.checkAllPlayed = function () {
@@ -1985,7 +1986,13 @@ function audioObject(id) {
             this.interfaceDOM.error();
             return;
         }
-        this.storeDOM.setAttribute('presentedId', interfaceObject.getPresentedId());
+        var presentedId = interfaceObject.getPresentedId();
+        this.storeDOM.setAttribute('presentedId', presentedId);
+
+        // Key-bindings
+        if (presentedId.length == 1) {
+            interfaceContext.keyboardInterface.registerKeyBinding(presentedId, this);
+        }
     };
 
     this.listenStart = function (setTime) {
@@ -2365,6 +2372,66 @@ function Interface(specificationObject) {
         interfaceContext.deleteCommentQuestions();
         loadTest(audioHolderObject, store);
     };
+
+    this.keyboardInterface = (function () {
+        var keyboardInterfaceController = {
+            keys: [],
+            registerKeyBinding: function (key, audioObject) {
+                if (typeof key != "string" || key.length != 1) {
+                    throw ("Key must be a singular character");
+                }
+                var included = this.keys.findIndex(function (k) {
+                    return k.key == key
+                }) >= 0;
+                if (included) {
+                    throw ("Key " + key + " already bounded!");
+                }
+                this.keys.push({
+                    key: key,
+                    audioObject: audioObject
+                });
+                return true;
+            },
+            deregisterKeyBinding: function (key) {
+                var index = this.keys.findIndex(function (k) {
+                    return k.key == key;
+                });
+                if (index == -1) {
+                    throw ("Key " + key + " not bounded!");
+                }
+                this.keys.splice(index, 1);
+                return true;
+            },
+            resetKeyBindings: function () {
+                this.keys = [];
+            },
+            handleEvent: function (e) {
+                function isPlaying() {
+                    return audioEngineContext.audioObjects.some(function (a) {
+                        return a.playing;
+                    });
+                }
+
+                function keypress(key) {
+                    var index = this.keys.findIndex(function (k) {
+                        return k.key == key
+                    });
+                    if (index >= 0) {
+                        audioEngineContext.play(this.keys[index].audioObject.id);
+                    }
+                }
+                if (e.key === " ") {
+                    if (isPlaying()) {
+                        audioEngineContext.stop();
+                    }
+                } else {
+                    keypress.call(this, e.key);
+                }
+            }
+        };
+        document.addEventListener("keydown", keyboardInterfaceController, false);
+        return keyboardInterfaceController;
+    })();
 
     // Bounded by interface!!
     // Interface object MUST have an exportXMLDOM method which returns the various DOM levels
