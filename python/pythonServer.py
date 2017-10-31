@@ -70,8 +70,6 @@ def processFile(s):
         lenSt = len(st)
         fmt = st[lenSt-1].rsplit('.')
         fmt = fmt[len(fmt)-1]
-        print(st)
-        print(fmt)
         fpath = "../"+urllib2.unquote(s.path)
         size = os.path.getsize(fpath)
         fileDump = open(fpath, mode='rb')
@@ -197,7 +195,8 @@ def saveFile(self):
     curSaveIndex += 1
     curFileName = 'test-'+str(curSaveIndex)+'.xml'
     if update == False:
-        os.remove("../saves/update-"+filename)
+        if(os.path.isfile("../saves/update-"+filename)):
+            os.remove("../saves/update-"+filename)
     
 def testSave(self):
     self.send_response(200)
