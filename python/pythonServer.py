@@ -69,16 +69,19 @@ def processFile(s):
         st = s.path.rsplit(',')
         lenSt = len(st)
         fmt = st[lenSt-1].rsplit('.')
+        fmt = fmt[len(fmt)-1]
+        print(st)
+        print(fmt)
         fpath = "../"+urllib2.unquote(s.path)
         size = os.path.getsize(fpath)
-        fileDump = open(fpath)
+        fileDump = open(fpath, mode='rb')
         s.send_response(200)
 
-        if (fmt[1] == 'html'):
+        if (fmt == 'html'):
             s.send_header("Content-type", 'text/html')
-        elif (fmt[1] == 'css'):
+        elif (fmt == 'css'):
             s.send_header("Content-type", 'text/css')
-        elif (fmt[1] == 'js'):
+        elif (fmt == 'js'):
             s.send_header("Content-type", 'application/javascript')
         else:
             s.send_header("Content-type", 'application/octet-stream')
