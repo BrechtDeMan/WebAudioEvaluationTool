@@ -67,6 +67,7 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
+                <xs:attribute name="randomiseAxisOrder" type="xs:boolean" default="false" />
                 <xs:attribute ref="preSilence" />
                 <xs:attribute ref="postSilence" />
                 <xs:attribute ref="playOne" />
@@ -105,6 +106,7 @@
                     </xs:simpleType>
                 </xs:attribute>
                 <xs:attribute name="labelStart" type="xs:string" use="optional" default="" />
+                <xs:attribute name="randomiseAxisOrder" type="xs:boolean" use="optional" />
                 <xs:attribute ref="poolSize" />
                 <xs:attribute ref="alwaysInclude" />
                 <xs:attribute name="position" use="optional" type="xs:nonNegativeInteger" />
