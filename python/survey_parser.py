@@ -140,7 +140,7 @@ for file_name in os.listdir(folder_name):
                 if len(post_survey) is not 0:
                     if "post" not in page_store.keys():
                         page_store["post"] = {}
-                page_store["post"] = decodeSurveyTree(subject_id, post_survey, page_store["post"])
+                    page_store["post"] = decodeSurveyTree(subject_id, post_survey, page_store["post"])
 
 #Storage now holds entire survey structure
 # Time to start exporting to files
