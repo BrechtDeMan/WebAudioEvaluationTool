@@ -393,7 +393,7 @@ function comparator(page) {
     if (typeof element.name == "string") {
         element.name += "-X";
     }
-    page.audioElements.push(element);
+
     // Create the save place-holder for the 'X' element
     var root = testState.currentStore.XMLDOM;
     var aeNode = storage.document.createElement('audioelement');
@@ -410,7 +410,6 @@ function comparator(page) {
     var label;
     var audioObject = audioEngineContext.newTrack(element);
     node = buildElement.call(this, 3, audioObject);
-    audioObject.bindInterface(node);
     this.X = node;
     this.boxHolders.appendChild(node.box);
 }

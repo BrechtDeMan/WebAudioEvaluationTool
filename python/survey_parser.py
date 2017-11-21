@@ -36,7 +36,7 @@ elif not os.access(os.path.dirname(folder_name), os.W_OK):
 storage = {"globals":{}, "pages": {}}
 
 def decodeSurveyTree(session_id, surveyroot, store):
-    # Get all the childs
+    # Get all the children
     for survey_entry in list(surveyroot):
         survey_id = survey_entry.get("ref")
         if survey_id not in store.keys():
@@ -142,7 +142,7 @@ for file_name in os.listdir(folder_name):
                         page_store["post"] = {}
                     page_store["post"] = decodeSurveyTree(subject_id, post_survey, page_store["post"])
 
-#Storage now holds entire survey structure
+# Storage now holds entire survey structure
 # Time to start exporting to files
 
 # Store globals
@@ -153,6 +153,7 @@ for position in storage["globals"].keys():
             filewriter = csv.writer(f, delimiter=",")
             filewriter.writerow(storage["globals"][position][ref]["header"])
             for row in storage["globals"][position][ref]["responses"]:
+                row = [element.encode("utf-8") for element in row]
                 filewriter.writerow(row)
 for page_name in storage["pages"].keys():
     for position in storage["pages"][page_name].keys():
@@ -163,9 +164,10 @@ for page_name in storage["pages"].keys():
                 filewriter = csv.writer(f, delimiter=",")
                 filewriter.writerow(storage["pages"][page_name][position][ref]["header"])
                 for row in storage["pages"][page_name][position][ref]["responses"]:
+                    row = [element.encode("utf-8") for element in row]
                     filewriter.writerow(row)
 
-#Time to plot
+# Time to plot
 
 def plotDurationHistogram(store, plot_id, saveloc):
     x = []
