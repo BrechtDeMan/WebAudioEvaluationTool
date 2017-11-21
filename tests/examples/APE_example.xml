@@ -57,7 +57,7 @@
                 <interfaceoption type="show" name="comments" />
             </interface>
         </setup>
-        <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
+        <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' synchronous="true" loudness="-12">
             <commentboxprefix>Comment on fragment</commentboxprefix>
             <interface name="preference">
                 <title>Preference</title>
@@ -93,7 +93,7 @@
                 </surveyentry>
             </survey>
         </page>
-        <page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='false' label="letter">
+        <page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='false' synchronous="true" label="letter">
             <commentboxprefix>Comment on fragment</commentboxprefix>
             <interface name="preference">
                 <title>Example Test Question</title>
