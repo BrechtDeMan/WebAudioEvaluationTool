@@ -85,7 +85,7 @@ for file in os.listdir(folder_name):
                            valuestr = ''
 
                         # anonymous comments:
-                        #writer.writerow([commentstr])  # .encode("utf-8")
+                        # writer.writerow([commentstr.encode("utf-8")])
                         # comments with (file) name:
                         writer.writerow([file[:-4]] + [valuestr] + [commentstr.encode("utf-8")]) 
 
