@@ -1,84 +1,84 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-    <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-        <setup interface="timeline" projectReturn="save.php">
-            <metric>
-                <metricenable>testTimer</metricenable>
-                <metricenable>elementTimer</metricenable>
-                <metricenable>elementInitialPosition</metricenable>
-                <metricenable>elementTracker</metricenable>
-                <metricenable>elementFlagListenedTo</metricenable>
-                <metricenable>elementFlagMoved</metricenable>
-                <metricenable>elementListenTracker</metricenable>
-            </metric>
-            <interface>
-                <interfaceoption type="check" name="fragmentPlayed" />
-                <interfaceoption type="check" name="scalerange" min="25" max="75" />
-                <interfaceoption type="show" name="volume" />
-                <interfaceoption type="show" name='playhead' />
-                <interfaceoption type="show" name="page-count" />
-                <interfaceoption type="show" name="comments" />
-            </interface>
-        </setup>
-        <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' loudness="-23">
-            <title>My Test</title>
-            <interface>
-                <scales>
-                    <scalelabel position="0">(1) Very Annoying</scalelabel>
-                    <scalelabel position="25">(2) Annoying</scalelabel>
-                    <scalelabel position="50">(3) Slightly Annoying</scalelabel>
-                    <scalelabel position="75">(4) Audible but not Annoying</scalelabel>
-                    <scalelabel position="100">(5) Inaudible</scalelabel>
-                </scales>
-            </interface>
-            <audioelement url="0.wav" id="track-1" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
-            <audioelement url="1.wav" id="track-2" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
-            <commentquestions>
-                <commentradio id="preference">
-                    <statement>Please enter your overall preference</statement>
-                    <option name="worst">Very Bad</option>
-                    <option name="bad"></option>
-                    <option name="OK">OK</option>
-                    <option name="Good"></option>
-                    <option name="Great">Great</option>
-                </commentradio>
-                <commentcheckbox id="character">
-                    <statement>Please describe the overall character</statement>
-                    <option name="funky">Funky</option>
-                    <option name="mellow">Mellow</option>
-                    <option name="laidback">Laid back</option>
-                    <option name="heavy">Heavy</option>
-                </commentcheckbox>
-            </commentquestions>
-        </page>
-        <page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' loudness="-23">
-            <title>My Test</title>
-            <interface>
-                <scales>
-                    <scalelabel position="0">(1) Very Annoying</scalelabel>
-                    <scalelabel position="25">(2) Annoying</scalelabel>
-                    <scalelabel position="50">(3) Slightly Annoying</scalelabel>
-                    <scalelabel position="75">(4) Audible but not Annoying</scalelabel>
-                    <scalelabel position="100">(5) Inaudible</scalelabel>
-                </scales>
-            </interface>
-            <audioelement url="0.wav" id="track-3" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
-            <audioelement url="1.wav" id="track-4" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
-            <commentquestions>
-                <commentradio id="preference1">
-                    <statement>Please enter your overall preference</statement>
-                    <option name="worst">Very Bad</option>
-                    <option name="bad"></option>
-                    <option name="OK">OK</option>
-                    <option name="Good"></option>
-                    <option name="Great">Great</option>
-                </commentradio>
-                <commentcheckbox id="character1">
-                    <statement>Please describe the overall character</statement>
-                    <option name="funky">Funky</option>
-                    <option name="mellow">Mellow</option>
-                    <option name="laidback">Laid back</option>
-                    <option name="heavy">Heavy</option>
-                </commentcheckbox>
-            </commentquestions>
-        </page>
-    </waet>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+    <setup interface="timeline" projectReturn="save.php">
+        <metric>
+            <metricenable>testTimer</metricenable>
+            <metricenable>elementTimer</metricenable>
+            <metricenable>elementInitialPosition</metricenable>
+            <metricenable>elementTracker</metricenable>
+            <metricenable>elementFlagListenedTo</metricenable>
+            <metricenable>elementFlagMoved</metricenable>
+            <metricenable>elementListenTracker</metricenable>
+        </metric>
+        <interface>
+            <interfaceoption type="check" name="fragmentPlayed" />
+            <interfaceoption type="check" name="scalerange" min="25" max="75" />
+            <interfaceoption type="show" name="volume" />
+            <interfaceoption type="show" name='playhead' />
+            <interfaceoption type="show" name="page-count" />
+            <interfaceoption type="show" name="comments" />
+        </interface>
+    </setup>
+    <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' loudness="-23">
+        <title>My Test</title>
+        <interface>
+            <scales>
+                <scalelabel position="0">(1) Very Annoying</scalelabel>
+                <scalelabel position="25">(2) Annoying</scalelabel>
+                <scalelabel position="50">(3) Slightly Annoying</scalelabel>
+                <scalelabel position="75">(4) Audible but not Annoying</scalelabel>
+                <scalelabel position="100">(5) Inaudible</scalelabel>
+            </scales>
+        </interface>
+        <audioelement url="0.wav" id="track-1" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+        <audioelement url="1.wav" id="track-2" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+        <commentquestions>
+            <commentradio id="preference">
+                <statement>Please enter your overall preference</statement>
+                <option name="worst">Very Bad</option>
+                <option name="bad"></option>
+                <option name="OK">OK</option>
+                <option name="Good"></option>
+                <option name="Great">Great</option>
+            </commentradio>
+            <commentcheckbox id="character">
+                <statement>Please describe the overall character</statement>
+                <option name="funky">Funky</option>
+                <option name="mellow">Mellow</option>
+                <option name="laidback">Laid back</option>
+                <option name="heavy">Heavy</option>
+            </commentcheckbox>
+        </commentquestions>
+    </page>
+    <page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' loudness="-23">
+        <title>My Test</title>
+        <interface>
+            <scales>
+                <scalelabel position="0">(1) Very Annoying</scalelabel>
+                <scalelabel position="25">(2) Annoying</scalelabel>
+                <scalelabel position="50">(3) Slightly Annoying</scalelabel>
+                <scalelabel position="75">(4) Audible but not Annoying</scalelabel>
+                <scalelabel position="100">(5) Inaudible</scalelabel>
+            </scales>
+        </interface>
+        <audioelement url="0.wav" id="track-3" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+        <audioelement url="1.wav" id="track-4" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+        <commentquestions>
+            <commentradio id="preference1">
+                <statement>Please enter your overall preference</statement>
+                <option name="worst">Very Bad</option>
+                <option name="bad"></option>
+                <option name="OK">OK</option>
+                <option name="Good"></option>
+                <option name="Great">Great</option>
+            </commentradio>
+            <commentcheckbox id="character1">
+                <statement>Please describe the overall character</statement>
+                <option name="funky">Funky</option>
+                <option name="mellow">Mellow</option>
+                <option name="laidback">Laid back</option>
+                <option name="heavy">Heavy</option>
+            </commentcheckbox>
+        </commentquestions>
+    </page>
+</waet>

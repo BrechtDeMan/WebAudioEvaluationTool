@@ -114,7 +114,7 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
 
     $s.exportXML = function () {
         var s = new XMLSerializer();
-        var doc = specification.encode();
+        var doc = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" + specification.encode();
         var xmlstr = s.serializeToString(doc);
         var bb = new Blob([s.serializeToString(doc)], {
             type: 'application/xml'
@@ -133,7 +133,7 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
     $s.validate = function () {
         var s = new XMLSerializer();
         var Module = {
-            xml: s.serializeToString(specification.encode()),
+            xml: "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" + s.serializeToString(specification.encode()),
             schema: specification.getSchemaString(),
             arguments: ["--noout", "--schema", 'test-schema.xsd', 'document.xml']
         };
@@ -211,9 +211,9 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         }
     };
     $s.select = function (name) {
-            $s.selected = name;
-        }
-        // Get the test interface specifications
+        $s.selected = name;
+    }
+    // Get the test interface specifications
     $s.file = undefined;
     $s.description = "";
 

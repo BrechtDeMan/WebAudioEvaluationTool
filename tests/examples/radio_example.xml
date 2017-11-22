@@ -1,37 +1,37 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-    <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-        <setup interface="discrete" projectReturn="save.php" crossFade="3.0">
-            <metric>
-                <metricenable>testTimer</metricenable>
-                <metricenable>elementTimer</metricenable>
-                <metricenable>elementInitialPosition</metricenable>
-                <metricenable>elementTracker</metricenable>
-                <metricenable>elementFlagListenedTo</metricenable>
-                <metricenable>elementFlagMoved</metricenable>
-                <metricenable>elementListenTracker</metricenable>
-            </metric>
-            <interface>
-                <interfaceoption type="check" name="fragmentMoved" />
-                <interfaceoption type="check" name="scalerange" min="25" max="75" />
-                <interfaceoption type="show" name="volume" />
-                <interfaceoption type="show" name='playhead' />
-                <interfaceoption type="show" name="page-count" />
-                <interfaceoption type="show" name="comments" />
-            </interface>
-        </setup>
-        <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' loudness="-23">
-            <interface>
-                <scales>
-                    <scalelabel position="0">(1) Very Annoying</scalelabel>
-                    <scalelabel position="25">(2) Annoying</scalelabel>
-                    <scalelabel position="50">(3) Slightly Annoying</scalelabel>
-                    <scalelabel position="75">(4) Audible but not Annoying</scalelabel>
-                    <scalelabel position="100">(5) Inaudible</scalelabel>
-                </scales>
-            </interface>
-            <audioelement url="0.wav" id="track-0" alwaysInclude="true" />
-            <audioelement url="1.wav" id="track-1" />
-            <audioelement url="2.wav" id="track-2" />
-            <audioelement url="3.wav" id="track-3" />
-        </page>
-    </waet>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+    <setup interface="discrete" projectReturn="save.php" crossFade="3.0">
+        <metric>
+            <metricenable>testTimer</metricenable>
+            <metricenable>elementTimer</metricenable>
+            <metricenable>elementInitialPosition</metricenable>
+            <metricenable>elementTracker</metricenable>
+            <metricenable>elementFlagListenedTo</metricenable>
+            <metricenable>elementFlagMoved</metricenable>
+            <metricenable>elementListenTracker</metricenable>
+        </metric>
+        <interface>
+            <interfaceoption type="check" name="fragmentMoved" />
+            <interfaceoption type="check" name="scalerange" min="25" max="75" />
+            <interfaceoption type="show" name="volume" />
+            <interfaceoption type="show" name='playhead' />
+            <interfaceoption type="show" name="page-count" />
+            <interfaceoption type="show" name="comments" />
+        </interface>
+    </setup>
+    <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='4' loop='true' loudness="-23">
+        <interface>
+            <scales>
+                <scalelabel position="0">(1) Very Annoying</scalelabel>
+                <scalelabel position="25">(2) Annoying</scalelabel>
+                <scalelabel position="50">(3) Slightly Annoying</scalelabel>
+                <scalelabel position="75">(4) Audible but not Annoying</scalelabel>
+                <scalelabel position="100">(5) Inaudible</scalelabel>
+            </scales>
+        </interface>
+        <audioelement url="0.wav" id="track-0" alwaysInclude="true" />
+        <audioelement url="1.wav" id="track-1" />
+        <audioelement url="2.wav" id="track-2" />
+        <audioelement url="3.wav" id="track-3" />
+    </page>
+</waet>
