@@ -1,33 +1,33 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-    <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-        <setup interface="horizontal" projectReturn="save.php">
-            <metric>
-                <metricenable>testTimer</metricenable>
-                <metricenable>elementTimer</metricenable>
-                <metricenable>elementInitialPosition</metricenable>
-                <metricenable>elementTracker</metricenable>
-                <metricenable>elementFlagListenedTo</metricenable>
-                <metricenable>elementFlagMoved</metricenable>
-                <metricenable>elementListenTracker</metricenable>
-            </metric>
-            <interface>
-                <interfaceoption type="check" name="fragmentMoved" />
-                <interfaceoption type="check" name="scalerange" min="25" max="75" />
-                <interfaceoption type="show" name='playhead' />
-                <interfaceoption type="show" name="page-count" />
-                <interfaceoption type="show" name="volume" />
-                <interfaceoption type="show" name="comments" />
-            </interface>
-        </setup>
-        <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
-            <interface>
-                <scales>
-                    <scalelabel position="0">-50</scalelabel>
-                    <scalelabel position="50">0</scalelabel>
-                    <scalelabel position="100">50</scalelabel>
-                </scales>
-            </interface>
-            <audioelement url="0.wav" id="track-1" />
-            <audioelement url="1.wav" id="track-2" />
-        </page>
-    </waet>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+    <setup interface="horizontal" projectReturn="save.php">
+        <metric>
+            <metricenable>testTimer</metricenable>
+            <metricenable>elementTimer</metricenable>
+            <metricenable>elementInitialPosition</metricenable>
+            <metricenable>elementTracker</metricenable>
+            <metricenable>elementFlagListenedTo</metricenable>
+            <metricenable>elementFlagMoved</metricenable>
+            <metricenable>elementListenTracker</metricenable>
+        </metric>
+        <interface>
+            <interfaceoption type="check" name="fragmentMoved" />
+            <interfaceoption type="check" name="scalerange" min="25" max="75" />
+            <interfaceoption type="show" name='playhead' />
+            <interfaceoption type="show" name="page-count" />
+            <interfaceoption type="show" name="volume" />
+            <interfaceoption type="show" name="comments" />
+        </interface>
+    </setup>
+    <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
+        <interface>
+            <scales>
+                <scalelabel position="0">-50</scalelabel>
+                <scalelabel position="50">0</scalelabel>
+                <scalelabel position="100">50</scalelabel>
+            </scales>
+        </interface>
+        <audioelement url="0.wav" id="track-1" />
+        <audioelement url="1.wav" id="track-2" />
+    </page>
+</waet>

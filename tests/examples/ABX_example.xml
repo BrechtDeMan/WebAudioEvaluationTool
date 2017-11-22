@@ -1,87 +1,87 @@
-<?xml version="1.0" encoding="utf-8"?>
-    <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-        <setup interface="ABX" projectReturn="save.php" randomiseOrder='true' poolSize="2" loudness="-23">
-            <survey location="before">
-                <surveyquestion id="sessionId" mandatory="true">
-                    <statement>Please enter your name.</statement>
-                </surveyquestion>
-                <surveycheckbox id="checkboxtest" mandatory="true">
-                    <statement>Please select with which activities you have any experience (example checkbox question)</statement>
-                    <option name="musician">Playing a musical instrument</option>
-                    <option name="soundengineer">Recording or mixing audio</option>
-                    <option name="developer">Developing audio software</option>
-                    <option name="hwdesigner">Designing or building audio hardware</option>
-                    <option name="researcher">Research in the field of audio</option>
-                </surveycheckbox>
-                <surveystatement id="test-intro">
-                    <statement>This is an example of an 'ABX'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
-                </surveystatement>
-            </survey>
-            <survey location="after">
-                <surveyquestion id="location" mandatory="true" boxsize="large">
-                    <statement>Please enter your location. (example mandatory text question)</statement>
-                </surveyquestion>
-                <surveynumber id="age" min="0">
-                    <statement>Please enter your age (example non-mandatory number question)</statement>
-                </surveynumber>
-                <surveyradio id="rating">
-                    <statement>Please rate this interface (example radio button question)</statement>
-                    <option name="bad">Bad</option>
-                    <option name="poor">Poor</option>
-                    <option name="good">Good</option>
-                    <option name="great">Great</option>
-                </surveyradio>
-                <surveystatement id="test-thank-you">
-                    <statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
-                </surveystatement>
-            </survey>
-            <metric>
-                <metricenable>testTimer</metricenable>
-                <metricenable>elementTimer</metricenable>
-                <metricenable>elementInitialPosition</metricenable>
-                <metricenable>elementTracker</metricenable>
-                <metricenable>elementFlagListenedTo</metricenable>
-                <metricenable>elementFlagMoved</metricenable>
-                <metricenable>elementListenTracker</metricenable>
-            </metric>
-            <interface>
-                <interfaceoption type="check" name="fragmentMoved" />
-                <interfaceoption type="check" name="scalerange" min="25" max="75" />
-                <interfaceoption type="show" name='playhead' />
-                <interfaceoption type="show" name="page-count" />
-                <interfaceoption type="show" name='volume' />
-                <interfaceoption type="show" name='comments' />
-            </interface>
-        </setup>
-        <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
-            <commentboxprefix>Comment on fragment</commentboxprefix>
-            <interface>
-                <title>Depth</title>
-            </interface>
-            <audioelement url="0.wav" id="track-0" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
-            <audioelement url="1.wav" id="track-1" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
-            <survey location="before">
-                <surveyentry type="statement" id="test-0-intro">
-                    <statement>A two way comparison using randomised element order, automatic loudness and synchronised looping.</statement>
-                </surveyentry>
-            </survey>
-            <survey location="after">
-                <surveyentry type="question" id="genre-0" mandatory="true">
-                    <statement>Please enter the genre.</statement>
-                </surveyentry>
-            </survey>
-        </page>
-        <page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='false' loudness="-12">
-            <commentboxprefix>Comment on fragment</commentboxprefix>
-            <interface>
-                <title>Depth</title>
-            </interface>
-            <audioelement url="0.wav" id="track-2" />
-            <audioelement url="1.wav" id="track-3" />
-            <survey location="after">
-                <surveyentry type="question" id="genre-1" mandatory="true">
-                    <statement>Please enter the genre.</statement>
-                </surveyentry>
-            </survey>
-        </page>
-    </waet>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+    <setup interface="ABX" projectReturn="save.php" randomiseOrder='true' poolSize="2" loudness="-23">
+        <survey location="before">
+            <surveyquestion id="sessionId" mandatory="true">
+                <statement>Please enter your name.</statement>
+            </surveyquestion>
+            <surveycheckbox id="checkboxtest" mandatory="true">
+                <statement>Please select with which activities you have any experience (example checkbox question)</statement>
+                <option name="musician">Playing a musical instrument</option>
+                <option name="soundengineer">Recording or mixing audio</option>
+                <option name="developer">Developing audio software</option>
+                <option name="hwdesigner">Designing or building audio hardware</option>
+                <option name="researcher">Research in the field of audio</option>
+            </surveycheckbox>
+            <surveystatement id="test-intro">
+                <statement>This is an example of an 'ABX'-style test, with two pages, using the test stimuli in 'example_eval/'.</statement>
+            </surveystatement>
+        </survey>
+        <survey location="after">
+            <surveyquestion id="location" mandatory="true" boxsize="large">
+                <statement>Please enter your location. (example mandatory text question)</statement>
+            </surveyquestion>
+            <surveynumber id="age" min="0">
+                <statement>Please enter your age (example non-mandatory number question)</statement>
+            </surveynumber>
+            <surveyradio id="rating">
+                <statement>Please rate this interface (example radio button question)</statement>
+                <option name="bad">Bad</option>
+                <option name="poor">Poor</option>
+                <option name="good">Good</option>
+                <option name="great">Great</option>
+            </surveyradio>
+            <surveystatement id="test-thank-you">
+                <statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
+            </surveystatement>
+        </survey>
+        <metric>
+            <metricenable>testTimer</metricenable>
+            <metricenable>elementTimer</metricenable>
+            <metricenable>elementInitialPosition</metricenable>
+            <metricenable>elementTracker</metricenable>
+            <metricenable>elementFlagListenedTo</metricenable>
+            <metricenable>elementFlagMoved</metricenable>
+            <metricenable>elementListenTracker</metricenable>
+        </metric>
+        <interface>
+            <interfaceoption type="check" name="fragmentMoved" />
+            <interfaceoption type="check" name="scalerange" min="25" max="75" />
+            <interfaceoption type="show" name='playhead' />
+            <interfaceoption type="show" name="page-count" />
+            <interfaceoption type="show" name='volume' />
+            <interfaceoption type="show" name='comments' />
+        </interface>
+    </setup>
+    <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-12">
+        <commentboxprefix>Comment on fragment</commentboxprefix>
+        <interface>
+            <title>Depth</title>
+        </interface>
+        <audioelement url="0.wav" id="track-0" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+        <audioelement url="1.wav" id="track-1" image="https://upload.wikimedia.org/wikipedia/commons/0/0a/Drumkit-icon.png" />
+        <survey location="before">
+            <surveyentry type="statement" id="test-0-intro">
+                <statement>A two way comparison using randomised element order, automatic loudness and synchronised looping.</statement>
+            </surveyentry>
+        </survey>
+        <survey location="after">
+            <surveyentry type="question" id="genre-0" mandatory="true">
+                <statement>Please enter the genre.</statement>
+            </surveyentry>
+        </survey>
+    </page>
+    <page id='test-1' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='false' loudness="-12">
+        <commentboxprefix>Comment on fragment</commentboxprefix>
+        <interface>
+            <title>Depth</title>
+        </interface>
+        <audioelement url="0.wav" id="track-2" />
+        <audioelement url="1.wav" id="track-3" />
+        <survey location="after">
+            <surveyentry type="question" id="genre-1" mandatory="true">
+                <statement>Please enter the genre.</statement>
+            </surveyentry>
+        </survey>
+    </page>
+</waet>
