@@ -1,33 +1,33 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-    <waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
-        <setup interface="ordinal" projectReturn="save.php" randomiseOrder="true">
-            <metric>
-                <metricenable>testTimer</metricenable>
-                <metricenable>elementTimer</metricenable>
-                <metricenable>elementInitialPosition</metricenable>
-                <metricenable>elementTracker</metricenable>
-                <metricenable>elementFlagListenedTo</metricenable>
-                <metricenable>elementFlagMoved</metricenable>
-                <metricenable>elementListenTracker</metricenable>
-            </metric>
-            <interface>
-                <interfaceoption type="check" name="fragmentComment" />
-                <interfaceoption type="show" name='playhead' />
-                <interfaceoption type="show" name="page-count" />
-                <interfaceoption type="show" name="volume" />
-                <interfaceoption type="show" name="comments" />
-            </interface>
-        </setup>
-        <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-23">
-            <title>Ordinal Evaluation</title>
-            <interface></interface>
-            <audioelement url="0.wav" id="track-1" />
-            <audioelement url="1.wav" id="track-2" />
-            <audioelement url="2.wav" id="track-3" />
-            <audioelement url="3.wav" id="track-4" />
-            <audioelement url="4.wav" id="track-5" />
-            <audioelement url="5.wav" id="track-6" />
-            <audioelement url="6.wav" id="track-7" />
-            <audioelement url="7.wav" id="track-8" />
-        </page>
-    </waet>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd">
+    <setup interface="ordinal" projectReturn="save.php" randomiseOrder="true">
+        <metric>
+            <metricenable>testTimer</metricenable>
+            <metricenable>elementTimer</metricenable>
+            <metricenable>elementInitialPosition</metricenable>
+            <metricenable>elementTracker</metricenable>
+            <metricenable>elementFlagListenedTo</metricenable>
+            <metricenable>elementFlagMoved</metricenable>
+            <metricenable>elementListenTracker</metricenable>
+        </metric>
+        <interface>
+            <interfaceoption type="check" name="fragmentComment" />
+            <interfaceoption type="show" name='playhead' />
+            <interfaceoption type="show" name="page-count" />
+            <interfaceoption type="show" name="volume" />
+            <interfaceoption type="show" name="comments" />
+        </interface>
+    </setup>
+    <page id='test-0' hostURL="media/example/" randomiseOrder='true' repeatCount='0' loop='true' loudness="-23">
+        <title>Ordinal Evaluation</title>
+        <interface></interface>
+        <audioelement url="0.wav" id="track-1" />
+        <audioelement url="1.wav" id="track-2" />
+        <audioelement url="2.wav" id="track-3" />
+        <audioelement url="3.wav" id="track-4" />
+        <audioelement url="4.wav" id="track-5" />
+        <audioelement url="5.wav" id="track-6" />
+        <audioelement url="6.wav" id="track-7" />
+        <audioelement url="7.wav" id="track-8" />
+    </page>
+</waet>
