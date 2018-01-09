@@ -2420,13 +2420,19 @@ function Interface(specificationObject) {
                         audioEngineContext.play(this.keys[index].audioObject.id);
                     }
                 }
+
+                function trackCommentFocus() {
+                    return document.activeElement.className.indexOf("trackComment") >= 0;
+                }
                 if (e.key === " ") {
-                    if (isPlaying()) {
+                    if (isPlaying() && trackCommentFocus() == false) {
+                        e.preventDefault();
                         audioEngineContext.stop();
                     }
                 } else {
                     keypress.call(this, e.key);
                 }
+                console.log(e);
             }
         };
         document.addEventListener("keydown", keyboardInterfaceController, false);
