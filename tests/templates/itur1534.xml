@@ -30,7 +30,7 @@
             <audioelement url="1.wav" id="training-1" type="anchor" />
             <audioelement url="0.wav" id="training-2" />
         </page>
-        <page id="test-0" randomiseOrder="true" repeatCount="0" loop="true" synchronous="true" position="0" label="capital">
+        <page id="test-0" randomiseOrder="true" repeatCount="0" loop="true" synchronous="true" label="capital">
             <interface>
                 <title>Quality</title>
                 <scales>
