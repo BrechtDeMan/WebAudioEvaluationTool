@@ -3751,7 +3751,7 @@ function Storage() {
                         }
                         var parse = new DOMParser();
                         var xml = parse.parseFromString(response, "text/xml");
-                        if (this.request.response.length === 0) {
+                        if (response.length === 0) {
                             throwerror();
                         }
                         if (xml.getElementsByTagName("state").length > 0) {
