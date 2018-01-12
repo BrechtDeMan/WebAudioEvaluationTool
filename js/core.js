@@ -3757,9 +3757,8 @@ function Storage() {
                         if (xml.getElementsByTagName("state").length > 0) {
                             if (xml.getElementsByTagName("state")[0].textContent == "OK") {
                                 sessionKey = xml.getAllElementsByTagName("key")[0].textContent;
-                                this.parent.root.setAttribute("key", this.key);
-                                this.parent.root.setAttribute("state", "empty");
-                                this.update();
+                                parent.root.setAttribute("key", sessionKey);
+                                parent.root.setAttribute("state", "empty");
                                 return (true);
                             } else if (xml.getElementsByTagName("state")[0].textContent == "ERROR") {
                                 sessionKey = null;
