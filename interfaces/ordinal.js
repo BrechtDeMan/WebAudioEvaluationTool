@@ -2,7 +2,7 @@
  * WAET Blank Template
  * Use this to start building your custom interface
  */
-/*globals interfaceContext, window, document, specification, audioEngineContext, console, testState, $, storage */
+/*globals interfaceContext, window, document, specification, audioEngineContext, console, testState, $, storage, sessionStorage */
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
@@ -271,11 +271,11 @@ function interfaceObject(audioObject, label) {
 
         e.dataTransfer.dropEffect = 'move'; // See the section on the DataTransfer object.
         var srcid = e.dataTransfer.getData('text/plain');
-        if (srcid == "") {
+        if (srcid === "") {
             srcid = sessionStorage.getItem("drag-object");
         }
         console.log(srcid);
-        var srcid = Number(srcid);
+        srcid = Number(srcid);
         var elements = container.childNodes;
         var srcObject = audioEngineContext.audioObjects.find(function (ao) {
             return ao.id === srcid;

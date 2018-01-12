@@ -4,7 +4,7 @@
  */
 
 /*globals window,interfaceContext, document, audioEngineContext, console, $, Interface, testState, storage, specification */
-/*globals metricTracker */
+/*globals metricTracker, module, randomiseOrder */
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
@@ -218,10 +218,10 @@ function loadTest(audioHolderObject) {
 }
 
 function ape() {
-    var axis = []
+    var axis = [];
     var DOMRoot = document.getElementById("slider-holder");
     var AOIs = [];
-    var page = undefined;
+    var page;
 
     function audioObjectInterface(audioObject, parent) {
         // The audioObject communicates with this object
@@ -231,39 +231,39 @@ function ape() {
             sliders.forEach(function (s) {
                 s.enable();
             });
-        }
+        };
 
         this.updateLoading = function (p) {
             sliders.forEach(function (s) {
                 s.updateLoading(p);
             });
-        }
+        };
 
         this.startPlayback = function () {
             playing = true;
             sliders.forEach(function (s) {
                 s.playing();
             });
-        }
+        };
 
         this.stopPlayback = function () {
             playing = false;
             sliders.forEach(function (s) {
                 s.stopped();
             });
-        }
+        };
 
         this.getValue = function () {
             return sliders[0].value;
-        }
+        };
 
         this.getPresentedId = function () {
             return sliders[0].label;
-        }
+        };
 
         this.canMove = function () {
             return true;
-        }
+        };
 
         this.exportXMLDOM = function (audioObject) {
             var elements = [];
@@ -271,17 +271,17 @@ function ape() {
                 elements.push(s.exportXMLDOM());
             });
             return elements;
-        }
+        };
 
         this.error = function () {
             sliders.forEach(function (s) {
                 s.error();
             });
-        }
+        };
 
         this.addSlider = function (s) {
             sliders.push(s);
-        }
+        };
 
         this.clicked = function (event) {
             if (!playing) {
@@ -290,14 +290,14 @@ function ape() {
                 audioEngineContext.stop();
             }
             playing = !playing;
-        }
+        };
 
         this.pageXMLSave = function (store) {
             var inject = audioObject.storeDOM.getElementsByTagName("metric")[0];
             sliders.forEach(function (s) {
                 s.pageXMLSave(inject);
             });
-        }
+        };
 
     }
 
@@ -316,39 +316,39 @@ function ape() {
             metric.initialise(this.value);
             this.setLabel = function (s) {
                 label = s;
-            }
+            };
             this.resize = function (event) {
                 var width = $(axisInterface.sliderRail).width();
                 var w = Number(value * width);
                 trackObj.style.left = String(w) + "px";
-            }
+            };
             this.playing = function () {
                 trackObj.classList.add("track-slider-playing");
-            }
+            };
             this.stopped = function () {
                 trackObj.classList.remove("track-slider-playing");
-            }
+            };
             this.enable = function () {
                 trackObj.addEventListener("mousedown", this);
                 trackObj.addEventListener("mouseup", this);
                 trackObj.classList.remove("track-slider-disabled");
                 labelHolder.textContent = label;
-            }
+            };
             this.updateLoading = function (progress) {
                 labelHolder.textContent = progress + "%";
-            }
+            };
             this.exportXMLDOM = function () {
                 var node = storage.document.createElement('value');
-                node.setAttribute("interface-name", axisInterface.name)
+                node.setAttribute("interface-name", axisInterface.name);
                 node.textContent = this.value;
                 return node;
-            }
+            };
             this.error = function () {
                 trackObj.classList.add("error-colour");
                 trackObj.removeEventListener("mousedown");
                 trackObj.removeEventListener("mouseup");
-            }
-            var timing = undefined;
+            };
+            var timing;
             this.handleEvent = function (e) {
                 // This is only for the mousedown / touchdown
                 if (e.preventDefault) {
@@ -361,10 +361,10 @@ function ape() {
                     metric.moved(audioEngineContext.timer.getTestTime(), this.value);
                     console.log("Slider " + label + " on axis " + axisInterface.name + " moved to " + this.value);
                 }
-            }
+            };
             this.clicked = function (e) {
                 AOI.clicked();
-            }
+            };
             this.pageXMLSave = function (inject) {
                 var nodes = metric.exportXMLDOM(inject);
                 nodes.forEach(function (elem) {
@@ -375,10 +375,10 @@ function ape() {
                         inject.removeChild(elem);
                     }
                 });
-            }
+            };
             this.hasMoved = function () {
                 return metric.wasMoved;
-            }
+            };
             Object.defineProperties(this, {
                 "DOM": {
                     "value": trackObj
@@ -450,13 +450,12 @@ function ape() {
         var UI = {
             selected: undefined,
             startTime: undefined
-        }
+        };
         this.name = interfaceObject.name;
         var DOMRoot = document.createElement("div");
         parent.getDOMRoot().appendChild(DOMRoot);
         DOMRoot.className = "sliderCanvasDiv";
         DOMRoot.id = "sliderCanvasHolder-" + this.name;
-        var sliders = [];
 
         var axisTitle = document.createElement("div");
         axisTitle.className = "pageTitle";
@@ -527,7 +526,7 @@ function ape() {
             tickCanvas.width = $(sliderRail).width();
             tickCanvas.style.width = tickCanvas.width + "px";
             createScaleMarkers(interfaceObject, scale, $(sliderRail).width());
-        }
+        };
         this.playing = function (id) {
             var node = audioEngineContext.audioObjects.find(function (a) {
                 return a.id == id;
@@ -538,20 +537,20 @@ function ape() {
             }
             var imgurl = node.specification.image || interfaceObject.image || "";
             this.imageHolder.setImage(imgurl);
-        }
+        };
         this.stopped = function () {
             var imgurl = interfaceObject.image || "";
             this.imageHolder.setImage(imgurl);
-        }
+        };
         this.addSlider = function (aoi) {
             var node = new sliderInterface(aoi, this);
             sliders.push(node);
             return node;
-        }
+        };
         this.mousedown = function (sliderUI) {
             UI.selected = sliderUI;
             UI.startTime = new Date();
-        }
+        };
         this.mouseup = function (event) {
             var delta = new Date() - UI.startTime;
             if (delta < 200) {
@@ -561,7 +560,7 @@ function ape() {
             }
             UI.selected = undefined;
             UI.startTime = undefined;
-        }
+        };
         this.handleEvent = function (event) {
             function getTargetSlider(target) {
                 return sliders.find(function (a) {
@@ -609,7 +608,7 @@ function ape() {
                     this.mouseup(event);
                 }
             }
-        }
+        };
         this.checkAllMoved = function () {
             var notMoved = sliders.filter(function (s) {
                 return !s.hasMoved();
@@ -618,7 +617,7 @@ function ape() {
                 var ls = [];
                 notMoved.forEach(function (s) {
                     ls.push(s.label);
-                })
+                });
                 var str = "On axis \"" + interfaceObject.title + "\", ";
                 if (ls.length == 1) {
                     str += "slider " + ls[0];
@@ -630,7 +629,7 @@ function ape() {
             } else {
                 return "";
             }
-        }
+        };
         this.checkScaleRange = function () {
             var scaleRange = interfaceObject.options.find(function (a) {
                 return a.name == "scalerange";
@@ -652,7 +651,7 @@ function ape() {
                 return "On axis \"" + interfaceObject.title + "\", you have not used the required width of the scales";
             }
             return "";
-        }
+        };
         sliderRail.addEventListener("mousemove", this);
         sliderRail.addEventListener("touchstart", this);
         sliderRail.addEventListener("touchmove", this);
@@ -666,16 +665,16 @@ function ape() {
     }
     this.getDOMRoot = function () {
         return DOMRoot;
-    }
+    };
     this.getPage = function () {
         return page;
-    }
+    };
     this.clear = function () {
         page = undefined;
         axis = [];
         AOIs = [];
         DOMRoot.innerHTML = "";
-    }
+    };
     this.initialisePage = function (page_init) {
         this.clear();
         page = page_init;
@@ -723,9 +722,9 @@ function ape() {
                 }
             }
         });
-    }
+    };
     this.checkAllMoved = function () {
-        var str = "You have not moved the following sliders. "
+        var str = "You have not moved the following sliders. ";
         var cont = true;
         axis.forEach(function (a) {
             var msg = a.checkAllMoved();
@@ -740,7 +739,7 @@ function ape() {
             console.log(str);
         }
         return cont;
-    }
+    };
     this.checkScaleRange = function () {
         var str = "";
         var cont = true;
@@ -757,19 +756,19 @@ function ape() {
             console.log(str);
         }
         return cont;
-    }
+    };
     this.pageXMLSave = function (store, pageSpecification) {
         if (axis.length > 1) {
             AOIs.forEach(function (ao) {
                 ao.pageXMLSave(store);
             });
         }
-    }
+    };
     this.resize = function (event) {
         axis.forEach(function (a) {
             a.resize(event);
         });
-    }
+    };
 }
 
 function outsideReferenceDOM(audioObject, index, inject) {
