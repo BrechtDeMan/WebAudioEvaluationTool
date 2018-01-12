@@ -3663,7 +3663,7 @@ function Storage() {
             return new Promise(function (resolve, reject) {
                 // Do the usual XHR stuff
                 var req = new XMLHttpRequest();
-                req.open("POST", returnURL + "php/save.php?key=" + key + "&saveFilenamePrefix=" + parent.filenamePrefix);
+                req.open("POST", returnURL + "php/save.php?key=" + sessionKey + "&saveFilenamePrefix=" + parent.filenamePrefix);
                 req.setRequestHeader('Content-Type', 'text/xml');
 
                 req.onload = function () {
