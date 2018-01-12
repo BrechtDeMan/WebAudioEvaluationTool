@@ -3787,7 +3787,7 @@ function Storage() {
                         throw ("Cannot save as key == null");
                     }
                     this.parent.finish();
-                    requestChains.then(postUpdate()).then(function () {
+                    return requestChains.then(postUpdate()).then(function () {
                         console.log("OK");
                     }, function () {
                         createProjectSave("local");
