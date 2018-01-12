@@ -89,7 +89,7 @@ if ($n1->length > 0) {
     $sn1 = findNodeByAttribute($n1, "location", "pre");
     $sn2 = findNodeByAttribute($n2, "location", "pre");
     if ($sn1 != 0) {
-        if ($sn2 != 0 && $sn2.getAttribute("state") != "complete") {
+        if ($sn2 != 0) {
             $saved_root->removeChild($sn2);
             $sn2 = 0;
         }
@@ -102,7 +102,7 @@ if ($n1->length > 0) {
     $sn1 = findNodeByAttribute($n1, "location", "post");
     $sn2 = findNodeByAttribute($n2, "location", "post");
     if ($sn1 != 0) {
-        if ($sn2 != 0 && $sn2.getAttribute("state") != "complete") {
+        if ($sn2 != 0) {
             $saved_root->removeChild($sn2);
             $sn2 = 0;
         }
@@ -124,7 +124,7 @@ if ($n1->length > 0) {
         $ref = $page->getAttribute("ref");
         if (!empty($ref)) {
             $pn2 = findNodeByAttribute($n2, "ref", $ref);
-            if ($pn2 != 0 && $pn2.getAttribute("state") != "complete") {
+            if ($pn2 != 0) {
                 $saved_root->removeChild($pn2);
                 $pn2 = 0;
             }
