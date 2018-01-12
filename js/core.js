@@ -3673,7 +3673,7 @@ function Storage() {
                         console.log("WARNING - Could not update at this time");
                     } else {
                         var parser = new DOMParser();
-                        var xmlDoc = parser.parseFromString(xmlhttp.responseText, "application/xml");
+                        var xmlDoc = parser.parseFromString(req.responseText, "application/xml");
                         var response = xmlDoc.getElementsByTagName('response')[0];
                         if (response.getAttribute("state") == "OK") {
                             var file = response.getElementsByTagName("file")[0];
