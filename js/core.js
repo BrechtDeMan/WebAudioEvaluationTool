@@ -3719,12 +3719,13 @@ function Storage() {
         }
 
         var requestChains = null;
+        var sessionKey = null;
         var object = {};
 
         Object.defineProperties(object, {
             "key": {
                 "get": function () {
-                    return key;
+                    return sessionKey;
                 },
                 "set": function (a) {
                     throw ("Cannot set read-only property")
@@ -3740,7 +3741,7 @@ function Storage() {
                 "value": function () {
                     requestChains = keyPromise().then(function (response) {
                         function throwerror() {
-                            key = null;
+                            sessionKey = null;
                             throw ("An unspecified error occured, no server key could be generated");
                         }
                         var parse = new DOMParser();
@@ -3750,15 +3751,15 @@ function Storage() {
                         }
                         if (xml.getElementsByTagName("state").length > 0) {
                             if (xml.getElementsByTagName("state")[0].textContent == "OK") {
-                                key = xml.getAllElementsByTagName("key")[0].textContent;
+                                sessionKey = xml.getAllElementsByTagName("key")[0].textContent;
                                 this.parent.root.setAttribute("key", this.key);
                                 this.parent.root.setAttribute("state", "empty");
                                 this.update();
                                 return (true);
                             } else if (xml.getElementsByTagName("state")[0].textContent == "ERROR") {
-                                key = null;
+                                sessionKey = null;
                                 console.error("Could not generate server key. Server responded with error message: \"" + xml.getElementsByTagName("message")[0].textContent + "\"");
-                                return (true);
+                                return (false);
                             }
                         } else {
                             throwerror();
