@@ -3767,25 +3767,29 @@ function Storage() {
                     });
                 }
             },
-            "update": function () {
-                if (this.key == null || requestChains === undefined) {
-                    throw ("Cannot save as key == null");
+            "update": {
+                "value": function () {
+                    if (this.key == null || requestChains === undefined) {
+                        throw ("Cannot save as key == null");
+                    }
+                    this.parent.root.setAttribute("state", "update");
+                    requestChains = requestChains.then(postUpdate());
                 }
-                this.parent.root.setAttribute("state", "update");
-                requestChains = requestChains.then(postUpdate());
             },
-            "finish": function () {
-                if (this.key == null || requestChains === undefined) {
-                    throw ("Cannot save as key == null");
+            "finish": {
+                "value": function () {
+                    if (this.key == null || requestChains === undefined) {
+                        throw ("Cannot save as key == null");
+                    }
+                    this.parent.finish();
+                    requestChains.then(postUpdate()).then(function () {
+                        console.log("OK");
+                    }, function () {
+                        createProjectSave("local");
+                    })
                 }
-                this.parent.finish();
-                requestChains.then(postUpdate()).then(function () {
-                    console.log("OK");
-                }, function () {
-                    createProjectSave("local");
-                })
             }
-        })
+        });
         return object;
     })(this);
     /*
