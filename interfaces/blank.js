@@ -9,7 +9,7 @@ loadInterface();
 function loadInterface() {
     // Use this to do any one-time page / element construction. For instance, placing any stationary text objects,
     // holding div's, or setting up any nodes which are present for the entire test sequence
-};
+}
 
 function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
@@ -50,8 +50,8 @@ function interfaceObject() {
     };
     this.error = function () {
         // If there is an error with the audioObject, this will be called to indicate a failure
-    }
-};
+    };
+}
 
 function resizeWindow(event) {
     // Called on every window resize event, use this to scale your page properly

@@ -587,7 +587,7 @@ function interfaceSliderHolder(interfaceObject, page) {
         }
         var imgurl = node.specification.image || interfaceObject.image || "";
         this.imageHolder.setImage(imgurl);
-    }
+    };
 }
 
 function sliderObject(audioObject, interfaceObjects, index) {
