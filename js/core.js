@@ -3698,44 +3698,165 @@ function Storage() {
         }
     };
 
+    this.SessionKey = (function (parent) {
+        var returnURL = "";
+        if (window.returnURL !== undefined) {
+            returnURL = String(window.returnURL);
+        }
+
+        function postUpdate() {
+            // Return a new promise.
+            var hold = document.createElement("div");
+            var clone = parent.root.cloneNode(true);
+            hold.appendChild(clone);
+            return new Promise(function (resolve, reject) {
+                // Do the usual XHR stuff
+                console.log("Requested save...");
+                var req = new XMLHttpRequest();
+                req.open("POST", returnURL + "php/save.php?key=" + sessionKey + "&saveFilenamePrefix=" + parent.filenamePrefix);
+                req.setRequestHeader('Content-Type', 'text/xml');
+
+                req.onload = function () {
+                    // This is called even on 404 etc
+                    // so check the status
+                    if (this.status >= 300) {
+                        console.log("WARNING - Could not update at this time");
+                    } else {
+                        var parser = new DOMParser();
+                        var xmlDoc = parser.parseFromString(req.responseText, "application/xml");
+                        var response = xmlDoc.getElementsByTagName('response')[0];
+                        if (response.getAttribute("state") == "OK") {
+                            var file = response.getElementsByTagName("file")[0];
+                            console.log("Intermediate save: OK, written " + file.getAttribute("bytes") + "B");
+                            resolve(true);
+                        } else {
+                            var message = response.getElementsByTagName("message");
+                            console.log("Intermediate save: Error! " + message.textContent);
+                            reject("Intermediate save: Error! " + message.textContent);
+                        }
+                    }
+                };
+
+                // Handle network errors
+                req.onerror = function () {
+                    reject(Error("Network Error"));
+                };
+
+                // Make the request
+                req.send([hold.innerHTML]);
+            });
+        };
+
+        function keyPromise() {
+            return new Promise(function (resolve, reject) {
+                var req = new XMLHttpRequest();
+                req.open("GET", returnURL + "php/requestKey.php?saveFilenamePrefix=" + parent.filenamePrefix, true);
+                req.onload = function () {
+                    // This is called even on 404 etc
+                    // so check the status
+                    if (req.status == 200) {
+                        // Resolve the promise with the response text
+                        resolve(req.response);
+                    } else {
+                        // Otherwise reject with the status text
+                        // which will hopefully be a meaningful error
+                        reject(Error(req.statusText));
+                    }
+                };
+
+                // Handle network errors
+                req.onerror = function () {
+                    reject(Error("Network Error"));
+                };
+
+                req.send();
+            })
+        }
+
+        var requestChains = null;
+        var sessionKey = null;
+        var object = {};
+
+        Object.defineProperties(object, {
+            "key": {
+                "get": function () {
+                    return sessionKey;
+                },
+                "set": function (a) {
+                    throw ("Cannot set read-only property")
+                }
+            },
+            "request": {
+                "value": new XMLHttpRequest()
+            },
+            "parent": {
+                "value": parent
+            },
+            "requestKey": {
+                "value": function () {
+                    requestChains = keyPromise().then(function (response) {
+                        function throwerror() {
+                            sessionKey = null;
+                            throw ("An unspecified error occured, no server key could be generated");
+                        }
+                        var parse = new DOMParser();
+                        var xml = parse.parseFromString(response, "text/xml");
+                        if (response.length === 0) {
+                            throwerror();
+                        }
+                        if (xml.getElementsByTagName("state").length > 0) {
+                            if (xml.getElementsByTagName("state")[0].textContent == "OK") {
+                                sessionKey = xml.getAllElementsByTagName("key")[0].textContent;
+                                parent.root.setAttribute("key", sessionKey);
+                                parent.root.setAttribute("state", "empty");
+                                return (true);
+                            } else if (xml.getElementsByTagName("state")[0].textContent == "ERROR") {
+                                sessionKey = null;
+                                console.error("Could not generate server key. Server responded with error message: \"" + xml.getElementsByTagName("message")[0].textContent + "\"");
+                                return (false);
+                            }
+                        } else {
+                            throwerror();
+                        }
+                        return (true);
+                    });
+                }
+            },
+            "update": {
+                "value": function () {
+                    if (this.key == null || requestChains === undefined) {
+                        throw ("Cannot save as key == null");
+                    }
+                    this.parent.root.setAttribute("state", "update");
+                    requestChains = requestChains.then(postUpdate);
+                }
+            },
+            "finish": {
+                "value": function () {
+                    if (this.key == null || requestChains === undefined) {
+                        throw ("Cannot save as key == null");
+                    }
+                    this.parent.finish();
+                    return requestChains.then(postUpdate()).then(function () {
+                        console.log("OK");
+                    }, function () {
+                        createProjectSave("local");
+                    })
+                }
+            }
+        });
+        return object;
+    })(this);
+    /*
     this.SessionKey = {
         key: null,
         request: new XMLHttpRequest(),
         parent: this,
         handleEvent: function () {
-            var parse = new DOMParser();
-            var xml = parse.parseFromString(this.request.response, "text/xml");
-            if (this.request.response.length === 0) {
-                console.error("An unspecified error occured, no server key could be generated");
-                return;
-            }
-            if (xml.getElementsByTagName("state").length > 0) {
-                if (xml.getElementsByTagName("state")[0].textContent == "OK") {
-                    this.key = xml.getAllElementsByTagName("key")[0].textContent;
-                    this.parent.root.setAttribute("key", this.key);
-                    this.parent.root.setAttribute("state", "empty");
-                    this.update();
-                    return;
-                } else if (xml.getElementsByTagName("state")[0].textContent == "ERROR") {
-                    this.key = null;
-                    console.error("Could not generate server key. Server responded with error message: \"" + xml.getElementsByTagName("message")[0].textContent + "\"");
-                    return;
-                }
-            }
-            this.key = null;
-            console.error("An unspecified error occured, no server key could be generated");
+
         },
         requestKey: function () {
-            // For new servers, request a new key from the server
-            var returnURL = "";
-            if (typeof specification.projectReturn == "string") {
-                if (specification.projectReturn.substr(0, 4) == "http") {
-                    returnURL = specification.projectReturn;
-                }
-            }
-            this.request.open("GET", returnURL + "php/requestKey.php?saveFilenamePrefix=" + this.parent.filenamePrefix, true);
-            this.request.addEventListener("load", this);
-            this.request.send();
+
         },
         update: function () {
             if (this.key === null) {
@@ -3818,7 +3939,7 @@ function Storage() {
             });
         }
     };
-
+    */
     this.createTestPageStore = function (specification) {
         var store = new this.pageNode(this, specification);
         this.testPages.push(store);
