@@ -696,7 +696,7 @@ function interfacePopup() {
             tr = document.createElement('div');
             tr.setAttribute('name', 'option');
             tr.className = "popup-option-checbox";
-            var resp = undefined;
+            var resp;
             if (node.response.length > 0) {
                 resp = node.response.find(function (a) {
                     return a.name == option.name;
@@ -1267,7 +1267,7 @@ function stateMachine() {
                 } else {
                     remainder.push(a);
                 }
-            })
+            });
             if (page.poolSize > 0 || page.randomiseOrder) {
                 page.randomiseOrder = true;
                 if (page.poolSize === 0) {
@@ -2040,9 +2040,9 @@ function audioObject(id) {
 
     this.bufferStart = function (startTime) {
         this.outputGain.gain.cancelScheduledValues(audioContext.currentTime);
-        if (this.bufferNode && this.bufferNode.state == 0) {
+        if (this.bufferNode && this.bufferNode.state === 0) {
             this.bufferNode.state = 1;
-            if (this.bufferNode.loop == true) {
+            if (this.bufferNode.loop === true) {
                 this.bufferNode.start(startTime);
             } else {
                 this.bufferNode.start(startTime, this.specification.startTime || 0, this.specification.stopTime - this.specification.startTime || this.buffer.buffer.duration);
@@ -2381,7 +2381,7 @@ function Interface(specificationObject) {
                     throw ("Key must be a singular character");
                 }
                 var included = this.keys.findIndex(function (k) {
-                    return k.key == key
+                    return k.key == key;
                 }) >= 0;
                 if (included) {
                     throw ("Key " + key + " already bounded!");
@@ -2414,7 +2414,7 @@ function Interface(specificationObject) {
 
                 function keypress(key) {
                     var index = this.keys.findIndex(function (k) {
-                        return k.key == key
+                        return k.key == key;
                     });
                     if (index >= 0) {
                         audioEngineContext.play(this.keys[index].audioObject.id);
@@ -2425,7 +2425,7 @@ function Interface(specificationObject) {
                     return document.activeElement.className.indexOf("trackComment") >= 0;
                 }
                 if (e.key === " ") {
-                    if (isPlaying() && trackCommentFocus() == false) {
+                    if (isPlaying() && trackCommentFocus() === false) {
                         e.preventDefault();
                         audioEngineContext.stop();
                     }
@@ -3696,7 +3696,7 @@ function Storage() {
                 // Make the request
                 req.send([hold.innerHTML]);
             });
-        };
+        }
 
         function keyPromise() {
             return new Promise(function (resolve, reject) {
@@ -3721,7 +3721,7 @@ function Storage() {
                 };
 
                 req.send();
-            })
+            });
         }
 
         var requestChains = null;
@@ -3734,7 +3734,7 @@ function Storage() {
                     return sessionKey;
                 },
                 "set": function (a) {
-                    throw ("Cannot set read-only property")
+                    throw ("Cannot set read-only property");
                 }
             },
             "request": {
@@ -3775,7 +3775,7 @@ function Storage() {
             },
             "update": {
                 "value": function () {
-                    if (this.key == null || requestChains === undefined) {
+                    if (this.key === null || requestChains === undefined) {
                         throw ("Cannot save as key == null");
                     }
                     this.parent.root.setAttribute("state", "update");
@@ -3784,7 +3784,7 @@ function Storage() {
             },
             "finish": {
                 "value": function () {
-                    if (this.key == null || requestChains === undefined) {
+                    if (this.key === null || requestChains === undefined) {
                         throw ("Cannot save as key == null");
                     }
                     this.parent.finish();
@@ -3792,7 +3792,7 @@ function Storage() {
                         console.log("OK");
                     }, function () {
                         createProjectSave("local");
-                    })
+                    });
                 }
             }
         });
