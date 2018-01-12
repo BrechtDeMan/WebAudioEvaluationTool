@@ -562,12 +562,14 @@ function ape() {
             UI.startTime = undefined;
         };
         this.handleEvent = function (event) {
+            // TODO: Functionalise and scope
             function getTargetSlider(target) {
                 return sliders.find(function (a) {
                     return a.DOM == target;
                 });
             }
             var time = audioEngineContext.timer.getTestTime();
+            var move, w;
             if (event.preventDefault) {
                 event.preventDefault();
             }
@@ -583,14 +585,13 @@ function ape() {
                 return;
             }
             if (event.type == "mousemove") {
-                var move = event.clientX - 6;
-                var w = $(sliderRail).width();
+                move = event.clientX - 6;
+                w = $(sliderRail).width();
                 move = Math.max(50, move);
                 move = Math.min(w, move);
                 UI.selected.value = (move / w);
             } else if (event.type == "touchmove") {
                 if (UI.selected == getTargetSlider(event.target)) {
-                    var move;
                     if (event.targetTouches) {
                         move = event.targetTouches[0].clientX - 6;
                     } else if (event.originalEvent.targetTouches) {
@@ -598,7 +599,7 @@ function ape() {
                     } else {
                         return;
                     }
-                    var w = $(event.currentTarget).width();
+                    w = $(event.currentTarget).width();
                     move = Math.max(50, move);
                     move = Math.min(w, move);
                     UI.selected.value = (move / w);

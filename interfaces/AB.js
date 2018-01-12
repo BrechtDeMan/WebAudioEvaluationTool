@@ -76,7 +76,7 @@ function loadInterface() {
     boxes.id = "box-holders";
 
     var submitHolder = document.createElement("div");
-    submitHolder.id = "submit-holder"
+    submitHolder.id = "submit-holder";
     var submit = document.createElement('button');
     submit.id = "submit";
     submit.onclick = buttonSubmitClick;

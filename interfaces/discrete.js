@@ -2,7 +2,7 @@
  * WAET Blank Template
  * Use this to start building your custom interface
  */
-
+/*globals window, interfaceContext, testState, Interface, audioEngineContext, console, document, specification, $, storage*/
 // Once this is loaded and parsed, begin execution
 loadInterface();
 
@@ -115,7 +115,7 @@ function loadInterface() {
     // Load the full interface
     testState.initialise();
     testState.advanceState();
-};
+}
 
 function loadTest(page) {
     // Called each time a new test page is to be build. The page specification node is the only item passed in
@@ -186,7 +186,7 @@ function loadTest(page) {
         text.textContent = a.text;
         h.appendChild(text);
         scaleTextHolder.appendChild(h);
-    })
+    });
 
     // Find all the audioElements from the audioHolder
     var index = 0;
@@ -268,13 +268,13 @@ function discreteObject(audioObject, label) {
         } else {
             audioEngineContext.stop();
         }
-    };
+    }
 
     function radioSelected(event) {
         var time = audioEngineContext.timer.getTestTime();
         audioObject.metric.moved(time, event.currentTarget.value);
         console.log("slider " + audioObject.id + " moved to " + event.currentTarget.value + "(" + time + ")");
-    };
+    }
 
     var root = document.createElement("div"),
         labelHolder = document.createElement("div"),
@@ -309,7 +309,7 @@ function discreteObject(audioObject, label) {
         } else if (event.currentTarget.type === "radio") {
             radioSelected(event);
         }
-    }
+    };
     this.enable = function () {
         // This is used to tell the interface object that playback of this node is ready
         button.disabled = "";
@@ -372,7 +372,7 @@ function discreteObject(audioObject, label) {
             "value": root
         }
     });
-};
+}
 
 function resizeWindow(event) {
     // Called on every window resize event, use this to scale your page properly

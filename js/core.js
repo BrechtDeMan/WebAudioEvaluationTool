@@ -2727,11 +2727,11 @@ function Interface(specificationObject) {
         };
         this.resize();
         this.check = function () {
-            if (this.specification.mandatory && this.textArea.value.length == 0) {
+            if (this.specification.mandatory && this.textArea.value.length === 0) {
                 return false;
             }
             return true;
-        }
+        };
     };
 
     this.radioBox = function (commentQuestion) {
@@ -2810,11 +2810,11 @@ function Interface(specificationObject) {
             var anyChecked = this.options.some(function (a) {
                 return a.checked;
             });
-            if (this.specification.mandatory && anyChecked == false) {
+            if (this.specification.mandatory && anyChecked === false) {
                 return false;
             }
             return true;
-        }
+        };
         this.resize();
     };
 
@@ -2885,7 +2885,7 @@ function Interface(specificationObject) {
             var anyChecked = this.options.some(function (a) {
                 return a.checked;
             });
-            if (this.specification.mandatory && anyChecked == false) {
+            if (this.specification.mandatory && anyChecked === false) {
                 return false;
             }
             return true;
@@ -2949,7 +2949,7 @@ function Interface(specificationObject) {
         };
         this.check = function () {
             return true;
-        }
+        };
         this.resize();
     };
 
@@ -2974,16 +2974,16 @@ function Interface(specificationObject) {
 
     this.checkCommentQuestions = function () {
         var errored = this.commentQuestions.reduce(function (a, cq) {
-            if (cq.check() == false) {
+            if (cq.check() === false) {
                 a.push(cq);
             }
             return a;
         }, []);
-        if (errored.length == 0) {
+        if (errored.length === 0) {
             return true;
         }
         interfaceContext.lightbox.post("Message", "Not all the mandatory comment boxes below have been filled.");
-    }
+    };
 
     this.outsideReferenceDOM = function (audioObject, index, inject) {
         this.parent = audioObject;
