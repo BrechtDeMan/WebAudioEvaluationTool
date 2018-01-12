@@ -3778,6 +3778,7 @@ function Storage() {
                         throw ("Cannot save as key == null");
                     }
                     this.parent.root.setAttribute("state", "update");
+                    console.log("Requested save...");
                     requestChains = requestChains.then(postUpdate());
                 }
             },
