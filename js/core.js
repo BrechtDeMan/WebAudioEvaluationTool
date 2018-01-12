@@ -3662,6 +3662,7 @@ function Storage() {
             hold.appendChild(clone);
             return new Promise(function (resolve, reject) {
                 // Do the usual XHR stuff
+                console.log("Requested save...");
                 var req = new XMLHttpRequest();
                 req.open("POST", returnURL + "php/save.php?key=" + sessionKey + "&saveFilenamePrefix=" + parent.filenamePrefix);
                 req.setRequestHeader('Content-Type', 'text/xml');
@@ -3778,7 +3779,6 @@ function Storage() {
                         throw ("Cannot save as key == null");
                     }
                     this.parent.root.setAttribute("state", "update");
-                    console.log("Requested save...");
                     requestChains = requestChains.then(postUpdate());
                 }
             },
