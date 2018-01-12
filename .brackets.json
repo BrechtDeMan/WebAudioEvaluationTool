@@ -1,0 +1,12 @@
+{
+    "brackets-minifier.on-save-project": false,
+    "brackets-minifier.js-project-minify": true,
+    "brackets-minifier.css-project-minify": true,
+    "brackets-minifier.js-custom-path": "",
+    "brackets-minifier.css-custom-path": "",
+    "brackets-minifier.project-exclude": "",
+    "brackets-minifier.concat-js-filename": "",
+    "brackets-minifier.concat-css-filename": "",
+    "brackets-minifier.uglifyjs-options": "{}",
+    "brackets-minifier.cleancss-options": "{}"
+}
