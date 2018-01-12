@@ -3650,6 +3650,11 @@ function Storage() {
     };
 
     this.SessionKey = (function (parent) {
+        var returnURL = "";
+        if (window.returnURL !== undefined) {
+            returnURL = String(window.returnURL);
+        }
+
         function postUpdate() {
             // Return a new promise.
             var hold = document.createElement("div");
