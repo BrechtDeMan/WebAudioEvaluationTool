@@ -57,7 +57,7 @@ AngularInterface.directive("dropzone", function () {
 
                     reader.onload = (function (theFile) {
                         return function (e) {
-                            scope.addAudioElementFromFile(theFile.name);
+                            scope.ondrop(theFile.name);
                             scope.$apply();
                         };
                     })(f);
@@ -207,13 +207,39 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
 AngularInterface.controller("introduction", ['$scope', '$element', '$window', function ($s, $e, $w) {
     $s.state = 0;
     $s.selected = undefined;
+    $s.close = function () {
+        $($e[0]).modal('hide');
+    }
     $s.next = function () {
-        $s.state++;
-        if ($s.state > 1 || $s.file) {
-            $($e[0]).modal('hide')
+        if (($s.state === 0 && $s.file) || $s.state === 1) {
             $s.initialise($s.selected);
+            if ($s.selected != "AB" && $s.selected != "ABX") {
+                $s.close();
+            }
+        } else if ($s.state === 2 && $s.audioFragments.length > 0) {
+            // Populate the audio pages by creating a pairwise set of pairs
+            $s.populatePages((function (a) {
+                var b = [];
+                a.forEach(function (e1, i1, a) {
+                    a.forEach(function (e2, i2) {
+                        var entry = [e1, e2];
+                        if (i1 > i2) {
+                            b.push(entry);
+                        }
+                    });
+                });
+                return b;
+            })($s.audioFragments));
+            $s.close();
+        } else if ($s.state > 2) {
+            $s.close();
         }
+        $s.state++;
+        console.log("Modal state " + $s.state);
     };
+    $s.skip = function () {
+        $s.close();
+    }
     $s.back = function () {
         $s.state--;
     };
@@ -241,9 +267,9 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         }
     };
     $s.select = function (name) {
-            $s.selected = name;
-        }
-        // Get the test interface specifications
+        $s.selected = name;
+    };
+    // Get the test interface specifications
     $s.file = undefined;
     $s.description = "";
 
@@ -261,6 +287,28 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         };
         r.readAsText($s.file);
     };
+
+    $s.audioFragments = [];
+    $s.ondrop = function (filename) {
+        $s.audioFragments.push({
+            fname: filename,
+            name: "fragment-" + String($s.audioFragments.length)
+        });
+    };
+
+    $s.populatePages = function (structures) {
+        structures.forEach(function (p, i) {
+            var page = $w.specification.createNewPage();
+            page.id = "page-" + String(i);
+            p.forEach(function (a) {
+                var fragment = page.addAudioElement();
+                fragment.name = a.name;
+                fragment.id = a.name + "-p" + String(i);
+                fragment.url = a.fname;
+            });
+            page.addInterface();
+        });
+    }
 }]);
 
 AngularInterface.controller("setup", ['$scope', '$element', '$window', function ($s, $e, $w) {
@@ -522,7 +570,7 @@ AngularInterface.controller("page", ['$scope', '$element', '$window', function (
     $s.addAudioElement = function () {
         $s.page.addAudioElement();
     };
-    $s.addAudioElementFromFile = function (filename) {
+    $s.ondrop = function (filename) {
         var fragment = $s.page.addAudioElement();
         fragment.url = filename;
     };

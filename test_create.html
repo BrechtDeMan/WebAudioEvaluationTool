@@ -1093,8 +1093,8 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4>Test Creator</h4>
-                    <h4 class="label label-primary">v1.2.3</h4>
+                    <h3>Test Creator</h3>
+                    <h3 class="label label-primary">v1.2.3</h3>
                 </div>
                 <div class="modal-body" ng-switch="state">
                     <div ng-switch-when="0">
@@ -1110,7 +1110,7 @@
                             <span>Please select the interface you would like to use below. Selecting an interface will give a brief description of the interface type.</span>
                         </div>
                         <div class="row">
-                            <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
+                            <div class="col-md-6">
                                 <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="select(i.name)">
                                     <label style="cursor:pointer">
                                         <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
@@ -1122,9 +1122,28 @@
                             </div>
                         </div>
                     </div>
+                    <div ng-switch-when="2" dropzone>
+                        <div>
+                            <h4>Audio Files</h4>
+                            <p>{{selected}} is a pairwise test with only two fragments per page. To make it easy to add a lot of fragments (and therefore pages) you can automatically drop your fragments onto here, set a name for each and we will populate your page elements for you!</p>
+                        </div>
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Filename</td>
+                                <td>Name</td>
+                            </tr>
+                            <tr ng-repeat="elem in audioFragments">
+                                <td>{{elem.fname}}</td>
+                                <td>
+                                    <input type="text" ng-model="elem.name" required />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button id="popupBack" type="button" class="btn btn-default" ng-show="state>0" ng-click="back()">Back</button>
+                    <button id="popupNext" type="button" class="btn btn-warning" ng-show="state>1" ng-click="skip()">Skip</button>
                     <button id="popupNext" type="button" class="btn btn-default" ng-click="next()">Next</button>
                 </div>
             </div>
