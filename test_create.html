@@ -1089,42 +1089,44 @@
             </div>
         </div>
     </div>
-    <div id="popupHolder" ng-show="popupVisible">
-        <div ng-controller="introduction" class="popup" ng-show="popupVisible">
-            <div class="popupTitle" ng-switch="state">
-                <span ng-switch-when="0">Test Creator <span class="label label-primary">v1.2.2</span></span>
-                <span ng-switch-when="1">Create New Test</span>
-            </div>
-            <div class="popupContent container-fluid" ng-switch="state">
-                <div ng-switch-when="0">
-                    <div>
-                        <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.2 version.</span>
-                    </div>
-                    <div>
-                        <input type="file" id="files" ng-model="files" onchange="handleFiles(event)" />
-                    </div>
+    <div class="modal fade bs-example-modal-lg" id="popupHolder" tabindex="-1" role="dialog" ng-controller="introduction">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Test Creator</h4>
+                    <h4 class="label label-primary">v1.2.3</h4>
                 </div>
-                <div ng-switch-when="1">
-                    <div>
-                        <span>Please select the interface you would like to use below. Selecting an interface will give a brief description of the interface type.</span>
+                <div class="modal-body" ng-switch="state">
+                    <div ng-switch-when="0">
+                        <div>
+                            <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.3 version.</span>
+                        </div>
+                        <div>
+                            <input type="file" id="files" ng-model="files" onchange="handleFiles(event)" />
+                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
-                            <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="select(i.name)">
-                                <label style="cursor:pointer">
-                                    <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
-                                </label>
+                    <div ng-switch-when="1">
+                        <div>
+                            <span>Please select the interface you would like to use below. Selecting an interface will give a brief description of the interface type.</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6" style="overflow-y: scroll;height: 333px;">
+                                <div class="new-test" ng-repeat="i in testSpecifications.interfaces" ng-mouseover="mouseover(i.name)" ng-click="select(i.name)">
+                                    <label style="cursor:pointer">
+                                        <input type="radio" name="new-test" value="{{i.name}}" id="i.name" style="cursor:pointer" /> {{i.name}}
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <span>{{description}}</span>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <span>{{description}}</span>
-                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="popupButtons">
-                <button id="popupBack" type="button" class="btn btn-default" ng-show="state>0" ng-click="back()">Back</button>
-                <button id="popupNext" type="button" class="btn btn-default" ng-click="next()">Next</button>
+                <div class="modal-footer">
+                    <button id="popupBack" type="button" class="btn btn-default" ng-show="state>0" ng-click="back()">Back</button>
+                    <button id="popupNext" type="button" class="btn btn-default" ng-click="next()">Next</button>
+                </div>
             </div>
         </div>
     </div>

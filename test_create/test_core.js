@@ -72,6 +72,7 @@ var specification = new Specification();
 window.onload = function () {
     // Get the test interface specifications
     toggleDropdowns();
+    $("#popupHolder").modal("show");
 };
 
 function toggleDropdowns() {
@@ -87,7 +88,6 @@ function handleFiles(event) {
 }
 
 AngularInterface.controller("view", ['$scope', '$element', '$window', function ($s, $e, $w) {
-    $s.popupVisible = true;
     $s.testSpecifications = {};
 
     (function () {
@@ -111,12 +111,6 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
         });
     })();
 
-    $s.showPopup = function () {
-        $s.popupVisible = true;
-    };
-    $s.hidePopup = function () {
-        $s.popupVisible = false;
-    };
     $s.globalSchema = undefined;
     get("xml/test-schema.xsd").then(function (text) {
         specification.processSchema(text);
@@ -216,7 +210,7 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
     $s.next = function () {
         $s.state++;
         if ($s.state > 1 || $s.file) {
-            $s.hidePopup();
+            $($e[0]).modal('hide')
             $s.initialise($s.selected);
         }
     };
