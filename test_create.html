@@ -469,7 +469,7 @@
         <div style="text-align: center;">
             <button type="button" class="btn btn-success" ng-click="addPage()">Add Page</button>
         </div>
-        <div class="node pageNode" ng-controller="page" ng-repeat="page in specification.pages">
+        <div class="node pageNode" ng-controller="page" ng-repeat="page in specification.pages" dropzone>
             <h2>Page</h2>
             <button type="button" class="btn btn-danger" ng-click="removePage(page)">Remove Page</button>
             <div class="attributes">

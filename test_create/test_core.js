@@ -31,6 +31,42 @@ function get(url) {
 
 var AngularInterface = angular.module("creator", []);
 
+AngularInterface.directive("dropzone", function () {
+    return {
+        restrict: "A",
+        link: function (scope, elem) {
+            elem.bind('dragover', function (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+            });
+            elem.bind('dragend', function (evt) {
+                console.log(evt);
+                evt.stopPropagation();
+                evt.preventDefault();
+            });
+            elem.bind('drop', function (event) {
+                var evt = event.originalEvent;
+                console.log(evt);
+                evt.stopPropagation();
+                evt.preventDefault();
+
+                var files = evt.dataTransfer.files;
+                for (var i = 0, f; f = files[i]; i++) {
+                    var reader = new FileReader();
+                    reader.readAsArrayBuffer(f);
+
+                    reader.onload = (function (theFile) {
+                        return function (e) {
+                            scope.addAudioElementFromFile(theFile.name);
+                            scope.$apply();
+                        };
+                    })(f);
+                }
+            });
+        }
+    }
+});
+
 var specification = new Specification();
 
 window.onload = function () {
@@ -211,9 +247,9 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         }
     };
     $s.select = function (name) {
-        $s.selected = name;
-    }
-    // Get the test interface specifications
+            $s.selected = name;
+        }
+        // Get the test interface specifications
     $s.file = undefined;
     $s.description = "";
 
@@ -491,6 +527,10 @@ AngularInterface.controller("page", ['$scope', '$element', '$window', function (
     };
     $s.addAudioElement = function () {
         $s.page.addAudioElement();
+    };
+    $s.addAudioElementFromFile = function (filename) {
+        var fragment = $s.page.addAudioElement();
+        fragment.url = filename;
     };
     $s.removeAudioElement = function (element) {
         var index = $s.page.audioElements.findIndex(function (a) {
