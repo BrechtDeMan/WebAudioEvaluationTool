@@ -74,10 +74,6 @@
                     <span>Fixed Sampling Rate: </span>
                     <input type="number" ng-model="specification.sampleRate" min="0" placeholder="{{placeholder('sampleRate')}}" />
                 </div>
-                <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show a 'method of adjustment' audio calibration before testing.">
-                    <span>Pre-Test audio calibration: </span>
-                    <input type="checkbox" ng-model="specification.calibration" />
-                </div>
                 <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Default cross-fade time when switching between elements. Can be over-ridden on each page">
                     <span>Global Cross-fade time: </span>
                     <input type="number" ng-model="specification.crossFade" min="0" step="0.1" placeholder="{{placeholder('crossFade')}}" />
@@ -106,6 +102,23 @@
             <div class="node">
                 <h2>Test Completed Message</h2>
                 <textarea ng-model="specification.exitText" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Once the test is completed, you can show a message to the user. Markdown syntax is supported for formatting."></textarea>
+            </div>
+            <div class="node">
+                <h2>Pre-Test Calibrations</h2>
+                <div class="attributes">
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Perform a frequency listening response">
+                        <span>Check Frequency Response</span>
+                        <input type="checkbox" value="testTimer" ng-model="specification.calibration.checkFrequencies" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Set the output levels">
+                        <span>Check Levels</span>
+                        <input type="checkbox" value="testTimer" ng-model="specification.calibration.checkLevels" />
+                    </div>
+                    <div class="attribute" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Check L/R configuration">
+                        <span>Check Channels</span>
+                        <input type="checkbox" value="testTimer" ng-model="specification.calibration.checkChannels" />
+                    </div>
+                </div>
             </div>
             <div id="metricsNode" class="node">
                 <h3>Session Metrics</h3>

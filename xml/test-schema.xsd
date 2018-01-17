@@ -48,6 +48,7 @@
             <xs:complexType>
                 <xs:sequence>
                     <xs:element name="exitText" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element ref="calibration" minOccurs="0" maxOccurs="1" />
                     <xs:element ref="survey" minOccurs="0" maxOccurs="2" />
                     <xs:element ref="metric" maxOccurs="1" />
                     <xs:element ref="interface" maxOccurs="1" />
@@ -59,7 +60,6 @@
                 <xs:attribute ref="poolSize" />
                 <xs:attribute name="loudness" type="xs:nonPositiveInteger" use="optional" />
                 <xs:attribute name="sampleRate" type="xs:positiveInteger" use="optional" />
-                <xs:attribute name="calibration" type="xs:boolean" default="false" />
                 <xs:attribute name="crossFade" default="0.0">
                     <xs:simpleType>
                         <xs:restriction base="xs:decimal">
@@ -73,6 +73,14 @@
                 <xs:attribute ref="playOne" />
                 <xs:attribute ref="minNumberPlays" use="optional" />
                 <xs:attribute ref="maxNumberPlays" use="optional" />
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="calibration">
+            <xs:complexType>
+                <xs:attribute name="checkFrequencies" type="xs:boolean" default="false" />
+                <xs:attribute name="checkLevels" type="xs:boolean" default="false" />
+                <xs:attribute name="checkChannels" type="xs:boolean" default="false" />
             </xs:complexType>
         </xs:element>
 

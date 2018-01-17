@@ -12,7 +12,6 @@ function Specification() {
     this.poolSize = undefined;
     this.loudness = undefined;
     this.sampleRate = undefined;
-    this.calibration = undefined;
     this.crossFade = undefined;
     this.preSilence = undefined;
     this.postSilence = undefined;
@@ -131,8 +130,9 @@ function Specification() {
             if (projectAttr !== null) {
                 this[attributeName] = projectAttr;
             }
-
         }
+        
+        this.calibration.decode(this, projectXML.getElementsByTagName('calibration')[0]);
 
         var exitTextNode = setupNode.getElementsByTagName('exitText');
         if (exitTextNode.length == 1) {
@@ -209,6 +209,7 @@ function Specification() {
             exitTextNode.textContent = this.exitText;
             setup.appendChild(exitTextNode);
         }
+        setup.appendChild(this.calibration.encode(RootDocument));
         setup.appendChild(this.preTest.encode(RootDocument));
         setup.appendChild(this.postTest.encode(RootDocument));
         setup.appendChild(this.metrics.encode(RootDocument));
@@ -218,6 +219,83 @@ function Specification() {
         });
         return RootDocument;
     };
+
+    this.calibration = (function () {
+        var frequencies = false,
+            levels = false,
+            channels = false,
+            schema = undefined;
+        var Calibration = {};
+        Object.defineProperties(Calibration, {
+            "parent": {
+                "value": this
+            },
+            "schema": {
+                "get": function () {
+                    return schema;
+                },
+                "set": function (t) {
+                    if (schema === undefined) {
+                        schema = t;
+                    } else {
+                        throw ("Cannot set readonly");
+                    }
+                }
+            },
+            "checkFrequencies": {
+                "get": function () {
+                    return frequencies;
+                },
+                "set": function (t) {
+                    frequencies = (t === true);
+                }
+            },
+            "checkLevels": {
+                "get": function () {
+                    return levels;
+                },
+                "set": function (t) {
+                    levels = (t === true);
+                }
+            },
+            "checkChannels": {
+                "get": function () {
+                    return channels;
+                },
+                "set": function (t) {
+                    channels = (t === true);
+                }
+            },
+            "encode": {
+                "value": function (doc) {
+                    var node = doc.createElement("calibration");
+                    node.setAttribute("checkFrequencies", frequencies);
+                    node.setAttribute("checkLevels", levels);
+                    node.setAttribute("checkChannels", channels);
+                    return node;
+                }
+            },
+            "decode": {
+                "value": function (parent, xml) {
+                    this.schema = schemaRoot.querySelector("[name=calibration]");
+                    var attributeMap = this.schema.querySelectorAll('attribute'),
+                        i;
+                    for (i in attributeMap) {
+                        if (isNaN(Number(i)) === true) {
+                            break;
+                        }
+                        var attributeName = attributeMap[i].getAttribute('name') || attributeMap[i].getAttribute('ref');
+                        var projectAttr = xml.getAttribute(attributeName);
+                        projectAttr = processAttribute(projectAttr, attributeMap[i]);
+                        if (projectAttr !== null) {
+                            this[attributeName] = projectAttr;
+                        }
+                    }
+                }
+            }
+        });
+        return Calibration;
+    })();
 
     function surveyNode(specification) {
         this.location = undefined;
