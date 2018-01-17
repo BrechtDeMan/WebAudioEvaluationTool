@@ -146,11 +146,12 @@ var onload = function () {
     // Create the specification object
     specification = new Specification();
 
+    // Create the storage object
+    storage = new Storage();
+
     // Create the interface object
     interfaceContext = new Interface(specification);
 
-    // Create the storage object
-    storage = new Storage();
     // Define window callbacks for interface
     window.onresize = function (event) {
         interfaceContext.resizeWindow(event);
@@ -1144,8 +1145,7 @@ function interfacePopup() {
 
     this.proceedClicked = function () {
         // Each time the popup button is clicked!
-        if (testState.stateIndex === 0 && specification.calibration) {
-            interfaceContext.calibrationModuleObject.collect();
+        if (testState.stateIndex === -1 && specification.calibration) {
             advanceState();
             return;
         }
@@ -1361,14 +1361,18 @@ function stateMachine() {
                 this.advanceState();
             }
         } else if (this.stateIndex == -1) {
-            this.stateIndex++;
-            if (specification.calibration) {
+            if (interfaceContext.calibrationTests.checkFrequencies) {
                 popup.showPopup();
-                popup.popupTitle.textContent = "Calibration. Set the levels so all tones are of equal amplitude. Move your mouse over the sliders to hear the tones. The red slider is the reference tone";
-                interfaceContext.calibrationModuleObject = new interfaceContext.calibrationModule();
-                interfaceContext.calibrationModuleObject.build(popup.popupResponse);
+                popup.popupTitle.textContent = "Set the levels so all tones are of equal amplitude. Move your mouse over the sliders to hear the tones. The red slider is the reference tone";
+                interfaceContext.calibrationTests.performFrequencyCheck(popup.popupResponse);
+                popup.hidePreviousButton();
+            } else if (interfaceContext.calibrationTests.checkChannels) {
+                popup.showPopup();
+                popup.popupTitle.textContent = "Click play to start the audio, the click the button corresponding to where the sound appears to be coming from.";
+                interfaceContext.calibrationTests.performChannelCheck(popup.popupResponse);
                 popup.hidePreviousButton();
             } else {
+                this.stateIndex++;
                 this.advanceState();
             }
         } else if (this.stateIndex == this.stateMap.length) {
@@ -3216,93 +3220,193 @@ function Interface(specificationObject) {
         return imageController;
     })();
 
-    this.calibrationModuleObject = null;
-    this.calibrationModule = function () {
-        // This creates an on-page calibration module
-        this.storeDOM = storage.document.createElement("calibration");
-        storage.root.appendChild(this.storeDOM);
-        // The calibration is a fixed state module
-        this.calibrationNodes = [];
-        this.holder = null;
-        this.build = function (inject) {
-            var f0 = 62.5;
-            this.holder = document.createElement("div");
-            this.holder.className = "calibration-holder";
-            this.calibrationNodes = [];
-            while (f0 < 20000) {
-                /* jshint loopfunc: true */
-                var obj = {
-                    root: document.createElement("div"),
-                    input: document.createElement("input"),
-                    oscillator: audioContext.createOscillator(),
-                    gain: audioContext.createGain(),
-                    f: f0,
-                    parent: this,
-                    handleEvent: function (event) {
-                        switch (event.type) {
-                            case "mouseenter":
-                                this.oscillator.start(0);
-                                break;
-                            case "mouseleave":
-                                this.oscillator.stop(0);
-                                this.oscillator = audioContext.createOscillator();
-                                this.oscillator.connect(this.gain);
-                                this.oscillator.frequency.value = this.f;
-                                break;
-                            case "mousemove":
-                                var value = Math.pow(10, this.input.value / 20);
-                                if (this.f == 1000) {
-                                    audioEngineContext.outputGain.gain.value = value;
-                                    interfaceContext.volume.slider.value = this.input.value;
-                                } else {
-                                    this.gain.gain.value = value;
-                                }
-                                break;
-                        }
-                    },
-                    disconnect: function () {
-                        this.gain.disconnect();
-                    }
-                };
-                obj.root.className = "calibration-slider";
-                obj.root.appendChild(obj.input);
-                obj.oscillator.connect(obj.gain);
-                obj.gain.connect(audioEngineContext.outputGain);
-                obj.gain.gain.value = Math.random() * 2;
-                obj.input.value = obj.gain.gain.value;
-                obj.input.setAttribute('orient', 'vertical');
-                obj.input.type = "range";
-                obj.input.min = -12;
-                obj.input.max = 0;
-                obj.input.step = 0.25;
-                if (f0 != 1000) {
-                    obj.input.value = (Math.random() * 12) - 6;
-                } else {
-                    obj.input.value = 0;
-                    obj.root.style.backgroundColor = "rgb(255,125,125)";
-                }
-                obj.input.addEventListener("mousemove", obj);
-                obj.input.addEventListener("mouseenter", obj);
-                obj.input.addEventListener("mouseleave", obj);
-                obj.gain.gain.value = Math.pow(10, obj.input.value / 20);
-                obj.oscillator.frequency.value = f0;
-                this.calibrationNodes.push(obj);
-                this.holder.appendChild(obj.root);
-                f0 *= 2;
+    this.calibrationTests = (function () {
+        function readonly(t) {
+            throw ("Cannot set read-only variable");
+        }
+
+        function getStorageRoot() {
+            var storageRoot = storage.root.querySelector("calibration");
+            if (storageRoot === undefined) {
+                storageRoot = storage.document.createElement("calibration");
+                storage.root.appendChild(storageRoot);
             }
-            inject.appendChild(this.holder);
-        };
-        this.collect = function () {
-            this.calibrationNodes.forEach(function (obj) {
-                var node = storage.document.createElement("calibrationresult");
-                node.setAttribute("frequency", obj.f);
-                node.setAttribute("range-min", obj.input.min);
-                node.setAttribute("range-max", obj.input.max);
-                node.setAttribute("gain-lin", obj.gain.gain.value);
-                this.storeDOM.appendChild(node);
-            }, this);
-        };
-    };
+            return storageRoot;
+        }
+        var calibrationObject = undefined,
+            _checkedFrequency = false,
+            _checkedChannels = false;
+
+        // Define the checkFrequencies test!
+        var checkFrequencyUnit = function (htmlRoot, storageRoot) {
+
+            function createFrequencyElement(frequency) {
+                return (function (frequency) {
+                    var range = document.createElement("input");
+                    range.type = "range";
+                    range.min = "-24";
+                    range.max = "24";
+                    range.step = "0.5";
+                    range.setAttribute("orient", "vertical");
+                    range.value = (Math.random() - 0.5) * 24;
+                    range.setAttribute("frequency", frequency);
+                    htmlRoot.append(range);
+
+                    var gain = audioContext.createGain();
+                    gain.connect(outputGain);
+                    gain.gain.value = Math.pow(10, Number(range.value) / 20.0);
+                    var osc = undefined;
+
+                    var store = storage.document.createElement("response");
+                    store.setAttribute("frequency", frequency);
+                    storageHook.appendChild(store);
+                    var interface = {};
+                    Object.defineProperties(interface, {
+                        "handleEvent": {
+                            "value": function (e) {
+                                if (e.type == "mouseenter") {
+                                    osc = audioContext.createOscillator();
+                                    osc.frequency.value = frequency;
+                                    osc.connect(gain);
+                                    osc.start();
+                                    console.log("start " + frequency);
+                                } else if (e.type == "mouseleave") {
+                                    console.log("stop " + frequency);
+                                    osc.stop();
+                                    osc = undefined;
+                                }
+                                store.textContent = e.currentTarget.value;
+                                gain.gain.value = Math.pow(10, Number(e.currentTarget.value) / 20.0);
+                            }
+                        }
+                    });
+                    range.addEventListener("mousemove", interface);
+                    range.addEventListener("mouseenter", interface);
+                    range.addEventListener("mouseleave", interface);
+                    return interface;
+                })(frequency);
+            }
+            var htmlHook = document.createElement("div");
+            htmlRoot.appendChild(htmlHook);
+            var storageHook = storage.document.createElement("frequency");
+            storageRoot.appendChild(storageHook);
+            var frequencies = [100, 200, 400, 800, 1200, 1600, 2000, 4000, 8000, 12000];
+            var outputGain = audioContext.createGain();
+            outputGain.gain.value = 0.25;
+            outputGain.connect(audioContext.destination);
+            this.sliders = frequencies.map(createFrequencyElement);
+        }
+
+        var checkChannelsUnit = function (htmlRoot, storageRoot) {
+
+            function onclick(ev) {
+                var storageHook = storage.document.querySelector("calibration").querySelector("channels");
+                storageHook.setAttribute("selected", ev.currentTarget.value);
+                storageHook.setAttribute("selectedText", ev.currentTarget.textContent);
+                osc.stop();
+                gainL = undefined;
+                gainR = undefined;
+                cmerge = undefined;
+                popup.proceedClicked();
+            }
+            var osc = audioContext.createOscillator();
+            var gainL = audioContext.createGain();
+            var gainR = audioContext.createGain();
+            gainL.channelCount = 1;
+            gainR.channelCount = 1;
+            var cmerge = audioContext.createChannelMerger(2);
+            osc.connect(gainL, 0, 0);
+            osc.connect(gainR, 0, 0);
+            gainL.connect(cmerge, 0, 0);
+            gainR.connect(cmerge, 0, 1);
+            cmerge.connect(audioContext.destination);
+            var play = document.createElement("button");
+            play.textContent = "Play Audio";
+            play.onclick = function () {
+                osc.start();
+                play.disabled = true;
+            }
+            htmlRoot.appendChild(play);
+            var choiceHolder = document.createElement("div");
+            var leftButton = document.createElement("button");
+            leftButton.textContent = "Left";
+            leftButton.value = "-1";
+            var centerButton = document.createElement("button");
+            centerButton.textContent = "Middle";
+            centerButton.value = "0";
+            var rightButton = document.createElement("button");
+            rightButton.textContent = "Right";
+            rightButton.value = "1";
+            choiceHolder.appendChild(leftButton);
+            choiceHolder.appendChild(centerButton);
+            choiceHolder.appendChild(rightButton);
+            htmlRoot.appendChild(choiceHolder);
+            leftButton.addEventListener("click", onclick);
+            centerButton.addEventListener("click", onclick);
+            rightButton.addEventListener("click", onclick);
+
+            var storageHook = storage.document.createElement("channels");
+            storageRoot.appendChild(storageHook);
+
+            var pan;
+            if (Math.random() > 0.5) {
+                pan = 1;
+                gainL.gain.value = 0.0;
+                gainR.gain.value = 0.25;
+                storageHook.setAttribute("presented", pan);
+                storageHook.setAttribute("presentedText", "Right");
+            } else {
+                pan = -1;
+                gainL.gain.value = 0.25;
+                gainR.gain.value = 0.0;
+                storageHook.setAttribute("presented", pan);
+                storageHook.setAttribute("presentedText", "Left");
+            }
+        }
+
+        var interface = {};
+        Object.defineProperties(interface, {
+            "calibrationObject": {
+                "get": function () {
+                    return calibrationObject
+                },
+                "set": readonly
+            },
+            "checkFrequencies": {
+                "get": function () {
+                    if (specification.calibration.checkFrequencies && _checkedFrequency === false) {
+                        return true;
+                    }
+                    return false;
+                },
+                "set": readonly
+            },
+            "checkChannels": {
+                "get": function () {
+                    if (specification.calibration.checkChannels && _checkedChannels === false) {
+                        return true;
+                    }
+                    return false;
+                },
+                "set": readonly
+            },
+            "performFrequencyCheck": {
+                "value": function (htmlRoot) {
+                    htmlRoot.innerHTML = "";
+                    calibrationObject = new checkFrequencyUnit(htmlRoot, getStorageRoot());
+                    _checkedFrequency = true;
+                }
+            },
+            "performChannelCheck": {
+                "value": function (htmlRoot) {
+                    htmlRoot.innerHTML = "";
+                    calibrationObject = new checkChannelsUnit(htmlRoot, getStorageRoot());
+                    _checkedChannels = true;
+                }
+            }
+        })
+        return interface;
+    })();
 
 
     // Global Checkers
