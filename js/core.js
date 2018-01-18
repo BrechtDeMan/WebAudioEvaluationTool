@@ -3935,8 +3935,8 @@ function Storage() {
             },
             "update": {
                 "value": function () {
-                    if (this.key === null || requestChains === undefined) {
-                        throw ("Cannot save as key == null");
+                    if (requestChains === undefined) {
+                        throw ("Initiate key exchange first");
                     }
                     this.parent.root.setAttribute("state", "update");
                     requestChains = requestChains.then(postUpdate);
