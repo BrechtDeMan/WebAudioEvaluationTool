@@ -131,8 +131,9 @@ function Specification() {
                 this[attributeName] = projectAttr;
             }
         }
-        
-        this.calibration.decode(this, projectXML.getElementsByTagName('calibration')[0]);
+        if (projectXML.getElementsByTagName('calibration').length > 0) {
+            this.calibration.decode(this, projectXML.getElementsByTagName('calibration')[0]);
+        }
 
         var exitTextNode = setupNode.getElementsByTagName('exitText');
         if (exitTextNode.length == 1) {
