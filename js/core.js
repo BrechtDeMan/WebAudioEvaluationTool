@@ -3233,7 +3233,7 @@ function Interface(specificationObject) {
             }
             return storageRoot;
         }
-        var calibrationObject = undefined,
+        var calibrationObject,
             _checkedFrequency = false,
             _checkedChannels = false;
 
@@ -3242,6 +3242,8 @@ function Interface(specificationObject) {
 
             function createFrequencyElement(frequency) {
                 return (function (frequency) {
+                    var hold = document.createElement("div");
+                    hold.className = "calibration-slider";
                     var range = document.createElement("input");
                     range.type = "range";
                     range.min = "-24";
@@ -3250,12 +3252,13 @@ function Interface(specificationObject) {
                     range.setAttribute("orient", "vertical");
                     range.value = (Math.random() - 0.5) * 24;
                     range.setAttribute("frequency", frequency);
-                    htmlRoot.append(range);
+                    hold.appendChild(range);
+                    htmlRoot.appendChild(hold);
 
                     var gain = audioContext.createGain();
                     gain.connect(outputGain);
                     gain.gain.value = Math.pow(10, Number(range.value) / 20.0);
-                    var osc = undefined;
+                    var osc;
 
                     var store = storage.document.createElement("response");
                     store.setAttribute("frequency", frequency);
@@ -3295,7 +3298,7 @@ function Interface(specificationObject) {
             outputGain.gain.value = 0.25;
             outputGain.connect(audioContext.destination);
             this.sliders = frequencies.map(createFrequencyElement);
-        }
+        };
 
         var checkChannelsUnit = function (htmlRoot, storageRoot) {
 
@@ -3325,18 +3328,22 @@ function Interface(specificationObject) {
             play.onclick = function () {
                 osc.start();
                 play.disabled = true;
-            }
+            };
+            play.className = "calibration-button";
             htmlRoot.appendChild(play);
             var choiceHolder = document.createElement("div");
             var leftButton = document.createElement("button");
             leftButton.textContent = "Left";
             leftButton.value = "-1";
+            leftButton.className = "calibration-button";
             var centerButton = document.createElement("button");
             centerButton.textContent = "Middle";
             centerButton.value = "0";
+            centerButton.className = "calibration-button";
             var rightButton = document.createElement("button");
             rightButton.textContent = "Right";
             rightButton.value = "1";
+            rightButton.className = "calibration-button";
             choiceHolder.appendChild(leftButton);
             choiceHolder.appendChild(centerButton);
             choiceHolder.appendChild(rightButton);
@@ -3362,13 +3369,13 @@ function Interface(specificationObject) {
                 storageHook.setAttribute("presented", pan);
                 storageHook.setAttribute("presentedText", "Left");
             }
-        }
+        };
 
         var interface = {};
         Object.defineProperties(interface, {
             "calibrationObject": {
                 "get": function () {
-                    return calibrationObject
+                    return calibrationObject;
                 },
                 "set": readonly
             },
@@ -3404,7 +3411,7 @@ function Interface(specificationObject) {
                     _checkedChannels = true;
                 }
             }
-        })
+        });
         return interface;
     })();
 

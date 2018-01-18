@@ -240,7 +240,7 @@ div.calibration-holder {
     height: auto;
 }
 div.calibration-slider {
-    width: 50px;
+    width: 44px;
     margin: 2px;
     text-align: center;
     align-content: center;
@@ -253,7 +253,15 @@ div.calibration-slider input[type=range][orient=vertical] {
     /* WebKit */
     width: 8px;
     padding: 0 5px;
-    height: 290px;
+    height: 200px;
+}
+button.calibration-button {
+    height: 25px;
+    border-radius: 5px;
+    border: #444;
+    border-width: 1px;
+    border-style: solid;
+    background-color: white;
 }
 
 /*  Comment Boxes */
