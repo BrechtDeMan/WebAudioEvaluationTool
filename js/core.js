@@ -2437,8 +2437,11 @@ function Interface(specificationObject) {
                 function trackCommentFocus() {
                     return document.activeElement.className.indexOf("trackComment") >= 0;
                 }
+                if (trackCommentFocus()) {
+                    return;
+                }
                 if (e.key === " ") {
-                    if (isPlaying() && trackCommentFocus() === false) {
+                    if (isPlaying()) {
                         e.preventDefault();
                         audioEngineContext.stop();
                     }
