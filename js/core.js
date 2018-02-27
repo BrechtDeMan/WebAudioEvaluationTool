@@ -415,10 +415,11 @@ function createProjectSave(destURL) {
             }
         }
         storage.SessionKey.finish().then(function (resolved) {
+            var converter = new showdown.Converter();
             if (typeof specification.returnURL == "string" && specification.returnURL.length > 0) {
                 window.location = specification.returnURL;
             } else {
-                popup.popupContent.textContent = specification.exitText;
+                popup.popupContent.innerHTML = converter.makeHtml(specification.exitText);
             }
         }, function (message) {
             console.log("Save: Error! " + message.textContent);
