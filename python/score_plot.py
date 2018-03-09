@@ -20,6 +20,7 @@ assert len(sys.argv)<4, "score_plot takes at most 2 command line arguments\n"+\
 # initialise plot types (false by default) and options
 enable_boxplot    = False     # show box plot
 enable_confidence = False     # show confidence interval
+enable_combined   = False     # show combined plots
 confidence        = 0.90      # confidence value (for confidence interval plot)
 enable_individual = False     # show all individual ratings
 show_individual   = []        # show specific individuals (empty: show all individuals found)
@@ -69,7 +70,8 @@ else:
             #TODO add confidence value input
         elif arg == 'ind' or arg == 'individual' or arg == '-i':
             enable_individual = True     # show all individual ratings
-            
+        elif arg == 'comb' or arg == 'combined' or arg == '-m':
+            enable_combined   = True     # show combined plot with error bars  
         # PLOT OPTIONS
         elif arg == 'leg' or arg == 'legend' or arg == '-l':
             if not enable_individual: 
@@ -91,7 +93,8 @@ else:
              rating_folder = arg
 
 # at least one plot type should be selected: box plot by default
-if not enable_boxplot and not enable_confidence and not enable_individual:
+if not enable_boxplot and not enable_confidence and not enable_individual and not enable_combined:
+    print("Default to enable boxplot")
     enable_boxplot = True
 
 # check if folder_name exists
@@ -113,6 +116,7 @@ plt.rc('font', **font)
 
 
 # CODE
+combined = {}
 
 # get every csv file in folder
 for file in os.listdir(rating_folder):
@@ -209,25 +213,44 @@ for file in os.listdir(rating_folder):
                                        numpoints=1 # remove extra marker
                                        )
                     increment += 1 # increase counter
+        if enable_combined:
+            print(page_name)
+            combined[page_name] = {"labels": headerrow, "r": ratings}
 
-        # TITLE, AXIS LABELS AND LIMITS
-        plt.title(page_name)
-        plt.xlabel('Fragment')
-        plt.xlim(0, len(headerrow)+1) # only show relevant region, leave space left & right)
-        plt.xticks(range(1, len(headerrow)+1), headerrow, rotation=90) # show fragment names
-        plt.ylabel('Rating')
-        plt.ylim(0,1)
-        
-        
-
-        # SHOW PLOT
-        #plt.show()
-        #exit()
+        if enable_boxplot or enable_confidence or enable_individual:
+            # TITLE, AXIS LABELS AND LIMITS
+            plt.title(page_name)
+            plt.xlabel('Fragment')
+            plt.xlim(0, len(headerrow)+1) # only show relevant region, leave space left & right)
+            plt.xticks(range(1, len(headerrow)+1), headerrow, rotation=90) # show fragment names
+            plt.ylabel('Rating')
+            plt.ylim(0,1)
+            # SHOW PLOT
+            #plt.show()
+            #exit()
     
-        # SAVE PLOT
-        # automatically 
-        plot_type = ("-box" if enable_boxplot else "") + \
+            # SAVE PLOT
+            # automatically 
+            plot_type = ("-box" if enable_boxplot else "") + \
                     ("-conf" if enable_confidence else "") + \
                     ("-ind" if enable_individual else "")
-        plt.savefig(rating_folder+page_name+plot_type+".pdf", bbox_inches='tight')
-        plt.close()
+            plt.savefig(rating_folder+page_name+plot_type+".pdf", bbox_inches='tight')
+            plt.close()
+
+if enable_combined:
+    plt.figure()
+    pages = combined.keys()
+    numcombined = len(pages)
+    spacing = 1.0/float(numcombined+2)
+    for i in range(0,numcombined):
+        page_name = pages[i]
+        N = len(combined[page_name]['labels'])
+        mean = np.percentile(combined[page_name]['r'], 50, 0)
+        p25 = np.percentile(combined[page_name]['r'], 25, 0)
+        p75 = np.percentile(combined[page_name]['r'], 75, 0)
+        yerr = [mean-p25, p75-mean]
+        print(yerr)
+        plt.errorbar(np.arange(0,N)+(spacing*(i+1)), combined[page_name]['r'].mean(0), yerr=yerr, fmt='x', elinewidth=0.5)
+    ax = plt.gca()
+    ax.grid(which='major', axis='x', linewidth=2, color='k')
+    plt.show()
