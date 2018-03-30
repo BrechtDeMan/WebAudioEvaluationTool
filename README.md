@@ -5,7 +5,7 @@
 | Author  | e-mail | 
 | ------- | ------ |
 | Nicholas Jillings 				| <[nicholas.jillings@mail.bcu.ac.uk](mailto:nicholas.jillings@mail.bcu.ac.uk)> |
-| Brecht De Man					| <[b.deman@qmul.ac.uk](mailto:b.deman@qmul.ac.uk)> | 
+| Brecht De Man					| <[brecht.deman@bcu.ac.uk](mailto:brecht.deman@bcu.ac.uk)> | 
 | David Moffat					| <[d.j.moffat@qmul.ac.uk](mailto:d.j.moffat@qmul.ac.uk)>| 
 | Joshua D. Reiss (supervisor)	| <[joshua.reiss@qmul.ac.uk](mailto:joshua.reiss@qmul.ac.uk)> | 
 | Ryan Stables (supervisor)		| <[ryan.stables@bcu.ac.uk](mailto:ryan.stables@bcu.ac.uk)> | 
