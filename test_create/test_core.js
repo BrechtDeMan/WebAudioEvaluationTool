@@ -85,6 +85,7 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
     get("xml/test-schema.xsd").then(function (text) {
         specification.processSchema(text);
         $s.globalSchema = specification.getSchema();
+        $s.$apply();
     });
     $s.availableInterfaceModules = [];
     get("interfaces/interfaces.json").then(JSON.parse).then(function (d) {
@@ -179,7 +180,7 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
     $s.selected = undefined;
     $s.next = function () {
         $s.state++;
-        if ($s.state > 1 || $s.file) {
+        if ($s.state > 2 || $s.file) {
             $s.hidePopup();
             $s.initialise($s.selected);
         }
@@ -187,6 +188,15 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
     $s.back = function () {
         $s.state--;
     };
+
+    $s.$watch(function () {
+        return ($s.globalSchema !== undefined)
+    }, function () {
+        if ($s.globalSchema !== undefined && $s.state === 0) {
+            $s.state = 1;
+        }
+    })
+
     $s.mouseover = function (name) {
         var obj = $s.testSpecifications.interfaces.find(function (i) {
             return i.name == name;
@@ -211,9 +221,9 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         }
     };
     $s.select = function (name) {
-        $s.selected = name;
-    }
-    // Get the test interface specifications
+            $s.selected = name;
+        }
+        // Get the test interface specifications
     $s.file = undefined;
     $s.description = "";
 

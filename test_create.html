@@ -1052,6 +1052,9 @@
             </div>
             <div class="popupContent container-fluid" ng-switch="state">
                 <div ng-switch-when="0">
+                    <h3>Please wait while assets load...</h3>
+                </div>
+                <div ng-switch-when="1">
                     <div>
                         <span>Welcome to the WAET test creator tool. This will allow you to create a new test from scratch to suit your testing needs. If you wish to update a test file, please drag and drop the XML document into the area below for processing, otherwise press 'Next' to start a new test. This tool generates files for the WAET 1.2.2 version.</span>
                     </div>
@@ -1059,7 +1062,7 @@
                         <input type="file" id="files" ng-model="files" onchange="handleFiles(event)" />
                     </div>
                 </div>
-                <div ng-switch-when="1">
+                <div ng-switch-when="2">
                     <div>
                         <span>Please select the interface you would like to use below. Selecting an interface will give a brief description of the interface type.</span>
                     </div>
