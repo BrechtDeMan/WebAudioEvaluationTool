@@ -115,6 +115,7 @@ AngularInterface.controller("view", ['$scope', '$element', '$window', function (
     get("xml/test-schema.xsd").then(function (text) {
         specification.processSchema(text);
         $s.globalSchema = specification.getSchema();
+        $s.$apply();
     });
     $s.availableInterfaceModules = [];
     get("interfaces/interfaces.json").then(JSON.parse).then(function (d) {
@@ -211,12 +212,12 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
         $($e[0]).modal('hide');
     }
     $s.next = function () {
-        if (($s.state === 0 && $s.file) || $s.state === 1) {
+        if (($s.state === 1 && $s.file) || $s.state === 2) {
             $s.initialise($s.selected);
             if ($s.selected != "AB" && $s.selected != "ABX") {
                 $s.close();
             }
-        } else if ($s.state === 2 && $s.audioFragments.length > 0) {
+        } else if ($s.state === 3 && $s.audioFragments.length > 0) {
             // Populate the audio pages by creating a pairwise set of pairs
             $s.populatePages((function (a) {
                 var b = [];
@@ -231,7 +232,7 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
                 return b;
             })($s.audioFragments));
             $s.close();
-        } else if ($s.state > 2) {
+        } else if ($s.state > 3) {
             $s.close();
         }
         $s.state++;
@@ -243,6 +244,15 @@ AngularInterface.controller("introduction", ['$scope', '$element', '$window', fu
     $s.back = function () {
         $s.state--;
     };
+
+    $s.$watch(function () {
+        return ($s.globalSchema !== undefined)
+    }, function () {
+        if ($s.globalSchema !== undefined && $s.state === 0) {
+            $s.state = 1;
+        }
+    })
+
     $s.mouseover = function (name) {
         var obj = $s.testSpecifications.interfaces.find(function (i) {
             return i.name == name;
