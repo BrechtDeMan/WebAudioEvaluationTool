@@ -153,7 +153,6 @@ for position in storage["globals"].keys():
             filewriter = csv.writer(f, delimiter=",")
             filewriter.writerow(storage["globals"][position][ref]["header"])
             for row in storage["globals"][position][ref]["responses"]:
-                row = [element.encode("utf-8") for element in row]
                 filewriter.writerow(row)
 for page_name in storage["pages"].keys():
     for position in storage["pages"][page_name].keys():
@@ -164,7 +163,6 @@ for page_name in storage["pages"].keys():
                 filewriter = csv.writer(f, delimiter=",")
                 filewriter.writerow(storage["pages"][page_name][position][ref]["header"])
                 for row in storage["pages"][page_name][position][ref]["responses"]:
-                    row = [element.encode("utf-8") for element in row]
                     filewriter.writerow(row)
 
 # Time to plot
