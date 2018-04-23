@@ -36,7 +36,7 @@
                 <option name="great">Great</option>
             </surveyradio>
             <surveystatement id="thankyou">
-                <statement>Thank you for taking this listening test. Please click 'submit' and your results will appear in the 'saves/' folder.</statement>
+                <statement>Thank you for taking this listening test. Please click 'Submit' and your results will appear in the 'saves/' folder.</statement>
             </surveystatement>
         </survey>
         <metric>
