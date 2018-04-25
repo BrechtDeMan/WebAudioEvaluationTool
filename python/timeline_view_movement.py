@@ -5,7 +5,7 @@ import os # list files in directory
 import sys # command line arguments
 import matplotlib.pyplot as plt # plots
 import matplotlib.patches as patches # rectangles
-
+import re # regular expressions
 
 # COMMAND LINE ARGUMENTS
 
@@ -113,11 +113,17 @@ for file in os.listdir(folder_name):
                     if initial_position_temp is None:
                         print("Skipping "+page_name+" from "+subject_id+": does not have initial positions specified.")
                         break
-                    
-                    # get move events, initial and eventual position
-                    initial_position = float(initial_position_temp.text)
-                    move_events = audioelement.findall("./metric/metricresult/[@name='elementTrackerFull']/movement")
-                    final_position = float(audioelement.find("./value").text)
+
+                    # if reference, only display 'listen' events
+                    if audioelement.get('type')=="outside-reference":
+                        initial_position = 1.0
+                        move_events = []
+                        final_position = 1.0
+                    else:
+                        # get move events, initial and eventual position
+                        initial_position = float(initial_position_temp.text)
+                        move_events = audioelement.findall("./metric/metricresult/[@name='elementTrackerFull']/movement")
+                        final_position = float(audioelement.find("./value").text)
                     
                     # get listen events
                     start_times_global = []
@@ -292,7 +298,8 @@ for file in os.listdir(folder_name):
 
                 # Y axis title and tick labels as specified in 'setup'
                 # for corresponding page
-                page_setup = root.find("./waet/page[@id='"+page_name+"']") 
+                page_name_root = re.sub('-repeat-.$', '', page_name)
+                page_setup = root.find("./waet/page[@id='"+page_name_root+"']") 
                     # 'ref' of page is 'id' in page setup
 
                 # Different plots for different axes
