@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import os
 import sys
 import csv
+import re
 
 # COMMAND LINE ARGUMENTS
 
@@ -60,9 +61,12 @@ for file_name in os.listdir(folder_name):
             if storage.get(page_name) == None:
                 storage[page_name] = {'header':[], 'axis':{}} # add to the store
             
+            # strip repetitions
+            page_name_root = re.sub('-repeat-.$', '', page_name)
+
             # Get the axis names
-            pageConfig = root.find('./waet/page/[@id="'+page_name+'"]')
-            for interface in pageConfig.findall('./interface'):    # Get the <interface> noeds
+            pageConfig = root.find('./waet/page/[@id="'+page_name_root+'"]')
+            for interface in pageConfig.findall('./interface'):    # Get the <interface> nodes
                 interfaceName = interface.get("name"); # Get the axis name
                 if interfaceName == None:
                     interfaceName = "default"   # If name not set, make name 'default'
