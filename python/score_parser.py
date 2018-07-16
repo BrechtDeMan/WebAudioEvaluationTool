@@ -66,13 +66,19 @@ for file_name in os.listdir(folder_name):
 
             # Get the axis names
             pageConfig = root.find('./waet/page/[@id="'+page_name_root+'"]')
-            for interface in pageConfig.findall('./interface'):    # Get the <interface> nodes
-                interfaceName = interface.get("name"); # Get the axis name
-                if interfaceName == None:
-                    interfaceName = "default"   # If name not set, make name 'default'
+            if pageConfig is None:
+                interfaceName = "default"
                 if storage[page_name]['axis'].get(interfaceName) == None:
                     storage[page_name]['axis'][interfaceName] = {}  # If not in store for page, add empty dict
-                storage[page_name]['axis'][interfaceName][subject_id] = [] # Add the store for the session
+                storage[page_name]['axis'][interfaceName][subject_id] = []
+            else:
+                for interface in pageConfig.findall('./interface'):    # Get the <interface> nodes
+                    interfaceName = interface.get("name"); # Get the axis name
+                    if interfaceName == None:
+                        interfaceName = "default"   # If name not set, make name 'default'
+                    if storage[page_name]['axis'].get(interfaceName) == None:
+                        storage[page_name]['axis'][interfaceName] = {}  # If not in store for page, add empty dict
+                    storage[page_name]['axis'][interfaceName][subject_id] = [] # Add the store for the session
                     
             # header: fragment IDs in 'alphabetical' order
             # go to fragment column, or create new column if it doesn't exist yet
