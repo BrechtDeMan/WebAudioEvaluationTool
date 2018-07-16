@@ -42,6 +42,7 @@ for filename in os.listdir(folder_name):
         # get the list of pages
         for page in root.findall("./page"):
             pagename = page.get("ref")
+            trackname = page.find('audioelement').get('ref')
             if pagename is None: # ignore 'empty' audio_holders
                 print("WARNING: " + filename + " contains empty audio holder. (commentquestion_parser.py)")
                 break
@@ -63,7 +64,7 @@ for filename in os.listdir(folder_name):
                 except KeyError:
                     commentStore = [];
                     questionStore[cqid] = commentStore
-                commentStore.append({"subject": subject_id, "value": response})
+                commentStore.append({"subject": subject_id, "value": response, "trackName": trackname})
 
 for page in pagestore.keys():
 	print page
@@ -73,6 +74,6 @@ for page in pagestore.keys():
 	for comment in pagestore[page].keys():
 		with open(pagedir+"/"+comment+".csv", "w") as csvfile:
 			filewriter = csv.writer(csvfile, delimiter=',')
-			filewriter.writerow(("save_id", "value"))
+			filewriter.writerow(("save_id", "value", "trackName"))
 			for entry in pagestore[page][comment]:
-				filewriter.writerow((entry["subject"], entry["value"]))
+				filewriter.writerow((entry["subject"], entry["value"], entry["trackName"]))
