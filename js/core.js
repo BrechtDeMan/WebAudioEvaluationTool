@@ -1,6 +1,6 @@
 /**
  * core.js
- * 
+ *
  * Main script to run, calls all other core functions and manages loading/store to backend.
  * Also contains all global variables.
  */
@@ -42,6 +42,17 @@ function qualifyURL(url) {
     var el = document.createElement('div');
     el.innerHTML = '<a href="' + escapeHTML(url) + '">x</a>';
     return el.firstChild.href;
+}
+
+function insertParam(s, key, value)
+{
+    key = encodeURI(key); value = encodeURI(value);
+    if (s.split("?").length == 1) {
+        s = s + ">";
+    } else {
+        s = s + "&";
+    }
+    return s+key+"="+value;
 }
 
 // Firefox does not have an XMLDocument.prototype.getElementsByName
@@ -174,6 +185,9 @@ var onload = function () {
                     break;
                 case "returnURL":
                     gReturnURL = value;
+                    break;
+                case "testKey":
+                    storage.sessionLinked = value;
                     break;
                 case "saveFilenamePrefix":
                     storage.filenamePrefix = value;
@@ -418,7 +432,7 @@ function createProjectSave(destURL) {
         storage.SessionKey.finish().then(function (resolved) {
             var converter = new showdown.Converter();
             if (typeof specification.returnURL == "string" && specification.returnURL.length > 0) {
-                window.location = specification.returnURL;
+                window.location = insertParam(specification.returnURL, "testKey", storage.SessionKey.key);
             } else {
                 popup.popupContent.innerHTML = converter.makeHtml(specification.exitText);
             }
@@ -2501,7 +2515,7 @@ function Interface(specificationObject) {
     this.returnDateNode = function () {
         // Create an XML Node for the Date and Time a test was conducted
         // Structure is
-        // <datetime> 
+        // <datetime>
         //	<date year="##" month="##" day="##">DD/MM/YY</date>
         //	<time hour="##" minute="##" sec="##">HH:MM:SS</time>
         // </datetime>
@@ -3786,6 +3800,7 @@ function Storage() {
     this.document = null;
     this.root = null;
     this.state = 0;
+    var linkedID = undefined;
     var pFilenamePrefix = "save";
 
     this.initialise = function (existingStore) {
@@ -3810,6 +3825,9 @@ function Storage() {
         }
         if (specification.postTest !== undefined) {
             this.globalPostTest = new this.surveyNode(this, this.root, specification.postTest);
+        }
+        if (linkedID) {
+            this.root.setAttribute("linked", linkedID);
         }
     };
 
@@ -3954,6 +3972,7 @@ function Storage() {
                     this.parent.finish();
                     return requestChains.then(postUpdate()).then(function () {
                         console.log("OK");
+                        return true;
                     }, function () {
                         createProjectSave("local");
                     });
@@ -4207,6 +4226,20 @@ function Storage() {
                 }
                 pFilenamePrefix = value;
                 return value;
+            }
+        },
+        "sessionLinked": {
+            'get': function () {
+                return linkedID;
+            },
+            'set': function(s) {
+                if (typeof s == "string") {
+                    linkedID = s;
+                    if (this.root) {
+                        this.root.setAttribute("linked", s);
+                    }
+                }
+                return linkedID;
             }
         }
     });
