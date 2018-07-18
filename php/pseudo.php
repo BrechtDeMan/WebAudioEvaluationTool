@@ -12,9 +12,9 @@ if (isset($_GET["prefix"]) == FALSE) {
 }
 
 if (isset($_GET["dir"]) == FALSE) {
-    $prefix = "";
+    $dir = "";
 } else {
-    $prefix = $_GET["dir"];
+    $dir = $_GET["dir"];
 }
 
 $files = glob('../saves/' . $prefix . '*.xml');
