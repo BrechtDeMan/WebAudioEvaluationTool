@@ -1,5 +1,5 @@
 <?php
-incluce_once("config.php");
+include_once("config.php");
 $saveLocation = getSaveLocation();
 $file = $saveLocation."test-save.xml";
 $state = file_put_contents($file, "<xml></xml>");
