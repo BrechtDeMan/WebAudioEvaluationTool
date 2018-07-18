@@ -12,7 +12,8 @@ include "rel2abs.php";
 
 // XML Saves location - assumes it will be saves/
 $data = array();
-$saves = glob("../saves/*.xml");
+$saveLocation = getSaveLocation();
+$saves = glob($saveLocation."*.xml");
 if (is_array($saves))
 {
     foreach($saves as $filename) {

@@ -39,10 +39,12 @@ if (isset($_GET["update"])) {
     $update = $_GET["update"] == "update";
 }
 
+$saveLocation = getSaveLocation();
+
 if ($update) {
-    $filename = '../saves/update-'.$saveFilenamePrefix.$file_key.".xml";
+    $filename = $saveLocation.'update-'.$saveFilenamePrefix.$file_key.".xml";
 } else {
-    $filename = '../saves/'.$saveFilenamePrefix.$file_key.".xml";
+    $filename = $saveLocation.$saveFilenamePrefix.$file_key.".xml";
 }
 
 if (!file_exists($filename)) {
@@ -144,6 +146,6 @@ $xml = '<response state="OK"><message>OK</message><file bytes="'.$wbytes.'">"'.$
 echo $xml;
 
 if (!$update) {
-    unlink('../saves/update-'.$saveFilenamePrefix.$file_key.".xml");
+    unlink($saveLocation.'update-'.$saveFilenamePrefix.$file_key.".xml");
 }
 ?>

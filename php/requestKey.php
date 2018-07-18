@@ -57,8 +57,8 @@ while ($key == "") {
         $key = $tempKey;
     }
 }
-
-$filename = "../saves/".$saveFilenamePrefix.$key.".xml";
+$saveLocation = getSaveLocation();
+$filename = $saveLocation.$saveFilenamePrefix.$key.".xml";
 $fileHandle = fopen($filename, 'w');
 if ($fileHandle == FALSE) {
     die("<response><state>ERROR</state><key>".$key."</key><message>Could not open file for writing</message></response>");

@@ -33,7 +33,8 @@ foreach ($_GET as $key => $value) {
 }
 
 $files = array();
-$saves = glob("../saves/*.xml");
+$saveLocation = getSaveLocation();
+$saves = glob($saveLocation."*.xml");
 if (is_array($saves))
 {
     foreach($saves as $filename) {

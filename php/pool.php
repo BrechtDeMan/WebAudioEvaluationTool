@@ -37,7 +37,8 @@ if ($master_xml) {
 
 $waet_url = rel2abs("pool.php","http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']);
 
-$saves = glob("../saves/*.xml");
+$saveLocation = getSaveLocation();
+$saves = glob($saveLocation."*.xml");
 if (is_array($saves))
 {
     foreach($saves as $filename) {

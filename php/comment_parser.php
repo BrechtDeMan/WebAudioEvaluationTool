@@ -1,4 +1,5 @@
 <?php
+incluce_once("config.php");
 // Comment Parser for PHP
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -20,7 +21,8 @@ class testPage {
     }
 }
 // XML Saves location - assumes it will be saves/
-$saves = glob("../saves/*.xml");
+$saveLocation = getSaveLocation();
+$saves = glob($saveLocation."*.xml");
 $comment_struct = array();
 if (is_array($saves))
 {

@@ -51,7 +51,8 @@ class nestedObject {
 $root = new nestedObject("root");
 
 // XML Saves location - assumes it will be saves/
-$saves = glob("../saves/*.xml");
+$saveLocation = getSaveLocation();
+$saves = glob($saveLocation."*.xml");
 if (is_array($saves))
 {
     foreach($saves as $filename) {

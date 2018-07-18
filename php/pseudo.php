@@ -16,15 +16,16 @@ if (isset($_GET["dir"]) == FALSE) {
 } else {
     $dir = $_GET["dir"];
 }
-
-$files = glob('../saves/' . $prefix . '*.xml');
+$saveLocation = getSaveLocation();
+$files = glob($saveLocation . $prefix . '*.xml');
 $numsaves = 0;
 if ( $files !== false )
 {
     $numsaves = count( $files );
 }
 
-$files = glob('../tests/' . $dir . '*.xml');
+$testLocation = getTestLocation();
+$files = glob($testLocation . $dir . '*.xml');
 $numtests = 0;
 
 if ( $numtests !== false )
