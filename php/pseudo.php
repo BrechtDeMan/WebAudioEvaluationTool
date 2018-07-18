@@ -6,13 +6,13 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 if (isset($_GET["prefix"]) == FALSE) {
-    $prefix = ""
+    $prefix = "";
 } else {
     $prefix = $_GET["prefix"];
 }
 
 if (isset($_GET["dir"]) == FALSE) {
-    $prefix = ""
+    $prefix = "";
 } else {
     $prefix = $_GET["dir"];
 }
