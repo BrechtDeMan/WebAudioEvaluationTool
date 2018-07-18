@@ -2452,6 +2452,9 @@ function Interface(specificationObject) {
                 function trackCommentFocus() {
                     return document.activeElement.className.indexOf("trackComment") >= 0;
                 }
+                if (testState.currentStatePosition != "test") {
+                    return;
+                }
                 if (trackCommentFocus()) {
                     return;
                 }
@@ -2463,7 +2466,6 @@ function Interface(specificationObject) {
                 } else {
                     keypress.call(this, e.key);
                 }
-                console.log(e);
             }
         };
         document.addEventListener("keydown", keyboardInterfaceController, false);
