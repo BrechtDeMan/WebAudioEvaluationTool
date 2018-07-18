@@ -3836,13 +3836,17 @@ function Storage() {
         if (window.returnURL !== undefined) {
             returnURL = String(window.returnURL);
         }
+        
+        var chainCount = 0;
+        var chainPosition = chainCount;
 
         function postUpdate() {
-            // Return a new promise.
-            var hold = document.createElement("div");
-            var clone = parent.root.cloneNode(true);
-            hold.appendChild(clone);
             return new Promise(function (resolve, reject) {
+                // Return a new promise.
+                chainPosition+=1;
+                var hold = document.createElement("div");
+                var clone = parent.root.cloneNode(true);
+                hold.appendChild(clone);
                 // Do the usual XHR stuff
                 console.log("Requested save...");
                 var req = new XMLHttpRequest();
@@ -3876,7 +3880,12 @@ function Storage() {
                 };
 
                 // Make the request
-                req.send([hold.innerHTML]);
+                if (chainCount > chainPosition) {
+                    // We have items downstream that will upload for us
+                    resolve(true);
+                } else {
+                    req.send([hold.innerHTML]);
+                }
             });
         }
 
@@ -3960,6 +3969,7 @@ function Storage() {
                     if (requestChains === undefined) {
                         throw ("Initiate key exchange first");
                     }
+                    chainCount += 1;
                     this.parent.root.setAttribute("state", "update");
                     requestChains = requestChains.then(postUpdate);
                 }
