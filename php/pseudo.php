@@ -1,4 +1,5 @@
 <?php
+incluce_once("config.php");
 header('Access-Control-Allow-Origin: *');
 header("Content-type: text/xml");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");

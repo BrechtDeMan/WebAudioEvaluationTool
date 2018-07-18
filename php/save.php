@@ -1,5 +1,5 @@
 <?php
-
+incluce_once("config.php");
 function findNodeByAttribute($nodeList, $attributeName, $attributeValue) {
     if (empty($attributeName) || empty($attributeValue)) {
         die("Error: Empty findNodeByAttribute");

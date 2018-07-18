@@ -1,5 +1,5 @@
 <?php
-
+incluce_once("config.php");
 function generateRandomString($length = 32) {
     // from http://stackoverflow.com/questions/4356289/php-random-string-generator
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
