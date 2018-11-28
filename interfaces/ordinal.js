@@ -374,6 +374,7 @@ function interfaceObject(audioObject, label) {
         // Return the current value of the object. If there is no value, return 0
         var pos = this.getElementPosition();
         var rank = pos / (audioEngineContext.audioObjects.length - 1);
+        return rank;
     };
     this.getPresentedId = function () {
         // Return the presented ID of the object. For instance, the APE has sliders starting from 0. Whilst AB has alphabetical scale
