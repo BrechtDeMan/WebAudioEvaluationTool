@@ -10,6 +10,7 @@
 /*globals Specification, calculateLoudness, WAVE, validateXML, showdown, pageXMLSave, loadTest, resizeWindow */
 
 /* create the web audio API context and store in audioContext*/
+var AngularWAET = angular.module('WAET', []);
 var audioContext; // Hold the browser web audio API
 var projectXML; // Hold the parsed setup XML
 var schemaXSD; // Hold the parsed schema XSD
