@@ -25,7 +25,7 @@ elif sys.version_info[0] == 3:
     from http.server import BaseHTTPRequestHandler, HTTPServer
     import urllib as urllib2
 
-# Go to right folder. 
+# Go to right folder.
 scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
 os.chdir(scriptdir) # does this work?
 
@@ -35,7 +35,7 @@ except OSError as e:
     if e.errno != errno.EEXIST:
         raise
 
-PSEUDO_PATH = '../tests/'
+PSEUDO_PATH = '../html/tests/'
 pseudo_files = []
 pseudo_index = 0
 for filename in os.listdir(PSEUDO_PATH):
@@ -60,7 +60,7 @@ def send404(s):
     s.send_response(404)
     s.send_header("Content-type", "text/html")
     s.end_headers()
-	
+
 def processFile(s):
     if sys.version_info[0] == 2:
         s.path = s.path.rsplit('?')
@@ -70,7 +70,7 @@ def processFile(s):
         lenSt = len(st)
         fmt = st[lenSt-1].rsplit('.')
         fmt = fmt[len(fmt)-1]
-        fpath = "../"+urllib2.unquote(s.path)
+        fpath = "../html/"+urllib2.unquote(s.path)
         size = os.path.getsize(fpath)
         fileDump = open(fpath, mode='rb')
         s.send_response(200)
@@ -120,7 +120,7 @@ def processFile(s):
         s.send_header("Content-Length", len(fileBytes))
         s.end_headers()
         s.wfile.write(fileBytes)
-    
+
 def requestKey(s):
     reply = ""
     key = ''
@@ -147,7 +147,7 @@ def requestKey(s):
     file = open("../saves/"+prefix+"-"+key+".xml",'w')
     file.write("<waetresult key=\""+key+"\"/>")
     file.close()
-    
+
 
 def saveFile(self):
     global curFileName
@@ -197,7 +197,7 @@ def saveFile(self):
     if update == False:
         if(os.path.isfile("../saves/update-"+filename)):
             os.remove("../saves/update-"+filename)
-    
+
 def testSave(self):
     self.send_response(200)
     self.send_header("Content-type", "text/xml")
@@ -258,11 +258,11 @@ def poolXML(s):
             rot_pages[value].append(key)
         else:
             rot_pages[value] = [key]
-            
+
     Keys = list(rot_pages)
     print ("Current pool state:")
     print (rot_pages)
-    
+
     return_node = ET.fromstring('<waet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="test-schema.xsd"/>');
     return_node.append(copy.deepcopy(root.find("setup")))
     page_elements = root.findall("page")
@@ -280,7 +280,7 @@ def poolXML(s):
     s.send_header("Content-type", "text/xml")
     s.end_headers()
     s.wfile.write(ET.tostring(return_node))
-        
+
 def http_do_HEAD(s):
     s.send_response(200)
     s.send_header("Content-type", "text/html")

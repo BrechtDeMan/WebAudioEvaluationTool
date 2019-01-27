@@ -1,5 +1,6 @@
 // Script to load the relevant JS files if the system supports it
 /*globals window, document */
+var AngularWAET = angular.module('WAET', []);
 window.onload = function () {
     // First check if the Web Audio API is supported
     if (window.AudioContext === undefined && window.webkitAudioContext === undefined) {
