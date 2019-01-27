@@ -30,13 +30,20 @@
     <div id='topLevelBody'>
         <span>Web Audio Evaluation Toolbox</span>
     </div>
-    <div id="popupHolder" class="popupHolder" style="visibility: hidden">
-        <div id="popupContent">
-            <div id="popupTitleHolder"></div>
-            <div id="popupResponse"></div>
+    <div class="modal" tabindex="-1" role="dialog" id="popupHolder">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="popupTitleHolder" class="modal-title"></h5>
+                </div>
+                <div class="modal-body" id="popupBody">
+                </div>
+                <div class="modal-footer">
+                    <button id="popup-previous" class="btn btn-secondary">Back</button>
+                    <button id="popup-proceed" class="btn btn-primary">Next</button>
+                </div>
+            </div>
         </div>
-        <button id="popup-proceed" class="popupButton">Next</button>
-        <button id="popup-previous" class="popupButton">Back</button>
     </div>
     <div class="testHalt" style="visibility: hidden"></div>
     <div id="footer"><a target="_blank" href="https://github.com/BrechtDeMan/WebAudioEvaluationTool">Web Audio Evaluation Toolbox (v1.2.3)</a></div>

@@ -1048,14 +1048,12 @@ function interfacePopup() {
         var insertPoint = document.getElementById("topLevelBody");
 
         this.popup = document.getElementById('popupHolder');
-        this.popup.style.left = (window.innerWidth / 2) - 250 + 'px';
-        this.popup.style.top = (window.innerHeight / 2) - 125 + 'px';
 
-        this.popupContent = document.getElementById('popupContent');
+        this.popupContent = document.getElementById('popupBody');
 
         this.popupTitle = document.getElementById('popupTitleHolder');
 
-        this.popupResponse = document.getElementById('popupResponse');
+        this.popupResponse = document.getElementById('popupBody');
 
         this.buttonProceed = document.getElementById('popup-proceed');
         this.buttonProceed.onclick = function () {
@@ -1068,25 +1066,18 @@ function interfacePopup() {
         };
 
         this.hidePopup();
-        this.popup.style.visibility = 'hidden';
     };
 
     this.showPopup = function () {
         if (this.popup === null) {
             this.createPopup();
         }
-        this.popup.style.visibility = 'visible';
-        var blank = document.getElementsByClassName('testHalt')[0];
-        blank.style.visibility = 'visible';
-        this.popupResponse.style.left = "0%";
+        $(this.popup).modal('show');
     };
 
     this.hidePopup = function () {
         if (this.popup) {
-            this.popup.style.visibility = 'hidden';
-            var blank = document.getElementsByClassName('testHalt')[0];
-            blank.style.visibility = 'hidden';
-            this.buttonPrevious.style.visibility = 'inherit';
+            $(this.popup).modal('hide');
         }
     };
 
@@ -1107,7 +1098,10 @@ function interfacePopup() {
         while (statementElements.length > 0) {
             this.popupTitle.appendChild(statementElements[0]);
         }
-        if (node.specification.type == 'question') {
+        this.popupContent.style.display = undefined;
+        if (node.specification.type == "statement") {
+            this.popupContent.style.display = 'none';
+        } else if (node.specification.type == 'question') {
             postQuestion.call(this, node);
         } else if (node.specification.type == 'checkbox') {
             postCheckbox.call(this, node);
@@ -1215,14 +1209,6 @@ function interfacePopup() {
     };
 
     this.resize = function (event) {
-        // Called on window resize;
-        if (this.popup !== null) {
-            this.popup.style.left = (window.innerWidth / 2) - 250 + 'px';
-            this.popup.style.top = (window.innerHeight / 2) - 125 + 'px';
-            var blank = document.getElementsByClassName('testHalt')[0];
-            blank.style.width = window.innerWidth;
-            blank.style.height = window.innerHeight;
-        }
     };
     this.hideNextButton = function () {
         this.buttonProceed.style.visibility = "hidden";
@@ -3838,7 +3824,7 @@ function Storage() {
         if (window.returnURL !== undefined) {
             returnURL = String(window.returnURL);
         }
-        
+
         var chainCount = 0;
         var chainPosition = chainCount;
 
