@@ -1202,6 +1202,7 @@ function interfacePopup() {
                 this.store.postResult(node);
             }, this);
             this.store.complete();
+            testState.stateIndex++;
             advanceState();
         }
     };
@@ -1369,7 +1370,6 @@ function stateMachine() {
             storage.update();
         }
         if (this.stateIndex == -2) {
-            this.stateIndex++;
             if (this.preTestSurvey !== undefined) {
                 popup.initState(this.preTestSurvey, storage.globalPreTest);
             } else {
@@ -3838,7 +3838,7 @@ function Storage() {
         if (window.returnURL !== undefined) {
             returnURL = String(window.returnURL);
         }
-        
+
         var chainCount = 0;
         var chainPosition = chainCount;
 
