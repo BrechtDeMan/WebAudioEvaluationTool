@@ -1160,13 +1160,12 @@ function interfacePopup() {
 
     this.proceedClicked = function () {
         // Each time the popup button is clicked!
-        if (testState.stateIndex === -1 && specification.calibration) {
-            advanceState();
-            return;
-        }
         var node = this.popupOptions[this.currentIndex],
             pass = true,
             timeDelta = (new Date() - lastNodeStart) / 1000.0;
+        if (node == undefined) {
+            advanceState();
+        }
         if (timeDelta < node.specification.minWait) {
             interfaceContext.lightbox.post("Error", "Not enough time has elapsed, please wait " + (node.specification.minWait - timeDelta).toFixed(0) + " seconds");
             return;
@@ -1202,7 +1201,6 @@ function interfacePopup() {
                 this.store.postResult(node);
             }, this);
             this.store.complete();
-            testState.stateIndex++;
             advanceState();
         }
     };
@@ -1370,10 +1368,10 @@ function stateMachine() {
             storage.update();
         }
         if (this.stateIndex == -2) {
+            this.stateIndex++;
             if (this.preTestSurvey !== undefined) {
                 popup.initState(this.preTestSurvey, storage.globalPreTest);
             } else {
-                this.stateIndex++;
                 this.advanceState();
             }
         } else if (this.stateIndex == -1) {
