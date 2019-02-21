@@ -1,6 +1,6 @@
 /*
  * Hold any style information for MUSHRA interface. Customise if you like to make the interface your own!
- * 
+ *
  */
 
 body {
@@ -51,19 +51,18 @@ div.track-slider {
     border: solid;
     border-width: 1px;
     border-color: black;
-    padding: 2px;
     margin-left: 94px;
     margin-bottom: 25px;
+    display: grid;
+    grid-template-columns: 113px 1fr 107px;
 }
 div.track-slider-title {
-    float: left;
-    padding-top: 40px;
-    width: 100px;
+    padding-top: 30px;
 }
 button.track-slider-button {
-    float: left;
-    width: 100px;
-    height: 94px;
+    width: 90px;
+    height: 74px;
+    margin: 10px;
 }
 div#outside-reference-holder {
     display: flex;
@@ -78,14 +77,11 @@ button.outside-reference {
 div.track-slider-playing {
     background-color: rgba(255, 201, 201, 0.5);
 }
-input.track-slider-range {
-    float: left;
-    margin: 2px 10px;
-}
 input[type=range] {
     height: 94px;
     padding: 0px;
     color: rgb(255, 144, 144);
+    background-color: rgba(0,0,0,0);
 }
 input[type=range]::-webkit-slider-runnable-track {
     cursor: pointer;

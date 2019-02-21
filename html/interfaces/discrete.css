@@ -1,6 +1,6 @@
 /*
  * Hold any style information for MUSHRA interface. Customise if you like to make the interface your own!
- * 
+ *
  */
 
 body {
@@ -43,7 +43,6 @@ div.discrete-row {
     padding: 10px;
     border: 1px solid black;
     height: 50px;
-    line-height: 50px;
 }
 button.discrete-button {
     width: 100px;
