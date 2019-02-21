@@ -257,16 +257,18 @@ function sliderObject(audioObject, label) {
 
     this.holder = document.createElement('div');
     this.title = document.createElement('div');
+    this.titleH4 = document.createElement('h4');
     this.slider = document.createElement('input');
     this.play = document.createElement('button');
 
     this.holder.className = 'track-slider';
     this.holder.style.width = window.innerWidth - 200 + 'px';
+    this.title.appendChild(this.titleH4);
     this.holder.appendChild(this.title);
     this.holder.appendChild(this.slider);
     this.holder.appendChild(this.play);
     this.holder.setAttribute('trackIndex', audioObject.id);
-    this.title.textContent = label;
+    this.titleH4.textContent = label;
     this.title.className = 'track-slider-title';
 
     this.slider.type = "range";
@@ -274,7 +276,6 @@ function sliderObject(audioObject, label) {
     this.slider.min = "0";
     this.slider.max = "1";
     this.slider.step = "0.01";
-    this.slider.style.width = window.innerWidth - 420 + 'px';
     this.slider.onchange = function () {
         var time = audioEngineContext.timer.getTestTime();
         var id = Number(this.parentNode.getAttribute('trackIndex'));
@@ -299,7 +300,6 @@ function sliderObject(audioObject, label) {
     };
     this.resize = function (event) {
         this.holder.style.width = window.innerWidth - 200 + 'px';
-        this.slider.style.width = window.innerWidth - 420 + 'px';
     };
     this.enable = function () {
         // This is used to tell the interface object that playback of this node is ready
@@ -376,7 +376,6 @@ function resizeWindow(event) {
 
     var numObj = document.getElementsByClassName('track-slider').length;
     var totalHeight = (numObj * 125) - 25;
-    document.getElementById('scale-holder').style.width = window.innerWidth - 220 + 'px';
     // Cheers edge for making me delete a canvas every resize.
     var canvas = document.getElementById('scale-canvas');
     var new_canvas = document.createElement("canvas");
