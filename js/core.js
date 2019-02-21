@@ -1373,6 +1373,7 @@ function stateMachine() {
             if (this.preTestSurvey !== undefined) {
                 popup.initState(this.preTestSurvey, storage.globalPreTest);
             } else {
+                this.stateIndex++;
                 this.advanceState();
             }
         } else if (this.stateIndex == -1) {
