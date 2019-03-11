@@ -74,7 +74,7 @@
             "name": "MUSHRA (ITU-R BS.1534)",
             "interface": "MUSHRA",
             "description": {
-                "en": "Multiple Stimulus with hiddren reference and anchor. At least four fragments must be shown, an outside reference, hidden reference, hidden anchor and the test candidate. ITU-R BS.1534-3"
+                "en": "Multiple Stimulus with hidden reference and anchor. At least four fragments must be shown, an outside reference, hidden reference, hidden anchor and the test candidate. ITU-R BS.1534-3"
             },
             "template": "./tests/templates/itur1534.xml"
         }, {
