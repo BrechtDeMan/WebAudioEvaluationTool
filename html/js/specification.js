@@ -585,8 +585,9 @@ function Specification() {
             }
             this.options.forEach(function (option) {
                 var child = doc.createElement("interfaceoption");
-                child.setAttribute("type", option.type);
-                child.setAttribute("name", option.name);
+                Object.keys(option).forEach(function(key) {
+                    child.setAttribute(key, option[key]);
+                });
                 if (option.type == "check" && option.errorMessage !== undefined) {
                     var errorMessage = doc.createElement("errormessage");
                     errorMessage.textContent = option.errorMessage;

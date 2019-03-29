@@ -450,10 +450,12 @@
                         <div class="attribute" name="scalerange" type="check" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="A page can only be submitted if there are fragments above and below the maximum and minimum ranges.">
                             <span>Enforce a scale usage: </span>
                             <input type="checkbox" ng-click="enableInterfaceOption($event)" />
-                            <span>Minimum:</span>
-                            <input type="number" min="0" max="100" name="min" />
-                            <span>Maximum:</span>
-                            <input type="number" min="0" max="100" name="max" />
+                            <div ng-show="interface.options.find((x)=>{return x.name == 'scalerange';})">
+                                <span>Minimum:</span>
+                                <input type="number" min="0" max="100" name="min" ng-keyup="updateScaleRange();"/>
+                                <span>Maximum:</span>
+                                <input type="number" min="0" max="100" name="max" ng-keyup="updateScaleRange();"/>
+                            </div>
                         </div>
                         <div class="attribute" name="volume" type="show" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Show the master volume control on each page.">
                             <span>Show master volume control: </span>
