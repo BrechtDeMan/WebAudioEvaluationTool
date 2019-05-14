@@ -33,6 +33,7 @@ elif not os.access(os.path.dirname(folder_name), os.W_OK):
 
 surveys = {}
 pages = {}
+tests = list()
 
 # create folder 'timings' if not yet created
 if not os.path.exists(folder_name + '/timings'):
@@ -44,33 +45,71 @@ for file_name in os.listdir(folder_name):
         root = tree.getroot()
 
         subject_id = root.get('key');
+        print(subject_id)
 
         # get all the survey elements in the root
         for survey in root.findall('survey'):
-            if survey.get("state") == "complete":
+            if survey.get("state") != "complete":
                 break
             for surveyresult in survey.findall('surveyresult'):
                 survey_name = surveyresult.get("ref")
-                print(survey_name)
                 if survey_name is None:
                     break
                 if surveys.get(survey_name) is None:
                     surveys[survey_name] = list()
-                print(surveyresult.get("duration"))
-                surveys[survey_name].append(surveyresult.get("duration"))
+                if surveyresult.get("duration") is None:
+                    break
+                surveys[survey_name].append(float(surveyresult.get("duration")))
 
         # get all the pages
+        sigma = 0.0
         for page in root.findall('page'):
             page_name = page.get('ref')
             if page_name is None:
                 break
             if pages.get(page_name) is None:
                 pages[page_name] = list()
-            if page.get("state") is not "completed":
+            if page.get("state") != "complete":
                 break
             metrics = page.find('metric')
             for metric in metrics.findall('metricresult'):
-                if metric.get("name") is "testTime":
-                    pages[page_name].append(float(metric.text))
-print(surveys)
-print(pages)
+                if metric.get("id") == "testTime":
+                    t = float(metric.text)
+                    if t is None:
+                        t = 0.0
+                    sigma = sigma + t
+                    pages[page_name].append(t)
+        tests.append(sigma)
+#print(surveys)
+#print(pages)
+#print(tests)
+
+if not os.path.exists(folder_name + '/timings/surveys'):
+    os.makedirs(folder_name + '/timings/surveys')
+
+if not os.path.exists(folder_name + '/timings/pages'):
+    os.makedirs(folder_name + '/timings/pages')
+
+for survey in surveys:
+    fname = folder_name + '/timings/surveys/' + survey + ".csv"
+    writefile = open(fname, 'w')
+    filewriter = csv.writer(writefile, delimiter=',')
+    for entry in surveys.get(survey):
+        filewriter.writerow([entry])
+    writefile.close()
+
+for page in pages:
+    print(page)
+    fname = folder_name + '/timings/pages/' + page + '.csv'
+    writefile = open(fname, 'w')
+    filewriter = csv.writer(writefile, delimiter=',')
+    for entry in pages.get(page):
+        filewriter.writerow([entry])
+    writefile.close()
+
+fname = folder_name + '/timings/totals.csv'
+writefile = open(fname, 'w')
+filewriter = csv.writer(writefile, delimiter=',')
+for entry in tests:
+    filewriter.writerow([entry])
+writefile.close()
