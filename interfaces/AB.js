@@ -327,6 +327,10 @@ function comparator(audioHolderObject) {
         this.exportXMLDOM = function (audioObject) {
             var node = storage.document.createElement('value');
             node.textContent = this.value;
+            var iname = testState.getCurrentTestPage().interfaces[0].name;
+            if (typeof iname == "string") {
+                node.setAttribute("interface-name", iname);
+            }
             return node;
         };
         this.getValue = function () {
