@@ -83,6 +83,7 @@ def processFile(s):
             s.send_header("Content-type", 'application/javascript')
         else:
             s.send_header("Content-type", 'application/octet-stream')
+        s.send_header("Cache-Control", "no-cache")
         fileRead = fileDump.read()
         s.send_header("Content-Length", len(fileRead))
         s.end_headers()
@@ -117,6 +118,7 @@ def processFile(s):
             fileDump = open(fpath, 'rb')
             fileBytes = fileDump.read()
             fileDump.close()
+        s.send_header("Cache-Control", "no-cache")
         s.send_header("Content-Length", len(fileBytes))
         s.end_headers()
         s.wfile.write(fileBytes)
@@ -137,7 +139,8 @@ def requestKey(s):
     if prefix == None:
         prefix = "save"
     s.send_response(200)
-    s.send_header("Content-type", "application/xml");
+    s.send_header("Content-Type", "application/xml")
+    s.send_header("Cache-Control", "no-cache")
     s.end_headers()
     reply = "<response><state>OK</state><key>"+key+"</key></response>"
     if sys.version_info[0] == 2:
@@ -288,15 +291,16 @@ def http_do_HEAD(s):
 
 def http_do_GET(request):
     global pseudo_index
+    print(request.path)
     if(request.client_address[0] == "127.0.0.1"):
         if (request.path == "/favicon.ico"):
             send404(request)
         elif (request.path.split('?',1)[0] == "/php/requestKey.php"):
-            requestKey(request);
+            requestKey(request)
         elif (request.path.split('?',1)[0] == "/php/pool.php"):
-            poolXML(request);
+            poolXML(request)
         elif (request.path.split('?',1)[0] == "/php/test_write.php"):
-            testSave(request);
+            testSave(request)
         else:
             request.path = request.path.split('?',1)[0]
             if (request.path == '/'):
@@ -314,6 +318,8 @@ def http_do_POST(request):
     if(request.client_address[0] == "127.0.0.1"):
         if (request.path.rsplit('?',1)[0] == "/save" or request.path.rsplit('?',1)[0] == "/php/save.php"):
             saveFile(request)
+        elif (request.path.split('?',1)[0] == "/php/requestKey.php"):
+            requestKey(request)
         else:
             send404(request)
 

@@ -3893,7 +3893,7 @@ function Storage() {
         function keyPromise() {
             return new Promise(function (resolve, reject) {
                 var req = new XMLHttpRequest();
-                req.open("GET", returnURL + "php/requestKey.php?saveFilenamePrefix=" + parent.filenamePrefix, true);
+                req.open("POST", returnURL + "php/requestKey.php?saveFilenamePrefix=" + parent.filenamePrefix, true);
                 req.onload = function () {
                     // This is called even on 404 etc
                     // so check the status
