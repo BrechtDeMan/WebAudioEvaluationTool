@@ -1309,9 +1309,9 @@ function stateMachine() {
             }
             pagePool.push(page);
         });
-        if (specification.numPages > 0) {
+        if (specification.poolSize > 0) {
             specification.randomiseOrder = true;
-            pagePool = pickSubPool(pagePool, specification.numPages);
+            pagePool = pickSubPool(pagePool, specification.poolSize);
         }
 
         // Now get the order of pages
