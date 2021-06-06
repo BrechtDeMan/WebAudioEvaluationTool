@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 import xml.etree.ElementTree as ET
 import os
 import sys
@@ -70,8 +70,8 @@ def decodeSurveyStatement(session_id, survey_entry, store):
     return store
 
 def decodeSurveyQuestion(session_id, survey_entry, store):
-    if survey_entry.find("./response") is not None:
-        resp = (session_id, survey_entry.get("duration"), survey_entry.find("./response").text)
+    if survey_entry.find("./response") is not None and survey_entry.find("./response").text is not None:
+        resp = (session_id, survey_entry.get("duration"), survey_entry.find("./response").text.encode('utf-8'))
     else:
         resp = (session_id, survey_entry.get("duration"), None)
     store["responses"].append(resp)
