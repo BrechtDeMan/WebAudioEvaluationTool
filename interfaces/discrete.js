@@ -205,12 +205,18 @@ function loadTest(page) {
             audioObject.bindInterface(orNode);
         } else {
             // Create a slider per track
-            var label = interfaceContext.getLabel(labelType, index, page.labelStart);
+            console.log('in discrete')
+            if (this.label == ""){
+                var label = interfaceContext.getLabel(labelType, index, page.labelStart);
+                index += 1;
+            }
+            else {
+                var label = this.label
+            }
             var sliderObj = new discreteObject(audioObject, label);
             sliderGrid.appendChild(sliderObj.DOMRoot);
             audioObject.bindInterface(sliderObj);
             interfaceContext.commentBoxes.createCommentBox(audioObject);
-            index += 1;
         }
 
     });
